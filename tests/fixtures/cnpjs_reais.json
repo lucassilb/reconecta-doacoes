@@ -1,0 +1,306 @@
+{
+  "fonte": "BrasilAPI GET /api/cnpj/v1/{cnpj} — consultado em 2026-10-02 (casos reais da Receita Federal)",
+  "observacao": "cnae_fiscal e cnaes_secundarios conforme resposta da BrasilAPI; codigos normalizados para 7 digitos. esperado.alimentar = True se classificar_atividades deve retornar ao menos uma atividade; esperado.cnaes_alimentares = conjunto exato de codigos que devem casar.",
+  "casos": [
+    {
+      "nome": "JBS (industria de alimentos)",
+      "cnpj": "02916265000160",
+      "cnpj_formatado": "02.916.265/0001-60",
+      "razao_social": "JBS S/A",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "1011201", "descricao": "Frigorífico - abate de bovinos"},
+      "cnaes_secundarios": [
+        {"codigo": "1013901", "descricao": "Fabricação de produtos de carne"},
+        {"codigo": "1013902", "descricao": "Preparação de subprodutos do abate"},
+        {"codigo": "1510600", "descricao": "Curtimento e outras preparações de couro"},
+        {"codigo": "1932200", "descricao": "Fabricação de biocombustíveis, exceto álcool"},
+        {"codigo": "2013401", "descricao": "Fabricação de adubos e fertilizantes organo-minerais"},
+        {"codigo": "2013402", "descricao": "Fabricação de adubos e fertilizantes, exceto organo-minerais"},
+        {"codigo": "2029100", "descricao": "Fabricação de produtos químicos orgânicos não especificados anteriormente"},
+        {"codigo": "2061400", "descricao": "Fabricação de sabões e detergentes sintéticos"},
+        {"codigo": "2062200", "descricao": "Fabricação de produtos de limpeza e polimento"},
+        {"codigo": "2063100", "descricao": "Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal"},
+        {"codigo": "2099199", "descricao": "Fabricação de outros produtos químicos não especificados anteriormente"},
+        {"codigo": "2222600", "descricao": "Fabricação de embalagens de material plástico"},
+        {"codigo": "2591800", "descricao": "Fabricação de embalagens metálicas"},
+        {"codigo": "3511501", "descricao": "Geração de energia elétrica"},
+        {"codigo": "3513100", "descricao": "Comércio atacadista de energia elétrica"},
+        {"codigo": "4622200", "descricao": "Comércio atacadista de soja"},
+        {"codigo": "4623102", "descricao": "Comércio atacadista de couros, lãs, peles e outros subprodutos não-comestíveis de origem animal"},
+        {"codigo": "4623199", "descricao": "Comércio atacadista de matérias-primas agrícolas não especificadas anteriormente"},
+        {"codigo": "4634601", "descricao": "Comércio atacadista de carnes bovinas e suínas e derivados"},
+        {"codigo": "4646001", "descricao": "Comércio atacadista de cosméticos e produtos de perfumaria"},
+        {"codigo": "4649408", "descricao": "Comércio atacadista de produtos de higiene, limpeza e conservação domiciliar"},
+        {"codigo": "4772500", "descricao": "Comércio varejista de cosméticos, produtos de perfumaria e de higiene pessoal"},
+        {"codigo": "4930201", "descricao": "Transporte rodoviário de carga, exceto produtos perigosos e mudanças, municipal"},
+        {"codigo": "4930202", "descricao": "Transporte rodoviário de carga, exceto produtos perigosos e mudanças, intermunicipal, interestadual e internacional"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["1011201", "1013901", "1013902", "4634601"]
+      },
+      "porque": "CNAE principal é frigorífico (indústria de alimentos); atacado de carnes (4634-6/01) confirma. Couro, adubos e commodities (462*) ficam de fora."
+    },
+    {
+      "nome": "Arcos Dourados / McDonald's (restaurante)",
+      "cnpj": "42591651000143",
+      "cnpj_formatado": "42.591.651/0001-43",
+      "razao_social": "ARCOS DOURADOS COMERCIO DE ALIMENTOS SA",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "5611203", "descricao": "Lanchonetes, casas de chá, de sucos e similares"},
+      "cnaes_secundarios": [
+        {"codigo": "4763601", "descricao": "Comércio varejista de brinquedos e artigos recreativos"},
+        {"codigo": "5611201", "descricao": "Restaurantes e similares"},
+        {"codigo": "7740300", "descricao": "Gestão de ativos intangíveis não-financeiros"},
+        {"codigo": "8211300", "descricao": "Serviços combinados de escritório e apoio administrativo"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["5611203", "5611201"]
+      },
+      "porque": "CNAE principal é serviço de alimentação (divisão 56)."
+    },
+    {
+      "nome": "Pão de Açúcar (alimento só nos CNAEs secundários)",
+      "cnpj": "47508411000156",
+      "cnpj_formatado": "47.508.411/0001-56",
+      "razao_social": "COMPANHIA BRASILEIRA DE DISTRIBUICAO",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "4789099", "descricao": "Comércio varejista de outros produtos não especificados anteriormente"},
+      "cnaes_secundarios": [
+        {"codigo": "4637199", "descricao": "Comércio atacadista especializado em outros produtos alimentícios não especificados anteriormente"},
+        {"codigo": "4639701", "descricao": "Comércio atacadista de produtos alimentícios em geral"},
+        {"codigo": "4711301", "descricao": "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - hipermercados"},
+        {"codigo": "4711302", "descricao": "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - supermercados"},
+        {"codigo": "4712100", "descricao": "Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - minimercados, mercearias e armazéns"},
+        {"codigo": "4721102", "descricao": "Padaria e confeitaria com predominância de revenda"},
+        {"codigo": "4721103", "descricao": "Comércio varejista de laticínios e frios"},
+        {"codigo": "4721104", "descricao": "Comércio varejista de doces, balas, bombons e semelhantes"},
+        {"codigo": "4722901", "descricao": "Comércio varejista de carnes - açougues"},
+        {"codigo": "4723700", "descricao": "Comércio varejista de bebidas"},
+        {"codigo": "4724500", "descricao": "Comércio varejista de hortifrutigranjeiros"},
+        {"codigo": "4729602", "descricao": "Comércio varejista de mercadorias em lojas de conveniência"},
+        {"codigo": "4759899", "descricao": "Comércio varejista de outros artigos de uso pessoal e doméstico não especificados anteriormente"},
+        {"codigo": "4771701", "descricao": "Comércio varejista de produtos farmacêuticos, sem manipulação de fórmulas"},
+        {"codigo": "4789002", "descricao": "Comércio varejista de plantas e flores naturais"},
+        {"codigo": "5611201", "descricao": "Restaurantes e similares"},
+        {"codigo": "5611203", "descricao": "Lanchonetes, casas de chá, de sucos e similares"},
+        {"codigo": "6311900", "descricao": "Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet"},
+        {"codigo": "6319400", "descricao": "Portais, provedores de conteúdo e outros serviços de informação na internet"},
+        {"codigo": "6499999", "descricao": "Outras atividades de serviços financeiros não especificadas anteriormente"},
+        {"codigo": "6619302", "descricao": "Correspondentes de instituições financeiras"},
+        {"codigo": "6822600", "descricao": "Gestão e administração da propriedade imobiliária"},
+        {"codigo": "7312200", "descricao": "Agenciamento de espaços para publicidade, exceto em veículos de comunicação"},
+        {"codigo": "7490104", "descricao": "Atividades de intermediação e agenciamento de serviços e negócios em geral, exceto imobiliários"},
+        {"codigo": "8211300", "descricao": "Serviços combinados de escritório e apoio administrativo"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["4637199", "4639701", "4711301", "4711302", "4712100", "4721102", "4721103", "4721104", "4722901", "4723700", "4724500", "4729602", "5611201", "5611203"]
+      },
+      "porque": "Caso que derruba regra ingênua: o CNAE principal (4789-0/99) não é alimentar; a relação com alimentação aparece só nos secundários (hiper/supermercados, padaria, açougue, hortifruti, restaurantes)."
+    },
+    {
+      "nome": "Google Brasil (tecnologia)",
+      "cnpj": "06990590000123",
+      "cnpj_formatado": "06.990.590/0001-23",
+      "razao_social": "GOOGLE BRASIL INTERNET LTDA.",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "6319400", "descricao": "Portais, provedores de conteúdo e outros serviços de informação na internet"},
+      "cnaes_secundarios": [
+        {"codigo": "4751201", "descricao": "Comércio varejista especializado de equipamentos e suprimentos de informática"},
+        {"codigo": "6201501", "descricao": "Desenvolvimento de programas de computador sob encomenda"},
+        {"codigo": "6202300", "descricao": "Desenvolvimento e licenciamento de programas de computador customizáveis"},
+        {"codigo": "6311900", "descricao": "Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet"},
+        {"codigo": "6462000", "descricao": "Holdings de instituições não-financeiras"},
+        {"codigo": "7319004", "descricao": "Consultoria em publicidade"},
+        {"codigo": "8299799", "descricao": "Outras atividades de serviços prestados principalmente às empresas não especificadas anteriormente"}
+      ],
+      "esperado": {
+        "alimentar": false,
+        "cnaes_alimentares": []
+      },
+      "porque": "Ativa mas 100% tecnologia/serviços — nenhum CNAE alimentar. Caso de recusa pedido pelo Lucas."
+    },
+    {
+      "nome": "Sadia S.A. (baixada com CNAE alimentar)",
+      "cnpj": "20730099000194",
+      "cnpj_formatado": "20.730.099/0001-94",
+      "razao_social": "SADIA S.A.",
+      "situacao": "BAIXADA",
+      "cnae_principal": {"codigo": "1012103", "descricao": "Frigorífico - abate de suínos"},
+      "cnaes_secundarios": [
+        {"codigo": "1012101", "descricao": "Abate de aves"},
+        {"codigo": "1013901", "descricao": "Fabricação de produtos de carne"},
+        {"codigo": "1013902", "descricao": "Preparação de subprodutos do abate"},
+        {"codigo": "1066000", "descricao": "Fabricação de alimentos para animais"},
+        {"codigo": "0155502", "descricao": "Produção de pintos de um dia"},
+        {"codigo": "0155505", "descricao": "Produção de ovos"},
+        {"codigo": "0210107", "descricao": "Extração de madeira em florestas plantadas"},
+        {"codigo": "4639701", "descricao": "Comércio atacadista de produtos alimentícios em geral"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["1012103", "1012101", "1013901", "1013902", "1066000", "0155502", "0155505", "4639701"]
+      },
+      "porque": "CNAEs alimentares casam, mas a situação é BAIXADA — prova que a exigência ATIVO é um gate separado do critério CNAE. Códigos como 155502 (=0155-5/02) chegam sem zero à esquerda na BrasilAPI."
+    },
+    {
+      "nome": "Vinícola Salton (só bebida alcoólica)",
+      "cnpj": "87547428000137",
+      "cnpj_formatado": "87.547.428/0001-37",
+      "razao_social": "VINICOLA SALTON S.A.",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "1112700", "descricao": "Fabricação de vinho"},
+      "cnaes_secundarios": [
+        {"codigo": "4789002", "descricao": "Comércio varejista de plantas e flores naturais"},
+        {"codigo": "7912100", "descricao": "Operadores turísticos"}
+      ],
+      "esperado": {
+        "alimentar": false,
+        "cnaes_alimentares": []
+      },
+      "porque": "Única atividade de bebida é alcoólica (1112-7); secundários são flores e turismo. Sem vínculo alimentar declarado, é recusada."
+    },
+    {
+      "nome": "Vinícola Aurora (vinho + suco de frutas)",
+      "cnpj": "87547188000170",
+      "cnpj_formatado": "87.547.188/0001-70",
+      "razao_social": "COOPERATIVA VINICOLA AURORA LTDA",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "1112700", "descricao": "Fabricação de vinho"},
+      "cnaes_secundarios": [
+        {"codigo": "0161099", "descricao": "Atividades de apoio à agricultura não especificadas anteriormente"},
+        {"codigo": "1033302", "descricao": "Fabricação de sucos de frutas, hortaliças e legumes, exceto concentrados"},
+        {"codigo": "1111902", "descricao": "Fabricação de outras aguardentes e bebidas destiladas"},
+        {"codigo": "4723700", "descricao": "Comércio varejista de bebidas"},
+        {"codigo": "4789099", "descricao": "Comércio varejista de outros produtos não especificados anteriormente"},
+        {"codigo": "4930202", "descricao": "Transporte rodoviário de carga, exceto produtos perigosos e mudanças, intermunicipal, interestadual e internacional"},
+        {"codigo": "4930203", "descricao": "Transporte rodoviário de produtos perigosos"},
+        {"codigo": "6810202", "descricao": "Aluguel de imóveis próprios"},
+        {"codigo": "7912100", "descricao": "Operadores turísticos"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["1033302", "4723700"]
+      },
+      "porque": "Principal é vinho (excluído), mas o secundário 1033-3/02 (sucos de frutas) é alimentar — contrasta com a Salton e mostra que o secundário decide."
+    },
+    {
+      "nome": "Ambev (bebidas: alcoólicas + não alcoólicas)",
+      "cnpj": "07526557000100",
+      "cnpj_formatado": "07.526.557/0001-00",
+      "razao_social": "AMBEV S.A.",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "1113502", "descricao": "Fabricação de cervejas e chopes"},
+      "cnaes_secundarios": [
+        {"codigo": "0111399", "descricao": "Cultivo de outros cereais não especificados anteriormente"},
+        {"codigo": "0141501", "descricao": "Produção de sementes certificadas, exceto de forrageiras para pasto"},
+        {"codigo": "0141502", "descricao": "Produção de sementes certificadas de forrageiras para formação de pasto"},
+        {"codigo": "1064300", "descricao": "Fabricação de farinha de milho e derivados, exceto óleos de milho"},
+        {"codigo": "1099604", "descricao": "Fabricação de gelo comum"},
+        {"codigo": "1099699", "descricao": "Fabricação de outros produtos alimentícios não especificados anteriormente"},
+        {"codigo": "1122401", "descricao": "Fabricação de refrigerantes"},
+        {"codigo": "1731100", "descricao": "Fabricação de embalagens de papel"},
+        {"codigo": "1813001", "descricao": "Impressão de material para uso publicitário"},
+        {"codigo": "1813099", "descricao": "Impressão de material para outros usos"},
+        {"codigo": "2014200", "descricao": "Fabricação de gases industriais"},
+        {"codigo": "2222600", "descricao": "Fabricação de embalagens de material plástico"},
+        {"codigo": "2312500", "descricao": "Fabricação de embalagens de vidro"},
+        {"codigo": "2591800", "descricao": "Fabricação de embalagens metálicas"},
+        {"codigo": "4623199", "descricao": "Comércio atacadista de matérias-primas agrícolas não especificadas anteriormente"},
+        {"codigo": "4635402", "descricao": "Comércio atacadista de cerveja, chope e refrigerante"},
+        {"codigo": "4637199", "descricao": "Comércio atacadista especializado em outros produtos alimentícios não especificados anteriormente"},
+        {"codigo": "4646001", "descricao": "Comércio atacadista de cosméticos e produtos de perfumaria"},
+        {"codigo": "4646002", "descricao": "Comércio atacadista de produtos de higiene pessoal"},
+        {"codigo": "4649408", "descricao": "Comércio atacadista de produtos de higiene, limpeza e conservação domiciliar"},
+        {"codigo": "4686902", "descricao": "Comércio atacadista de embalagens"},
+        {"codigo": "4692300", "descricao": "Comércio atacadista de mercadorias em geral, com predominância de insumos agropecuários"},
+        {"codigo": "6203100", "descricao": "Desenvolvimento e licenciamento de programas de computador não-customizáveis"},
+        {"codigo": "6319400", "descricao": "Portais, provedores de conteúdo e outros serviços de informação na internet"},
+        {"codigo": "7020400", "descricao": "Atividades de consultoria em gestão empresarial, exceto consultoria técnica específica"},
+        {"codigo": "7311400", "descricao": "Agências de publicidade"},
+        {"codigo": "7312200", "descricao": "Agenciamento de espaços para publicidade, exceto em veículos de comunicação"},
+        {"codigo": "7490104", "descricao": "Atividades de intermediação e agenciamento de serviços e negócios em geral, exceto imobiliários"},
+        {"codigo": "7740300", "descricao": "Gestão de ativos intangíveis não-financeiros"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["0111399", "1064300", "1099604", "1099699", "1122401", "4635402", "4637199"]
+      },
+      "porque": "Principal é cerveja (excluído), mas produz refrigerantes, farinha de milho e atacadeia alimentos — a empresa não é 'só álcool'. Sementes (014*) e matérias-primas (462*) ficam fora."
+    },
+    {
+      "nome": "Engarrafamento Pitú (cachaça + bebidas não alcoólicas)",
+      "cnpj": "11856283000194",
+      "cnpj_formatado": "11.856.283/0001-94",
+      "razao_social": "ENGARRAFAMENTO PITU LTDA",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "1111901", "descricao": "Fabricação de aguardente de cana-de-açúcar"},
+      "cnaes_secundarios": [
+        {"codigo": "1111902", "descricao": "Fabricação de outras aguardentes e bebidas destiladas"},
+        {"codigo": "1112700", "descricao": "Fabricação de vinho"},
+        {"codigo": "1122499", "descricao": "Fabricação de outras bebidas não-alcoólicas não especificadas anteriormente"},
+        {"codigo": "4635403", "descricao": "Comércio atacadista de bebidas com atividade de fracionamento e acondicionamento associada"},
+        {"codigo": "4635499", "descricao": "Comércio atacadista de bebidas não especificadas anteriormente"},
+        {"codigo": "4723700", "descricao": "Comércio varejista de bebidas"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["1122499", "4635403", "4635499", "4723700"]
+      },
+      "porque": "Aguardente (1111-9) e vinho (1112-7) ficam fora; o CNAE 1122-4/99 de bebidas não alcoólicas e o comércio de bebidas entram."
+    },
+    {
+      "nome": "Diageo Brasil (atacado de destilados — caso-limite)",
+      "cnpj": "62166848000142",
+      "cnpj_formatado": "62.166.848/0001-42",
+      "razao_social": "DIAGEO BRASIL LTDA.",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "4635499", "descricao": "Comércio atacadista de bebidas não especificadas anteriormente"},
+      "cnaes_secundarios": [
+        {"codigo": "7319004", "descricao": "Consultoria em publicidade"},
+        {"codigo": "8211300", "descricao": "Serviços combinados de escritório e apoio administrativo"},
+        {"codigo": "8299799", "descricao": "Outras atividades de serviços prestados principalmente às empresas não especificadas anteriormente"}
+      ],
+      "esperado": {
+        "alimentar": true,
+        "cnaes_alimentares": ["4635499"]
+      },
+      "porque": "Caso-limite conhecido: 4635-4 mistura bebidas alcoólicas e não alcoólicas na mesma classe e não dá para separar por código — distribuidora só de destilados passa. Limitação documentada em docs/cnae-alimentos.md."
+    },
+    {
+      "nome": "ONG Banco de Alimentos (ativa, CNAE associativo genérico)",
+      "cnpj": "02736449000148",
+      "cnpj_formatado": "02.736.449/0001-48",
+      "razao_social": "BANCO DE ALIMENTOS - ASSOCIACAO CIVIL",
+      "situacao": "ATIVA",
+      "cnae_principal": {"codigo": "9430800", "descricao": "Atividades de associações de defesa de direitos sociais"},
+      "cnaes_secundarios": [
+        {"codigo": "9499500", "descricao": "Atividades associativas não especificadas anteriormente"}
+      ],
+      "esperado": {
+        "alimentar": false,
+        "cnaes_alimentares": []
+      },
+      "porque": "Banco de alimentos de verdade, mas registrado como associação genérica (9430-8/00 e 9499-5/00). Aceitar 94xx deixaria uma ONG de tecnologia passar — fica fora e o limite é documentado."
+    },
+    {
+      "nome": "Banco de Alimentos (baixada, CNAE associativo genérico)",
+      "cnpj": "00390654000179",
+      "cnpj_formatado": "00.390.654/0001-79",
+      "razao_social": "BANCO DE ALIMENTOS",
+      "situacao": "BAIXADA",
+      "cnae_principal": {"codigo": "9430800", "descricao": "Atividades de associações de defesa de direitos sociais"},
+      "cnaes_secundarios": [
+        {"codigo": "9493600", "descricao": "Atividades de organizações associativas ligadas à cultura e à arte"},
+        {"codigo": "9499500", "descricao": "Atividades associativas não especificadas anteriormente"}
+      ],
+      "esperado": {
+        "alimentar": false,
+        "cnaes_alimentares": []
+      },
+      "porque": "Duplamente inapta: baixada e sem CNAE alimentar."
+    }
+  ]
+}
