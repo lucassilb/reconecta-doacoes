@@ -208,6 +208,18 @@ Por padrão, a aplicação estará disponível em:
 http://localhost:5000
 ```
 
+## Cadastro de doadores
+
+Sem `DATABASE_URL`, a aplicação usa SQLite em `instance/reconecta.db` e cria as tabelas ausentes ao iniciar. Para PostgreSQL, configure `DATABASE_URL` como no `.env.example`. A página inicial (`/`) serve `static/cadastro.html`; a documentação continua em `/swagger`.
+
+| Método | Endpoint | Resultado |
+|---|---|---|
+| GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ nas fontes públicas, situação cadastral e atividades alimentares; informa `apto` e `motivos`. |
+| POST | `/reconecta/cadastro/empresa` | Cadastra estabelecimento doador após repetir a verificação do CNPJ. Corpo: `cnpj`, `email`, `telefone`. |
+| POST | `/reconecta/cadastro/doador` | Cadastra pessoa física com validação local do CPF. Corpo: `nome`, `cpf`, `email`, `telefone`. |
+
+CNPJ e CPF aceitam dígitos ou máscara completa. O CPF volta mascarado na resposta. A consulta de CNPJ usa BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas, e guarda resultados por dez minutos em memória. O cadastro exige e-mail válido e telefone com DDD (10 ou 11 dígitos); um e-mail já usado por empresa ou doador é recusado. Não há senha ou login nesta etapa.
+
 ## Principais endpoints previstos
 
 Os caminhos abaixo representam os recursos definidos para o CP1 e devem ser atualizados para coincidir exatamente com a implementação final.
