@@ -144,6 +144,7 @@ button, input { font: inherit; color: inherit; }
 @media (min-width: 600px) { .painel__corpo { padding: 48px 32px 56px; } }
 @media (min-width: 960px) { .painel__corpo { padding: 9vh 48px 64px; } }
 
+#etapa-cadastro > .cabecalho { display: block; padding: 0; min-height: 0; } /* não herda o cabeçalho global da base.css */
 .cabecalho { margin-bottom: 20px; }
 .cabecalho h2 { font-size: clamp(1.6rem, 4.5vw, 2.15rem); }
 .cabecalho__sub { color: var(--tinta-suave); margin-top: 6px; }
