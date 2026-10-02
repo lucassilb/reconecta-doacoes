@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Padaria">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#F5E6CC"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#E3C38E" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <ellipse cx="60" cy="64" rx="36" ry="22" fill="#C98B44"/>
+    <ellipse cx="60" cy="60" rx="34" ry="19" fill="#E1A85E"/>
+    <path d="M40 54c4 6 8 10 14 12M56 50c4 6 8 10 14 12M72 48c3 5 6 8 10 10" stroke="#F6D7A6" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+</svg>

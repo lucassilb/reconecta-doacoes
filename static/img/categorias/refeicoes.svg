@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Refeições prontas">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#F6E4D2"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#E6C29C" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <rect x="26" y="40" width="68" height="46" rx="10" fill="#FFFFFF"/>
+    <rect x="30" y="44" width="60" height="38" rx="7" fill="#F4EDE0"/>
+    <path d="M60 44v38" stroke="#E2D6C0" stroke-width="2"/>
+    <g fill="#FFFDF6"><circle cx="40" cy="56" r="5"/><circle cx="48" cy="54" r="5"/><circle cx="44" cy="64" r="5"/><circle cx="52" cy="62" r="5"/><circle cx="40" cy="72" r="5"/><circle cx="50" cy="72" r="5"/></g>
+    <rect x="64" y="50" width="22" height="12" rx="6" fill="#D98A3C"/>
+    <circle cx="70" cy="72" r="4" fill="#6FA544"/><circle cx="80" cy="72" r="4" fill="#EE7B2B"/><circle cx="75" cy="76" r="3.4" fill="#86BD52"/></g>
+</svg>

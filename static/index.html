@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReConecta · Alimento bom não é desperdício</title>
+  <meta name="description" content="O ReConecta liga estabelecimentos com alimento excedente a instituições que alimentam quem precisa. Veja as doações disponíveis e cadastre sua empresa.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/home.css">
+  <link rel="preload" as="image" href="/static/img/hero-cesta.svg" type="image/svg+xml">
+  <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/home.js" defer></script>
+</head>
+<body class="home">
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero container" aria-labelledby="hero-titulo">
+      <p class="lateral" aria-hidden="true">Alimento bom não é desperdício</p>
+
+      <div class="hero__texto">
+        <p class="sobretitulo sobretitulo--acento">Redistribuição de excedentes alimentares</p>
+        <h1 id="hero-titulo">Excedente de hoje,<br><em>refeição</em> de amanhã</h1>
+        <p class="lead">Padarias, mercados e restaurantes publicam o alimento bom que sobrou. Instituições sociais reservam e retiram. O que iria para o lixo vira refeição no mesmo dia.</p>
+
+        <ul class="metricas hero__metricas" id="resumo" aria-live="polite" aria-busy="true" aria-label="A plataforma agora">
+          <li class="metrica"><span class="metrica__valor" data-resumo="kg">—</span><span class="metrica__rotulo">kg disponíveis</span></li>
+          <li class="metrica"><span class="metrica__valor" data-resumo="doacoes">—</span><span class="metrica__rotulo">doações ativas</span></li>
+          <li class="metrica"><span class="metrica__valor" data-resumo="empresas">—</span><span class="metrica__rotulo">empresas parceiras</span></li>
+        </ul>
+
+        <div class="hero__acoes">
+          <a class="btn btn--primario hero__cta" id="hero-cta" href="/cadastro">
+            <span data-cta-rotulo>Quero doar</span><span class="btn__traco" aria-hidden="true"></span><span class="btn__acao" data-cta-acao>Cadastrar</span>
+          </a>
+          <a class="hero__secundario" href="#doacoes">Sou instituição <span aria-hidden="true">·</span> ver doações</a>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <img class="hero__imagem" src="/static/img/hero-cesta.svg" width="640" height="640"
+             alt="Caixa de madeira vista de cima com verduras, tomates, laranjas, pães, cenouras, bananas e um saco de arroz">
+
+        <article class="cartao cartao--flutuante hero__cartao hero__cartao--doacao" id="ultima-doacao" aria-live="polite" aria-busy="true">
+          <p class="sobretitulo">Doação mais recente</p>
+          <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
+        </article>
+
+        <article class="cartao cartao--flutuante hero__cartao hero__cartao--passos" aria-labelledby="passos-titulo">
+          <p class="sobretitulo" id="passos-titulo">Em três passos</p>
+          <ol class="mini-passos">
+            <li><span class="mini-passos__n">1</span> A empresa publica o excedente</li>
+            <li><span class="mini-passos__n">2</span> Uma instituição reserva</li>
+            <li><span class="mini-passos__n">3</span> A retirada fica registrada</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ DOAÇÕES DISPONÍVEIS ============ -->
+    <section class="faixa container" id="doacoes" aria-labelledby="doacoes-titulo">
+      <div class="faixa__cartao">
+        <div class="faixa__topo">
+          <div>
+            <p class="sobretitulo sobretitulo--acento">Agora na plataforma</p>
+            <h2 id="doacoes-titulo">Doações disponíveis</h2>
+          </div>
+          <div class="faixa__controles" id="carrossel-controles" hidden>
+            <button type="button" class="link-seta" id="carrossel-anterior" aria-controls="lista-doacoes"><span aria-hidden="true">←</span> Anterior</button>
+            <button type="button" class="link-seta" id="carrossel-proximo" aria-controls="lista-doacoes">Próximo <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+        <div id="doacoes-conteudo" aria-live="polite" aria-busy="true">
+          <ul class="carrossel" aria-hidden="true">
+            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMO FUNCIONA ============ -->
+    <section class="secao container" id="como-funciona" aria-labelledby="como-titulo">
+      <div class="secao__cabeca">
+        <p class="sobretitulo sobretitulo--acento">Como funciona</p>
+        <h2 id="como-titulo">Do balcão à mesa, <em>sem perder o dia</em></h2>
+        <p class="lead">Cada doação tem itens, quantidades, validade e um prazo de retirada. A plataforma só deixa reservar o que ainda pode ser consumido.</p>
+      </div>
+      <ol class="passos">
+        <li class="passo">
+          <span class="passo__n" aria-hidden="true">01</span>
+          <h3>A empresa publica</h3>
+          <p>O estabelecimento cadastra o excedente do dia: o que é, quanto tem, a validade de cada item e até quando dá para retirar.</p>
+        </li>
+        <li class="passo">
+          <span class="passo__n" aria-hidden="true">02</span>
+          <h3>A instituição reserva</h3>
+          <p>ONGs e projetos sociais veem as doações abertas e reservam. Uma doação reservada sai da vitrine para não haver duas retiradas.</p>
+        </li>
+        <li class="passo">
+          <span class="passo__n" aria-hidden="true">03</span>
+          <h3>A retirada é registrada</h3>
+          <p>Na hora da coleta a retirada é confirmada e entra no histórico. Se a reserva for cancelada, a doação volta a ficar disponível.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ PARA QUEM ============ -->
+    <section class="secao container" aria-labelledby="quem-titulo">
+      <div class="secao__cabeca">
+        <p class="sobretitulo sobretitulo--acento">Quem participa</p>
+        <h2 id="quem-titulo">Uma rede com três pontas</h2>
+      </div>
+      <div class="publicos">
+        <article class="publico publico--empresa">
+          <img src="/static/img/categorias/padaria.svg" width="88" height="88" alt="">
+          <h3>Empresas do setor de alimentos</h3>
+          <p>Restaurantes, padarias, mercados, hortifrutis, distribuidores e indústrias de alimentos que querem dar destino ao que sobra.</p>
+          <a class="btn btn--primario btn--pequeno" href="/cadastro">Cadastrar empresa</a>
+        </article>
+        <article class="publico publico--doador">
+          <img src="/static/img/categorias/hortifruti.svg" width="88" height="88" alt="">
+          <h3>Doadores</h3>
+          <p>Pessoas que querem acompanhar a rede e apoiar as ações de doação de alimentos. O cadastro é pelo CPF.</p>
+          <a class="btn btn--secundario btn--pequeno" href="/cadastro">Quero ser doador</a>
+        </article>
+        <article class="publico publico--instituicao">
+          <img src="/static/img/categorias/refeicoes.svg" width="88" height="88" alt="">
+          <h3>Instituições sociais</h3>
+          <p>ONGs, associações e projetos que distribuem alimentos. Hoje a reserva é feita pela API do ReConecta; a área própria no site vem a seguir.</p>
+          <a class="btn btn--fantasma btn--pequeno" href="#doacoes">Ver doações abertas <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ CRITÉRIO ============ -->
+    <section class="secao container" aria-labelledby="criterio-titulo">
+      <div class="criterio">
+        <div class="criterio__texto">
+          <p class="sobretitulo sobretitulo--acento">Quem pode doar como empresa</p>
+          <h2 id="criterio-titulo">Conferimos na Receita Federal antes de aceitar</h2>
+          <p class="lead">Para manter a rede focada em alimento, o cadastro de empresa só é aceito quando o CNPJ passa nas duas verificações. Nada disso depende do que a pessoa digita: os dados vêm da Receita.</p>
+          <a class="link-sobre" href="/sobre#criterio">Entenda o critério completo <span aria-hidden="true">→</span></a>
+        </div>
+        <ul class="checagens">
+          <li class="checagem">
+            <span class="checagem__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><h3>CNPJ ativo</h3><p>Empresas com situação baixada, inapta, suspensa ou nula não entram.</p></div>
+          </li>
+          <li class="checagem">
+            <span class="checagem__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><h3>Atividade ligada a alimentos</h3><p>Olhamos a atividade principal e as secundárias. Um supermercado entra mesmo que a principal seja genérica; uma empresa de tecnologia, não.</p></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ CTA FINAL ============ -->
+    <section class="cta-final container" aria-labelledby="cta-titulo">
+      <div class="cta-final__cartao">
+        <img class="cta-final__img" src="/static/img/categorias/graos.svg" width="120" height="120" alt="">
+        <h2 id="cta-titulo">Tem alimento bom sobrando <em>hoje</em>?</h2>
+        <p class="lead">Cadastre a empresa em poucos minutos. Basta o CNPJ: o resto a gente busca na Receita.</p>
+        <a class="btn btn--primario" href="/cadastro">Quero doar <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>

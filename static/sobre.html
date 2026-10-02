@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sobre · ReConecta</title>
+  <meta name="description" content="O que é o ReConecta, por que ele existe, como funciona e o que conferimos na Receita Federal antes de aceitar uma empresa.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/sobre.css">
+  <script src="/static/js/layout.js" defer></script>
+</head>
+<body class="sobre">
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo">
+
+    <!-- ============ ABERTURA ============ -->
+    <section class="abertura container" aria-labelledby="sobre-titulo">
+      <div class="abertura__texto">
+        <p class="sobretitulo sobretitulo--acento">Sobre o ReConecta</p>
+        <h1 id="sobre-titulo">Comida boa<br>merece <em>destino</em></h1>
+        <p class="lead">O ReConecta é uma plataforma que liga estabelecimentos com alimento excedente a instituições que alimentam quem precisa. Ela organiza o caminho entre o balcão e a mesa: o que foi doado, quanto, até quando dá para consumir e quem retirou.</p>
+        <nav class="indice" aria-label="Nesta página">
+          <a href="#problema">O problema</a>
+          <a href="#missao">Missão</a>
+          <a href="#regras">Regras</a>
+          <a href="#criterio">Critério de cadastro</a>
+          <a href="#participar">Quem participa</a>
+          <a href="#projeto">O projeto</a>
+        </nav>
+      </div>
+      <div class="orbita" aria-hidden="true">
+        <img class="orbita__centro" src="/static/img/hero-cesta.svg" width="640" height="640" alt="">
+        <img class="orbita__item orbita__item--1" src="/static/img/categorias/padaria.svg" width="120" height="120" alt="">
+        <img class="orbita__item orbita__item--2" src="/static/img/categorias/hortifruti.svg" width="120" height="120" alt="">
+        <img class="orbita__item orbita__item--3" src="/static/img/categorias/laticinios.svg" width="120" height="120" alt="">
+        <img class="orbita__item orbita__item--4" src="/static/img/categorias/graos.svg" width="120" height="120" alt="">
+      </div>
+    </section>
+
+    <!-- ============ PROBLEMA ============ -->
+    <section class="bloco container" id="problema" aria-labelledby="problema-titulo">
+      <div class="problema">
+        <div class="problema__numero">
+          <p class="numero" aria-hidden="true"><span>1</span><span class="numero__barra">/</span><span>3</span></p>
+          <p class="problema__legenda">
+            Cerca de <strong>um terço</strong> dos alimentos produzidos para consumo humano se perde ou é desperdiçado no mundo, <strong>cerca de 1,3 bilhão de toneladas por ano</strong>.
+          </p>
+          <p class="fonte">Fonte: FAO, <cite><a href="https://www.fao.org/4/mb060e/mb060e00.htm" rel="noopener">Global Food Losses and Food Waste</a></cite> (2011).</p>
+        </div>
+        <div class="problema__texto">
+          <p class="sobretitulo sobretitulo--acento">O problema</p>
+          <h2 id="problema-titulo">O alimento sobra num lugar e falta em outro</h2>
+          <p>No fim do dia, padarias, mercados e restaurantes ficam com produtos que ainda estão bons para consumo, mas não serão vendidos. Ao mesmo tempo, ONGs e projetos sociais procuram doações para servir refeições.</p>
+          <p>O que separa uma ponta da outra quase nunca é vontade. É informação: quem tem o quê, até quando, e como combinar a retirada antes que o prazo vença.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MISSÃO ============ -->
+    <section class="bloco container" id="missao" aria-labelledby="missao-titulo">
+      <div class="missao">
+        <p class="sobretitulo">Missão</p>
+        <h2 id="missao-titulo" class="missao__frase">Fazer o alimento bom que sobra chegar a quem precisa <em>enquanto ainda é bom</em>, com cada passo registrado.</h2>
+      </div>
+    </section>
+
+    <!-- ============ REGRAS ============ -->
+    <section class="bloco container" id="regras" aria-labelledby="regras-titulo">
+      <div class="cabeca">
+        <p class="sobretitulo sobretitulo--acento">Como funciona</p>
+        <h2 id="regras-titulo">Regras que a plataforma garante</h2>
+        <p class="lead">Elas não dependem de boa vontade de ninguém: estão no sistema e valem para todas as doações.</p>
+      </div>
+      <ol class="regras">
+        <li><span class="regras__fase">Publicar</span><p>Todo item precisa ter <strong>quantidade maior que zero</strong>.</p></li>
+        <li><span class="regras__fase">Publicar</span><p>Alimento com a <strong>validade vencida</strong> não pode ser disponibilizado para retirada.</p></li>
+        <li><span class="regras__fase">Reservar</span><p>Só doações <strong>disponíveis</strong> podem ser reservadas.</p></li>
+        <li><span class="regras__fase">Reservar</span><p>Uma doação tem <strong>no máximo uma reserva ativa</strong> por vez; ao reservar, ela deixa de aparecer como disponível.</p></li>
+        <li><span class="regras__fase">Retirar</span><p>Só uma doação <strong>reservada</strong> pode ter a retirada confirmada, e então passa a constar como retirada.</p></li>
+        <li><span class="regras__fase">Cancelar</span><p>A reserva pode ser cancelada antes da retirada. Se a doação continuar válida, <strong>volta a ficar disponível</strong>.</p></li>
+      </ol>
+    </section>
+
+    <!-- ============ CRITÉRIO E TRANSPARÊNCIA ============ -->
+    <section class="bloco container" id="criterio" aria-labelledby="criterio-titulo">
+      <div class="transparencia">
+        <div class="cabeca">
+          <p class="sobretitulo sobretitulo--acento">Critério de cadastro e transparência</p>
+          <h2 id="criterio-titulo">O que conferimos antes de aceitar uma empresa</h2>
+          <p class="lead">O ReConecta é para o setor de alimentos. Por isso o cadastro de empresa passa por três verificações automáticas, sempre com dados públicos da Receita Federal.</p>
+        </div>
+
+        <ol class="verificacoes">
+          <li class="verificacao">
+            <span class="verificacao__n" aria-hidden="true">1</span>
+            <h3>O CNPJ existe</h3>
+            <p>Os dígitos verificadores são conferidos na hora. Depois consultamos o cadastro público do CNPJ (BrasilAPI e, se ela falhar, outras fontes abertas com os mesmos dados da Receita).</p>
+          </li>
+          <li class="verificacao">
+            <span class="verificacao__n" aria-hidden="true">2</span>
+            <h3>A situação é ATIVA</h3>
+            <p>CNPJ baixado, inapto, suspenso ou nulo é recusado, e a tela mostra a situação encontrada.</p>
+          </li>
+          <li class="verificacao">
+            <span class="verificacao__n" aria-hidden="true">3</span>
+            <h3>Há atividade ligada a alimentos</h3>
+            <p>Olhamos a atividade principal <em>e</em> as secundárias (CNAE). Um supermercado cuja atividade principal é genérica entra pelas secundárias; uma empresa de tecnologia não entra. Ração animal não conta como alimento.</p>
+          </li>
+        </ol>
+
+        <div class="dados">
+          <div class="dados__coluna">
+            <h3>O que guardamos</h3>
+            <ul>
+              <li>Da empresa: nome, CNPJ e endereço como constam na Receita, mais o e-mail e o telefone informados.</li>
+              <li>Do doador: nome, CPF, e-mail e telefone.</li>
+              <li>A senha nunca é guardada como texto: só um resumo criptográfico (hash).</li>
+            </ul>
+          </div>
+          <div class="dados__coluna">
+            <h3>O que aparece em público</h3>
+            <ul>
+              <li>Nas doações abertas: nome do estabelecimento, cidade, itens, quantidades, validade e prazo de retirada.</li>
+              <li>Não mostramos e-mail, telefone, CNPJ nem CPF de ninguém.</li>
+              <li>O CPF do doador é exibido mascarado até para o próprio dono (***.456.789-**).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUEM PARTICIPA ============ -->
+    <section class="bloco container" id="participar" aria-labelledby="participar-titulo">
+      <div class="cabeca">
+        <p class="sobretitulo sobretitulo--acento">Quem pode participar</p>
+        <h2 id="participar-titulo">Três papéis, um mesmo objetivo</h2>
+      </div>
+      <dl class="papeis">
+        <div class="papel">
+          <dt><img src="/static/img/categorias/padaria.svg" width="64" height="64" alt="">Empresas do setor de alimentos</dt>
+          <dd>Restaurantes, padarias, mercados, hortifrutis, distribuidores e indústrias de alimentos com CNPJ ativo. Publicam as doações e acompanham o que foi retirado.</dd>
+        </div>
+        <div class="papel">
+          <dt><img src="/static/img/categorias/hortifruti.svg" width="64" height="64" alt="">Doadores</dt>
+          <dd>Pessoas físicas que querem fazer parte da rede. O cadastro é pelo CPF, conferido pelos dígitos verificadores.</dd>
+        </div>
+        <div class="papel">
+          <dt><img src="/static/img/categorias/refeicoes.svg" width="64" height="64" alt="">Instituições sociais</dt>
+          <dd>ONGs, associações e projetos que recebem e distribuem alimentos. Reservam doações e confirmam a retirada; hoje isso é feito pela API do ReConecta.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- ============ PROJETO ============ -->
+    <section class="bloco container" id="projeto" aria-labelledby="projeto-titulo">
+      <div class="projeto">
+        <div>
+          <p class="sobretitulo">O projeto</p>
+          <h2 id="projeto-titulo">Nasceu em sala de aula, <em>funciona de verdade</em></h2>
+        </div>
+        <div class="projeto__texto">
+          <p>O ReConecta começou como projeto do CP1 da disciplina <strong>Computational Thinking with Python</strong>. A primeira versão foi o backend: API REST em Python e Flask, banco de dados e as regras de doação acima, documentadas em Swagger.</p>
+          <p>Depois vieram o cadastro com consulta real à Receita Federal, o critério de atividade alimentar e este site. Tudo o que aparece aqui sai do mesmo banco de dados que a API usa.</p>
+          <a class="btn btn--secundario btn--pequeno" href="/swagger">Ver a documentação da API</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="bloco container" aria-labelledby="cta-sobre-titulo">
+      <div class="cta">
+        <h2 id="cta-sobre-titulo">Sua empresa tem excedente? <em>Comece hoje.</em></h2>
+        <div class="cta__acoes">
+          <a class="btn btn--primario" href="/cadastro">Quero doar <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
+          <a class="btn btn--fantasma" href="/#doacoes">Ver doações abertas <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>

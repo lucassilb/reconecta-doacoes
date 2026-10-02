@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Outros">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#E8E6DE"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#C9C5B6" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <rect x="30" y="46" width="34" height="44" rx="6" fill="#C9D6C2"/>
+    <rect x="28" y="40" width="38" height="10" rx="3" fill="#8A6A3A"/>
+    <rect x="34" y="58" width="26" height="16" rx="3" fill="#FFFDF6"/>
+    <path d="M40 66h14" stroke="#C8532A" stroke-width="3" stroke-linecap="round"/>
+    <rect x="68" y="56" width="26" height="34" rx="4" fill="#B9C2C9"/>
+    <ellipse cx="81" cy="56" rx="13" ry="4" fill="#D9E0E5"/>
+    <rect x="68" y="64" width="26" height="14" fill="#C8532A"/></g>
+</svg>
