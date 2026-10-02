@@ -84,7 +84,7 @@
 
     var menu = el("button", {
       type: "button", classe: "cabecalho__menu", "aria-expanded": "false", "aria-controls": "rc-nav"
-    }, [el("span", { "aria-hidden": "true" }), el("span", { classe: "sr-only", texto: "Menu" })]);
+    }, [el("span", { classe: "cabecalho__menu-icone", "aria-hidden": "true" }), el("span", { classe: "sr-only", texto: "Menu" })]);
 
     function fecharMenu() {
       menu.setAttribute("aria-expanded", "false");

@@ -346,15 +346,15 @@ select.campo__entrada { appearance: none; padding-right: 40px;
   width: 44px; height: 44px; border-radius: 50%;
   background: transparent; border: 1.5px solid var(--linha-forte); cursor: pointer;
 }
-.cabecalho__menu span, .cabecalho__menu span::before, .cabecalho__menu span::after {
+.cabecalho__menu-icone, .cabecalho__menu-icone::before, .cabecalho__menu-icone::after {
   content: ""; display: block; width: 18px; height: 1.6px; background: currentColor; border-radius: 2px; position: relative;
   transition: transform .2s ease, opacity .2s ease;
 }
-.cabecalho__menu span::before { position: absolute; top: -6px; }
-.cabecalho__menu span::after { position: absolute; top: 6px; }
-.cabecalho__menu[aria-expanded="true"] span { background: transparent; }
-.cabecalho__menu[aria-expanded="true"] span::before { transform: translateY(6px) rotate(45deg); }
-.cabecalho__menu[aria-expanded="true"] span::after { transform: translateY(-6px) rotate(-45deg); }
+.cabecalho__menu-icone::before { position: absolute; top: -6px; }
+.cabecalho__menu-icone::after { position: absolute; top: 6px; }
+.cabecalho__menu[aria-expanded="true"] .cabecalho__menu-icone { background: transparent; }
+.cabecalho__menu[aria-expanded="true"] .cabecalho__menu-icone::before { transform: translateY(6px) rotate(45deg); }
+.cabecalho__menu[aria-expanded="true"] .cabecalho__menu-icone::after { transform: translateY(-6px) rotate(-45deg); }
 
 /* celular: marca + menu à esquerda; aba compacta; nav em gaveta */
 @media (max-width: 899.98px) {
