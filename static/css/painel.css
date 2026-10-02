@@ -69,13 +69,13 @@
   .item__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .item__grade .item__nome { grid-column: 1 / -1; }
 }
-@media (min-width: 760px) {
+@media (min-width: 1440px) {
   .item__grade { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, .55fr) minmax(0, .75fr) minmax(0, .9fr); }
   .item__grade .item__nome { grid-column: auto; }
 }
 .item .campo { gap: 4px; }
 .item .campo__rotulo { font-size: .8rem; color: var(--tinta-suave); }
-.item .campo__entrada { min-height: 44px; background: var(--superficie); }
+.item .campo__entrada { min-height: 44px; background: var(--superficie); width: 100%; min-width: 0; box-sizing: border-box; }
 .item .campo__erro { font-size: .8rem; }
 
 .item__remover {
