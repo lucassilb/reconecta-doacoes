@@ -104,6 +104,11 @@
     return d.toLocaleDateString("pt-BR");
   }
 
+  function telefone(t) {
+    // (11) 98765-4321 ou (11) 4196-9800; ver formatarTelefone em layout.js
+    return (window.ReConecta && window.ReConecta.formatarTelefone) ? window.ReConecta.formatarTelefone(t) : t;
+  }
+
   function fmtQtd(q, unidade) {
     var n = Number(q);
     var txt = isNaN(n) ? String(q) : n.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
@@ -136,7 +141,9 @@
 
   function saudacao(u, rotulo) {
     $("saudacao-tipo").textContent = rotulo;
-    $("saudacao-nome").textContent = "Olá, " + (u.nome || "").split(" ")[0];
+    // sem caixa alta da Receita: "ARCOS DOURADOS ..." → "Olá, Arcos"
+    var nome = (window.ReConecta && window.ReConecta.nomeTitulo) ? window.ReConecta.nomeTitulo(u.nome) : String(u.nome || "");
+    $("saudacao-nome").textContent = "Olá, " + nome.split(" ")[0];
     var selo = $("saudacao-selo");
     selo.textContent = u.tipo === "empresa" ? "Empresa" : "Doador";
   }
@@ -164,7 +171,7 @@
       ["CNPJ", u.cnpj_formatado],
       ["Endereço", u.endereco],
       ["E-mail", u.email],
-      ["Telefone", u.telefone]
+      ["Telefone", telefone(u.telefone)]
     ]);
 
     listaItens = $("lista-itens");
@@ -320,7 +327,7 @@
         limparFormulario();
         carregarDoacoes();
         mostrarAviso(avisoDoacao, "Doação publicada",
-          "Ela já aparece para as instituições da rede.", { ok: true });
+          "Ela já aparece na lista pública de doações.", { ok: true });
         $("minhas-t").scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
       }
@@ -402,35 +409,52 @@
     }
 
     if (propria && d.status === "DISPONIVEL") {
-      var acoes = el("div", { classe: "doacao__acoes" });
+      var acoes = el("div", { classe: "doacao__acoes", "aria-live": "polite" });
       var btnRemover = el("button", { type: "button", classe: "btn btn--perigo btn--pequeno", texto: "Remover" });
+
       btnRemover.addEventListener("click", function () {
-        var confirma = el("span", { classe: "doacao__confirmar" }, [
-          "Remover esta doação? ",
-          el("button", { type: "button", classe: "btn btn--perigo btn--pequeno", texto: "Sim, remover" }),
-          el("button", { type: "button", classe: "link-seta", texto: "Cancelar" })
+        // referências diretas: o texto da pergunta não entra em .children
+        var btnSim = el("button", { type: "button", classe: "btn btn--perigo btn--pequeno", texto: "Sim, remover" });
+        var btnCancelar = el("button", { type: "button", classe: "link-seta", texto: "Cancelar" });
+        var confirma = el("span", { classe: "doacao__confirmar", role: "group", "aria-label": "Confirmar remoção" }, [
+          "Remover esta doação? ", btnSim, btnCancelar
         ]);
-        confirma.children[1].addEventListener("click", function () { removerDoacao(d.id, art); });
-        confirma.children[2].addEventListener("click", function () { acoes.replaceChildren(btnRemover); });
+        btnSim.addEventListener("click", function () {
+          btnSim.disabled = true; btnCancelar.disabled = true;
+          btnSim.classList.add("is-carregando");
+          removerDoacao(d.id, acoes, btnRemover);
+        });
+        btnCancelar.addEventListener("click", function () {
+          acoes.replaceChildren(btnRemover);
+          btnRemover.focus();
+        });
         acoes.replaceChildren(confirma);
+        btnCancelar.focus();
       });
+
       acoes.appendChild(btnRemover);
       art.appendChild(acoes);
     }
     return art;
   }
 
-  function removerDoacao(id, art) {
+  function removerDoacao(id, acoes, btnRemover) {
+    function falha(msg) {
+      acoes.replaceChildren(el("p", { classe: "campo__erro", role: "alert", texto: msg }), btnRemover);
+    }
     requisitar("/reconecta/painel/doacoes/" + id, { method: "DELETE" }).then(function (r) {
       if (r.status === 204) { carregarDoacoes(); return; }
-      var msg = r.status === 409
-        ? (r.corpo.mensagem || "Esta doação não pode ser removida.")
-        : (r.corpo.mensagem || "Não foi possível remover. Tente novamente.");
-      var acoes = art.querySelector(".doacao__acoes");
-      if (acoes) acoes.replaceChildren(el("p", { classe: "campo__erro", texto: msg }));
+      if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
+      if (r.status === 409) {
+        falha((r.corpo.mensagem ? r.corpo.mensagem + " " : "") +
+          "Só dá para remover doações ainda disponíveis e sem reserva.");
+      } else if (r.status === 404) {
+        falha("Esta doação não foi encontrada; ela pode já ter sido removida. Atualize a lista.");
+      } else {
+        falha(r.corpo.mensagem || "Não foi possível remover. Tente novamente.");
+      }
     }).catch(function () {
-      var acoes = art.querySelector(".doacao__acoes");
-      if (acoes) acoes.replaceChildren(el("p", { classe: "campo__erro", texto: "Sem conexão com o servidor." }));
+      falha("Sem conexão com o servidor. Tente novamente.");
     });
   }
 
@@ -446,7 +470,7 @@
       ["Nome", u.nome],
       ["CPF", u.cpf_formatado],
       ["E-mail", u.email],
-      ["Telefone", u.telefone]
+      ["Telefone", telefone(u.telefone)]
     ]);
 
     requisitar("/reconecta/publico/resumo").then(function (r) {

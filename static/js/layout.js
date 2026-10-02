@@ -10,6 +10,8 @@
      window.ReConecta.sessao            Promise<usuario | null> (resultado de GET /reconecta/auth/me)
      window.ReConecta.atualizarSessao() refaz a consulta e redesenha o cabeçalho; devolve a Promise
      window.ReConecta.sair()            POST /reconecta/auth/logout e volta para /
+     window.ReConecta.nomeTitulo(nome)  "PADARIA PAO DOURADO LTDA" → "Padaria Pao Dourado LTDA"
+     window.ReConecta.formatarTelefone(t) "11987654321" → "(11) 98765-4321"
      evento "reconecta:sessao" no document, detail = { usuario }  (usuario null = deslogado) */
 (function () {
   "use strict";
@@ -117,12 +119,38 @@
     }
   }
 
+  /* Nomes em CAIXA ALTA (como vêm da Receita) em formato de título,
+     preservando siglas societárias e com conectivos em minúsculas:
+     "ARCOS DOURADOS COMERCIO DE ALIMENTOS SA" → "Arcos Dourados Comercio de Alimentos SA". */
+  var SIGLAS = /^(S\/?A|S\.A\.?|LTDA\.?|ME|EPP|EIRELI|MEI|SS)$/;
+  var CONECTIVOS = /^(de|da|do|das|dos|e|em|para)$/;
+  function nomeTitulo(nome) {
+    var n = String(nome || "").trim().replace(/\s+/g, " ");
+    if (!n || n !== n.toUpperCase()) return n;
+    return n.split(" ").map(function (p, i) {
+      if (SIGLAS.test(p)) return p;
+      var min = p.toLowerCase();
+      if (i > 0 && CONECTIVOS.test(min)) return min;
+      return min.charAt(0).toUpperCase() + min.slice(1);
+    }).join(" ");
+  }
+
+  /* (11) 98765-4321 | (11) 4196-9800; outros formatos ficam como vieram */
+  function formatarTelefone(t) {
+    var d = String(t || "").replace(/\D+/g, "");
+    if (d.length === 11) return "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7);
+    if (d.length === 10) return "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6);
+    return String(t || "");
+  }
+
   function nomeCurto(usuario) {
-    // empresa: nome completo em formato de título ("Pao De Acucar"); pessoa: primeiro nome
-    var n = String(usuario.nome || "").trim();
-    if (usuario.tipo !== "empresa") return primeiroNome(n);
-    if (n === n.toUpperCase()) n = n.toLowerCase().replace(/(^|\s)(\S)/g, function (m, a, b) { return a + b.toUpperCase(); });
-    return n;
+    // empresa: as duas primeiras palavras do nome ("Arcos Dourados"); pessoa: primeiro nome.
+    // O nome completo fica no title do elemento.
+    if (usuario.tipo !== "empresa") return primeiroNome(usuario.nome);
+    var palavras = nomeTitulo(usuario.nome).split(" ").filter(function (p) { return !SIGLAS.test(p); });
+    var curto = palavras.slice(0, 2);
+    if (curto.length === 2 && CONECTIVOS.test(curto[1])) curto = palavras.slice(0, 3);
+    return curto.join(" ");
   }
 
   function primeiroNome(nome) {
@@ -207,6 +235,8 @@
   }
 
   var api = window.ReConecta = window.ReConecta || {};
+  api.nomeTitulo = nomeTitulo;
+  api.formatarTelefone = formatarTelefone;
   api.atualizarSessao = function () { api.sessao = consultarSessao(); return api.sessao; };
   api.sair = function () {
     return fetch("/reconecta/auth/logout", { method: "POST", credentials: "same-origin" })
