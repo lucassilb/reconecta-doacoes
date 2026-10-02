@@ -6,7 +6,9 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 
+from Auth import iniciar_sessao
 from cnpj_service import ConsultaCNPJError, consultar_cnpj, formatar_cnpj, validar_cnpj
 from models import Doador, Estabelecimento, db
 
@@ -17,12 +19,14 @@ empresa_entrada = ns.model("CadastroEmpresaEntrada", {
     "cnpj": fields.String(required=True, description="CNPJ com ou sem máscara"),
     "email": fields.String(required=True),
     "telefone": fields.String(required=True, description="DDD e telefone, 10 ou 11 dígitos"),
+    "senha": fields.String(required=True, description="Mínimo 8 caracteres, com letra e número"),
 })
 doador_entrada = ns.model("CadastroDoadorEntrada", {
     "nome": fields.String(required=True),
     "cpf": fields.String(required=True, description="CPF com ou sem máscara"),
     "email": fields.String(required=True),
     "telefone": fields.String(required=True),
+    "senha": fields.String(required=True, description="Mínimo 8 caracteres, com letra e número"),
 })
 motivo_model = ns.model("CadastroMotivo", {
     "codigo": fields.String,
@@ -90,6 +94,12 @@ def _telefone(valor):
         return None
     digitos = re.sub(r"\D", "", valor)
     return digitos if len(digitos) in (10, 11) else None
+
+
+def _senha_valida(valor):
+    return (isinstance(valor, str) and len(valor) >= 8 and
+            any(caractere.isalpha() for caractere in valor) and
+            any(caractere.isdigit() for caractere in valor))
 
 
 def _cpf(valor):
@@ -173,6 +183,8 @@ class CadastroEmpresa(Resource):
             campos["email"] = "Informe um e-mail válido de até 100 caracteres."
         if not telefone:
             campos["telefone"] = "Informe um telefone com DDD e 10 ou 11 dígitos."
+        if not _senha_valida(corpo.get("senha")):
+            campos["senha"] = "Use pelo menos 8 caracteres, com uma letra e um número."
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
         email = email.strip().lower()
@@ -190,6 +202,7 @@ class CadastroEmpresa(Resource):
             nome=(dados["nome_fantasia"] or dados["razao_social"])[:100],
             cnpj=cnpj, email=email, telefone=telefone,
             endereco=_endereco_texto(dados["endereco"]),
+            senha_hash=generate_password_hash(corpo["senha"]),
         )
         db.session.add(empresa)
         try:
@@ -199,6 +212,7 @@ class CadastroEmpresa(Resource):
             if _empresa_cadastrada(cnpj):
                 return _erro("CNPJ_JA_CADASTRADO", "Este CNPJ já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+        iniciar_sessao("empresa", empresa.id)
         return {"id": empresa.id, "tipo": "empresa", "nome": empresa.nome,
                 "cnpj": empresa.cnpj, "cnpj_formatado": formatar_cnpj(empresa.cnpj),
                 "email": empresa.email, "telefone": empresa.telefone,
@@ -228,6 +242,8 @@ class CadastroDoador(Resource):
             campos["email"] = "Informe um e-mail válido de até 100 caracteres."
         if not telefone:
             campos["telefone"] = "Informe um telefone com DDD e 10 ou 11 dígitos."
+        if not _senha_valida(corpo.get("senha")):
+            campos["senha"] = "Use pelo menos 8 caracteres, com uma letra e um número."
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
         email = email.strip().lower()
@@ -235,7 +251,8 @@ class CadastroDoador(Resource):
             return _erro("CPF_JA_CADASTRADO", "Este CPF já está cadastrado.", 409)
         if _email_cadastrado(email):
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
-        doador = Doador(nome=nome.strip(), cpf=cpf, email=email, telefone=telefone)
+        doador = Doador(nome=nome.strip(), cpf=cpf, email=email, telefone=telefone,
+                        senha_hash=generate_password_hash(corpo["senha"]))
         db.session.add(doador)
         try:
             db.session.commit()
@@ -244,6 +261,7 @@ class CadastroDoador(Resource):
             if Doador.query.filter_by(cpf=cpf).first():
                 return _erro("CPF_JA_CADASTRADO", "Este CPF já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+        iniciar_sessao("doador", doador.id)
         return {"id": doador.id, "tipo": "doador", "nome": doador.nome,
                 "cpf_formatado": f"***.{cpf[3:6]}.{cpf[6:9]}-**",
                 "email": doador.email, "telefone": doador.telefone}, 201

@@ -154,7 +154,7 @@ ReConecta/
 ### Pré-requisitos
 
 - Python 3.10 ou superior;
-- PostgreSQL;
+- PostgreSQL (opcional; sem `DATABASE_URL`, usa SQLite);
 - Git.
 
 ### Passos
@@ -189,7 +189,8 @@ Crie um arquivo `.env` na raiz do projeto a partir do `.env.example`:
 ```env
 DATABASE_URL=postgresql://USUARIO:SENHA@localhost:5432/reconecta
 FLASK_APP=app.py
-FLASK_DEBUG=1
+FLASK_DEBUG=0
+# SECRET_KEY=uma_chave_longa_e_aleatoria
 ```
 
 Não publique o arquivo `.env` no GitHub.
@@ -210,15 +211,32 @@ http://localhost:5000
 
 ## Cadastro de doadores
 
-Sem `DATABASE_URL`, a aplicação usa SQLite em `instance/reconecta.db` e cria as tabelas ausentes ao iniciar. Para PostgreSQL, configure `DATABASE_URL` como no `.env.example`. A página inicial (`/`) serve `static/cadastro.html`; a documentação continua em `/swagger`.
+Sem `DATABASE_URL`, a aplicação usa SQLite em `instance/reconecta.db`. Ela cria as tabelas ausentes e adiciona a coluna `senha_hash` às tabelas antigas ao iniciar. Para PostgreSQL, configure `DATABASE_URL` como no `.env.example`. `SECRET_KEY` pode vir do ambiente; se faltar, a aplicação gera uma chave persistente em `instance/secret_key`. A documentação continua em `/swagger`.
+
+As páginas são `/` (Home), `/sobre`, `/cadastro`, `/entrar` e `/painel`. O painel consulta `/reconecta/auth/me` para exigir uma sessão válida.
 
 | Método | Endpoint | Resultado |
 |---|---|---|
 | GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ nas fontes públicas, situação cadastral e atividades alimentares; informa `apto` e `motivos`. |
-| POST | `/reconecta/cadastro/empresa` | Cadastra estabelecimento doador após repetir a verificação do CNPJ. Corpo: `cnpj`, `email`, `telefone`. |
-| POST | `/reconecta/cadastro/doador` | Cadastra pessoa física com validação local do CPF. Corpo: `nome`, `cpf`, `email`, `telefone`. |
+| POST | `/reconecta/cadastro/empresa` | Cadastra estabelecimento doador após repetir a verificação do CNPJ. Corpo: `cnpj`, `email`, `telefone`, `senha`. |
+| POST | `/reconecta/cadastro/doador` | Cadastra pessoa física com validação local do CPF. Corpo: `nome`, `cpf`, `email`, `telefone`, `senha`. |
 
-CNPJ e CPF aceitam dígitos ou máscara completa. O CPF volta mascarado na resposta. A consulta de CNPJ usa BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas, e guarda resultados por dez minutos em memória. O cadastro exige e-mail válido e telefone com DDD (10 ou 11 dígitos); um e-mail já usado por empresa ou doador é recusado. Não há senha ou login nesta etapa.
+CNPJ e CPF aceitam dígitos ou máscara completa. O CPF volta mascarado na resposta. A consulta de CNPJ usa BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas, e guarda resultados por dez minutos em memória. O cadastro exige e-mail válido, telefone com DDD (10 ou 11 dígitos) e senha de pelo menos oito caracteres com letra e número. Só o hash da senha é salvo; o cadastro já inicia a sessão. Um e-mail já usado por empresa ou doador é recusado.
+
+## Entrada e doações
+
+| Método | Endpoint | Resultado |
+|---|---|---|
+| POST | `/reconecta/auth/login` | Entra por e-mail, CNPJ ou CPF com senha. Cinco falhas em 15 minutos bloqueiam a sexta tentativa para o identificador. |
+| GET | `/reconecta/auth/me` | Retorna o perfil da sessão, com CPF mascarado para doadores. |
+| POST | `/reconecta/auth/logout` | Encerra a sessão. |
+| GET | `/reconecta/publico/resumo` | Contadores e peso disponível em kg. |
+| GET | `/reconecta/publico/doacoes?limite=8` | Doações disponíveis com prazo futuro, sem contato ou documentos. |
+| GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
+| GET/POST | `/reconecta/painel/doacoes` | Lista ou cria doações com itens para a empresa autenticada. |
+| DELETE | `/reconecta/painel/doacoes/{id}` | Remove doação própria ainda disponível e sem reservas. |
+
+A sessão usa cookie HttpOnly com SameSite=Lax. Contas antigas sem senha ainda existem no banco, mas não podem entrar até receberem uma senha por um fluxo futuro de recuperação ou migração assistida.
 
 ## Principais endpoints previstos
 

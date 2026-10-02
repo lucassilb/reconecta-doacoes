@@ -57,3 +57,6 @@ CREATE TABLE IF NOT EXISTS reservas (
     CONSTRAINT fk_reserva_doacao FOREIGN KEY (doacao_id) REFERENCES doacoes (id) ON DELETE RESTRICT,
     CONSTRAINT fk_reserva_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes (id) ON DELETE RESTRICT
 );
+
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
+ALTER TABLE doadores ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);

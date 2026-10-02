@@ -187,7 +187,7 @@ def test_todas_fontes_falham(cliente, monkeypatch):
 
 def test_empresa_grava_digitos_e_recusa_duplicado(cliente, monkeypatch):
     mock_brasilapi(monkeypatch)
-    corpo = {"cnpj": "47.508.411/0001-56", "email": "Empresa@Exemplo.com", "telefone": "(11) 4004-0010"}
+    corpo = {"cnpj": "47.508.411/0001-56", "email": "Empresa@Exemplo.com", "telefone": "(11) 4004-0010", "senha": "Senha1234"}
     resposta = cliente.post("/reconecta/cadastro/empresa", json=corpo)
     assert resposta.status_code == 201
     assert resposta.json["cnpj"] == PAO
@@ -204,7 +204,7 @@ def test_empresa_grava_digitos_e_recusa_duplicado(cliente, monkeypatch):
 
 def test_empresa_nao_apta_e_email_duplicado(cliente, monkeypatch):
     mock_brasilapi(monkeypatch, empresa(principal=6319400, secundarios=[]))
-    corpo = {"cnpj": PAO, "email": "empresa@exemplo.com", "telefone": "11999998888"}
+    corpo = {"cnpj": PAO, "email": "empresa@exemplo.com", "telefone": "11999998888", "senha": "Senha1234"}
     nao_apta = cliente.post("/reconecta/cadastro/empresa", json=corpo)
     assert nao_apta.status_code == 422
     assert nao_apta.json["codigo"] == "EMPRESA_NAO_APTA"
@@ -223,7 +223,7 @@ def test_empresa_nao_apta_e_email_duplicado(cliente, monkeypatch):
 
 
 def test_doador_valido_invalido_e_duplicados(cliente):
-    corpo = {"nome": "Maria Souza", "cpf": "529.982.247-25", "email": "Maria@Exemplo.com", "telefone": "(11) 99999-8888"}
+    corpo = {"nome": "Maria Souza", "cpf": "529.982.247-25", "email": "Maria@Exemplo.com", "telefone": "(11) 99999-8888", "senha": "Senha1234"}
     criado = cliente.post("/reconecta/cadastro/doador", json=corpo)
     assert criado.status_code == 201
     assert criado.json["cpf_formatado"] == "***.982.247-**"
@@ -242,7 +242,7 @@ def test_doador_valido_invalido_e_duplicados(cliente):
 
 
 def test_validacoes_e_rotas_existentes(cliente, monkeypatch, tmp_path):
-    invalido = cliente.post("/reconecta/cadastro/empresa", json={"cnpj": PAO, "email": "ruim", "telefone": "123"})
+    invalido = cliente.post("/reconecta/cadastro/empresa", json={"cnpj": PAO, "email": "ruim", "telefone": "123", "senha": "Senha1234"})
     assert invalido.status_code == 400
     assert set(invalido.json["campos"]) == {"email", "telefone"}
     assert cliente.get("/swagger").status_code == 200
@@ -250,8 +250,11 @@ def test_validacoes_e_rotas_existentes(cliente, monkeypatch, tmp_path):
     assert cliente.get("/reconecta/estabelecimentos/").status_code == 200
     assert cliente.get("/reconecta/instituicoes/").status_code == 200
     assert cliente.get("/reconecta/doacoes/").status_code == 200
-    (tmp_path / "cadastro.html").write_text("<h1>Cadastro</h1>", encoding="utf-8")
+    for pagina in ("index", "sobre", "cadastro", "entrar", "painel"):
+        (tmp_path / f"{pagina}.html").write_text(f"<h1>{pagina}</h1>", encoding="utf-8")
     monkeypatch.setattr(app, "static_folder", str(tmp_path))
     raiz = cliente.get("/")
     assert raiz.status_code == 200
-    assert b"Cadastro" in raiz.data
+    assert b"index" in raiz.data
+    for rota in ("/sobre", "/cadastro", "/entrar", "/painel"):
+        assert cliente.get(rota).status_code == 200
