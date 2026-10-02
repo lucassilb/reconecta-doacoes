@@ -117,6 +117,14 @@
     }
   }
 
+  function nomeCurto(usuario) {
+    // empresa: nome completo em formato de título ("Pao De Acucar"); pessoa: primeiro nome
+    var n = String(usuario.nome || "").trim();
+    if (usuario.tipo !== "empresa") return primeiroNome(n);
+    if (n === n.toUpperCase()) n = n.toLowerCase().replace(/(^|\s)(\S)/g, function (m, a, b) { return a + b.toUpperCase(); });
+    return n;
+  }
+
   function primeiroNome(nome) {
     var n = String(nome || "").trim();
     if (!n) return "";
@@ -135,7 +143,7 @@
       var sair = el("button", { type: "button", classe: "cabecalho__sair", texto: "Sair" });
       sair.addEventListener("click", function () { sair.disabled = true; api.sair(); });
       aba.append(
-        el("span", { classe: "cabecalho__ola", title: usuario.nome || "" }, ["Olá, ", el("strong", { texto: primeiroNome(usuario.nome) })]),
+        el("span", { classe: "cabecalho__ola", title: usuario.nome || "" }, ["Olá, ", el("strong", { texto: nomeCurto(usuario) })]),
         el("a", painel, ["Painel"]),
         sair
       );
