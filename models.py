@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -12,6 +12,15 @@ class Estabelecimento(db.Model):
     telefone = db.Column(db.String(20), nullable=False)
     endereco = db.Column(db.Text, nullable=False)
     doacoes = db.relationship('Doacao', backref='estabelecimento', lazy=True)
+
+class Doador(db.Model):
+    __tablename__ = 'doadores'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    cpf = db.Column(db.String(11), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    telefone = db.Column(db.String(20), nullable=False)
+    criado_em = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
 class Instituicao(db.Model):
     __tablename__ = 'instituicoes'
