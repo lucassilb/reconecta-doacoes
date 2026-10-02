@@ -41,6 +41,7 @@ REGRAS_CNAE = {
     "03": (True, "Pesca e aquicultura"),
     # Seção C — indústria
     "10": (True, "Indústria de alimentos"),
+    "1066": (False, "Fabricação de alimentos para animais (ração)"),
     "111": (False, "Fabricação de bebidas alcoólicas"),
     "112": (True, "Indústria de bebidas não alcoólicas"),       # águas, refrigerantes, sucos, chás
     # Seção G — comércio

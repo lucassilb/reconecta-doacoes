@@ -141,7 +141,7 @@
       ],
       "esperado": {
         "alimentar": true,
-        "cnaes_alimentares": ["1012103", "1012101", "1013901", "1013902", "1066000", "0155502", "0155505", "4639701"]
+        "cnaes_alimentares": ["1012103", "1012101", "1013901", "1013902", "0155502", "0155505", "4639701"]
       },
       "porque": "CNAEs alimentares casam, mas a situação é BAIXADA — prova que a exigência ATIVO é um gate separado do critério CNAE. Códigos como 155502 (=0155-5/02) chegam sem zero à esquerda na BrasilAPI."
     },

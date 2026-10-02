@@ -73,8 +73,8 @@ nunca é usada para classificar.
   (refrigerantes 1122-4, sucos 1033-3, atacado de alimentos). Correto pelo
   critério — não são "só álcool". **Salton** (só vinho + turismo + flores)
   é recusada.
-- **10.66-0** (ração/alimentos para animais) entra junto com a divisão 10
-  — brief pediu a divisão inteira.
+- **10.66-0** (ração/alimentos para animais) fica **fora** da divisão 10:
+  a plataforma redistribui alimento para pessoas (ajuste do Regente na integração).
 - **Versão CNAE**: os prefixos seguem a numeração de subclasses CNAE 2.3
   (o que a BrasilAPI devolve). Em CNAE 2.0, `4729-6/01` era alimentício e
   `/02` era tabacaria (inverteu em 2.2/2.3); cadastros antigos podem carregar

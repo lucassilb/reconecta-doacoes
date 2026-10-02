@@ -127,6 +127,7 @@ def test_codigos_alimentares_sao_aceitos(codigo):
         "0141501",  # sementes certificadas
         "0161099",  # serviços de apoio à agricultura
         "0210107",  # extração de madeira
+        "1066000",  # ração para animais
         "1111901",  # aguardente
         "1112700",  # vinho
         "1113502",  # cerveja
