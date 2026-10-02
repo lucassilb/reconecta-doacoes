@@ -72,6 +72,7 @@
 @media (min-width: 1000px) {
   .hero { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 32px; min-height: min(700px, calc(100vh - 120px)); align-items: center; }
   .hero__texto { padding-left: clamp(0px, 2.6vw, 40px); }
+  .hero h1 { font-size: clamp(2.6rem, 4.4vw, 3.6rem); } /* Libre Baskerville é larga: 2 linhas como na referência */
   .hero__visual { min-height: 600px; }
   .hero__imagem { width: min(112%, 600px); max-width: none; position: relative; left: 4%; }
   .hero__cartao--doacao { left: -2%; bottom: 150px; width: 270px; }
