@@ -1,0 +1,183 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ReConecta API",
+    "description": "API REST para Plataforma de Redistribuição de Excedentes Alimentares",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/estabelecimentos": {
+      "get": {
+        "summary": "Listar estabelecimentos cadastrados",
+        "responses": {
+          "200": { "description": "Lista de estabelecimentos retornada com sucesso." }
+        }
+      },
+      "post": {
+        "summary": "Cadastrar um novo estabelecimento",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "Padaria Doce Pão" },
+                  "cnpj": { "type": "string", "example": "12.345.678/0001-90" },
+                  "email": { "type": "string", "example": "contato@docepao.com" },
+                  "telefone": { "type": "string", "example": "11999998888" },
+                  "endereco": { "type": "string", "example": "Rua A, 123 - São Paulo/SP" }
+                },
+                "required": ["nome", "cnpj", "email", "telefone", "endereco"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Estabelecimento cadastrado com sucesso." },
+          "400": { "description": "Dados inválidos ou CNPJ/e-mail já existente." }
+        }
+      }
+    },
+    "/instituicoes": {
+      "get": {
+        "summary": "Listar instituições receptoras cadastradas",
+        "responses": {
+          "200": { "description": "Lista de instituições retornada com sucesso." }
+        }
+      },
+      "post": {
+        "summary": "Cadastrar uma nova instituição receptora",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "ONG Mãos Dadas" },
+                  "cnpj": { "type": "string", "example": "98.765.432/0001-10" },
+                  "email": { "type": "string", "example": "contato@maosdadas.org" },
+                  "telefone": { "type": "string", "example": "11988887777" },
+                  "endereco": { "type": "string", "example": "Av. B, 456 - São Paulo/SP" }
+                },
+                "required": ["nome", "cnpj", "email", "telefone", "endereco"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Instituição cadastrada com sucesso." },
+          "400": { "description": "Dados inválidos." }
+        }
+      }
+    },
+    "/doacoes": {
+      "get": {
+        "summary": "Listar doações disponíveis (RN03)",
+        "responses": {
+          "200": { "description": "Lista de doações retornada com sucesso." }
+        }
+      },
+      "post": {
+        "summary": "Cadastrar uma nova doação",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estabelecimento_id": { "type": "integer", "example": 1 },
+                  "data_limite_retirada": { "type": "string", "format": "date-time", "example": "2026-10-15T18:00:00Z" }
+                },
+                "required": ["estabelecimento_id", "data_limite_retirada"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Doação cadastrada com sucesso com status DISPONIVEL." },
+          "400": { "description": "Dados inválidos ou estabelecimento inexistente." }
+        }
+      }
+    },
+    "/doacoes/{id}/itens": {
+      "post": {
+        "summary": "Adicionar item a uma doação (RN01, RN02)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "Pão Francês" },
+                  "categoria": { "type": "string", "example": "Padaria" },
+                  "quantidade": { "type": "number", "example": 5.0 },
+                  "unidade_medida": { "type": "string", "example": "kg" },
+                  "validade": { "type": "string", "format": "date", "example": "2026-10-14" }
+                },
+                "required": ["nome", "categoria", "quantidade", "unidade_medida", "validade"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Item adicionado com sucesso." },
+          "400": { "description": "Quantidade deve ser maior que zero ou validade expirada." }
+        }
+      }
+    },
+    "/reservas": {
+      "post": {
+        "summary": "Realizar reserva de doação disponível (RN03, RN04, RN05, RN09)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "doacao_id": { "type": "integer", "example": 1 },
+                  "instituicao_id": { "type": "integer", "example": 1 }
+                },
+                "required": ["doacao_id", "instituicao_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Reserva criada com sucesso. Status da doação alterado para RESERVADA." },
+          "400": { "description": "Doação indisponível ou já reservada." }
+        }
+      }
+    },
+    "/reservas/{id}/confirmar-retirada": {
+      "patch": {
+        "summary": "Confirmar retirada da doação (RN06, RN07)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Retirada confirmada. Status da doação alterado para RETIRADA e reserva CONCLUIDA." },
+          "400": { "description": "Reserva não encontrada ou não ativa." }
+        }
+      }
+    },
+    "/reservas/{id}/cancelar": {
+      "patch": {
+        "summary": "Cancelar uma reserva ativa (RN08)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Reserva marcada como CANCELADA. Doação retornou para DISPONIVEL." }
+        }
+      }
+    }
+  }
+}
