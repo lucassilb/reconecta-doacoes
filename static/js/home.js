@@ -51,12 +51,9 @@
   }
 
   function titulo(nome) {
-    var n = String(nome || "").trim();
-    if (n && n === n.toUpperCase()) {
-      return n.toLowerCase().replace(/(^|\s)(\S)/g, function (m, a, b) { return a + b.toUpperCase(); })
-        .replace(/\b(De|Da|Do|Das|Dos|E)\b/g, function (m) { return m.toLowerCase(); });
-    }
-    return n;
+    // formato de título com siglas preservadas (layout.js)
+    var R = window.ReConecta;
+    return R && R.nomeTitulo ? R.nomeTitulo(nome) : String(nome || "").trim();
   }
 
   function local(municipioUf) {

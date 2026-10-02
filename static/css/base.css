@@ -336,7 +336,7 @@ select.campo__entrada { appearance: none; padding-right: 40px;
 .cabecalho__aba a:not(.btn) { color: var(--tinta); text-decoration: none; font-size: .92rem; font-weight: 500; padding: 8px 10px; border-radius: var(--pilula); }
 .cabecalho__aba a:not(.btn):hover { background: var(--superficie-2); }
 .cabecalho__aba a[aria-current="page"]:not(.btn) { font-weight: 700; }
-.cabecalho__ola { font-size: .92rem; color: var(--tinta-suave); padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 16ch; }
+.cabecalho__ola { font-size: .92rem; color: var(--tinta-suave); padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 24ch; }
 .cabecalho__ola strong { color: var(--tinta); font-weight: 600; }
 .cabecalho__sair { background: none; border: 0; cursor: pointer; font-size: .92rem; color: var(--tinta-suave); padding: 8px 10px; border-radius: var(--pilula); }
 .cabecalho__sair:hover { color: var(--tinta); background: var(--superficie-2); }
