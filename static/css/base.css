@@ -12,42 +12,42 @@
 :root {
   color-scheme: light;
 
-  /* moldura e folha */
-  --moldura: #7C9455;
-  --folha: #F7F5EE;
+  /* moldura e folha: página branca de tom frio sobre moldura verde-clara */
+  --moldura: #9CC173;
+  --folha: #F3F3F9;
   --superficie: #FFFFFF;
-  --superficie-2: #EFECE2;
+  --superficie-2: #ECEDF5;
 
-  /* texto e linhas */
-  --tinta: #1E241B;
-  --tinta-suave: #5A6153;
-  --linha: #E1DDD0;
-  --linha-forte: #B8B2A1;
+  /* texto e linhas: quase preto e cinzas frios */
+  --tinta: #1B1D22;
+  --tinta-suave: #5E6270;
+  --linha: #E2E3EC;
+  --linha-forte: #C4C7D4;
 
   /* marca */
-  --verde: #4B7A2B;          /* CTA pílula; branco sobre ele ≥ 5:1 */
-  --verde-forte: #3C6522;
+  --verde: #4A8326;          /* CTA pílula verde-folha; branco sobre ele 4,6:1 */
+  --verde-forte: #3F7220;
   --verde-tinta: #FFFFFF;
-  --verde-suave: #E6EED9;
-  --verde-texto: #3F6B22;
+  --verde-suave: #E6F1DA;
+  --verde-texto: #3F7420;
 
-  --acento: #C8532A;         /* terracota: destaques pontuais */
-  --acento-texto: #9A3D1B;
-  --acento-suave: #F7E2D6;
-  --trigo: #E3B95B;
+  --acento: #E2A93B;         /* âmbar discreto (como as estrelas da referência) */
+  --acento-texto: #8A5B0B;
+  --acento-suave: #FBF0D9;
+  --trigo: #E9C46F;
 
   /* estados */
-  --ok: #2F6E2A;
-  --ok-suave: #DFEFD9;
+  --ok: #3F7420;
+  --ok-suave: #E6F1DA;
   --erro: #A8261D;
-  --erro-suave: #FBE6E3;
-  --erro-linha: #E7B4AD;
+  --erro-suave: #FCEBE9;
+  --erro-linha: #EDBDB7;
   --alerta: #7A4E00;
-  --alerta-suave: #FBEFD3;
+  --alerta-suave: #FBF0D9;
 
-  --foco: #C8532A;
-  --sombra-1: 0 1px 2px rgba(30, 36, 27, .06);
-  --sombra-2: 0 2px 4px rgba(30, 36, 27, .04), 0 18px 40px -18px rgba(30, 36, 27, .28);
+  --foco: #4A8326;
+  --sombra-1: 0 1px 2px rgba(27, 29, 34, .05);
+  --sombra-2: 0 1px 3px rgba(27, 29, 34, .05), 0 16px 36px -18px rgba(27, 29, 34, .22);
 
   --raio: 18px;
   --raio-p: 12px;
@@ -69,36 +69,36 @@
   :root {
     color-scheme: dark;
 
-    --moldura: #0D120B;
-    --folha: #151A13;
-    --superficie: #1D2419;
-    --superficie-2: #232B1F;
+    --moldura: #0E100F;
+    --folha: #16171C;
+    --superficie: #1F2026;
+    --superficie-2: #26272E;
 
-    --tinta: #ECEFE6;
-    --tinta-suave: #A9B19F;
-    --linha: #2E3828;
-    --linha-forte: #4B5743;
+    --tinta: #ECEDF2;
+    --tinta-suave: #A3A6B3;
+    --linha: #2E3038;
+    --linha-forte: #4A4D58;
 
-    --verde: #A3CF7E;
-    --verde-forte: #B9DD99;
+    --verde: #A6D67C;
+    --verde-forte: #B8E092;
     --verde-tinta: #13200B;
-    --verde-suave: #263520;
-    --verde-texto: #A9D486;
+    --verde-suave: #26331F;
+    --verde-texto: #B2DE8C;
 
-    --acento: #F08A5D;
-    --acento-texto: #F4A27E;
-    --acento-suave: #3A2219;
+    --acento: #F2C266;
+    --acento-texto: #F2C266;
+    --acento-suave: #3A2F17;
     --trigo: #E9C46F;
 
-    --ok: #9BD48E;
-    --ok-suave: #1E3320;
+    --ok: #B2DE8C;
+    --ok-suave: #26331F;
     --erro: #FF9C91;
     --erro-suave: #3A1D1A;
     --erro-linha: #6E3530;
     --alerta: #F2C46B;
     --alerta-suave: #362A12;
 
-    --foco: #F4A27E;
+    --foco: #B2DE8C;
     --sombra-1: 0 1px 2px rgba(0, 0, 0, .35);
     --sombra-2: 0 2px 4px rgba(0, 0, 0, .25), 0 20px 44px -20px rgba(0, 0, 0, .7);
   }
@@ -168,7 +168,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-size: .75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
   color: var(--tinta-suave);
 }
-.sobretitulo--acento { color: var(--acento-texto); }
+.sobretitulo--acento { color: var(--verde-texto); }
 
 .lead { font-size: 1.05rem; color: var(--tinta-suave); max-width: 52ch; }
 
