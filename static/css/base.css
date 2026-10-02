@@ -5,7 +5,7 @@
 
    O corpo da página é a "folha" clara sobre a moldura verde-oliva. */
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Public+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400&family=Manrope:wght@400;500;600;700&display=swap");
 
 /* ---------- tokens ---------- */
 
@@ -54,8 +54,8 @@
   --raio-folha: 30px;
   --pilula: 999px;
 
-  --fonte-titulo: "Fraunces", Georgia, "Times New Roman", serif;
-  --fonte-texto: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fonte-titulo: "Libre Baskerville", Georgia, serif;
+  --fonte-texto: "Manrope", "Segoe UI", "Helvetica Neue", sans-serif;
   --fonte-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
 
   --largura: 1180px;
@@ -120,7 +120,7 @@ body {
   color: var(--tinta);
   font-family: var(--fonte-texto);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
   position: relative;
@@ -131,13 +131,13 @@ h1, h2, h3, h4 {
   margin: 0;
   font-family: var(--fonte-titulo);
   font-weight: 400;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.045em;
   line-height: 1.08;
-  font-variation-settings: "opsz" 144;
 }
 h1 { font-size: clamp(2.6rem, 8vw, 5.4rem); }
 h2 { font-size: clamp(2rem, 5vw, 3.2rem); }
-h3 { font-size: clamp(1.25rem, 2.4vw, 1.6rem); font-weight: 500; line-height: 1.2; font-variation-settings: "opsz" 36; }
+h3, h4 { font-family: var(--fonte-texto); font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; }
+h3 { font-size: clamp(1.25rem, 2.4vw, 1.6rem); }
 p { margin: 0; }
 img, svg { max-width: 100%; }
 img { height: auto; display: block; }
@@ -172,7 +172,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .lead { font-size: 1.05rem; color: var(--tinta-suave); max-width: 52ch; }
 
-.destaque-serifa { font-family: var(--fonte-titulo); font-style: italic; color: var(--verde-texto); }
+.destaque-serifa { font-family: var(--fonte-titulo); font-style: normal; font-weight: 400; color: var(--verde-texto); }
 
 /* ---------- botões ---------- */
 
@@ -280,7 +280,7 @@ select.campo__entrada { appearance: none; padding-right: 40px;
 .metrica { display: grid; align-content: start; gap: 2px; padding-inline: clamp(12px, 2.6vw, 24px); border-left: 1px solid var(--linha-forte); }
 .metrica:first-child { padding-left: 0; border-left: 0; }
 .metrica__rotulo { order: -1; font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-suave); }
-.metrica__valor { font-family: var(--fonte-titulo); font-size: 1.45rem; line-height: 1.2; font-variant-numeric: lining-nums tabular-nums; }
+.metrica__valor { font-family: var(--fonte-texto); font-size: 1.45rem; font-weight: 700; line-height: 1.15; font-variant-numeric: lining-nums tabular-nums; }
 
 /* ---------- cabeçalho (injetado por layout.js) ---------- */
 
@@ -298,7 +298,7 @@ select.campo__entrada { appearance: none; padding-right: 40px;
   border-right: 1px solid var(--linha-forte);
 }
 .cabecalho__marca svg { width: 34px; height: 34px; flex: none; }
-.cabecalho__nome { font-family: var(--fonte-titulo); font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; font-variation-settings: "opsz" 36; }
+.cabecalho__nome { font-family: var(--fonte-texto); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.04em; }
 
 .cabecalho__nav { display: none; }
 .cabecalho__nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }

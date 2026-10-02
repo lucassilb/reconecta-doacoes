@@ -17,8 +17,8 @@
   animation: rc-surgir .3s ease both;
 }
 
-.entrar h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 600; }
-.entrar h1 em { font-family: var(--fonte-titulo); font-style: italic; color: var(--verde-texto); font-weight: 500; }
+.entrar h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 400; }
+.entrar h1 em { font-family: var(--fonte-titulo); font-style: normal; color: var(--verde-texto); font-weight: 400; }
 .entrar__lead { color: var(--tinta-suave); font-size: .95rem; }
 
 .entrar__form { display: grid; gap: 16px; margin-top: 12px; }
