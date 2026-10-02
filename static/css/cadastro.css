@@ -24,8 +24,8 @@
   --raio: 14px;
   --raio-p: 10px;
 
-  --fonte-titulo: "Fraunces", Georgia, "Times New Roman", serif;
-  --fonte-texto: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fonte-titulo: "Libre Baskerville", Georgia, serif;
+  --fonte-texto: "Manrope", "Segoe UI", "Helvetica Neue", sans-serif;
   --fonte-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
 }
 
@@ -47,7 +47,8 @@ html { -webkit-text-size-adjust: 100%; }
 /* body (margem da moldura, folha e tipografia) vem de base.css;
    os tokens abaixo mantêm a identidade da página de cadastro. */
 
-h1, h2, h3 { margin: 0; font-family: var(--fonte-titulo); font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+h1, h2, h3 { margin: 0; font-family: var(--fonte-titulo); font-weight: 400; letter-spacing: -0.045em; line-height: 1.12; }
+h3 { font-family: var(--fonte-texto); font-weight: 700; letter-spacing: -0.03em; }
 p { margin: 0; }
 a { color: var(--marca-texto); text-underline-offset: 3px; }
 button, input { font: inherit; color: inherit; }
@@ -97,11 +98,11 @@ button, input { font: inherit; color: inherit; }
 
 .marca { display: flex; align-items: center; gap: 10px; color: var(--folha-viva); }
 .marca__simbolo { width: 36px; height: 36px; flex: none; }
-.marca__nome { font-family: var(--fonte-titulo); font-size: 1.35rem; font-weight: 700; color: var(--vitrine-tinta); letter-spacing: -0.01em; }
+.marca__nome { font-family: var(--fonte-texto); font-size: 1.35rem; font-weight: 700; color: var(--vitrine-tinta); letter-spacing: -0.04em; }
 
 .vitrine__texto { display: grid; gap: 10px; }
-.vitrine h1 { font-size: clamp(1.75rem, 6vw, 3.1rem); font-weight: 600; }
-.vitrine h1 em { font-style: italic; color: var(--acento-claro); font-weight: 500; }
+.vitrine h1 { font-size: clamp(1.75rem, 6vw, 3.1rem); font-weight: 400; }
+.vitrine h1 em { font-style: normal; color: var(--acento-claro); font-weight: 400; }
 .vitrine__lead { color: var(--vitrine-suave); max-width: 44ch; }
 
 .trilha { list-style: none; margin: 0; padding: 0; display: none; gap: 14px; }
@@ -111,7 +112,7 @@ button, input { font: inherit; color: inherit; }
   flex: none; width: 28px; height: 28px; border-radius: 50%;
   display: grid; place-items: center;
   border: 1.5px solid var(--linha-forte);
-  font-family: var(--fonte-titulo); font-weight: 600; font-size: .9rem; color: var(--vitrine-tinta);
+  font-family: var(--fonte-texto); font-weight: 700; font-size: .9rem; color: var(--vitrine-tinta);
 }
 
 .vitrine__arte { display: none; width: 100%; max-width: 380px; color: var(--vitrine-tinta); margin-top: auto; }
@@ -187,7 +188,7 @@ button, input { font: inherit; color: inherit; }
 .perfil__icone svg { width: 28px; height: 28px; }
 
 .perfil__texto { display: grid; gap: 4px; }
-.perfil__titulo { font-family: var(--fonte-titulo); font-size: 1.2rem; font-weight: 600; }
+.perfil__titulo { font-family: var(--fonte-texto); font-size: 1.2rem; font-weight: 700; }
 .perfil__desc { font-size: .9rem; color: var(--tinta-suave); line-height: 1.45; }
 
 .perfil__marcador {
@@ -330,7 +331,7 @@ button, input { font: inherit; color: inherit; }
 .empresa__topo { padding: 18px 18px 14px; display: grid; gap: 6px; }
 .empresa__linha-selo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .empresa__cnpj { font-family: var(--fonte-mono); font-size: .9rem; color: var(--tinta-suave); }
-.empresa__nome { font-family: var(--fonte-titulo); font-size: 1.25rem; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.empresa__nome { font-family: var(--fonte-texto); font-size: 1.25rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .empresa__fantasia { font-size: .92rem; color: var(--tinta-suave); overflow-wrap: anywhere; }
 .empresa__local { font-size: .9rem; color: var(--tinta-suave); display: flex; gap: 6px; align-items: center; }
 .empresa__local svg { width: 14px; height: 14px; flex: none; }

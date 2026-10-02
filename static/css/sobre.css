@@ -1,7 +1,7 @@
 /* ReConecta — Sobre. Depende de base.css. */
 
-.sobre h1 em, .sobre h2 em { font-style: italic; color: var(--verde-texto); font-weight: 350; }
-.sobre h2 { font-weight: 350; }
+.sobre h1 em, .sobre h2 em { font-style: normal; color: var(--verde-texto); font-weight: 400; }
+.sobre h2 { font-weight: 400; }
 
 .bloco { margin-top: clamp(64px, 10vw, 128px); scroll-margin-top: 24px; }
 .cabeca { display: grid; gap: 14px; max-width: 760px; margin-bottom: clamp(28px, 4vw, 44px); }
@@ -13,7 +13,7 @@
   padding-top: clamp(12px, 3vw, 40px);
 }
 .abertura__texto { display: grid; gap: 20px; }
-.abertura h1 { font-size: clamp(2.7rem, 9vw, 4.6rem); font-weight: 350; letter-spacing: -0.025em; }
+.abertura h1 { font-size: clamp(2.7rem, 9vw, 4.6rem); font-weight: 400; letter-spacing: -0.055em; line-height: 1.04; }
 
 .indice { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .indice a {
@@ -47,12 +47,12 @@
 }
 .problema__numero { display: grid; gap: 14px; align-content: start; }
 .numero {
-  font-family: var(--fonte-titulo); font-weight: 300; line-height: .9;
+  font-family: var(--fonte-titulo); font-weight: 400; line-height: .9;
   font-size: clamp(6rem, 20vw, 10rem); letter-spacing: -0.04em;
-  color: var(--verde-texto); font-variation-settings: "opsz" 144;
+  color: var(--verde-texto);
   display: flex; align-items: baseline;
 }
-.numero__barra { color: var(--acento); margin-inline: .02em; font-style: italic; }
+.numero__barra { color: var(--acento); margin-inline: .02em; font-style: normal; }
 .problema__legenda { font-size: 1.05rem; max-width: 36ch; }
 .problema__legenda strong { font-weight: 600; }
 .fonte { font-size: .82rem; color: var(--tinta-suave); }
@@ -81,7 +81,7 @@
 }
 .regras li::before {
   content: counter(regra, decimal-leading-zero); grid-row: span 2;
-  font-family: var(--fonte-titulo); font-size: 1.8rem; font-weight: 300; color: var(--verde-texto); line-height: 1;
+  font-family: var(--fonte-titulo); font-size: 1.8rem; font-weight: 400; color: var(--verde-texto); line-height: 1;
 }
 .regras__fase { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--acento-texto); }
 .regras p { color: var(--tinta-suave); }
@@ -104,7 +104,7 @@
 .verificacao__n {
   width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
   background: var(--verde); color: var(--verde-tinta);
-  font-family: var(--fonte-titulo); font-size: 1.15rem; font-weight: 500;
+  font-family: var(--fonte-texto); font-size: 1.15rem; font-weight: 700;
 }
 .verificacao p { color: var(--tinta-suave); font-size: .95rem; }
 @media (min-width: 860px) { .verificacoes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -119,7 +119,7 @@
 
 .papeis { margin: 0; display: grid; gap: 0; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--linha); }
 .papel { display: grid; gap: 8px; padding: 24px 0; border-bottom: 1px solid var(--linha); }
-.papel dt { display: flex; align-items: center; gap: 14px; font-family: var(--fonte-titulo); font-size: 1.35rem; font-variation-settings: "opsz" 36; }
+.papel dt { display: flex; align-items: center; gap: 14px; font-family: var(--fonte-texto); font-size: 1.35rem; font-weight: 700; }
 .papel dt img { width: 56px; height: 56px; flex: none; }
 .papel dd { margin: 0; color: var(--tinta-suave); max-width: 62ch; }
 @media (min-width: 860px) {

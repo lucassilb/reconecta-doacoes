@@ -13,8 +13,8 @@
 .lateral { display: none; }
 
 .hero__texto { display: grid; gap: 20px; align-content: center; }
-.hero h1 { text-wrap: balance; font-size: clamp(2.6rem, 10vw, 4.3rem); font-weight: 350; letter-spacing: -0.025em; }
-.hero h1 em, .secao h2 em, .cta-final h2 em { font-style: italic; color: var(--verde-texto); font-weight: 350; }
+.hero h1 { text-wrap: balance; font-size: clamp(2.6rem, 10vw, 4.3rem); font-weight: 400; letter-spacing: -0.055em; line-height: 1.04; }
+.hero h1 em, .secao h2 em, .cta-final h2 em { font-style: normal; color: var(--verde-texto); font-weight: 400; }
 .hero .lead { font-size: 1.02rem; }
 .hero__metricas { margin-top: 8px; }
 
@@ -32,7 +32,7 @@
 .hero__cartao { width: 100%; max-width: 340px; padding: 16px 18px; display: grid; gap: 8px; animation: rc-surgir .4s ease both; }
 .hero__cartao--doacao { margin-top: -56px; position: relative; }
 
-.ultima__nome { font-family: var(--fonte-titulo); font-size: 1.12rem; font-weight: 500; line-height: 1.25; font-variation-settings: "opsz" 36; }
+.ultima__nome { font-family: var(--fonte-texto); font-size: 1.12rem; font-weight: 700; line-height: 1.2; }
 .ultima__local { font-size: .82rem; color: var(--tinta-suave); }
 .ultima__itens { font-size: .88rem; color: var(--tinta); }
 .ultima__rodape { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; font-size: .82rem; color: var(--tinta-suave); padding-top: 8px; border-top: 1px solid var(--linha); }
@@ -45,7 +45,7 @@
   flex: none; width: 24px; height: 24px; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--verde-suave); color: var(--verde-texto);
-  font-family: var(--fonte-titulo); font-size: .82rem; font-weight: 600;
+  font-family: var(--fonte-texto); font-size: .82rem; font-weight: 700;
 }
 
 /* esqueleto de carregamento */
@@ -126,7 +126,7 @@
 .doacao__img { width: 76px; height: 76px; border-radius: 50%; flex: none; box-shadow: 0 8px 18px -10px rgba(30, 36, 27, .45); }
 span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 .doacao__corpo { display: grid; gap: 4px; min-width: 0; }
-.doacao__nome { font-family: var(--fonte-titulo); font-size: 1.12rem; font-weight: 500; line-height: 1.25; font-variation-settings: "opsz" 36; overflow-wrap: anywhere; }
+.doacao__nome { font-family: var(--fonte-texto); font-size: 1.12rem; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .doacao__local { font-size: .82rem; color: var(--tinta-suave); }
 .doacao__itens { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; font-size: .88rem; }
 .doacao__itens li { display: flex; justify-content: space-between; gap: 10px; }
@@ -159,11 +159,11 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 
 .secao { margin-top: clamp(64px, 10vw, 128px); }
 .secao__cabeca { display: grid; gap: 14px; max-width: 760px; margin-bottom: clamp(28px, 4vw, 48px); }
-.secao h2 { font-weight: 350; }
+.secao h2 { font-weight: 400; }
 
 .passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); counter-reset: passo; }
 .passo { display: grid; gap: 10px; padding-top: 22px; border-top: 1.5px solid var(--tinta); }
-.passo__n { font-family: var(--fonte-titulo); font-size: 3rem; line-height: 1; font-weight: 300; color: var(--verde-texto); font-variation-settings: "opsz" 144; }
+.passo__n { font-family: var(--fonte-titulo); font-size: 3rem; line-height: 1; font-weight: 400; color: var(--verde-texto); }
 .passo p { color: var(--tinta-suave); }
 @media (min-width: 800px) { .passos { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; } }
 
@@ -207,7 +207,7 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
   border: 1px solid var(--linha);
 }
 .cta-final__img { width: 96px; height: 96px; }
-.cta-final h2 { font-weight: 350; max-width: 18ch; }
+.cta-final h2 { font-weight: 400; max-width: 18ch; }
 .cta-final .lead { margin-inline: auto; }
 .cta-final .btn { margin-top: 8px; }
 .doacao__local:empty { display: none; }
