@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Laticínios">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#E6EEF5"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#BCD0E2" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <path d="M38 38h20v8l6 10v36a4 4 0 0 1-4 4H36a4 4 0 0 1-4-4V56l6-10z" fill="#FFFFFF"/>
+    <rect x="38" y="32" width="20" height="8" rx="2" fill="#4A8BC7"/>
+    <rect x="32" y="64" width="32" height="14" fill="#4A8BC7" opacity=".85"/>
+    <path d="M62 80l30-16 4 18-30 10z" fill="#F2CF4A"/>
+    <path d="M62 80l30-16 2 6-30 14z" fill="#F7DE7C"/>
+    <circle cx="76" cy="84" r="3" fill="#E0B532"/><circle cx="86" cy="78" r="2.4" fill="#E0B532"/></g>
+</svg>

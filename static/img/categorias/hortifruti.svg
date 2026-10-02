@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Hortifrúti">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#E3EFD3"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#B9D39A" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <circle cx="48" cy="66" r="24" fill="#E2533A"/>
+    <circle cx="41" cy="58" r="7" fill="#F2836A" opacity=".7"/>
+    <path d="M48 46l4 6 7-1-4 6 4 6-7-1-4 6-4-6-7 1 4-6-4-6 7 1z" fill="#4C8530"/>
+    <path d="M70 40c14-6 26 0 30 10-12 6-26 4-34-6z" fill="#6FA544"/>
+    <path d="M72 44c8 2 16 4 24 6" stroke="#4C7A2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="80" cy="76" r="16" fill="#F29B38"/>
+    <circle cx="78" cy="74" r="2" fill="#B85F10" opacity=".7"/></g>
+</svg>

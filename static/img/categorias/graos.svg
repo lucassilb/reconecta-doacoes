@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Grãos e cereais">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#F1EAD6"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#D8C79C" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <path d="M36 44c0-6 48-6 48 0l4 40a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8z" fill="#E9DDBF"/>
+    <path d="M36 44c8-8 40-8 48 0" stroke="#C9B585" stroke-width="3" fill="none"/>
+    <rect x="44" y="58" width="32" height="16" rx="4" fill="#5E9A3A"/>
+    <g fill="#FFFDF6"><ellipse cx="50" cy="40" rx="3.4" ry="1.8"/><ellipse cx="60" cy="38" rx="3.4" ry="1.8"/><ellipse cx="70" cy="40" rx="3.4" ry="1.8"/></g>
+    <path d="M90 92c0-20 2-36 6-52" stroke="#C9A24A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <g fill="#DDB55A"><ellipse cx="92" cy="48" rx="3" ry="6" transform="rotate(-20 92 48)"/><ellipse cx="99" cy="52" rx="3" ry="6" transform="rotate(25 99 52)"/><ellipse cx="91" cy="60" rx="3" ry="6" transform="rotate(-20 91 60)"/><ellipse cx="98" cy="64" rx="3" ry="6" transform="rotate(25 98 64)"/></g></g>
+</svg>

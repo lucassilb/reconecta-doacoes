@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Carnes e peixes">
+  <defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#2A1A08" flood-opacity=".25"/></filter></defs>
+  <circle cx="60" cy="60" r="60" fill="#F7E0D8"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#E8B6A5" stroke-width="1.5" opacity=".6"/>
+  <g filter="url(#s)">
+    <path d="M24 62c14-18 40-22 60-10l12-10-2 18 2 18-12-10c-20 12-46 8-60-6z" fill="#7FA6BE"/>
+    <path d="M28 62c14-12 36-14 54-6-18 8-40 10-54 6z" fill="#A9C6D8"/>
+    <circle cx="38" cy="58" r="3" fill="#24384A"/>
+    <path d="M52 52c2 6 2 14 0 20M62 50c2 7 2 17 0 24" stroke="#5F879F" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+</svg>
