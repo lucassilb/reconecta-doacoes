@@ -146,3 +146,4 @@
 }
 .cta h2 { max-width: 20ch; text-wrap: balance; }
 .cta__acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.regras li.regras__futura::before { color: var(--tinta-suave); }

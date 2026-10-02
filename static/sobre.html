@@ -23,7 +23,7 @@
       <div class="abertura__texto">
         <p class="sobretitulo sobretitulo--acento">Sobre o ReConecta</p>
         <h1 id="sobre-titulo">Comida boa<br>merece <em>destino</em></h1>
-        <p class="lead">O ReConecta é uma plataforma que liga estabelecimentos com alimento excedente a instituições que alimentam quem precisa. Ela organiza o caminho entre o balcão e a mesa: o que foi doado, quanto, até quando dá para consumir e quem retirou.</p>
+        <p class="lead">O ReConecta é uma plataforma que liga estabelecimentos com alimento excedente a instituições que alimentam quem precisa. Ela organiza o caminho entre o balcão e a mesa: o que foi doado, quanto e até quando dá para consumir e retirar.</p>
         <nav class="indice" aria-label="Nesta página">
           <a href="#problema">O problema</a>
           <a href="#missao">Missão</a>
@@ -73,16 +73,16 @@
     <section class="bloco container" id="regras" aria-labelledby="regras-titulo">
       <div class="cabeca">
         <p class="sobretitulo sobretitulo--acento">Como funciona</p>
-        <h2 id="regras-titulo">Regras que a plataforma garante</h2>
-        <p class="lead">Elas não dependem de boa vontade de ninguém: estão no sistema e valem para todas as doações.</p>
+        <h2 id="regras-titulo">As regras do processo de doação</h2>
+        <p class="lead">As duas primeiras já valem hoje, na publicação de cada doação. As demais são as regras de reserva e retirada e entram em vigor junto com essa etapa, que é a próxima da plataforma.</p>
       </div>
       <ol class="regras">
-        <li><span class="regras__fase">Publicar</span><p>Todo item precisa ter <strong>quantidade maior que zero</strong>.</p></li>
-        <li><span class="regras__fase">Publicar</span><p>Alimento com a <strong>validade vencida</strong> não pode ser disponibilizado para retirada.</p></li>
-        <li><span class="regras__fase">Reservar</span><p>Só doações <strong>disponíveis</strong> podem ser reservadas.</p></li>
-        <li><span class="regras__fase">Reservar</span><p>Uma doação tem <strong>no máximo uma reserva ativa</strong> por vez; ao reservar, ela deixa de aparecer como disponível.</p></li>
-        <li><span class="regras__fase">Retirar</span><p>Só uma doação <strong>reservada</strong> pode ter a retirada confirmada, e então passa a constar como retirada.</p></li>
-        <li><span class="regras__fase">Cancelar</span><p>A reserva pode ser cancelada antes da retirada. Se a doação continuar válida, <strong>volta a ficar disponível</strong>.</p></li>
+        <li><span class="regras__fase">Publicar · já vale</span><p>Todo item precisa ter <strong>quantidade maior que zero</strong>.</p></li>
+        <li><span class="regras__fase">Publicar · já vale</span><p>Alimento com a <strong>validade vencida</strong> não pode ser disponibilizado para retirada.</p></li>
+        <li class="regras__futura"><span class="regras__fase">Reservar · próxima etapa</span><p>Só doações <strong>disponíveis</strong> podem ser reservadas.</p></li>
+        <li class="regras__futura"><span class="regras__fase">Reservar · próxima etapa</span><p>Uma doação tem <strong>no máximo uma reserva ativa</strong> por vez; ao reservar, ela deixa de aparecer como disponível.</p></li>
+        <li class="regras__futura"><span class="regras__fase">Retirar · próxima etapa</span><p>Só uma doação <strong>reservada</strong> pode ter a retirada confirmada, e então passa a constar como retirada.</p></li>
+        <li class="regras__futura"><span class="regras__fase">Cancelar · próxima etapa</span><p>A reserva pode ser cancelada antes da retirada. Se a doação continuar válida, <strong>volta a ficar disponível</strong>.</p></li>
       </ol>
     </section>
 
@@ -143,7 +143,7 @@
       <dl class="papeis">
         <div class="papel">
           <dt><img src="/static/img/categorias/padaria.svg" width="64" height="64" alt="">Empresas do setor de alimentos</dt>
-          <dd>Restaurantes, padarias, mercados, hortifrutis, distribuidores e indústrias de alimentos com CNPJ ativo. Publicam as doações e acompanham o que foi retirado.</dd>
+          <dd>Restaurantes, padarias, mercados, hortifrutis, distribuidores e indústrias de alimentos com CNPJ ativo. Publicam as doações e acompanham o que está aberto.</dd>
         </div>
         <div class="papel">
           <dt><img src="/static/img/categorias/hortifruti.svg" width="64" height="64" alt="">Doadores</dt>
@@ -151,7 +151,7 @@
         </div>
         <div class="papel">
           <dt><img src="/static/img/categorias/refeicoes.svg" width="64" height="64" alt="">Instituições sociais</dt>
-          <dd>ONGs, associações e projetos que recebem e distribuem alimentos. Reservam doações e confirmam a retirada; hoje isso é feito pela API do ReConecta.</dd>
+          <dd>ONGs, associações e projetos que recebem e distribuem alimentos. Já podem ver as doações abertas; a reserva e a confirmação de retirada pelas instituições são a próxima etapa da plataforma.</dd>
         </div>
       </dl>
     </section>
@@ -164,7 +164,7 @@
           <h2 id="projeto-titulo">Nasceu em sala de aula, <em>funciona de verdade</em></h2>
         </div>
         <div class="projeto__texto">
-          <p>O ReConecta começou como projeto do CP1 da disciplina <strong>Computational Thinking with Python</strong>. A primeira versão foi o backend: API REST em Python e Flask, banco de dados e as regras de doação acima, documentadas em Swagger.</p>
+          <p>O ReConecta começou como projeto do CP1 da disciplina <strong>Computational Thinking with Python</strong>. A primeira versão foi o backend: API REST em Python e Flask, com banco de dados e cadastro de estabelecimentos, instituições e doações, documentada em Swagger.</p>
           <p>Depois vieram o cadastro com consulta real à Receita Federal, o critério de atividade alimentar e este site. Tudo o que aparece aqui sai do mesmo banco de dados que a API usa.</p>
           <a class="btn btn--secundario btn--pequeno" href="/swagger">Ver a documentação da API</a>
         </div>
