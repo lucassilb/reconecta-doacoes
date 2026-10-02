@@ -1,45 +1,26 @@
 /* ReConecta — página de cadastro
-   Paleta: verde-folha (marca), terracota (acento), creme (fundo). */
+   Cores: tokens de base.css (página branca fria, verdes claros). */
 
 :root {
   color-scheme: light;
 
-  --fundo: #F6F1E7;
-  --superficie: #FFFDF8;
-  --superficie-2: #F1EBDF;
-  --tinta: #1B2620;
-  --tinta-suave: #56635B;
-  --linha: #DDD4C3;
-  --linha-forte: #B9AE9A;
+  /* cores: apelidos dos tokens de base.css (claro e escuro vêm de lá) */
+  --fundo: var(--folha);
+  --marca: var(--verde);
+  --marca-forte: var(--verde-forte);
+  --marca-tinta: var(--verde-tinta);
+  --marca-suave: var(--verde-suave);
+  --marca-texto: var(--verde-texto);
 
-  --marca: #1F5B43;
-  --marca-forte: #17473A;
-  --marca-tinta: #FFFFFF;
-  --marca-suave: #E1EDE4;
-  --marca-texto: #1F5B43;
+  /* painel lateral: verde-claro com texto escuro */
+  --vitrine-bg: var(--verde-suave);
+  --vitrine-tinta: var(--tinta);
+  --vitrine-suave: var(--tinta-suave);
+  --acento-claro: var(--verde-texto);
+  --folha-viva: var(--verde);
+  --ilustra-fruta: #F2A27C;
 
-  --acento: #C8532A;
-  --acento-texto: #9A3D1B;
-  --acento-suave: #F7E2D6;
-
-  --ok: #1D6E46;
-  --ok-suave: #DCEFE3;
-  --erro: #A8261D;
-  --erro-suave: #FBE6E3;
-  --erro-linha: #E7B4AD;
-  --alerta: #7A4E00;
-  --alerta-suave: #FBEFD3;
-
-  /* painel lateral */
-  --vitrine-bg: #173F30;
-  --vitrine-tinta: #F3EFE4;
-  --vitrine-suave: #B9CBBF;
-  --acento-claro: #F2A27C;
-  --folha-viva: #7FBF8E;
-  --trigo: #E8C77A;
-
-  --foco: #C8532A;
-  --sombra: 0 1px 2px rgba(27, 38, 32, .06), 0 8px 24px -12px rgba(27, 38, 32, .18);
+  --sombra: var(--sombra-2);
   --raio: 14px;
   --raio-p: 10px;
 
@@ -52,38 +33,7 @@
   :root {
     color-scheme: dark;
 
-    --fundo: #101613;
-    --superficie: #18201B;
-    --superficie-2: #1F2923;
-    --tinta: #ECEFE8;
-    --tinta-suave: #A5B2A9;
-    --linha: #2E3A33;
-    --linha-forte: #4A5950;
-
-    --marca: #7DD3A6;
-    --marca-forte: #9BE0BB;
-    --marca-tinta: #0E2219;
-    --marca-suave: #1D3429;
-    --marca-texto: #8FDCB3;
-
-    --acento: #F08A5D;
-    --acento-texto: #F4A27E;
-    --acento-suave: #3A2219;
-
-    --ok: #8FDCB3;
-    --ok-suave: #1B3327;
-    --erro: #FF9C91;
-    --erro-suave: #3A1D1A;
-    --erro-linha: #6E3530;
-    --alerta: #F2C46B;
-    --alerta-suave: #362A12;
-
-    --vitrine-bg: #0C1D16;
-    --vitrine-tinta: #ECEFE8;
-    --vitrine-suave: #9DB3A5;
-
-    --foco: #F4A27E;
-    --sombra: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px -14px rgba(0, 0, 0, .6);
+    /* cores do modo escuro: herdadas de base.css pelos apelidos acima */
   }
 }
 
@@ -110,7 +60,7 @@ button, input { font: inherit; color: inherit; }
 }
 
 .pular {
-  position: absolute; left: 16px; top: -60px; z-index: 10;
+  position: absolute; left: 16px; top: -120px; z-index: 10;
   background: var(--marca); color: var(--marca-tinta);
   padding: 10px 16px; border-radius: var(--raio-p); text-decoration: none; font-weight: 600;
 }
@@ -160,7 +110,7 @@ button, input { font: inherit; color: inherit; }
 .trilha__n {
   flex: none; width: 28px; height: 28px; border-radius: 50%;
   display: grid; place-items: center;
-  border: 1.5px solid rgba(243, 239, 228, .35);
+  border: 1.5px solid var(--linha-forte);
   font-family: var(--fonte-titulo); font-weight: 600; font-size: .9rem; color: var(--vitrine-tinta);
 }
 
