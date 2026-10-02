@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro · ReConecta</title>
+  <meta name="description" content="Cadastre sua empresa do setor de alimentos ou seja um doador no ReConecta, a plataforma de redistribuição de excedentes alimentares.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/cadastro.css">
+  <script src="/static/js/cadastro.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o cadastro</a>
+
+  <div class="pagina">
+    <aside class="vitrine" aria-labelledby="vitrine-titulo">
+     <div class="vitrine__fixo">
+      <div class="marca">
+        <svg class="marca__simbolo" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <circle cx="20" cy="20" r="20" fill="currentColor"/>
+          <path d="M12 24c0-6.6 5-11.5 12.5-12-.4 7.4-5.3 12.3-11.9 12.3" fill="none" stroke="var(--vitrine-bg)" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M13 27.5c2.6-4.4 6-7.6 10.4-9.6" fill="none" stroke="var(--vitrine-bg)" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M27.5 22.5a8 8 0 0 1-8.5 7.4" fill="none" stroke="var(--acento-claro)" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M20.6 27.6l-1.8 2.3 2.4 1.7" fill="none" stroke="var(--acento-claro)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="marca__nome">ReConecta</span>
+      </div>
+
+      <div class="vitrine__texto">
+        <p class="sobretitulo">Redistribuição de excedentes alimentares</p>
+        <h1 id="vitrine-titulo">Excedente de hoje, <em>refeição</em> de amanhã.</h1>
+        <p class="vitrine__lead">O ReConecta liga quem tem alimento bom sobrando a instituições que alimentam quem precisa. Tudo começa pelo seu cadastro.</p>
+      </div>
+
+      <ol class="trilha" aria-label="Como funciona">
+        <li><span class="trilha__n" aria-hidden="true">1</span><span><strong>Cadastre-se</strong> como empresa do setor de alimentos ou como doador.</span></li>
+        <li><span class="trilha__n" aria-hidden="true">2</span><span><strong>Publique o excedente</strong> com quantidade e validade de cada item.</span></li>
+        <li><span class="trilha__n" aria-hidden="true">3</span><span><strong>Uma instituição reserva e retira</strong>, com o histórico registrado.</span></li>
+      </ol>
+
+      <svg class="vitrine__arte" viewBox="0 0 320 120" aria-hidden="true" focusable="false">
+        <path d="M18 70h284" stroke="currentColor" stroke-opacity=".25" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"/>
+        <circle cx="62" cy="58" r="26" fill="var(--acento-claro)"/>
+        <path d="M62 33c3-8 9-11 15-10-2 7-8 10-15 10z" fill="var(--folha)"/>
+        <rect x="118" y="38" width="44" height="44" rx="12" fill="var(--folha)"/>
+        <rect x="128" y="30" width="24" height="12" rx="6" fill="var(--folha)" opacity=".7"/>
+        <ellipse cx="214" cy="62" rx="30" ry="20" fill="var(--trigo)"/>
+        <path d="M196 56c6-4 12-4 18 0s12 4 18 0" fill="none" stroke="var(--vitrine-bg)" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="276" cy="64" r="16" fill="var(--acento-claro)" opacity=".75"/>
+        <circle cx="290" cy="50" r="10" fill="var(--trigo)" opacity=".9"/>
+      </svg>
+     </div>
+    </aside>
+
+    <main id="conteudo" class="painel" tabindex="-1">
+      <div class="painel__corpo">
+
+        <!-- Etapa: escolha do perfil + formulários -->
+        <section id="etapa-cadastro" aria-labelledby="cadastro-titulo">
+          <header class="cabecalho">
+            <h2 id="cadastro-titulo">Crie seu cadastro</h2>
+            <p class="cabecalho__sub">Escolha como você vai participar.</p>
+          </header>
+
+          <fieldset class="perfis">
+            <legend class="sr-only">Tipo de cadastro</legend>
+
+            <label class="perfil perfil--empresa">
+              <input type="radio" name="perfil" value="empresa" class="perfil__radio">
+              <span class="perfil__icone" aria-hidden="true">
+                <svg viewBox="0 0 32 32" focusable="false"><path d="M5 13l2.2-6.4A2 2 0 0 1 9.1 5h13.8a2 2 0 0 1 1.9 1.4L27 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 13h22v1.5a3.7 3.7 0 0 1-7.3 0 3.7 3.7 0 0 1-7.4 0A3.7 3.7 0 0 1 5 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 18.5V27h18v-8.5M13 27v-5.5h6V27" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="perfil__texto">
+                <span class="perfil__titulo">Sou empresa</span>
+                <span class="perfil__desc">Restaurante, padaria, mercado ou outro negócio de alimentos que quer doar excedentes. Usa CNPJ.</span>
+              </span>
+              <span class="perfil__marcador" aria-hidden="true"></span>
+            </label>
+
+            <label class="perfil perfil--doador">
+              <input type="radio" name="perfil" value="doador" class="perfil__radio">
+              <span class="perfil__icone" aria-hidden="true">
+                <svg viewBox="0 0 32 32" focusable="false"><path d="M16 12.5c-1.6-3.2-6.5-3-7 .6-.4 3 3.4 5.7 7 8.4 3.6-2.7 7.4-5.4 7-8.4-.5-3.6-5.4-3.8-7-.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 22.5l4.5-1.8c1.3-.5 2.7-.4 3.9.3l3.4 1.9h4.2a1.8 1.8 0 0 1 0 3.6H14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 26.5l6.2-2.6a2 2 0 0 1 1.8 3.4L20.5 30H11l-8-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="perfil__texto">
+                <span class="perfil__titulo">Sou doador</span>
+                <span class="perfil__desc">Pessoa física que quer contribuir com doações de alimentos. Usa CPF.</span>
+              </span>
+              <span class="perfil__marcador" aria-hidden="true"></span>
+            </label>
+          </fieldset>
+
+          <p id="dica-perfil" class="dica-perfil">Selecione uma opção acima para continuar.</p>
+
+          <!-- Formulário: empresa -->
+          <form id="form-empresa" class="formulario" novalidate hidden aria-labelledby="titulo-empresa">
+            <h3 id="titulo-empresa" class="formulario__titulo">Dados da empresa</h3>
+            <p class="formulario__intro">Conferimos o CNPJ na Receita Federal: ele precisa estar <strong>ativo</strong> e ter atividade ligada a <strong>alimentação</strong>.</p>
+
+            <div class="campo">
+              <label for="cnpj" class="campo__rotulo">CNPJ</label>
+              <div class="campo__linha">
+                <input id="cnpj" name="cnpj" class="campo__entrada campo__entrada--mono" inputmode="numeric" autocomplete="off"
+                       placeholder="00.000.000/0000-00" maxlength="18" aria-describedby="cnpj-ajuda cnpj-erro" required>
+                <button type="button" id="btn-verificar" class="botao botao--secundario">Verificar</button>
+              </div>
+              <p id="cnpj-ajuda" class="campo__ajuda">A consulta começa sozinha quando os 14 dígitos estiverem completos.</p>
+              <p id="cnpj-erro" class="campo__erro" data-erro></p>
+            </div>
+
+            <div id="resultado-cnpj" class="resultado" aria-live="polite" aria-busy="false"></div>
+
+            <fieldset id="contato-empresa" class="grupo-contato" disabled>
+              <legend class="grupo-contato__legenda">Contato para as doações</legend>
+              <div class="campo">
+                <label for="empresa-email" class="campo__rotulo">E-mail</label>
+                <input id="empresa-email" name="email" type="email" class="campo__entrada" autocomplete="email"
+                       placeholder="contato@empresa.com.br" aria-describedby="empresa-email-erro" required>
+                <p id="empresa-email-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo">
+                <label for="empresa-telefone" class="campo__rotulo">Telefone</label>
+                <input id="empresa-telefone" name="telefone" type="tel" class="campo__entrada campo__entrada--mono" autocomplete="tel"
+                       inputmode="numeric" placeholder="(00) 00000-0000" maxlength="15" aria-describedby="empresa-telefone-erro" required>
+                <p id="empresa-telefone-erro" class="campo__erro" data-erro></p>
+              </div>
+            </fieldset>
+
+            <div id="aviso-empresa" class="aviso" role="alert" hidden></div>
+
+            <button type="submit" id="btn-empresa" class="botao botao--primario" disabled>
+              <span class="botao__rotulo">Concluir cadastro</span>
+            </button>
+            <p class="formulario__nota" id="nota-empresa">Verifique o CNPJ para liberar o cadastro.</p>
+          </form>
+
+          <!-- Formulário: doador -->
+          <form id="form-doador" class="formulario" novalidate hidden aria-labelledby="titulo-doador">
+            <h3 id="titulo-doador" class="formulario__titulo">Seus dados</h3>
+            <p class="formulario__intro">Usamos seus dados só para organizar as doações. O CPF não aparece para ninguém.</p>
+
+            <div class="campo">
+              <label for="doador-nome" class="campo__rotulo">Nome completo</label>
+              <input id="doador-nome" name="nome" class="campo__entrada" autocomplete="name" maxlength="100"
+                     aria-describedby="doador-nome-erro" required>
+              <p id="doador-nome-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo">
+              <label for="doador-cpf" class="campo__rotulo">CPF</label>
+              <input id="doador-cpf" name="cpf" class="campo__entrada campo__entrada--mono" inputmode="numeric" autocomplete="off"
+                     placeholder="000.000.000-00" maxlength="14" aria-describedby="doador-cpf-erro" required>
+              <p id="doador-cpf-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo-dupla">
+              <div class="campo">
+                <label for="doador-email" class="campo__rotulo">E-mail</label>
+                <input id="doador-email" name="email" type="email" class="campo__entrada" autocomplete="email"
+                       placeholder="voce@email.com" aria-describedby="doador-email-erro" required>
+                <p id="doador-email-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo">
+                <label for="doador-telefone" class="campo__rotulo">Telefone</label>
+                <input id="doador-telefone" name="telefone" type="tel" class="campo__entrada campo__entrada--mono" autocomplete="tel"
+                       inputmode="numeric" placeholder="(00) 00000-0000" maxlength="15" aria-describedby="doador-telefone-erro" required>
+                <p id="doador-telefone-erro" class="campo__erro" data-erro></p>
+              </div>
+            </div>
+
+            <div id="aviso-doador" class="aviso" role="alert" hidden></div>
+
+            <button type="submit" id="btn-doador" class="botao botao--primario">
+              <span class="botao__rotulo">Concluir cadastro</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- Etapa: sucesso -->
+        <section id="etapa-sucesso" class="sucesso" hidden aria-labelledby="sucesso-titulo" tabindex="-1">
+          <svg class="sucesso__selo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <circle cx="32" cy="32" r="30" fill="var(--marca-suave)"/>
+            <path class="sucesso__check" d="M20 33.5l8 8 16-17" fill="none" stroke="var(--marca)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="sobretitulo" id="sucesso-tipo"></p>
+          <h2 id="sucesso-titulo">Cadastro concluído</h2>
+          <p class="sucesso__texto" id="sucesso-texto"></p>
+          <dl class="sucesso__dados" id="sucesso-dados"></dl>
+          <button type="button" id="btn-novo" class="botao botao--secundario">Fazer novo cadastro</button>
+        </section>
+
+      </div>
+      <footer class="rodape">
+        <span>ReConecta · Plataforma de redistribuição de excedentes alimentares</span>
+        <a href="/swagger">Documentação da API</a>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
