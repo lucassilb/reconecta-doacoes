@@ -1,0 +1,138 @@
+/* ReConecta — painel. Depende de base.css (tokens, .btn, .campo, .cartao, .selo, .metricas). */
+
+.painel { padding-top: clamp(12px, 3vh, 32px); padding-bottom: 56px; max-width: 920px; }
+
+.painel__carregando {
+  display: grid; place-items: center; gap: 14px;
+  padding: 15vh 16px; color: var(--tinta-suave);
+}
+.painel__spinner {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2.5px solid var(--verde-suave); border-top-color: var(--verde);
+  animation: rc-girar .8s linear infinite;
+}
+
+.painel__topo {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;
+  margin-bottom: 22px; flex-wrap: wrap;
+}
+.painel__topo h1 {
+  font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 600; margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.painel__grade { display: grid; gap: 18px; }
+.painel .cartao { display: grid; gap: 12px; align-content: start; animation: rc-surgir .3s ease both; }
+.cartao__titulo { font-size: 1.35rem; font-weight: 600; }
+.cartao__sub { color: var(--tinta-suave); font-size: .92rem; margin-top: -6px; }
+.cartao__linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* ---------- dados ---------- */
+
+.dados {
+  margin: 0;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px;
+}
+.dados dt { color: var(--tinta-suave); font-size: .88rem; }
+.dados dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+/* ---------- selo retirada (DISPONIVEL = .selo padrão, RESERVADA = .selo--acento) ---------- */
+
+.selo--cinza { background: var(--superficie-2); color: var(--tinta-suave); }
+
+/* ---------- formulário de doação ---------- */
+
+.form-doacao { display: grid; gap: 16px; }
+.campo--limite { max-width: 320px; }
+
+.campo__erro { display: flex; gap: 6px; align-items: flex-start; }
+.campo__erro::before {
+  content: ""; flex: none; width: 14px; height: 14px; margin-top: 3px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.9 3.5h1.8l-.3 5H7.4zM8 12.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.9 3.5h1.8l-.3 5H7.4zM8 12.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.itens { border: 0; margin: 0; padding: 0; display: grid; gap: 12px; min-width: 0; }
+.itens__legenda { padding: 0; font-weight: 700; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-suave); }
+.itens__lista { display: grid; gap: 12px; }
+
+.item {
+  position: relative;
+  display: grid; gap: 10px;
+  padding: 14px; padding-top: 16px;
+  border: 1.5px solid var(--linha); border-radius: var(--raio);
+  background: var(--superficie-2);
+}
+.item__grade { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) {
+  .item__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .item__grade .item__nome { grid-column: 1 / -1; }
+}
+@media (min-width: 760px) {
+  .item__grade { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, .55fr) minmax(0, .75fr) minmax(0, .9fr); }
+  .item__grade .item__nome { grid-column: auto; }
+}
+.item .campo { gap: 4px; }
+.item .campo__rotulo { font-size: .8rem; color: var(--tinta-suave); }
+.item .campo__entrada { min-height: 44px; background: var(--superficie); }
+.item .campo__erro { font-size: .8rem; }
+
+.item__remover {
+  position: absolute; top: 8px; right: 8px;
+  width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--tinta-suave);
+}
+.item__remover:hover { background: var(--erro-suave); color: var(--erro); }
+.item__remover svg { width: 16px; height: 16px; }
+
+.btn--add { width: fit-content; }
+.btn--add svg { width: 14px; height: 14px; }
+.btn--perigo { --btn-cor: var(--erro); --btn-borda: var(--erro-linha); --btn-bg: var(--superficie); }
+.btn--perigo:hover:not(:disabled) { --btn-bg: var(--erro-suave); --btn-cor: var(--erro); }
+.btn--perigo.btn--pequeno { min-height: 38px; }
+
+/* ---------- aviso com ícone + título ---------- */
+
+.aviso { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.aviso__icone { width: 22px; height: 22px; color: var(--alerta); }
+.aviso--erro .aviso__icone { color: var(--erro); }
+.aviso--ok .aviso__icone { color: var(--ok); }
+.aviso__titulo { font-weight: 700; }
+.aviso__texto { font-size: .92rem; color: var(--tinta-suave); margin-top: 2px; }
+.aviso .btn { margin-top: 12px; }
+
+/* ---------- lista de doações ---------- */
+
+.doacoes { display: grid; gap: 12px; }
+.doacoes__vazio { color: var(--tinta-suave); font-size: .95rem; padding: 6px 0; }
+
+.doacao {
+  border: 1.5px solid var(--linha); border-radius: var(--raio);
+  background: var(--superficie-2);
+  padding: 14px 16px; display: grid; gap: 8px;
+}
+.doacao__topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.doacao__onde { font-weight: 600; overflow-wrap: anywhere; }
+.doacao__uf { font-weight: 400; color: var(--tinta-suave); font-size: .9rem; }
+.doacao__prazo { font-size: .88rem; color: var(--tinta-suave); }
+.doacao__itens { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.doacao__item {
+  padding: 4px 10px; border-radius: var(--pilula); font-size: .84rem;
+  background: var(--verde-suave); color: var(--verde-texto);
+}
+.doacao__acoes { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.doacao__confirmar { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: .88rem; color: var(--tinta-suave); }
+.doacao__confirmar .btn { min-height: 34px; padding: 0 14px; font-size: .84rem; }
+
+/* ---------- resumo / doador ---------- */
+
+.metricas { grid-auto-flow: initial; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+.metricas .metrica { min-width: 0; }
+
+.nota-honesta {
+  font-size: .9rem; color: var(--tinta-suave);
+  border-top: 1px dashed var(--linha-forte); padding-top: 12px;
+}

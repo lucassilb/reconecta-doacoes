@@ -1,0 +1,59 @@
+/* ReConecta — entrar. Depende de base.css (tokens, .btn, .campo, .aviso, .cartao). */
+
+.entrar {
+  flex: 1;
+  display: grid; place-items: center;
+  padding: clamp(20px, 5vh, 64px) 16px;
+  background:
+    radial-gradient(55% 45% at 85% 0%, color-mix(in srgb, var(--verde-suave) 70%, transparent), transparent),
+    radial-gradient(45% 40% at 8% 100%, color-mix(in srgb, var(--acento-suave) 60%, transparent), transparent),
+    var(--folha);
+}
+
+.entrar__cartao {
+  width: min(460px, 100%);
+  display: grid; gap: 10px;
+  padding: clamp(26px, 5vw, 46px);
+  animation: rc-surgir .3s ease both;
+}
+
+.entrar h1 { font-size: clamp(1.9rem, 6vw, 2.6rem); font-weight: 600; }
+.entrar h1 em { font-family: var(--fonte-titulo); font-style: italic; color: var(--verde-texto); font-weight: 500; }
+.entrar__lead { color: var(--tinta-suave); font-size: .95rem; }
+
+.entrar__form { display: grid; gap: 16px; margin-top: 12px; }
+
+/* campo de senha com olho */
+.campo__linha { display: flex; gap: 8px; align-items: stretch; }
+.campo__linha .campo__entrada { flex: 1; min-width: 0; }
+.campo__olho {
+  flex: none; width: 50px; min-height: 50px;
+  display: grid; place-items: center;
+  background: var(--superficie); color: var(--tinta-suave);
+  border: 1.5px solid var(--linha-forte); border-radius: var(--raio-p);
+  cursor: pointer; transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.campo__olho:hover { color: var(--tinta); border-color: var(--tinta-suave); }
+.campo__olho svg { width: 22px; height: 22px; }
+.campo__olho .olho-fechado { display: none; }
+.campo__olho[aria-pressed="true"] .olho-aberto { display: none; }
+.campo__olho[aria-pressed="true"] .olho-fechado { display: block; }
+
+/* ícone do erro de campo (base.css não traz marcador) */
+.campo__erro { display: flex; gap: 6px; align-items: flex-start; }
+.campo__erro::before {
+  content: ""; flex: none; width: 14px; height: 14px; margin-top: 3px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.9 3.5h1.8l-.3 5H7.4zM8 12.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.9 3.5h1.8l-.3 5H7.4zM8 12.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* aviso com ícone + título (estrutura rica sobre o .aviso da base) */
+.aviso { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.aviso__icone { width: 22px; height: 22px; color: var(--alerta); }
+.aviso--erro .aviso__icone { color: var(--erro); }
+.aviso__titulo { font-weight: 700; }
+.aviso__texto { font-size: .92rem; color: var(--tinta-suave); margin-top: 2px; }
+.aviso .btn { margin-top: 12px; }
+
+.entrar__rodape-cartao { font-size: .92rem; color: var(--tinta-suave); text-align: center; margin-top: 4px; }

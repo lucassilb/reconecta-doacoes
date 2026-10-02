@@ -10,11 +10,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/cadastro.css">
+  <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/cadastro.js" defer></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o cadastro</a>
+  <header data-layout="cabecalho"></header>
 
   <div class="pagina">
     <aside class="vitrine" aria-labelledby="vitrine-titulo">
@@ -130,6 +133,33 @@
               </div>
             </fieldset>
 
+            <fieldset id="acesso-empresa" class="grupo-contato grupo-contato--acesso" disabled>
+              <legend class="grupo-contato__legenda">Senha de acesso ao painel</legend>
+              <div class="campo">
+                <label for="empresa-senha" class="campo__rotulo">Senha</label>
+                <div class="campo__linha">
+                  <input id="empresa-senha" name="senha" type="password" class="campo__entrada" autocomplete="new-password"
+                         maxlength="72" aria-describedby="empresa-senha-ajuda empresa-senha-erro" required>
+                  <button type="button" class="campo__olho" data-olho="empresa-senha" aria-label="Mostrar senha" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path class="olho-aberto" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                      <circle class="olho-aberto" cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                      <path class="olho-fechado" d="M4 4.5l16 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="senha-forca" id="empresa-senha-forca" aria-hidden="true"><i></i><i></i><i></i></div>
+                <p id="empresa-senha-ajuda" class="campo__ajuda">Pelo menos 8 caracteres, com letra e número.</p>
+                <p id="empresa-senha-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo">
+                <label for="empresa-confirmar" class="campo__rotulo">Confirmar senha</label>
+                <input id="empresa-confirmar" name="confirmar_senha" type="password" class="campo__entrada" autocomplete="new-password"
+                       maxlength="72" aria-describedby="empresa-confirmar-erro" required>
+                <p id="empresa-confirmar-erro" class="campo__erro" data-erro></p>
+              </div>
+            </fieldset>
+
             <div id="aviso-empresa" class="aviso" role="alert" hidden></div>
 
             <button type="submit" id="btn-empresa" class="botao botao--primario" disabled>
@@ -170,6 +200,33 @@
               </div>
             </div>
 
+            <fieldset class="grupo-contato grupo-contato--acesso">
+              <legend class="grupo-contato__legenda">Senha de acesso ao painel</legend>
+              <div class="campo">
+                <label for="doador-senha" class="campo__rotulo">Senha</label>
+                <div class="campo__linha">
+                  <input id="doador-senha" name="senha" type="password" class="campo__entrada" autocomplete="new-password"
+                         maxlength="72" aria-describedby="doador-senha-ajuda doador-senha-erro" required>
+                  <button type="button" class="campo__olho" data-olho="doador-senha" aria-label="Mostrar senha" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path class="olho-aberto" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                      <circle class="olho-aberto" cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                      <path class="olho-fechado" d="M4 4.5l16 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="senha-forca" id="doador-senha-forca" aria-hidden="true"><i></i><i></i><i></i></div>
+                <p id="doador-senha-ajuda" class="campo__ajuda">Pelo menos 8 caracteres, com letra e número.</p>
+                <p id="doador-senha-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo">
+                <label for="doador-confirmar" class="campo__rotulo">Confirmar senha</label>
+                <input id="doador-confirmar" name="confirmar_senha" type="password" class="campo__entrada" autocomplete="new-password"
+                       maxlength="72" aria-describedby="doador-confirmar-erro" required>
+                <p id="doador-confirmar-erro" class="campo__erro" data-erro></p>
+              </div>
+            </fieldset>
+
             <div id="aviso-doador" class="aviso" role="alert" hidden></div>
 
             <button type="submit" id="btn-doador" class="botao botao--primario">
@@ -188,15 +245,16 @@
           <h2 id="sucesso-titulo">Cadastro concluído</h2>
           <p class="sucesso__texto" id="sucesso-texto"></p>
           <dl class="sucesso__dados" id="sucesso-dados"></dl>
-          <button type="button" id="btn-novo" class="botao botao--secundario">Fazer novo cadastro</button>
+          <div class="sucesso__acoes">
+            <a href="/painel" class="botao botao--primario botao--link">Ir para o painel</a>
+            <button type="button" id="btn-novo" class="botao botao--secundario">Fazer novo cadastro</button>
+          </div>
         </section>
 
       </div>
-      <footer class="rodape">
-        <span>ReConecta · Plataforma de redistribuição de excedentes alimentares</span>
-        <a href="/swagger">Documentação da API</a>
-      </footer>
     </main>
   </div>
+
+  <footer data-layout="rodape"></footer>
 </body>
 </html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel · ReConecta</title>
+  <meta name="description" content="Painel do ReConecta: publique doações e acompanhe suas contribuições.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/painel.css">
+  <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/painel.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o painel</a>
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="painel container" tabindex="-1">
+
+    <div id="painel-carregando" class="painel__carregando" role="status">
+      <span class="painel__spinner" aria-hidden="true"></span>
+      <p>Verificando sua sessão…</p>
+    </div>
+
+    <div id="painel-corpo" hidden>
+      <header class="painel__topo">
+        <div>
+          <p class="sobretitulo" id="saudacao-tipo">Painel</p>
+          <h1 id="saudacao-nome">Olá</h1>
+        </div>
+        <span id="saudacao-selo" class="selo"></span>
+      </header>
+
+      <!-- ===== empresa ===== -->
+      <div id="bloco-empresa" class="painel__grade" hidden>
+
+        <section class="cartao" aria-labelledby="dados-empresa-t">
+          <h2 id="dados-empresa-t" class="cartao__titulo">Seus dados</h2>
+          <dl class="dados" id="dados-empresa"></dl>
+        </section>
+
+        <section class="cartao" aria-labelledby="publicar-t">
+          <h2 id="publicar-t" class="cartao__titulo">Publicar doação</h2>
+          <p class="cartao__sub">Liste os itens com quantidade e validade. Uma instituição reserva e combina a retirada.</p>
+
+          <form id="form-doacao" class="form-doacao" novalidate>
+            <div class="campo campo--limite">
+              <label for="limite" class="campo__rotulo">Retirar até</label>
+              <input id="limite" name="limite" type="datetime-local" class="campo__entrada campo__entrada--mono"
+                     aria-describedby="limite-ajuda limite-erro" required>
+              <p id="limite-ajuda" class="campo__ajuda">A retirada não pode ser depois da menor validade dos itens.</p>
+              <p id="limite-erro" class="campo__erro" data-erro></p>
+            </div>
+
+            <fieldset class="itens">
+              <legend class="itens__legenda">Itens da doação</legend>
+              <p id="itens-erro" class="campo__erro" data-erro></p>
+              <div id="lista-itens" class="itens__lista"></div>
+              <button type="button" id="btn-add-item" class="btn btn--secundario btn--pequeno btn--add">
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Adicionar item
+              </button>
+            </fieldset>
+
+            <div id="aviso-doacao" class="aviso" role="alert" hidden></div>
+
+            <button type="submit" id="btn-publicar" class="btn btn--primario">
+              Publicar doação
+            </button>
+          </form>
+        </section>
+
+        <section class="cartao" aria-labelledby="minhas-t">
+          <div class="cartao__linha">
+            <h2 id="minhas-t" class="cartao__titulo">Minhas doações</h2>
+            <button type="button" id="btn-recarregar" class="link-seta">Atualizar</button>
+          </div>
+          <div id="lista-doacoes" class="doacoes" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <!-- ===== doador ===== -->
+      <div id="bloco-doador" class="painel__grade" hidden>
+
+        <section class="cartao" aria-labelledby="dados-doador-t">
+          <h2 id="dados-doador-t" class="cartao__titulo">Seus dados</h2>
+          <dl class="dados" id="dados-doador"></dl>
+        </section>
+
+        <section class="cartao" aria-labelledby="resumo-t">
+          <h2 id="resumo-t" class="cartao__titulo">A rede agora</h2>
+          <ul id="resumo" class="metricas"></ul>
+        </section>
+
+        <section class="cartao" aria-labelledby="disponiveis-t">
+          <h2 id="disponiveis-t" class="cartao__titulo">Doações disponíveis agora</h2>
+          <div id="lista-disponiveis" class="doacoes" aria-live="polite"></div>
+          <p class="nota-honesta">
+            A reserva das doações é feita pelas instituições parceiras — o botão de
+            reserva para doadores chega na próxima etapa do projeto.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>
