@@ -126,8 +126,52 @@
     email: "Informe um e-mail válido, como nome@dominio.com.",
     telefone: "Informe o telefone com DDD (10 ou 11 dígitos).",
     cnpj: "Este CNPJ não é válido. Confira os números digitados.",
-    cnpjIncompleto: "O CNPJ tem 14 dígitos."
+    cnpjIncompleto: "O CNPJ tem 14 dígitos.",
+    senha: "A senha precisa de pelo menos 8 caracteres, com letra e número.",
+    confirmar: "As senhas não são iguais."
   };
+
+  function senhaValida(v) {
+    return v.length >= 8 && /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(v) && /\d/.test(v);
+  }
+
+  function nivelSenha(v) {
+    if (!v) return 0;
+    if (!senhaValida(v)) return 1;
+    if (v.length >= 12 && /[^A-Za-zÀ-ÖØ-öø-ÿ\d]/.test(v)) return 3;
+    return 2;
+  }
+
+  /* ---------- senha: medidor e mostrar/ocultar ---------- */
+
+  function ligarSenha(inputSenha, inputConfirmar, medidor) {
+    inputSenha.addEventListener("input", function () {
+      medidor.setAttribute("data-nivel", String(nivelSenha(inputSenha.value)));
+      if (inputSenha.getAttribute("aria-invalid") && senhaValida(inputSenha.value)) mostrarErro(inputSenha, "");
+      if (inputConfirmar.getAttribute("aria-invalid") && inputConfirmar.value === inputSenha.value) mostrarErro(inputConfirmar, "");
+    });
+    inputSenha.addEventListener("blur", function () {
+      if (inputSenha.value) mostrarErro(inputSenha, senhaValida(inputSenha.value) ? "" : MSG.senha);
+    });
+    inputConfirmar.addEventListener("input", function () {
+      if (inputConfirmar.getAttribute("aria-invalid") && inputConfirmar.value === inputSenha.value) mostrarErro(inputConfirmar, "");
+    });
+    inputConfirmar.addEventListener("blur", function () {
+      if (inputConfirmar.value) mostrarErro(inputConfirmar, inputConfirmar.value === inputSenha.value ? "" : MSG.confirmar);
+    });
+  }
+
+  document.querySelectorAll("[data-olho]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var alvo = $(btn.getAttribute("data-olho"));
+      if (!alvo) return;
+      var mostrar = alvo.type === "password";
+      alvo.type = mostrar ? "text" : "password";
+      btn.setAttribute("aria-pressed", mostrar ? "true" : "false");
+      btn.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+      alvo.focus();
+    });
+  });
 
   /* ---------- erros de campo ---------- */
 
@@ -232,11 +276,16 @@
   var btnVerificar = $("btn-verificar");
   var resultado = $("resultado-cnpj");
   var contato = $("contato-empresa");
+  var acessoEmpresa = $("acesso-empresa");
   var emailEmpresa = $("empresa-email");
   var telEmpresa = $("empresa-telefone");
+  var senhaEmpresa = $("empresa-senha");
+  var confirmarEmpresa = $("empresa-confirmar");
   var btnEmpresa = $("btn-empresa");
   var notaEmpresa = $("nota-empresa");
   var avisoEmpresa = $("aviso-empresa");
+
+  ligarSenha(senhaEmpresa, confirmarEmpresa, $("empresa-senha-forca"));
 
   var consultaAtual = null;     // AbortController da consulta em andamento
   var temporizador = null;
@@ -245,6 +294,7 @@
   function travarEmpresa(nota) {
     empresaVerificada = null;
     contato.disabled = true;
+    acessoEmpresa.disabled = true;
     btnEmpresa.disabled = true;
     notaEmpresa.hidden = false;
     notaEmpresa.textContent = nota || "Verifique o CNPJ para liberar o cadastro.";
@@ -253,6 +303,7 @@
   function liberarEmpresa(dados) {
     empresaVerificada = dados;
     contato.disabled = false;
+    acessoEmpresa.disabled = false;
     btnEmpresa.disabled = false;
     notaEmpresa.hidden = true;
     if (!emailEmpresa.value && dados.email) emailEmpresa.value = String(dados.email).toLowerCase();
@@ -454,18 +505,25 @@
     if (!empresaVerificada) { consultarCNPJ(true); return; }
     esconderAviso(avisoEmpresa);
     mostrarErro(emailEmpresa, ""); mostrarErro(telEmpresa, "");
+    mostrarErro(senhaEmpresa, ""); mostrarErro(confirmarEmpresa, "");
 
     var campos = {};
     if (!emailValido(emailEmpresa.value)) campos.email = MSG.email;
     if (!telefoneValido(telEmpresa.value)) campos.telefone = MSG.telefone;
-    var mapa = { email: emailEmpresa, telefone: telEmpresa, cnpj: cnpjInput };
+    if (!senhaValida(senhaEmpresa.value)) campos.senha = MSG.senha;
+    var mapa = { email: emailEmpresa, telefone: telEmpresa, cnpj: cnpjInput, senha: senhaEmpresa };
+    if (confirmarEmpresa.value !== senhaEmpresa.value) {
+      mostrarErro(confirmarEmpresa, MSG.confirmar);
+      if (!Object.keys(campos).length) { confirmarEmpresa.focus(); return; }
+    }
     if (Object.keys(campos).length) { aplicarCampos(formEmpresa, campos, mapa); return; }
 
     carregando(btnEmpresa, true);
     postar("/empresa", {
       cnpj: empresaVerificada.cnpj,
       email: emailEmpresa.value.trim(),
-      telefone: digitos(telEmpresa.value)
+      telefone: digitos(telEmpresa.value),
+      senha: senhaEmpresa.value
     }).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) { mostrarSucesso(c); return; }
@@ -512,9 +570,13 @@
   var cpfDoador = $("doador-cpf");
   var emailDoador = $("doador-email");
   var telDoador = $("doador-telefone");
+  var senhaDoador = $("doador-senha");
+  var confirmarDoador = $("doador-confirmar");
   var btnDoador = $("btn-doador");
   var avisoDoador = $("aviso-doador");
-  var mapaDoador = { nome: nomeDoador, cpf: cpfDoador, email: emailDoador, telefone: telDoador };
+  var mapaDoador = { nome: nomeDoador, cpf: cpfDoador, email: emailDoador, telefone: telDoador, senha: senhaDoador };
+
+  ligarSenha(senhaDoador, confirmarDoador, $("doador-senha-forca"));
 
   function validarDoador(campo) {
     var v = {
@@ -524,7 +586,8 @@
         return cpfValido(cpfDoador.value) ? "" : MSG.cpf;
       },
       email: function () { return emailValido(emailDoador.value) ? "" : MSG.email; },
-      telefone: function () { return telefoneValido(telDoador.value) ? "" : MSG.telefone; }
+      telefone: function () { return telefoneValido(telDoador.value) ? "" : MSG.telefone; },
+      senha: function () { return senhaValida(senhaDoador.value) ? "" : MSG.senha; }
     };
     return v[campo]();
   }
@@ -562,14 +625,17 @@
 
     var campos = {};
     Object.keys(mapaDoador).forEach(function (c) { var m = validarDoador(c); if (m) campos[c] = m; });
+    if (confirmarDoador.value !== senhaDoador.value) mostrarErro(confirmarDoador, MSG.confirmar);
     if (Object.keys(campos).length) { aplicarCampos(formDoador, campos, mapaDoador); return; }
+    if (confirmarDoador.value !== senhaDoador.value) { confirmarDoador.focus(); return; }
 
     carregando(btnDoador, true);
     postar("/doador", {
       nome: nomeDoador.value.trim(),
       cpf: digitos(cpfDoador.value),
       email: emailDoador.value.trim(),
-      telefone: digitos(telDoador.value)
+      telefone: digitos(telDoador.value),
+      senha: senhaDoador.value
     }).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) { mostrarSucesso(c); return; }
@@ -632,6 +698,15 @@
     formEmpresa.reset(); formDoador.reset();
     limparErros(formEmpresa); limparErros(formDoador);
     [cnpjInput, cpfDoador].forEach(function (i) { i.classList.remove("is-valido"); });
+    ["empresa-senha-forca", "doador-senha-forca"].forEach(function (id) {
+      $(id).removeAttribute("data-nivel");
+    });
+    document.querySelectorAll("[data-olho]").forEach(function (b) {
+      var alvo = $(b.getAttribute("data-olho"));
+      if (alvo) alvo.type = "password";
+      b.setAttribute("aria-pressed", "false");
+      b.setAttribute("aria-label", "Mostrar senha");
+    });
     resultado.replaceChildren();
     esconderAviso(avisoEmpresa); esconderAviso(avisoDoador);
     travarEmpresa();

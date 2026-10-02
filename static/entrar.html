@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · ReConecta</title>
+  <meta name="description" content="Entre na sua conta do ReConecta com e-mail, CNPJ ou CPF.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/entrar.css">
+  <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/entrar.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o acesso</a>
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="entrar" tabindex="-1">
+    <section class="cartao cartao--flutuante entrar__cartao" aria-labelledby="entrar-titulo">
+      <p class="sobretitulo">Acesso</p>
+      <h1 id="entrar-titulo">Que bom te ver <em>de novo</em>.</h1>
+      <p class="entrar__lead">Entre para publicar excedentes ou acompanhar as doações da rede.</p>
+
+      <form id="form-entrar" class="entrar__form" novalidate>
+        <div class="campo">
+          <label for="identificador" class="campo__rotulo">E-mail, CNPJ ou CPF</label>
+          <input id="identificador" name="identificador" class="campo__entrada" autocomplete="username"
+                 placeholder="voce@email.com" maxlength="64" spellcheck="false" autocapitalize="none"
+                 aria-describedby="identificador-ajuda identificador-erro" required>
+          <p id="identificador-ajuda" class="campo__ajuda">Se digitar só números, o campo já aplica a máscara de CPF ou CNPJ.</p>
+          <p id="identificador-erro" class="campo__erro" data-erro></p>
+        </div>
+
+        <div class="campo">
+          <label for="senha" class="campo__rotulo">Senha</label>
+          <div class="campo__linha campo__linha--senha">
+            <input id="senha" name="senha" type="password" class="campo__entrada" autocomplete="current-password"
+                   aria-describedby="senha-erro" required>
+            <button type="button" id="btn-olho" class="campo__olho" aria-label="Mostrar senha" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path class="olho-aberto" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <circle class="olho-aberto" cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                <path class="olho-fechado" d="M4 4.5l16 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <p id="senha-erro" class="campo__erro" data-erro></p>
+        </div>
+
+        <div id="aviso-entrar" class="aviso" role="alert" hidden></div>
+
+        <button type="submit" id="btn-entrar" class="btn btn--primario btn--largo">
+          Entrar
+        </button>
+      </form>
+
+      <p class="entrar__rodape-cartao">Ainda não tem conta? <a href="/cadastro">Cadastre-se</a></p>
+    </section>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>
