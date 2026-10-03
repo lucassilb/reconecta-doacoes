@@ -22,7 +22,7 @@
 }
 
 /* palco de largura total: decoração atrás do hero */
-.hero-palco { position: relative; isolation: isolate; overflow-x: clip; }
+.hero-palco { position: relative; isolation: isolate; }
 .hero-deco { position: absolute; z-index: -1; pointer-events: none; }
 .hero-deco--ondas { left: 0; right: 0; bottom: -10px; width: 100%; height: clamp(90px, 14vw, 200px); }
 .hero-deco--folha-dir { display: none; }
@@ -43,7 +43,7 @@
 }
 .hero h1 em { font-style: normal; color: var(--verde-texto); font-weight: 700; }
 .secao h2 em, .cta-final h2 em { font-style: normal; color: var(--verde-texto); font-weight: 400; }
-.hero .lead { font-size: clamp(1.05rem, 1.2vw + .6rem, 1.35rem); line-height: 1.5; max-width: 36em; }
+.hero .lead { font-size: clamp(1.05rem, 1.2vw + .6rem, 1.35rem); line-height: 1.5; max-width: 32em; }
 .hero .lead strong { color: var(--tinta); font-weight: 700; }
 
 /* métricas com ícone em quadrado arredondado */
@@ -172,8 +172,8 @@
   .hero__cartao--doacao { top: 8%; left: 0; width: min(360px, 50%); }
   .hero__cartao--passos { right: -2%; bottom: 0; width: min(360px, 48%); }
 
-  .hero-deco--folha-dir { display: block; width: clamp(160px, 16vw, 300px); top: -120px; right: -40px; transform: rotate(-12deg); filter: blur(6px); opacity: .55; }
-  .hero-deco--folha-esq { display: block; width: clamp(90px, 8vw, 150px); top: -70px; left: -40px; transform: rotate(150deg); filter: blur(8px); opacity: .35; }
+  .hero-deco--folha-dir { display: block; width: clamp(160px, 16vw, 300px); top: calc(-88px - var(--moldura-espaco) - 30px); right: calc(-1 * var(--moldura-espaco) + 40px); transform: rotate(-12deg); filter: blur(6px); opacity: .6; }
+  .hero-deco--folha-esq { display: block; width: clamp(90px, 8vw, 150px); top: -70px; left: calc(-1 * var(--moldura-espaco)); transform: rotate(150deg); filter: blur(8px); opacity: .35; }
 }
 
 /* desktop médio (ex.: 1280 px): cartões e métricas mais compactos para não esconder a foto */

@@ -3,7 +3,7 @@
    e <script src="/static/js/layout.js" defer></script>, com
    <header data-layout="cabecalho"></header> … <footer data-layout="rodape"></footer>.
 
-   O corpo da página ocupa a tela toda sobre um fundo branco-esverdeado (sem moldura). */
+   O corpo da página é um cartão claro arredondado sobre uma moldura verde bem pálida. */
 
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap");
 
@@ -12,9 +12,9 @@
 :root {
   color-scheme: light;
 
-  /* fundo da página (sem moldura) e "folha": tons claros; cartões brancos */
-  --moldura: #F6FAF3;        /* fundo da página (sem moldura desde a rodada 4) */
-  --pagina: #F7FAF4;
+  /* moldura verde bem pálida; página (cartão) off-white; "folha" e cartões claros */
+  --moldura: #E3EEDA;
+  --pagina: #FAFCF7;
   --folha: #F3F3F9;
   --superficie: #FFFFFF;
   --superficie-2: #ECEDF5;
@@ -61,7 +61,7 @@
 
   --largura: 1180px;
   --respiro: clamp(16px, 4vw, 56px);
-  --moldura-espaco: 0px;
+  --moldura-espaco: 8px;
 }
 
 
@@ -69,7 +69,7 @@
   :root {
     color-scheme: dark;
 
-    --moldura: #16171C;
+    --moldura: #0E100F;
     --pagina: #16171C;
     --folha: #16171C;
     --superficie: #1F2026;
@@ -110,19 +110,21 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
-html { -webkit-text-size-adjust: 100%; background: var(--moldura); }
+html { -webkit-text-size-adjust: 100%; background: var(--moldura); overflow-x: clip; }
+@media (min-width: 720px) { :root { --moldura-espaco: 20px; } }
 
 body {
   margin: var(--moldura-espaco);
   min-height: calc(100vh - 2 * var(--moldura-espaco));
   display: flex; flex-direction: column;
   background: var(--pagina);
+  border-radius: var(--raio-folha);
+  box-shadow: 0 1px 2px rgba(27, 29, 34, .04), 0 24px 60px -40px rgba(46, 102, 24, .35);
   color: var(--tinta);
   font-family: var(--fonte-texto);
   font-size: 1rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  overflow-x: clip;
   position: relative;
 }
 body > main { flex: 1; }
