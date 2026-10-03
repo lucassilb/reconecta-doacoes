@@ -28,6 +28,7 @@ class Doador(db.Model):
     telefone = db.Column(db.String(20), nullable=False)
     criado_em = db.Column(db.DateTime, default=_utc_naive, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=True)
+    doacoes = db.relationship('Doacao', backref='doador', lazy=True)
 
 class Instituicao(db.Model):
     __tablename__ = 'instituicoes'
@@ -41,8 +42,15 @@ class Instituicao(db.Model):
 
 class Doacao(db.Model):
     __tablename__ = 'doacoes'
+    __table_args__ = (db.CheckConstraint(
+        '(estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)',
+        name='ck_doacoes_uma_origem'),)
     id = db.Column(db.Integer, primary_key=True)
-    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id'), nullable=False)
+    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id'), nullable=True)
+    doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'), nullable=True)
+    retirada_endereco = db.Column(db.String(200), nullable=True)
+    retirada_municipio = db.Column(db.String(80), nullable=True)
+    retirada_uf = db.Column(db.String(2), nullable=True)
     data_cadastro = db.Column(db.DateTime, default=_utc_naive)
     data_limite_retirada = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='DISPONIVEL')
