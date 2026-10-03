@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/home.css">
-  <link rel="preload" as="image" href="/static/img/hero-cesta.svg" type="image/svg+xml">
+  
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/home.js" defer></script>
 </head>
@@ -21,47 +21,94 @@
   <main id="conteudo">
 
     <!-- ============ HERO ============ -->
-    <section class="hero container" aria-labelledby="hero-titulo">
-      <p class="lateral" aria-hidden="true">Alimento bom não é desperdício</p>
+    <div class="hero-palco">
+      <!-- decoração: folhas desfocadas nos cantos e ondas na base -->
+      <svg class="hero-deco hero-deco--folha-dir" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+        <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#7DBB55"/>
+        <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#5E9A3A" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <svg class="hero-deco hero-deco--folha-esq" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+        <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#9CCB76"/>
+      </svg>
+      <svg class="hero-deco hero-deco--ondas" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M0 120C240 60 420 150 720 110s520-90 720-30v120H0z" fill="var(--hero-onda-1)"/>
+        <path d="M0 160c260-50 520 20 760-10s460-60 680-10v60H0z" fill="var(--hero-onda-2)"/>
+      </svg>
 
-      <div class="hero__texto">
-        <p class="sobretitulo sobretitulo--acento">Redistribuição de excedentes alimentares</p>
-        <h1 id="hero-titulo">Excedente de hoje, <br><em>refeição</em> de amanhã</h1>
-        <p class="lead">Padarias, mercados e restaurantes publicam o alimento bom que sobrou, com quantidade, validade e prazo de retirada, para que instituições sociais possam buscá-lo. O que iria para o lixo vira refeição.</p>
+      <section class="hero container" aria-labelledby="hero-titulo">
+        <div class="hero__texto">
+          <p class="sobretitulo sobretitulo--acento">Redistribuição de excedentes alimentares</p>
+          <h1 id="hero-titulo">Excedente de hoje, <br><em>refeição</em> de amanhã</h1>
+          <p class="lead">Padarias, mercados e restaurantes publicam o alimento bom que sobrou, com quantidade, validade e prazo de retirada, para que instituições sociais possam buscá-lo. O que iria para o lixo <strong>vira refeição.</strong></p>
 
-        <ul class="metricas hero__metricas" id="resumo" aria-live="polite" aria-busy="true" aria-label="A plataforma agora">
-          <li class="metrica"><span class="metrica__valor" data-resumo="kg">—</span><span class="metrica__rotulo">kg disponíveis</span></li>
-          <li class="metrica"><span class="metrica__valor" data-resumo="doacoes">—</span><span class="metrica__rotulo">doações ativas</span></li>
-          <li class="metrica"><span class="metrica__valor" data-resumo="empresas">—</span><span class="metrica__rotulo">empresas parceiras</span></li>
-        </ul>
+          <ul class="hero__metricas" id="resumo" aria-live="polite" aria-busy="true" aria-label="A plataforma agora">
+            <li class="hero-metrica">
+              <span class="hero-metrica__icone hero-metrica__icone--verde" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 19c0-8 5-13.5 14-14-.5 9-6 14-14 14z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19l7.5-7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">kg disponíveis</span><span class="hero-metrica__valor" data-resumo="kg">—</span></span>
+            </li>
+            <li class="hero-metrica">
+              <span class="hero-metrica__icone hero-metrica__icone--pessego" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">doações ativas</span><span class="hero-metrica__valor" data-resumo="doacoes">—</span></span>
+            </li>
+            <li class="hero-metrica">
+              <span class="hero-metrica__icone hero-metrica__icone--verde" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="9.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.8 14.2c2.4-.3 4.2 1.1 4.7 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">instituições</span><span class="hero-metrica__valor" data-resumo="instituicoes">—</span></span>
+            </li>
+          </ul>
 
-        <div class="hero__acoes">
-          <a class="btn btn--primario hero__cta" id="hero-cta" href="/cadastro">
-            <span data-cta-rotulo>Quero doar</span><span class="btn__traco" aria-hidden="true"></span><span class="btn__acao" data-cta-acao>Cadastrar</span>
-          </a>
-          <a class="hero__secundario" href="#doacoes">Sou instituição <span aria-hidden="true">·</span> ver doações</a>
+          <div class="hero__acoes">
+            <a class="hero__cta" id="hero-cta" href="/cadastro">
+              <span data-cta-rotulo>Quero doar</span>
+              <svg class="hero__cta-seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="hero__secundario" href="#doacoes">Sou instituição <span aria-hidden="true">·</span> ver doações</a>
+          </div>
         </div>
-      </div>
 
-      <div class="hero__visual">
-        <img class="hero__imagem" src="/static/img/hero-cesta.svg" width="640" height="640"
-             alt="Caixa de madeira vista de cima com verduras, tomates, laranjas, pães, cenouras, bananas e um saco de arroz">
+        <div class="hero__visual">
+          <div class="hero__forma">
+            <img class="hero__foto" id="hero-foto" src="/static/img/hero-cesta.svg" width="1200" height="1000"
+                 alt="Caixote de madeira com alface, pimentão, bananas, cenouras, tomates, laranja e pão">
+          </div>
+          <svg class="hero__folha hero__folha--topo" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#6DAE45"/>
+            <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#467A2A" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <svg class="hero__folha hero__folha--base" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#5A9A38"/>
+            <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#3E6F1F" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <svg class="hero__folha hero__folha--lado" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
+            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#8CC56A"/>
+          </svg>
 
-        <article class="cartao cartao--flutuante hero__cartao hero__cartao--doacao" id="ultima-doacao" aria-live="polite" aria-busy="true">
-          <p class="sobretitulo">Doação mais recente</p>
-          <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
-        </article>
+          <article class="cartao cartao--flutuante hero__cartao hero__cartao--doacao" id="ultima-doacao" aria-live="polite" aria-busy="true">
+            <span class="hero__cartao-icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="hero__cartao-corpo" id="ultima-doacao-corpo">
+              <p class="sobretitulo">Doações abertas</p>
+              <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+          </article>
 
-        <article class="cartao cartao--flutuante hero__cartao hero__cartao--passos" aria-labelledby="passos-titulo">
-          <p class="sobretitulo" id="passos-titulo">Em três passos</p>
-          <ol class="mini-passos">
-            <li><span class="mini-passos__n">1</span> A empresa publica o excedente</li>
-            <li><span class="mini-passos__n">2</span> <span>Uma instituição reserva <span class="mini-passos__breve">em breve</span></span></li>
-            <li><span class="mini-passos__n">3</span> <span>A retirada fica registrada <span class="mini-passos__breve">em breve</span></span></li>
-          </ol>
-        </article>
-      </div>
-    </section>
+          <article class="cartao cartao--flutuante hero__cartao hero__cartao--passos" aria-labelledby="passos-titulo">
+            <p class="sobretitulo" id="passos-titulo">Em três passos</p>
+            <ol class="mini-passos">
+              <li><span class="mini-passos__n">1</span> <span>A empresa publica o excedente</span></li>
+              <li><span class="mini-passos__n">2</span> <span>Uma instituição reserva <span class="mini-passos__breve">em breve</span></span></li>
+              <li><span class="mini-passos__n">3</span> <span>A retirada fica registrada <span class="mini-passos__breve">em breve</span></span></li>
+            </ol>
+          </article>
+        </div>
+      </section>
+    </div>
 
     <!-- ============ DOAÇÕES DISPONÍVEIS ============ -->
     <section class="faixa container" id="doacoes" aria-labelledby="doacoes-titulo">
