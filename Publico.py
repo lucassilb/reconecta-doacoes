@@ -7,7 +7,7 @@ from decimal import Decimal
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
-from models import Doacao, Doador, Estabelecimento, ItemDoacao, db
+from models import Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, db
 
 
 ns = Namespace("publico", description="Resumo e doações disponíveis")
@@ -18,6 +18,7 @@ UNIDADES = ["kg", "g", "L", "unidade", "pacote", "caixa"]
 
 resumo_model = ns.model("ResumoPublico", {
     "empresas": fields.Integer, "doadores": fields.Integer,
+    "instituicoes": fields.Integer,
     "doacoes_disponiveis": fields.Integer, "itens_disponiveis": fields.Integer,
     "kg_disponiveis": fields.Float,
 })
@@ -83,6 +84,7 @@ class Resumo(Resource):
         return {
             "empresas": db.session.query(Estabelecimento.id).count(),
             "doadores": db.session.query(Doador.id).count(),
+            "instituicoes": db.session.query(Instituicao.id).count(),
             "doacoes_disponiveis": len(doacoes),
             "itens_disponiveis": len(itens),
             "kg_disponiveis": float(peso),

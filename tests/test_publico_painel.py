@@ -88,7 +88,8 @@ def test_publico_filtra_status_prazo_privacidade_e_soma_kg(cliente):
         ativa_id = ativa.id
     resumo = cliente.get("/reconecta/publico/resumo")
     assert resumo.status_code == 200
-    assert resumo.json == {"empresas": 2, "doadores": 1, "doacoes_disponiveis": 1,
+    assert resumo.json == {"empresas": 2, "doadores": 1, "instituicoes": 0,
+                           "doacoes_disponiveis": 1,
                            "itens_disponiveis": 3, "kg_disponiveis": 3.0}
     resposta = cliente.get("/reconecta/publico/doacoes?limite=8")
     assert resposta.status_code == 200
@@ -101,6 +102,24 @@ def test_publico_filtra_status_prazo_privacidade_e_soma_kg(cliente):
     opcoes = cliente.get("/reconecta/publico/opcoes")
     assert opcoes.json["unidades"] == ["kg", "g", "L", "unidade", "pacote", "caixa"]
     assert "Hortifrúti" in opcoes.json["categorias"]
+
+
+def test_resumo_conta_instituicoes_sem_alterar_os_outros_contadores(cliente):
+    with app.app_context():
+        db.session.add_all([
+            Instituicao(nome="ONG Vida", cnpj="12345678000190", email="vida@exemplo.com",
+                        telefone="11999995555", endereco="BARUERI/SP"),
+            Instituicao(nome="Banco de Alimentos", cnpj="98765432000110",
+                        email="banco@exemplo.com", telefone="11999994444",
+                        endereco="OSASCO/SP"),
+        ])
+        db.session.commit()
+
+    resposta = cliente.get("/reconecta/publico/resumo")
+    assert resposta.status_code == 200
+    assert resposta.json == {"empresas": 0, "doadores": 0, "instituicoes": 2,
+                            "doacoes_disponiveis": 0, "itens_disponiveis": 0,
+                            "kg_disponiveis": 0.0}
 
 
 def test_painel_exige_empresa_e_cria_doacao_com_itens(cliente):
