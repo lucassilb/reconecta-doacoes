@@ -1,4 +1,4 @@
-"""Gestão das doações por empresa autenticada."""
+"""Gestão das doações pelo titular autenticado."""
 
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
@@ -12,17 +12,25 @@ from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
 from models import Doacao, ItemDoacao, db
 
 
-ns = Namespace("painel", description="Doações da empresa autenticada")
+ns = Namespace("painel", description="Doações do titular autenticado")
 item_entrada = ns.model("ItemDoacaoEntradaPainel", {
     "nome": fields.String(required=True), "categoria": fields.String(required=True),
     "quantidade": fields.Float(required=True), "unidade_medida": fields.String(required=True),
     "validade": fields.String(required=True, description="AAAA-MM-DD"),
 })
+retirada_entrada = ns.model("RetiradaEntradaPainel", {
+    "endereco": fields.String(required=True),
+    "municipio": fields.String(required=True),
+    "uf": fields.String(required=True),
+})
 doacao_entrada = ns.model("DoacaoEntradaPainel", {
     "data_limite_retirada": fields.String(required=True, description="Data e hora ISO local"),
     "itens": fields.List(fields.Nested(item_entrada), required=True),
+    "retirada": fields.Nested(retirada_entrada, description="Obrigatório para doador pessoa física"),
 })
-doacao_saida = ns.inherit("DoacaoPainel", doacao_model, {"status": fields.String})
+doacao_saida = ns.inherit("DoacaoPainel", doacao_model, {
+    "status": fields.String, "retirada": fields.Nested(retirada_entrada),
+})
 erro_model = ns.model("PainelErro", {
     "codigo": fields.String, "mensagem": fields.String, "campos": fields.Raw,
 })
@@ -32,14 +40,33 @@ def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
 
-def _empresa_autenticada():
+def _titular_autenticado():
     atual = usuario_atual()
     if not atual:
         return None, _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
-    tipo, usuario = atual
-    if tipo != "empresa":
-        return None, _erro("APENAS_EMPRESAS", "Somente empresas podem gerenciar doações.", 403)
-    return usuario, None
+    return atual, None
+
+
+UFS = frozenset("AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split())
+
+
+def _validar_retirada(corpo):
+    retirada = corpo.get("retirada")
+    retirada = retirada if isinstance(retirada, dict) else {}
+    campos = {}
+    for chave, minimo, maximo in (("endereco", 5, 200), ("municipio", 2, 80)):
+        valor = retirada.get(chave)
+        if not isinstance(valor, str) or not minimo <= len(valor.strip()) <= maximo:
+            campos[f"retirada.{chave}"] = f"Informe entre {minimo} e {maximo} caracteres."
+    uf = retirada.get("uf")
+    if not isinstance(uf, str) or uf not in UFS:
+        campos["retirada.uf"] = "Selecione uma UF válida."
+    return ({chave: retirada[chave].strip() for chave in ("endereco", "municipio", "uf")}
+            if not campos else None), campos
+
+
+def _filtro_titular(tipo, usuario):
+    return {"estabelecimento_id": usuario.id} if tipo == "empresa" else {"doador_id": usuario.id}
 
 
 def _data_hora(valor):
@@ -115,15 +142,15 @@ def _validar_doacao(corpo):
 
 @ns.route("/doacoes")
 class DoacoesPainel(Resource):
-    @ns.response(200, "Doações da empresa", [doacao_saida])
+    @ns.response(200, "Doações do titular", [doacao_saida])
     @ns.response(401, "Não autenticado", erro_model)
-    @ns.response(403, "Apenas empresas", erro_model)
     def get(self):
-        """Lista todas as doações da empresa da sessão, inclusive encerradas."""
-        empresa, erro = _empresa_autenticada()
+        """Lista todas as doações do titular da sessão, inclusive encerradas."""
+        titular, erro = _titular_autenticado()
         if erro:
             return erro
-        doacoes = Doacao.query.filter_by(estabelecimento_id=empresa.id).order_by(
+        tipo, usuario = titular
+        doacoes = Doacao.query.filter_by(**_filtro_titular(tipo, usuario)).order_by(
             Doacao.data_cadastro.desc(), Doacao.id.desc()).all()
         return [serializar_doacao(doacao, incluir_status=True) for doacao in doacoes], 200
 
@@ -131,18 +158,24 @@ class DoacoesPainel(Resource):
     @ns.response(201, "Doação criada", doacao_saida)
     @ns.response(400, "Dados inválidos", erro_model)
     @ns.response(401, "Não autenticado", erro_model)
-    @ns.response(403, "Apenas empresas", erro_model)
     def post(self):
         """Cria doação e itens juntos após validar quantidade, prazo e validade."""
-        empresa, erro = _empresa_autenticada()
+        titular, erro = _titular_autenticado()
         if erro:
             return erro
+        tipo, usuario = titular
         corpo = request.get_json(silent=True)
         corpo = corpo if isinstance(corpo, dict) else {}
         limite, itens, campos = _validar_doacao(corpo)
+        retirada = None
+        if tipo == "doador":
+            retirada, campos_retirada = _validar_retirada(corpo)
+            campos.update(campos_retirada)
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
-        doacao = Doacao(estabelecimento_id=empresa.id,
+        doacao = Doacao(**_filtro_titular(tipo, usuario),
+                        **({f"retirada_{chave}": valor for chave, valor in retirada.items()}
+                           if retirada else {}),
                         data_limite_retirada=limite, status="DISPONIVEL")
         try:
             db.session.add(doacao)
@@ -160,15 +193,15 @@ class DoacoesPainel(Resource):
 class DoacaoPainel(Resource):
     @ns.response(204, "Doação removida")
     @ns.response(401, "Não autenticado", erro_model)
-    @ns.response(403, "Apenas empresas", erro_model)
     @ns.response(404, "Não encontrada", erro_model)
     @ns.response(409, "Não removível", erro_model)
     def delete(self, doacao_id):
         """Remove apenas doação disponível, própria e sem reservas."""
-        empresa, erro = _empresa_autenticada()
+        titular, erro = _titular_autenticado()
         if erro:
             return erro
-        doacao = Doacao.query.filter_by(id=doacao_id, estabelecimento_id=empresa.id).first()
+        tipo, usuario = titular
+        doacao = Doacao.query.filter_by(id=doacao_id, **_filtro_titular(tipo, usuario)).first()
         if not doacao:
             return _erro("DOACAO_NAO_ENCONTRADA", "Doação não encontrada.", 404)
         if doacao.status != "DISPONIVEL" or doacao.reservas:
