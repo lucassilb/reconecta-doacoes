@@ -114,23 +114,69 @@
     <!-- ============ DOAÇÕES DISPONÍVEIS ============ -->
     <section class="faixa container" id="doacoes" aria-labelledby="doacoes-titulo">
       <div class="faixa__cartao">
-        <div class="faixa__topo">
-          <div>
-            <p class="sobretitulo sobretitulo--acento">Agora na plataforma</p>
-            <h2 id="doacoes-titulo">Doações disponíveis</h2>
+        <div class="faixa__principal">
+          <div class="faixa__topo">
+            <div>
+              <p class="sobretitulo sobretitulo--acento">Agora na plataforma</p>
+              <h2 id="doacoes-titulo">Doações disponíveis</h2>
+            </div>
+            <div class="faixa__controles" id="carrossel-controles" hidden>
+              <button type="button" class="link-seta" id="carrossel-anterior" aria-controls="lista-doacoes"><span aria-hidden="true">←</span> Anterior</button>
+              <button type="button" class="link-seta" id="carrossel-proximo" aria-controls="lista-doacoes">Próximo <span aria-hidden="true">→</span></button>
+            </div>
           </div>
-          <div class="faixa__controles" id="carrossel-controles" hidden>
-            <button type="button" class="link-seta" id="carrossel-anterior" aria-controls="lista-doacoes"><span aria-hidden="true">←</span> Anterior</button>
-            <button type="button" class="link-seta" id="carrossel-proximo" aria-controls="lista-doacoes">Próximo <span aria-hidden="true">→</span></button>
+          <div id="doacoes-conteudo" aria-live="polite" aria-busy="true">
+            <ul class="carrossel" aria-hidden="true">
+              <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+              <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+            </ul>
           </div>
         </div>
-        <div id="doacoes-conteudo" aria-live="polite" aria-busy="true">
-          <ul class="carrossel" aria-hidden="true">
-            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
-            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
-            <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
+
+        <!-- painel de impacto: texto real; imagens só decorativas -->
+        <aside class="impacto" aria-labelledby="impacto-titulo">
+          <div class="impacto__fundo" aria-hidden="true">
+            <img class="impacto__bokeh" src="/static/img/doacoes/bokeh.webp" alt="" width="430" height="830" loading="lazy" decoding="async">
+            <img class="impacto__blob" src="/static/img/doacoes/blob-1.webp" alt="" width="740" height="560" loading="lazy" decoding="async">
+            <img class="impacto__folha impacto__folha--1" src="/static/img/doacoes/folha-3.webp" alt="" width="120" height="220" loading="lazy" decoding="async">
+            <img class="impacto__folha impacto__folha--2" src="/static/img/doacoes/folha-1.webp" alt="" width="220" height="200" loading="lazy" decoding="async">
+          </div>
+
+          <div class="impacto__texto">
+            <h3 id="impacto-titulo">Menos desperdício, <span>mais impacto.</span></h3>
+            <span class="impacto__fio" aria-hidden="true"></span>
+            <p>Conectamos empresas com instituições para que o alimento que sobrou chegue a quem precisa.</p>
+          </div>
+
+          <div class="impacto__sacola" aria-hidden="true">
+            <img class="impacto__brotos" src="/static/img/doacoes/brotos.webp" alt="" width="120" height="120" loading="lazy" decoding="async">
+            <img class="impacto__sacola-img" src="/static/img/doacoes/sacola.webp" alt="" width="620" height="760" loading="lazy" decoding="async">
+          </div>
+
+          <ul class="impacto__cartao">
+            <li class="impacto__item">
+              <span class="impacto__icone impacto__icone--verde" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 19c0-8 5-13.5 14-14-.5 9-6 14-14 14z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19l7.5-7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <strong>Alimenta comunidades</strong>
+              <span>Mais alimento para quem precisa.</span>
+            </li>
+            <li class="impacto__item">
+              <span class="impacto__icone impacto__icone--ambar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="5.8" cy="9.5" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="18.2" cy="9.5" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7.5 18.5c.5-3.2 2.3-5 4.5-5s4 1.8 4.5 5M2.5 17c.3-2.2 1.5-3.4 3.3-3.4M21.5 17c-.3-2.2-1.5-3.4-3.3-3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              </span>
+              <strong>Fortalece instituições</strong>
+              <span>Apoia iniciativas sociais locais.</span>
+            </li>
+            <li class="impacto__item">
+              <span class="impacto__icone impacto__icone--azul" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5s1.2-6.2 3.6-8.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              </span>
+              <strong>Constrói um futuro sustentável</strong>
+              <span>Reduz o desperdício de alimentos.</span>
+            </li>
           </ul>
-        </div>
+        </aside>
       </div>
     </section>
 

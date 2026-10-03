@@ -214,6 +214,20 @@
     atualizar();
   }
 
+  var SVG = {
+    chevron: '<path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    predio: '<path d="M4 20.5V5.5l8-2.5v17.5M12 8.5l8 2.5v9.5M2.5 20.5h19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M7 8.5h1.5M7 12h1.5M7 15.5h1.5M15 13.5h1.5M15 17h1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+    seta: '<path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+    duvida: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/>'
+  };
+  function svg(nome, classe) {
+    var span = el("span", { classe: classe, "aria-hidden": "true" });
+    span.innerHTML = '<svg viewBox="0 0 24 24" focusable="false">' + SVG[nome] + "</svg>";
+    return span;
+  }
+
+  /* Sem doações: grade de categorias aceitas. Cada cartão leva ao cadastro da empresa
+     (ou ao painel, se uma empresa já estiver logada): não há filtro por categoria. */
   function montarVazio(categorias) {
     var alvo = $("doacoes-conteudo");
     $("carrossel-controles").hidden = true;
@@ -223,14 +237,25 @@
         el("p", { texto: "Assim que uma empresa publicar o excedente do dia, ele aparece aqui. Estas são as categorias que a plataforma recebe:" })
       ]),
       el("ul", { classe: "categorias" }, categorias.map(function (c) {
-        return el("li", { classe: "categoria-convite" }, [imgCategoria(c, 72, ""), c]);
+        var slug = IMG_CATEGORIA[c] || "outros";
+        return el("li", null, [
+          el("a", { classe: "categoria categoria--" + slug, href: "/cadastro", "data-destino-empresa": "",
+                      "aria-label": c + ": cadastrar empresa que doa esta categoria" }, [
+            el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "")]),
+            el("span", { classe: "categoria__nome", texto: c }),
+            svg("chevron", "categoria__seta")
+          ])
+        ]);
       })),
       el("div", { classe: "vazio__acoes" }, [
-        el("a", { classe: "btn btn--primario", href: "/cadastro" }, ["Cadastrar minha empresa"]),
-        el("a", { classe: "btn btn--secundario", href: "/sobre#criterio" }, ["Quem pode doar"])
+        el("a", { classe: "vazio__cta", href: "/cadastro", "data-destino-empresa": "" }, [
+          svg("predio", "vazio__cta-icone"), el("span", { texto: "Cadastrar minha empresa" }), svg("seta", "vazio__cta-seta")
+        ]),
+        el("a", { classe: "vazio__quem", href: "/sobre#criterio" }, [svg("duvida", "vazio__quem-icone"), "Quem pode doar"])
       ])
     ]));
     alvo.setAttribute("aria-busy", "false");
+    ajustarConvites();
   }
 
   function montarFalha() {
@@ -271,6 +296,8 @@
     document.querySelectorAll("[data-convite]").forEach(function (a) {
       if (usuarioAtual && usuarioAtual.tipo === "empresa") { a.href = "/painel"; a.textContent = "Abra o painel"; }
     });
+    var empresa = usuarioAtual && usuarioAtual.tipo === "empresa";
+    document.querySelectorAll("[data-destino-empresa]").forEach(function (a) { a.href = empresa ? "/painel" : "/cadastro"; });
   }
 
   document.addEventListener("reconecta:sessao", function (e) {
