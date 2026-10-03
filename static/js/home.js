@@ -95,10 +95,11 @@
     return dias === 1 ? "ontem" : "há " + dias + " dias";
   }
 
-  function imgCategoria(categoria, tamanho, alt) {
+  /* estilo "redondo": miniaturas SVG do carrossel; "foto": ilustrações recortadas da grade de categorias */
+  function imgCategoria(categoria, tamanho, alt, estilo) {
     var slug = IMG_CATEGORIA[categoria] || "outros";
     return el("img", {
-      src: "/static/img/categorias/" + slug + ".svg",
+      src: estilo === "foto" ? "/static/img/doacoes/cat-" + slug + ".webp" : "/static/img/categorias/" + slug + ".svg",
       width: String(tamanho), height: String(tamanho),
       alt: alt == null ? "" : alt, loading: "lazy", decoding: "async"
     });
@@ -241,7 +242,7 @@
         return el("li", null, [
           el("a", { classe: "categoria categoria--" + slug, href: "/cadastro", "data-destino-empresa": "",
                       "aria-label": c + ": cadastrar empresa que doa esta categoria" }, [
-            el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "")]),
+            el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "", "foto")]),
             el("span", { classe: "categoria__nome", texto: c }),
             svg("chevron", "categoria__seta")
           ])
