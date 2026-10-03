@@ -237,7 +237,6 @@
 }
 .carrossel:focus-visible { outline-offset: 4px; }
 @media (min-width: 640px) { .carrossel { grid-auto-columns: calc((100% - 16px) / 2); } }
-@media (min-width: 1700px) { .carrossel { grid-auto-columns: calc((100% - 32px) / 3); } }
 
 .doacao {
   scroll-snap-align: start;
@@ -337,6 +336,12 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 .vazio__quem:hover { border-color: var(--verde); color: var(--verde-texto); }
 .vazio__quem-icone { width: 26px; height: 26px; flex: none; }
 .vazio__quem-icone svg { width: 100%; height: 100%; }
+@media (max-width: 519.98px) {
+  .vazio__cta, .vazio__quem { width: 100%; padding-inline: 18px; gap: 10px; font-size: 1rem; min-height: 56px; }
+  .vazio__quem { justify-content: center; }
+  .vazio__cta span:not([class]) { flex: 1; min-width: 0; line-height: 1.25; }
+  .vazio__cta-seta { margin-left: 0; }
+}
 
 /* ---------- painel de impacto ---------- */
 
@@ -405,13 +410,27 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
     align-content: end;
   }
   .impacto__fundo { border-radius: 0; }
-  .impacto__bokeh { display: block; right: 0; top: 0; height: 100%; width: 46%; object-fit: cover; -webkit-mask-image: linear-gradient(to left, #000 55%, transparent); mask-image: linear-gradient(to left, #000 55%, transparent); }
+  .impacto__bokeh { display: block; right: -16px; top: -16px; height: calc(100% + 32px); width: calc(46% + 16px); object-fit: cover; -webkit-mask-image: linear-gradient(to left, #000 55%, transparent); mask-image: linear-gradient(to left, #000 55%, transparent); }
   .impacto__blob { display: block; left: 3%; top: 6%; width: 92%; height: 90%; object-fit: fill; }
   .impacto__folha { display: block; }
   .impacto__folha--1 { width: 64px; left: -4px; top: 22%; transform: rotate(-20deg); }
   .impacto__folha--2 { width: 110px; left: -24px; top: 54%; }
-  .impacto__sacola { width: min(100%, 420px); margin-bottom: -6px; }
+  .impacto__sacola { width: min(100%, 324px); margin-bottom: -6px; justify-self: end; }
   .impacto__cartao { margin-top: -10px; }
+}
+
+/* desktop médio (ex.: 1280): painel com metade do cartão, sacola menor ao lado do texto */
+@media (min-width: 1100px) and (max-width: 1499.98px) {
+  .faixa__cartao { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .impacto { grid-template-columns: minmax(0, 1fr) 200px; padding-left: 52px; padding-right: 32px; column-gap: 12px; }
+  .impacto h3 { font-size: 2.4rem; }
+  .impacto__texto p { font-size: 1rem; }
+  .impacto__sacola { width: 200px; }
+  .impacto__cartao { padding: 20px 4px; }
+  .impacto__item { padding: 0 14px; }
+  .impacto__item strong { font-size: .98rem; }
+  .impacto__item > span:last-child { font-size: .88rem; }
+  .impacto__icone { width: 46px; height: 46px; margin-bottom: 10px; }
 }
 
 .falha { display: grid; gap: 12px; justify-items: start; }
