@@ -109,10 +109,11 @@
   function preencherResumo(r) {
     var alvo = $("resumo");
     var valores = r ? {
-      kg: numero.format(Number(r.kg_disponiveis) || 0),
+      kg: numero.format(Number(r.kg_disponiveis) || 0) + " kg",
       doacoes: inteiro.format(Number(r.doacoes_disponiveis) || 0),
-      empresas: inteiro.format(Number(r.empresas) || 0)
-    } : { kg: "—", doacoes: "—", empresas: "—" };
+      // "instituicoes" vem do backend a partir da rodada 4; sem ele, mostra traço
+      instituicoes: typeof r.instituicoes === "number" ? inteiro.format(r.instituicoes) : "—"
+    } : { kg: "—", doacoes: "—", instituicoes: "—" };
     Object.keys(valores).forEach(function (k) {
       alvo.querySelector('[data-resumo="' + k + '"]').textContent = valores[k];
     });
@@ -128,10 +129,11 @@
   }
 
   function preencherUltima(doacoes, falhou) {
-    var c = $("ultima-doacao");
+    var cartao = $("ultima-doacao");
+    var c = $("ultima-doacao-corpo");   // o ícone da caixa fica fixo no HTML
     c.replaceChildren();
-    c.setAttribute("aria-busy", "false");
-    if (falhou) { c.hidden = true; return; }
+    cartao.setAttribute("aria-busy", "false");
+    if (falhou) { cartao.hidden = true; return; }
     var d = doacoes[0];
     if (!d) {
       c.append(
@@ -278,10 +280,9 @@
     var cta = $("hero-cta");
     if (!cta) return;
     var rotulo = cta.querySelector("[data-cta-rotulo]");
-    var acao = cta.querySelector("[data-cta-acao]");
-    if (u && u.tipo === "empresa") { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; acao.textContent = "Painel"; }
-    else if (u) { cta.href = "/painel"; rotulo.textContent = "Meu cadastro"; acao.textContent = "Painel"; }
-    else { cta.href = "/cadastro"; rotulo.textContent = "Quero doar"; acao.textContent = "Cadastrar"; }
+    if (u && u.tipo === "empresa") { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; }
+    else if (u) { cta.href = "/painel"; rotulo.textContent = "Meu cadastro"; }
+    else { cta.href = "/cadastro"; rotulo.textContent = "Quero doar"; }
   });
 
   carregar();
