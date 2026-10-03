@@ -322,7 +322,7 @@
     if (!cta) return;
     var rotulo = cta.querySelector("[data-cta-rotulo]");
     if (u && u.tipo === "empresa") { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; }
-    else if (u) { cta.href = "/painel"; rotulo.textContent = "Meu cadastro"; }
+    else if (u) { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; } // doador também publica (rodada 7)
     else { cta.href = "/cadastro"; rotulo.textContent = "Quero doar"; }
   });
 
