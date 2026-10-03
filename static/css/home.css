@@ -105,7 +105,7 @@
   background: radial-gradient(120% 90% at 50% 20%, #EAF4E0 0%, #D7E9C6 55%, #C4DDB0 100%);
   box-shadow: 0 30px 60px -36px rgba(46, 102, 24, .45);
 }
-.hero__foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero__foto { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; display: block; }
 .hero__foto[src$=".svg"] { object-fit: contain; padding: 6%; }
 
 .hero__folha { position: absolute; pointer-events: none; z-index: 2; filter: drop-shadow(0 8px 10px rgba(46, 102, 24, .18)); }
@@ -176,9 +176,31 @@
   .hero-deco--folha-esq { display: block; width: clamp(90px, 8vw, 150px); top: -70px; left: -40px; transform: rotate(150deg); filter: blur(8px); opacity: .35; }
 }
 
+/* desktop médio (ex.: 1280 px): cartões e métricas mais compactos para não esconder a foto */
+@media (min-width: 1000px) and (max-width: 1499.98px) {
+  .hero__cartao { padding: 14px 16px; gap: 6px; }
+  .hero__cartao--doacao { width: min(300px, 46%); gap: 12px; }
+  .hero__cartao--passos { width: min(270px, 44%); bottom: 2%; }
+  .hero__cartao-icone { width: 40px; height: 40px; }
+  .ultima__vazia { font-size: .86rem; }
+  .mini-passos { gap: 10px; font-size: .86rem; }
+  .mini-passos__n { width: 32px; height: 32px; font-size: .9rem; }
+  .hero-metrica { gap: 10px; padding-inline: 16px; }
+  .hero-metrica__icone { width: 44px; height: 44px; border-radius: 12px; }
+  .hero-metrica__icone svg { width: 22px; height: 22px; }
+  .hero-metrica__rotulo { white-space: nowrap; font-size: .68rem; }
+}
+
 /* telas largas (ex.: 1877 px): acompanha o enquadramento do alvo */
 @media (min-width: 1500px) {
   .hero { max-width: 1720px; }
+  .hero-metrica { gap: 18px; padding-inline: 30px; }
+  .hero-metrica__icone { width: 64px; height: 64px; border-radius: 16px; }
+  .hero-metrica__icone svg { width: 30px; height: 30px; }
+  .hero-metrica__rotulo { font-size: .78rem; }
+  .hero-metrica__valor { font-size: 2.1rem; }
+  .hero__cta { min-height: 72px; padding: 0 56px; font-size: 1.35rem; }
+  .hero__secundario { font-size: 1.2rem; }
 }
 
 @media (max-width: 639.98px) {
