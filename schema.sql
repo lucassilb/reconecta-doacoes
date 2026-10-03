@@ -29,11 +29,17 @@ CREATE TABLE IF NOT EXISTS doadores (
 
 CREATE TABLE IF NOT EXISTS doacoes (
     id SERIAL PRIMARY KEY,
-    estabelecimento_id INT NOT NULL,
+    estabelecimento_id INT,
+    doador_id INT,
+    retirada_endereco VARCHAR(200),
+    retirada_municipio VARCHAR(80),
+    retirada_uf CHAR(2),
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_limite_retirada TIMESTAMP NOT NULL,
     status VARCHAR(20) DEFAULT 'DISPONIVEL' CHECK (status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA')),
-    CONSTRAINT fk_doacao_estabelecimento FOREIGN KEY (estabelecimento_id) REFERENCES estabelecimentos (id) ON DELETE RESTRICT
+    CONSTRAINT fk_doacao_estabelecimento FOREIGN KEY (estabelecimento_id) REFERENCES estabelecimentos (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_doacao_doador FOREIGN KEY (doador_id) REFERENCES doadores (id) ON DELETE RESTRICT,
+    CONSTRAINT ck_doacoes_uma_origem CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL))
 );
 
 CREATE TABLE IF NOT EXISTS itens_doacao (

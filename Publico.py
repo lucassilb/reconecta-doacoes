@@ -32,8 +32,13 @@ item_model = ns.model("ItemDoacaoPublico", {
 estabelecimento_model = ns.model("EstabelecimentoPublico", {
     "nome": fields.String, "municipio_uf": fields.String,
 })
+doador_model = ns.model("DoadorPublico", {
+    "nome": fields.String, "municipio_uf": fields.String,
+})
 doacao_model = ns.model("DoacaoPublica", {
-    "id": fields.Integer, "estabelecimento": fields.Nested(estabelecimento_model),
+    "id": fields.Integer, "origem": fields.String,
+    "estabelecimento": fields.Nested(estabelecimento_model),
+    "doador": fields.Nested(doador_model),
     "data_cadastro": fields.String, "data_limite_retirada": fields.String,
     "categorias": fields.List(fields.String), "itens": fields.List(fields.Nested(item_model)),
 })
@@ -54,13 +59,28 @@ def serializar_doacao(doacao, incluir_status=False):
              for item in doacao.itens]
     dados = {
         "id": doacao.id,
-        "estabelecimento": {"nome": doacao.estabelecimento.nome,
-                            "municipio_uf": _municipio_uf(doacao.estabelecimento.endereco)},
+        "origem": "doador" if doacao.doador_id is not None else "empresa",
         "data_cadastro": doacao.data_cadastro.isoformat() if doacao.data_cadastro else None,
         "data_limite_retirada": doacao.data_limite_retirada.isoformat(),
         "categorias": list(dict.fromkeys(item["categoria"] for item in itens)),
         "itens": itens,
     }
+    if doacao.doador_id is not None:
+        dados["doador"] = {
+            "nome": doacao.doador.nome.split()[0],
+            "municipio_uf": f"{doacao.retirada_municipio}/{doacao.retirada_uf}",
+        }
+        if incluir_status:
+            dados["retirada"] = {
+                "endereco": doacao.retirada_endereco,
+                "municipio": doacao.retirada_municipio,
+                "uf": doacao.retirada_uf,
+            }
+    else:
+        dados["estabelecimento"] = {
+            "nome": doacao.estabelecimento.nome,
+            "municipio_uf": _municipio_uf(doacao.estabelecimento.endereco),
+        }
     if incluir_status:
         dados["status"] = doacao.status
     return dados

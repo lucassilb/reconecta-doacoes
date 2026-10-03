@@ -122,13 +122,16 @@ def test_resumo_conta_instituicoes_sem_alterar_os_outros_contadores(cliente):
                             "kg_disponiveis": 0.0}
 
 
-def test_painel_exige_empresa_e_cria_doacao_com_itens(cliente):
+def test_painel_exige_login_e_empresa_cria_doacao_com_itens(cliente):
     empresa_id, _ = criar_usuarios()
     assert cliente.get("/reconecta/painel/doacoes").status_code == 401
     assert cliente.post("/reconecta/painel/doacoes", json=corpo_doacao()).status_code == 401
     entrar(cliente, "maria@exemplo.com")
-    assert cliente.get("/reconecta/painel/doacoes").json["codigo"] == "APENAS_EMPRESAS"
-    assert cliente.post("/reconecta/painel/doacoes", json=corpo_doacao()).status_code == 403
+    assert cliente.get("/reconecta/painel/doacoes").json == []
+    sem_retirada = cliente.post("/reconecta/painel/doacoes", json=corpo_doacao())
+    assert sem_retirada.status_code == 400
+    assert set(sem_retirada.json["campos"]) == {
+        "retirada.endereco", "retirada.municipio", "retirada.uf"}
     cliente.post("/reconecta/auth/logout")
     entrar(cliente, "verde@exemplo.com")
     criado = cliente.post("/reconecta/painel/doacoes", json=corpo_doacao())
@@ -136,6 +139,8 @@ def test_painel_exige_empresa_e_cria_doacao_com_itens(cliente):
     assert criado.json["status"] == "DISPONIVEL"
     assert criado.json["itens"][0]["nome"] == "Banana"
     assert criado.json["estabelecimento"]["municipio_uf"] == "BARUERI/SP"
+    assert criado.json["origem"] == "empresa"
+    assert "retirada" not in criado.json
     with app.app_context():
         assert Doacao.query.one().estabelecimento_id == empresa_id
         assert ItemDoacao.query.count() == 1
@@ -143,6 +148,59 @@ def test_painel_exige_empresa_e_cria_doacao_com_itens(cliente):
     assert lista.status_code == 200
     assert [doacao["id"] for doacao in lista.json] == [criado.json["id"]]
     assert cliente.get("/reconecta/publico/doacoes").json[0]["id"] == criado.json["id"]
+
+
+def test_doador_publica_com_retirada_privada_e_somente_acessa_proprias_doacoes(cliente):
+    criar_usuarios()
+    entrar(cliente, "verde@exemplo.com")
+    empresa = cliente.post("/reconecta/painel/doacoes", json={
+        **corpo_doacao(), "retirada": {"endereco": "IGNORAR", "municipio": "IGNORAR", "uf": "ZZ"}
+    })
+    assert empresa.status_code == 201
+    assert "retirada" not in empresa.json
+    cliente.post("/reconecta/auth/logout")
+    entrar(cliente, "maria@exemplo.com")
+    corpo = corpo_doacao()
+    corpo["retirada"] = {"endereco": "Rua das Flores, 123", "municipio": "Barueri", "uf": "SP"}
+    criado = cliente.post("/reconecta/painel/doacoes", json=corpo)
+    assert criado.status_code == 201
+    assert criado.json["origem"] == "doador"
+    assert criado.json["retirada"] == corpo["retirada"]
+    assert criado.json["doador"] == {"nome": "Maria", "municipio_uf": "Barueri/SP"}
+    assert "estabelecimento" not in criado.json
+    assert [item["id"] for item in cliente.get("/reconecta/painel/doacoes").json] == [criado.json["id"]]
+    assert cliente.delete(f"/reconecta/painel/doacoes/{empresa.json['id']}").status_code == 404
+    publico = cliente.get("/reconecta/publico/doacoes").json
+    publico_doador = next(item for item in publico if item["id"] == criado.json["id"])
+    assert publico_doador["doador"] == {"nome": "Maria", "municipio_uf": "Barueri/SP"}
+    assert "retirada" not in publico_doador
+    for privado in ("Rua das Flores", "Souza", "52998224725", "maria@exemplo.com"):
+        assert privado not in str(publico_doador)
+    assert cliente.get("/reconecta/publico/resumo").json["doacoes_disponiveis"] == 2
+    cliente.post("/reconecta/auth/logout")
+    entrar(cliente, "verde@exemplo.com")
+    assert [item["id"] for item in cliente.get("/reconecta/painel/doacoes").json] == [empresa.json["id"]]
+    assert cliente.delete(f"/reconecta/painel/doacoes/{criado.json['id']}").status_code == 404
+    cliente.post("/reconecta/auth/logout")
+    entrar(cliente, "maria@exemplo.com")
+    assert cliente.delete(f"/reconecta/painel/doacoes/{criado.json['id']}").status_code == 204
+
+
+@pytest.mark.parametrize("retirada,campo", [
+    (None, "retirada.endereco"),
+    ({"endereco": "abc", "municipio": "Barueri", "uf": "SP"}, "retirada.endereco"),
+    ({"endereco": "Rua das Flores", "municipio": "B", "uf": "SP"}, "retirada.municipio"),
+    ({"endereco": "Rua das Flores", "municipio": "Barueri", "uf": "ZZ"}, "retirada.uf"),
+])
+def test_doador_recusa_retirada_invalida(cliente, retirada, campo):
+    criar_usuarios()
+    entrar(cliente, "maria@exemplo.com")
+    resposta = cliente.post("/reconecta/painel/doacoes", json={**corpo_doacao(), "retirada": retirada})
+    assert resposta.status_code == 400
+    assert resposta.json["codigo"] == "DADOS_INVALIDOS"
+    assert campo in resposta.json["campos"]
+    with app.app_context():
+        assert Doacao.query.count() == 0
 
 
 @pytest.mark.parametrize("alteracao,campo", [
