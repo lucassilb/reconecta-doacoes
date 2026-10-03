@@ -260,14 +260,74 @@
   var formDoador = $("form-doador");
   var dicaPerfil = $("dica-perfil");
 
-  function escolherPerfil(perfil) {
-    formEmpresa.hidden = perfil !== "empresa";
-    formDoador.hidden = perfil !== "doador";
-    dicaPerfil.hidden = true;
+  /* Etapa 1: escolher o perfil e "Continuar". Etapa 2: o formulário do perfil, com "Voltar".
+     Os dados digitados ficam guardados ao voltar e trocar de perfil. */
+  var etapaPerfil = $("etapa-perfil");
+  var btnContinuar = $("btn-continuar");
+  var btnVoltar = $("btn-voltar");
+  var radiosPerfil = document.querySelectorAll('input[name="perfil"]');
+  var DICA_PADRAO = "Selecione uma opção acima para continuar.";
+
+  function perfilEscolhido() {
+    var r = document.querySelector('input[name="perfil"]:checked');
+    return r ? r.value : null;
   }
 
-  document.querySelectorAll('input[name="perfil"]').forEach(function (radio) {
-    radio.addEventListener("change", function () { if (radio.checked) escolherPerfil(radio.value); });
+  function irParaFormulario() {
+    var perfil = perfilEscolhido();
+    if (!perfil) {
+      dicaPerfil.textContent = "Escolha se você é empresa ou doador para continuar.";
+      dicaPerfil.classList.add("dica-perfil--alerta");
+      radiosPerfil[0].focus();
+      return;
+    }
+    etapaPerfil.hidden = true;
+    btnVoltar.hidden = false;
+    formEmpresa.hidden = perfil !== "empresa";
+    formDoador.hidden = perfil !== "doador";
+    var titulo = $(perfil === "empresa" ? "titulo-empresa" : "titulo-doador");
+    titulo.focus();
+    titulo.scrollIntoView({ block: "nearest" });
+  }
+
+  function voltarParaPerfil() {
+    formEmpresa.hidden = true;
+    formDoador.hidden = true;
+    btnVoltar.hidden = true;
+    etapaPerfil.hidden = false;
+    $("cadastro-titulo").focus();
+  }
+
+  radiosPerfil.forEach(function (radio) {
+    radio.addEventListener("change", function () {
+      if (!radio.checked) return;
+      dicaPerfil.classList.remove("dica-perfil--alerta");
+      dicaPerfil.textContent = radio.value === "empresa"
+        ? "Empresa selecionada. Na próxima etapa conferimos o CNPJ na Receita Federal."
+        : "Doador selecionado. Na próxima etapa você informa nome, CPF e contato.";
+    });
+    // Enter no radio avança, como o botão Continuar
+    radio.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); if (!radio.checked) radio.click(); irParaFormulario(); }
+    });
+  });
+  btnContinuar.addEventListener("click", irParaFormulario);
+  btnVoltar.addEventListener("click", voltarParaPerfil);
+
+  // passo 1 da coluna esquerda leva ao início do cadastro
+  var passoCadastro = $("passo-cadastro");
+  if (passoCadastro) passoCadastro.addEventListener("click", function (e) {
+    if (etapaSucesso && !etapaSucesso.hidden) return;
+    e.preventDefault();
+    if (etapaPerfil.hidden) { var f = formEmpresa.hidden ? formDoador : formEmpresa; f.querySelector(".formulario__titulo").focus(); }
+    else $("cadastro-titulo").focus();
+    $("conteudo").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  // passo 2: quem já é empresa logada publica pelo painel; os demais entram primeiro
+  document.addEventListener("reconecta:sessao", function (e) {
+    var u = e.detail && e.detail.usuario;
+    var p = $("passo-publicar");
+    if (p) p.href = u && u.tipo === "empresa" ? "/painel" : "/entrar";
   });
 
   /* ---------- empresa ---------- */
@@ -711,10 +771,12 @@
     esconderAviso(avisoEmpresa); esconderAviso(avisoDoador);
     travarEmpresa();
     document.querySelectorAll('input[name="perfil"]').forEach(function (r) { r.checked = false; });
-    formEmpresa.hidden = true; formDoador.hidden = true; dicaPerfil.hidden = false;
+    formEmpresa.hidden = true; formDoador.hidden = true;
+    dicaPerfil.textContent = DICA_PADRAO; dicaPerfil.classList.remove("dica-perfil--alerta");
+    etapaPerfil.hidden = false; btnVoltar.hidden = true;
     etapaSucesso.hidden = true;
     etapaCadastro.hidden = false;
-    document.querySelector('input[name="perfil"]').focus();
+    $("cadastro-titulo").focus();
   });
 
   travarEmpresa();

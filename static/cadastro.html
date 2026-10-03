@@ -19,32 +19,35 @@
   <header data-layout="cabecalho"></header>
 
   <div class="pagina">
+    <!-- coluna esquerda: apresentação e os três passos -->
     <aside class="vitrine" aria-labelledby="vitrine-titulo">
-     <div class="vitrine__fixo">
+      <div class="vitrine__deco" aria-hidden="true">
+        <img class="vitrine__folha vitrine__folha--topo" src="/static/img/doacoes/folha-3.webp" alt="" width="59" height="126">
+        <img class="vitrine__folha vitrine__folha--base" src="/static/img/doacoes/folha-6.webp" alt="" width="84" height="76">
+      </div>
       <div class="vitrine__texto">
         <p class="sobretitulo">Redistribuição de excedentes alimentares</p>
-        <h1 id="vitrine-titulo">Excedente de hoje, <em>refeição</em> de amanhã.</h1>
-        <p class="vitrine__lead">O ReConecta liga quem tem alimento bom sobrando a instituições que alimentam quem precisa. Tudo começa pelo seu cadastro.</p>
+        <h1 id="vitrine-titulo">Excedente de hoje, <br><em>refeição</em> de amanhã.</h1>
+        <p class="vitrine__lead">O ReConecta conecta quem tem alimento bom sobrando com quem precisa, reduzindo o desperdício e gerando mais refeições para pessoas e comunidades.</p>
       </div>
 
-      <ol class="trilha" aria-label="Como funciona">
-        <li><span class="trilha__n" aria-hidden="true">1</span><span><strong>Cadastre-se</strong> como empresa do setor de alimentos ou como doador.</span></li>
-        <li><span class="trilha__n" aria-hidden="true">2</span><span><strong>Publique o excedente</strong> com quantidade e validade de cada item.</span></li>
-        <li><span class="trilha__n" aria-hidden="true">3</span><span><strong>Instituições vão reservar e retirar</strong>, com o histórico registrado: essa é a próxima etapa da plataforma.</span></li>
+      <ol class="passos" aria-label="Como funciona">
+        <li><a class="passo" href="#cadastro-titulo" id="passo-cadastro">
+          <span class="passo__n" aria-hidden="true">1</span>
+          <span class="passo__icone" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path d="M5 13l2.2-6.4A2 2 0 0 1 9.1 5h13.8a2 2 0 0 1 1.9 1.4L27 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 13h22v1.5a3.7 3.7 0 0 1-7.3 0 3.7 3.7 0 0 1-7.4 0A3.7 3.7 0 0 1 5 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 18.5V27h18v-8.5M13 27v-5.5h6V27" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>
+          <span class="passo__rotulo">Cadastre-se</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a></li>
+        <li><a class="passo" href="/entrar" id="passo-publicar">
+          <span class="passo__n" aria-hidden="true">2</span>
+          <span class="passo__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+          <span class="passo__rotulo">Publique o excedente</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a></li>
+        <li><a class="passo" href="/#como-funciona">
+          <span class="passo__n" aria-hidden="true">3</span>
+          <span class="passo__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7.5" r="2.6" fill="currentColor"/><circle cx="5.8" cy="9.5" r="2" fill="currentColor"/><circle cx="18.2" cy="9.5" r="2" fill="currentColor"/><path d="M7.5 18.5c.5-3.2 2.3-5 4.5-5s4 1.8 4.5 5zM2.5 17c.3-2.2 1.5-3.4 3.3-3.4.9 0 1.6.3 2.2.8-.6.8-1 1.7-1.2 2.6zM21.5 17c-.3-2.2-1.5-3.4-3.3-3.4-.9 0-1.6.3-2.2.8.6.8 1 1.7 1.2 2.6z" fill="currentColor"/></svg></span>
+          <span class="passo__rotulo">Instituições retiram <span class="passo__breve">em breve</span></span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a></li>
       </ol>
-
-      <svg class="vitrine__arte" viewBox="0 0 320 120" aria-hidden="true" focusable="false">
-        <path d="M18 70h284" stroke="currentColor" stroke-opacity=".25" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round"/>
-        <circle cx="62" cy="58" r="26" fill="var(--ilustra-fruta)"/>
-        <path d="M62 33c3-8 9-11 15-10-2 7-8 10-15 10z" fill="var(--folha-viva)"/>
-        <rect x="118" y="38" width="44" height="44" rx="12" fill="var(--folha-viva)"/>
-        <rect x="128" y="30" width="24" height="12" rx="6" fill="var(--folha-viva)" opacity=".7"/>
-        <ellipse cx="214" cy="62" rx="30" ry="20" fill="var(--trigo)"/>
-        <path d="M196 56c6-4 12-4 18 0s12 4 18 0" fill="none" stroke="var(--vitrine-bg)" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="276" cy="64" r="16" fill="var(--ilustra-fruta)" opacity=".75"/>
-        <circle cx="290" cy="50" r="10" fill="var(--trigo)" opacity=".9"/>
-      </svg>
-     </div>
     </aside>
 
     <main id="conteudo" class="painel" tabindex="-1">
@@ -52,8 +55,9 @@
 
         <!-- Etapa: escolha do perfil + formulários -->
         <section id="etapa-cadastro" aria-labelledby="cadastro-titulo">
+          <div id="etapa-perfil">
           <header class="cabecalho">
-            <h2 id="cadastro-titulo">Crie seu cadastro</h2>
+            <h2 id="cadastro-titulo" tabindex="-1">Crie seu cadastro</h2>
             <p class="cabecalho__sub">Escolha como você vai participar.</p>
           </header>
 
@@ -67,7 +71,7 @@
               </span>
               <span class="perfil__texto">
                 <span class="perfil__titulo">Sou empresa</span>
-                <span class="perfil__desc">Restaurante, padaria, mercado ou outro negócio de alimentos que quer doar excedentes. Usa CNPJ.</span>
+                <span class="perfil__desc">Restaurante, padaria, mercado ou outro negócio que tem excedentes. Usa CNPJ.</span>
               </span>
               <span class="perfil__marcador" aria-hidden="true"></span>
             </label>
@@ -79,17 +83,28 @@
               </span>
               <span class="perfil__texto">
                 <span class="perfil__titulo">Sou doador</span>
-                <span class="perfil__desc">Pessoa física que quer contribuir com doações de alimentos. Usa CPF.</span>
+                <span class="perfil__desc">Pessoa física que quer doar alimentos. Usa CPF.</span>
               </span>
               <span class="perfil__marcador" aria-hidden="true"></span>
             </label>
           </fieldset>
 
-          <p id="dica-perfil" class="dica-perfil">Selecione uma opção acima para continuar.</p>
+          <p id="dica-perfil" class="dica-perfil" aria-live="polite">Selecione uma opção acima para continuar.</p>
+
+          <button type="button" id="btn-continuar" class="botao botao--primario botao--continuar">
+            <span class="botao__rotulo">Continuar</span>
+            <svg class="botao__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          </div>
+
+          <button type="button" id="btn-voltar" class="voltar" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Voltar e trocar o perfil
+          </button>
 
           <!-- Formulário: empresa -->
           <form id="form-empresa" class="formulario" novalidate hidden aria-labelledby="titulo-empresa">
-            <h3 id="titulo-empresa" class="formulario__titulo">Dados da empresa</h3>
+            <h3 id="titulo-empresa" class="formulario__titulo" tabindex="-1">Dados da empresa</h3>
             <p class="formulario__intro">Conferimos o CNPJ na Receita Federal: ele precisa estar <strong>ativo</strong> e ter atividade ligada a <strong>alimentação</strong>.</p>
 
             <div class="campo">
@@ -158,7 +173,7 @@
 
           <!-- Formulário: doador -->
           <form id="form-doador" class="formulario" novalidate hidden aria-labelledby="titulo-doador">
-            <h3 id="titulo-doador" class="formulario__titulo">Seus dados</h3>
+            <h3 id="titulo-doador" class="formulario__titulo" tabindex="-1">Seus dados</h3>
             <p class="formulario__intro">Usamos seus dados só para organizar as doações. O CPF não aparece para ninguém.</p>
 
             <div class="campo">
