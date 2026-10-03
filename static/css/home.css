@@ -229,14 +229,14 @@
 .carrossel {
   list-style: none; margin: 0 -4px; padding: 6px 4px 14px;
   display: grid; grid-auto-flow: column;
-  grid-auto-columns: minmax(260px, 86%);
+  grid-auto-columns: max(240px, calc(100cqi - 8px)); /* 1 cartão por vez na coluna (cqi = largura da coluna) */
   gap: 16px;
   overflow-x: auto; overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory; scroll-behavior: smooth;
   scrollbar-width: thin; scrollbar-color: var(--linha-forte) transparent;
 }
 .carrossel:focus-visible { outline-offset: 4px; }
-@container (min-width: 640px) { .carrossel { grid-auto-columns: calc((100% - 16px) / 2); } }
+@container (min-width: 640px) { .carrossel { grid-auto-columns: max(240px, calc((100cqi - 24px) / 2)); } }
 
 .doacao {
   scroll-snap-align: start;
@@ -507,3 +507,6 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
   .impacto { grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); }
   .impacto h3 { font-size: 2.95rem; }
 }
+
+/* doação de pessoa física (rodada 7) */
+.selo--pf { margin-left: 8px; vertical-align: 3px; font-size: .62rem; background: var(--acento-suave); color: var(--acento-texto); white-space: nowrap; }

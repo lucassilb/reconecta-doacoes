@@ -174,6 +174,18 @@
       ["Telefone", telefone(u.telefone)]
     ]);
 
+    iniciarDoacoes(false);
+  }
+
+  /* Publicar e "Minhas doações": comum a empresa e doador. O doador informa o
+     local de retirada (não tem endereço no cadastro); a empresa usa o da Receita. */
+  var ehDoador = false;
+  function iniciarDoacoes(doador) {
+    ehDoador = doador;
+    $("bloco-doacoes").hidden = false;
+    var grupo = $("grupo-retirada");
+    grupo.hidden = !doador;
+    grupo.disabled = !doador;
     listaItens = $("lista-itens");
     requisitar("/reconecta/publico/opcoes")
       .then(function (r) { if (r.ok) OPCOES = r.corpo; })
@@ -182,6 +194,22 @@
         adicionarItem();
         carregarDoacoes();
       });
+  }
+
+  var UFS = "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
+  var retiradaInputs = {
+    "retirada.endereco": $("retirada-endereco"),
+    "retirada.municipio": $("retirada-municipio"),
+    "retirada.uf": $("retirada-uf")
+  };
+  function validarRetirada(campos) {
+    if (!ehDoador) return;
+    var end = retiradaInputs["retirada.endereco"].value.trim();
+    var mun = retiradaInputs["retirada.municipio"].value.trim();
+    var uf = retiradaInputs["retirada.uf"].value;
+    if (end.length < 5) campos["retirada.endereco"] = "Informe o endereço de retirada (rua e número).";
+    if (mun.length < 2) campos["retirada.municipio"] = "Informe a cidade.";
+    if (UFS.indexOf(uf) === -1) campos["retirada.uf"] = "Escolha a UF.";
   }
 
   /* ---------- itens do formulário ---------- */
@@ -267,6 +295,7 @@
       else if (menorVal === null || v < menorVal) menorVal = v;
     });
 
+    validarRetirada(campos);
     if (limiteOk && menorVal && limiteV.slice(0, 10) > menorVal) {
       campos["data_limite_retirada"] = "A retirada não pode ser depois da menor validade dos itens (" + fmtData(menorVal) + ").";
     }
@@ -278,6 +307,7 @@
     Object.keys(campos).forEach(function (chave) {
       var input = null;
       if (chave === "data_limite_retirada") input = limiteInput;
+      else if (retiradaInputs[chave]) input = retiradaInputs[chave];
       else if (chave === "itens") { var p = $("itens-erro"); p.textContent = campos[chave]; return; }
       else {
         var m = chave.match(/^itens\[(\d+)\]\.(\w+)$/);
@@ -290,6 +320,7 @@
 
   function limparErrosForm() {
     mostrarErro(limiteInput, "");
+    Object.keys(retiradaInputs).forEach(function (k) { mostrarErro(retiradaInputs[k], ""); });
     $("itens-erro").textContent = "";
     linhasItens.forEach(function (l) {
       Object.keys(l.campos).forEach(function (c) { mostrarErro(l.campos[c], ""); });
@@ -318,10 +349,13 @@
     var btn = $("btn-publicar");
     btn.classList.add("is-carregando");
     btn.disabled = true;
-    postJson("/reconecta/painel/doacoes", {
-      data_limite_retirada: limiteInput.value,
-      itens: itens
-    }).then(function (r) {
+    var corpo = { data_limite_retirada: limiteInput.value, itens: itens };
+    if (ehDoador) corpo.retirada = {
+      endereco: retiradaInputs["retirada.endereco"].value.trim(),
+      municipio: retiradaInputs["retirada.municipio"].value.trim(),
+      uf: retiradaInputs["retirada.uf"].value
+    };
+    postJson("/reconecta/painel/doacoes", corpo).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) {
         limparFormulario();
@@ -333,7 +367,7 @@
       }
       if (r.status === 400 && c.campos) { aplicarErros(c.campos); return; }
       if (r.status === 403) {
-        mostrarAviso(avisoDoacao, "Somente empresas publicam doações", c.mensagem, { erro: true });
+        mostrarAviso(avisoDoacao, "Não foi possível publicar", c.mensagem || "Sua conta não tem permissão para publicar doações.", { erro: true });
       } else if (r.status === 401) {
         location.replace("/entrar?proximo=/painel");
       } else {
@@ -385,10 +419,12 @@
     var selo = SELOS[d.status] || null;
     var art = el("article", { classe: "doacao" });
 
+    var pf = d.origem === "doador" || (!d.estabelecimento && d.doador);
+    var quem = pf ? (d.doador || {}) : (d.estabelecimento || {});
     var onde = el("p", { classe: "doacao__onde" }, [
-      d.estabelecimento ? d.estabelecimento.nome : "Doação",
-      d.estabelecimento && d.estabelecimento.municipio_uf
-        ? el("span", { classe: "doacao__uf", texto: " · " + d.estabelecimento.municipio_uf }) : null
+      quem.nome || "Doação",
+      quem.municipio_uf ? el("span", { classe: "doacao__uf", texto: " · " + quem.municipio_uf }) : null,
+      pf ? el("span", { classe: "selo selo--pf", texto: "Pessoa física" }) : null
     ]);
 
     art.appendChild(el("div", { classe: "doacao__topo" }, [
@@ -400,6 +436,12 @@
       classe: "doacao__prazo",
       texto: "Retirar até " + fmtDataHora(d.data_limite_retirada)
     }));
+    if (propria && d.retirada && d.retirada.endereco) {
+      art.appendChild(el("p", { classe: "doacao__retirada" }, [
+        el("strong", { texto: "Local de retirada: " }),
+        d.retirada.endereco + ", " + d.retirada.municipio + "/" + d.retirada.uf
+      ]));
+    }
 
     if (d.itens && d.itens.length) {
       art.appendChild(el("ul", { classe: "doacao__itens" }, d.itens.map(function (i) {
@@ -465,6 +507,7 @@
   function iniciarDoador(u) {
     saudacao(u, "Painel do doador");
     $("bloco-doador").hidden = false;
+    $("bloco-rede").hidden = false;
 
     dlDados($("dados-doador"), [
       ["Nome", u.nome],
@@ -472,6 +515,7 @@
       ["E-mail", u.email],
       ["Telefone", telefone(u.telefone)]
     ]);
+    iniciarDoacoes(true);
 
     requisitar("/reconecta/publico/resumo").then(function (r) {
       if (!r.ok) return;
@@ -489,7 +533,7 @@
     requisitar("/reconecta/publico/doacoes?limite=8").then(function (r) {
       lista.replaceChildren();
       if (!r.ok || !Array.isArray(r.corpo) || !r.corpo.length) {
-        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhuma doação disponível agora. Quando uma empresa publicar, aparece aqui." }));
+        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhuma doação disponível agora. Quando alguém publicar, aparece aqui." }));
         return;
       }
       r.corpo.forEach(function (d) { lista.appendChild(cartaoDoacao(d, false)); });

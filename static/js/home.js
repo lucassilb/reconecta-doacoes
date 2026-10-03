@@ -105,6 +105,19 @@
     });
   }
 
+  /* Quem doa: empresa (estabelecimento, nome da Receita) ou pessoa física (doador:
+     só o primeiro nome e a cidade, sem dados pessoais). */
+  function origem(d) {
+    if (d.origem === "doador" || (!d.estabelecimento && d.doador)) {
+      var p = d.doador || {};
+      return { nome: p.nome || "Doador", municipio_uf: p.municipio_uf, pf: true };
+    }
+    var e = d.estabelecimento || {};
+    return { nome: e.nome, municipio_uf: e.municipio_uf, pf: false };
+  }
+  function tituloOrigem(o) { return o.pf ? String(o.nome || "") : titulo(o.nome); }
+  function seloPF() { return el("span", { classe: "selo selo--pf", texto: "Pessoa física" }); }
+
   /* ---------- resumo (métricas do hero) ---------- */
 
   function preencherResumo(r) {
@@ -144,10 +157,10 @@
       ajustarConvites();
       return;
     }
-    var est = d.estabelecimento || {};
+    var est = origem(d);
     c.append(
       el("p", { classe: "sobretitulo" }, ["Mais recente · ", haQuanto(d.data_cadastro)]),
-      el("p", { classe: "ultima__nome", texto: titulo(est.nome) }),
+      el("p", { classe: "ultima__nome" }, [tituloOrigem(est), est.pf ? seloPF() : null]),
       est.municipio_uf ? el("p", { classe: "ultima__local", texto: local(est.municipio_uf) }) : null,
       el("p", { classe: "ultima__itens", texto: resumoItens(d.itens || [], 3) }),
       el("div", { classe: "ultima__rodape" }, [
@@ -160,7 +173,7 @@
   /* ---------- carrossel ---------- */
 
   function cartaoDoacao(d) {
-    var est = d.estabelecimento || {};
+    var est = origem(d);
     var itens = d.itens || [];
     var categorias = d.categorias && d.categorias.length ? d.categorias : [itens[0] && itens[0].categoria];
     var MAX = 3;
@@ -168,7 +181,7 @@
       return el("li", null, [el("span", { texto: i.nome, title: i.nome }), el("span", { texto: quantidade(i) })]);
     }));
     var corpo = el("div", { classe: "doacao__corpo" }, [
-      el("h3", { classe: "doacao__nome", texto: titulo(est.nome) }),
+      el("h3", { classe: "doacao__nome" }, [tituloOrigem(est), est.pf ? seloPF() : null]),
       el("p", { classe: "doacao__local", texto: local(est.municipio_uf) }),
       lista,
       itens.length > MAX ? el("p", { classe: "doacao__mais", texto: "+ " + (itens.length - MAX) + (itens.length - MAX === 1 ? " item" : " itens") }) : null
@@ -235,7 +248,7 @@
     alvo.replaceChildren(el("div", { classe: "vazio" }, [
       el("div", { classe: "vazio__texto" }, [
         el("h3", { texto: "Nenhuma doação aberta agora" }),
-        el("p", { texto: "Assim que uma empresa publicar o excedente do dia, ele aparece aqui. Estas são as categorias que a plataforma recebe:" })
+        el("p", { texto: "Assim que uma empresa ou um doador publicar alimento para doar, ele aparece aqui. Estas são as categorias que a plataforma recebe:" })
       ]),
       el("ul", { classe: "categorias" }, categorias.map(function (c) {
         var slug = IMG_CATEGORIA[c] || "outros";
