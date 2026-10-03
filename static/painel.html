@@ -41,6 +41,21 @@
           <dl class="dados" id="dados-empresa"></dl>
         </section>
 
+      </div>
+
+      <!-- ===== doador ===== -->
+      <div id="bloco-doador" class="painel__grade" hidden>
+
+        <section class="cartao" aria-labelledby="dados-doador-t">
+          <h2 id="dados-doador-t" class="cartao__titulo">Seus dados</h2>
+          <dl class="dados" id="dados-doador"></dl>
+        </section>
+
+      </div>
+
+      <!-- ===== publicar e minhas doações: empresa e doador ===== -->
+      <div id="bloco-doacoes" class="painel__grade" hidden>
+
         <section class="cartao" aria-labelledby="publicar-t">
           <h2 id="publicar-t" class="cartao__titulo">Publicar doação</h2>
           <p class="cartao__sub">Liste os itens com quantidade, validade e o prazo de retirada. A doação entra na lista pública de doações; a reserva pelas instituições é a próxima etapa da plataforma.</p>
@@ -53,6 +68,57 @@
               <p id="limite-ajuda" class="campo__ajuda">A retirada não pode ser depois da menor validade dos itens.</p>
               <p id="limite-erro" class="campo__erro" data-erro></p>
             </div>
+
+            <fieldset id="grupo-retirada" class="retirada" hidden disabled>
+              <legend class="itens__legenda">Local de retirada</legend>
+              <p class="campo__ajuda retirada__ajuda">Como você não tem endereço no cadastro, diga onde o alimento pode ser buscado. Na lista pública aparecem só a cidade e o seu primeiro nome; o endereço completo fica visível apenas para você.</p>
+              <div class="campo retirada__endereco">
+                <label for="retirada-endereco" class="campo__rotulo">Endereço</label>
+                <input id="retirada-endereco" name="retirada_endereco" class="campo__entrada" maxlength="200" autocomplete="street-address"
+                       placeholder="Rua, número e complemento" aria-describedby="retirada-endereco-erro" required>
+                <p id="retirada-endereco-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo retirada__municipio">
+                <label for="retirada-municipio" class="campo__rotulo">Cidade</label>
+                <input id="retirada-municipio" name="retirada_municipio" class="campo__entrada" maxlength="80" autocomplete="address-level2"
+                       aria-describedby="retirada-municipio-erro" required>
+                <p id="retirada-municipio-erro" class="campo__erro" data-erro></p>
+              </div>
+              <div class="campo retirada__uf">
+                <label for="retirada-uf" class="campo__rotulo">UF</label>
+                <select id="retirada-uf" name="retirada_uf" class="campo__entrada" autocomplete="address-level1" aria-describedby="retirada-uf-erro" required>
+                  <option value="">UF</option>
+                  <option value="AC">AC</option>
+                  <option value="AL">AL</option>
+                  <option value="AP">AP</option>
+                  <option value="AM">AM</option>
+                  <option value="BA">BA</option>
+                  <option value="CE">CE</option>
+                  <option value="DF">DF</option>
+                  <option value="ES">ES</option>
+                  <option value="GO">GO</option>
+                  <option value="MA">MA</option>
+                  <option value="MT">MT</option>
+                  <option value="MS">MS</option>
+                  <option value="MG">MG</option>
+                  <option value="PA">PA</option>
+                  <option value="PB">PB</option>
+                  <option value="PR">PR</option>
+                  <option value="PE">PE</option>
+                  <option value="PI">PI</option>
+                  <option value="RJ">RJ</option>
+                  <option value="RN">RN</option>
+                  <option value="RS">RS</option>
+                  <option value="RO">RO</option>
+                  <option value="RR">RR</option>
+                  <option value="SC">SC</option>
+                  <option value="SP">SP</option>
+                  <option value="SE">SE</option>
+                  <option value="TO">TO</option>
+                </select>
+                <p id="retirada-uf-erro" class="campo__erro" data-erro></p>
+              </div>
+            </fieldset>
 
             <fieldset class="itens">
               <legend class="itens__legenda">Itens da doação</legend>
@@ -81,13 +147,8 @@
         </section>
       </div>
 
-      <!-- ===== doador ===== -->
-      <div id="bloco-doador" class="painel__grade" hidden>
-
-        <section class="cartao" aria-labelledby="dados-doador-t">
-          <h2 id="dados-doador-t" class="cartao__titulo">Seus dados</h2>
-          <dl class="dados" id="dados-doador"></dl>
-        </section>
+      <!-- ===== a rede (só doador) ===== -->
+      <div id="bloco-rede" class="painel__grade" hidden>
 
         <section class="cartao" aria-labelledby="resumo-t">
           <h2 id="resumo-t" class="cartao__titulo">A rede agora</h2>

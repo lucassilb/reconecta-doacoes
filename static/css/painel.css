@@ -136,3 +136,22 @@
   font-size: .9rem; color: var(--tinta-suave);
   border-top: 1px dashed var(--linha-forte); padding-top: 12px;
 }
+
+/* local de retirada (só doador) */
+.retirada {
+  border: 0; margin: 0; padding: 16px; display: grid; gap: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--superficie-2); border-radius: var(--raio);
+}
+.retirada[hidden] { display: none; }
+.retirada .itens__legenda { float: left; width: 100%; padding: 0; margin-bottom: 2px; }
+.retirada__ajuda { grid-column: 1 / -1; margin-top: -4px; }
+@media (min-width: 640px) {
+  .retirada { grid-template-columns: minmax(0, 1fr) 120px; align-items: start; }
+  .retirada__endereco { grid-column: 1 / -1; }
+}
+
+/* origem pessoa física nos cartões */
+.selo--pf { margin-left: 8px; vertical-align: 2px; background: var(--acento-suave); color: var(--acento-texto); }
+.doacao__retirada { font-size: .88rem; color: var(--tinta-suave); }
+.doacao__retirada strong { color: var(--tinta); font-weight: 600; }
