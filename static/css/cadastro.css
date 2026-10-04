@@ -29,14 +29,6 @@
   --fonte-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-
-    /* cores do modo escuro: herdadas de base.css pelos apelidos acima */
-  }
-}
-
 /* ---------- base ---------- */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -264,10 +256,6 @@ button, input { font: inherit; color: inherit; }
 .botao.botao--continuar:hover:not(:disabled) { background: linear-gradient(180deg, #57962F, #336F1B); }
 .botao__seta { width: 24px; height: 24px; flex: none; transition: transform .15s ease; }
 .botao--continuar:hover .botao__seta { transform: translateX(3px); }
-@media (prefers-color-scheme: dark) {
-  .botao.botao--continuar { background: linear-gradient(180deg, #A6D67C, #86C25A); color: #13200B; }
-  .botao.botao--continuar:hover:not(:disabled) { background: linear-gradient(180deg, #B4DE8E, #93CB69); }
-}
 @media (min-width: 1000px) { .botao.botao--continuar { min-height: 70px; font-size: 1.3rem; margin-top: 26px; } }
 
 /* voltar para trocar o perfil */

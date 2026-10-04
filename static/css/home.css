@@ -10,17 +10,6 @@
   --hero-pessego: #FDEBDD;
   --hero-laranja: #C8621E;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --hero-onda-1: #1C2419;
-    --hero-onda-2: #1A1F18;
-    --hero-cta-1: #A6D67C;
-    --hero-cta-2: #86C25A;
-    --hero-pessego: #3A2A1C;
-    --hero-laranja: #F2A266;
-  }
-}
-
 /* palco de largura total: decoração atrás do hero */
 .hero-palco { position: relative; isolation: isolate; }
 .hero-deco { position: absolute; z-index: -1; pointer-events: none; }
@@ -387,8 +376,6 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 .impacto__icone--verde { background: var(--verde-suave); color: var(--verde-texto); }
 .impacto__icone--ambar { background: var(--acento-suave); color: var(--acento-texto); }
 .impacto__icone--azul { background: color-mix(in srgb, #2F6FD8 14%, var(--superficie)); color: #2B5FB8; }
-@media (prefers-color-scheme: dark) { .impacto__icone--azul { color: #8DB4F2; } }
-
 @media (min-width: 640px) {
   .impacto { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); grid-template-areas: "texto sacola" "cartao cartao"; padding: 32px; }
   .impacto__sacola { width: min(100%, 300px); align-self: end; }
