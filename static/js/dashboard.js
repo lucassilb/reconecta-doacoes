@@ -65,7 +65,9 @@
     });
     var pct = Math.max(0, Math.min(100, Number(ind.percentual_atendimento) || 0));
     lista.querySelector(".indicador__barra span").style.width = pct + "%";
-    $("ind-itens").textContent = decimal.format(Number(ind.itens_atendidos) || 0) + " de " + decimal.format(Number(ind.itens_pedidos) || 0) + " unidades pedidas já chegaram";
+    // itens_pedidos = itens nos pedidos abertos; itens_atendidos = itens com a meta completa
+    var ped = Number(ind.itens_pedidos) || 0, at = Number(ind.itens_atendidos) || 0;
+    $("ind-itens").textContent = inteiro.format(at) + " de " + inteiro.format(ped) + (ped === 1 ? " item pedido" : " itens pedidos") + " com a meta completa";
     lista.setAttribute("aria-busy", "false");
   }
 
