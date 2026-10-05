@@ -23,7 +23,7 @@
       <div class="abertura__texto">
         <p class="sobretitulo sobretitulo--acento">Sobre o ReConecta</p>
         <h1 id="sobre-titulo">Comida boa<br>merece <em>destino</em></h1>
-        <p class="lead">O ReConecta é uma plataforma que liga estabelecimentos com alimento excedente a instituições que alimentam quem precisa. Ela organiza o caminho entre o balcão e a mesa: o que foi doado, quanto e até quando dá para consumir e retirar.</p>
+        <p class="lead">O ReConecta é uma plataforma em que empresas e associações do setor de alimentos publicam o que precisam e pessoas com CPF ou outras empresas doam. Ela organiza o caminho até a mesa: o que foi pedido, quanto já chegou e até quando dá para entregar.</p>
         <nav class="indice" aria-label="Nesta página">
           <a href="#problema">O problema</a>
           <a href="#missao">Missão</a>
@@ -78,7 +78,7 @@
       </div>
       <ol class="regras">
         <li><span class="regras__fase">Publicar · já vale</span><p>Todo item precisa ter <strong>quantidade maior que zero</strong>.</p></li>
-        <li><span class="regras__fase">Publicar · já vale</span><p>Alimento com a <strong>validade vencida</strong> não pode ser disponibilizado para retirada.</p></li>
+        <li><span class="regras__fase">Doar · já vale</span><p>Alimento com a <strong>validade vencida</strong> não pode ser doado; quem doa confirma a validade, a embalagem e o armazenamento e manda uma foto.</p></li>
         <li class="regras__futura"><span class="regras__fase">Reservar · próxima etapa</span><p>Só doações <strong>disponíveis</strong> podem ser reservadas.</p></li>
         <li class="regras__futura"><span class="regras__fase">Reservar · próxima etapa</span><p>Uma doação tem <strong>no máximo uma reserva ativa</strong> por vez; ao reservar, ela deixa de aparecer como disponível.</p></li>
         <li class="regras__futura"><span class="regras__fase">Retirar · próxima etapa</span><p>Só uma doação <strong>reservada</strong> pode ter a retirada confirmada, e então passa a constar como retirada.</p></li>
@@ -125,7 +125,7 @@
           <div class="dados__coluna">
             <h3>O que aparece em público</h3>
             <ul>
-              <li>Nas doações abertas: nome do estabelecimento, cidade, itens, quantidades, validade e prazo de retirada.</li>
+              <li>Nos pedidos abertos: nome da empresa, cidade, itens, quantidades e o prazo para receber.</li>
               <li>Não mostramos e-mail, telefone, CNPJ nem CPF de ninguém.</li>
               <li>O CPF do doador é exibido mascarado até para o próprio dono (***.456.789-**).</li>
             </ul>
@@ -143,7 +143,7 @@
       <dl class="papeis">
         <div class="papel">
           <dt><img src="/static/img/categorias/padaria.svg" width="64" height="64" alt="">Empresas do setor de alimentos</dt>
-          <dd>Restaurantes, padarias, mercados, hortifrutis, distribuidores e indústrias de alimentos com CNPJ ativo. Publicam as doações e acompanham o que está aberto.</dd>
+          <dd>Restaurantes, padarias, mercados, associações e indústrias de alimentos com CNPJ ativo. Publicam pedidos de doação e também podem doar para pedidos de outras empresas.</dd>
         </div>
         <div class="papel">
           <dt><img src="/static/img/categorias/hortifruti.svg" width="64" height="64" alt="">Doadores</dt>
@@ -151,7 +151,7 @@
         </div>
         <div class="papel">
           <dt><img src="/static/img/categorias/refeicoes.svg" width="64" height="64" alt="">Instituições sociais</dt>
-          <dd>ONGs, associações e projetos que recebem e distribuem alimentos. Já podem ver as doações abertas; a reserva e a confirmação de retirada pelas instituições são a próxima etapa da plataforma.</dd>
+          <dd>ONGs, associações e projetos com CNPJ ativo e atividade ligada a alimentos entram como empresa e publicam os seus pedidos.</dd>
         </div>
       </dl>
     </section>
@@ -174,9 +174,9 @@
     <!-- ============ CTA ============ -->
     <section class="bloco container" aria-labelledby="cta-sobre-titulo">
       <div class="cta">
-        <h2 id="cta-sobre-titulo">Sua empresa tem excedente? <em>Comece hoje.</em></h2>
+        <h2 id="cta-sobre-titulo">Sua empresa precisa de doações? <em>Comece hoje.</em></h2>
         <div class="cta__acoes">
-          <a class="btn btn--primario" href="/cadastro">Quero doar <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
+          <a class="btn btn--primario" href="/cadastro">Publicar pedido <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
           <a class="btn btn--fantasma" href="/#doacoes">Ver doações abertas <span aria-hidden="true">→</span></a>
         </div>
       </div>

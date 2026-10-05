@@ -155,3 +155,24 @@
 .selo--pf { margin-left: 8px; vertical-align: 2px; background: var(--acento-suave); color: var(--acento-texto); }
 .doacao__retirada { font-size: .88rem; color: var(--tinta-suave); }
 .doacao__retirada strong { color: var(--tinta); font-weight: 600; }
+
+/* pedidos (rodada 9): itens com progresso, doações recebidas e minhas doações */
+.pedido-itens-painel { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pedido-linha { display: grid; gap: 4px; }
+.pedido-linha__topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.pedido-linha__qtd { color: var(--tinta-suave); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.pedido-linha__barra { display: block; height: 8px; border-radius: 999px; background: var(--linha); overflow: hidden; } /* trilho visível sobre o cartão cinza */
+.pedido-linha__barra > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); }
+.doacao__recebidas summary { cursor: pointer; font-weight: 700; font-size: .92rem; color: var(--verde-texto); }
+.doacao__recebidas ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.doacao__sem { font-size: .9rem; color: var(--tinta-suave); }
+.doacao__doar { justify-self: start; }
+.recebida { display: flex; gap: 12px; align-items: center; }
+.recebida__foto { flex: none; width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: var(--superficie-2); display: block; }
+.recebida__foto img { width: 56px; height: 56px; object-fit: cover; display: block; }
+.recebida__texto { display: grid; gap: 2px; min-width: 0; }
+.recebida__meta { font-size: .86rem; color: var(--tinta-suave); }
+.minha-doacao { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; }
+.minha-doacao:not(:has(.minha-doacao__foto)) { grid-template-columns: minmax(0, 1fr); }
+.minha-doacao__foto { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
+.minha-doacao__texto { display: grid; gap: 6px; min-width: 0; }

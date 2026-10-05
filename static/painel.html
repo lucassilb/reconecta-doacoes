@@ -10,11 +10,8 @@
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/painel.css">
-  <link rel="stylesheet" href="/static/css/arrecadacoes.css">
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/painel.js" defer></script>
-  <script src="/static/js/arrecadacao-util.js" defer></script>
-  <script src="/static/js/painel-arrecadacoes.js" defer></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o painel</a>
@@ -56,75 +53,24 @@
 
       </div>
 
-      <!-- ===== publicar e minhas doações: empresa e doador ===== -->
+      <!-- ===== publicar pedido e meus pedidos: só empresa ===== -->
       <div id="bloco-doacoes" class="painel__grade" hidden>
 
-        <section class="cartao" aria-labelledby="publicar-t">
-          <h2 id="publicar-t" class="cartao__titulo">Publicar doação</h2>
-          <p class="cartao__sub">Liste os itens com quantidade, validade e o prazo de retirada. A doação entra na lista pública de doações; a reserva pelas instituições é a próxima etapa da plataforma.</p>
+        <section class="cartao" id="publicar" aria-labelledby="publicar-t">
+          <h2 id="publicar-t" class="cartao__titulo">Publicar pedido de doação</h2>
+          <p class="cartao__sub">Diga do que você precisa: cada item, a quantidade e até quando pode receber. O pedido aparece em Doações disponíveis e pessoas com CPF ou outras empresas doam, com questionário e foto.</p>
 
           <form id="form-doacao" class="form-doacao" novalidate>
             <div class="campo campo--limite">
-              <label for="limite" class="campo__rotulo">Retirar até</label>
+              <label for="limite" class="campo__rotulo">Receber até</label>
               <input id="limite" name="limite" type="datetime-local" class="campo__entrada campo__entrada--mono"
                      aria-describedby="limite-ajuda limite-erro" required>
-              <p id="limite-ajuda" class="campo__ajuda">A retirada não pode ser depois da menor validade dos itens.</p>
+              <p id="limite-ajuda" class="campo__ajuda">Até quando as doações podem ser entregues no endereço da empresa.</p>
               <p id="limite-erro" class="campo__erro" data-erro></p>
             </div>
 
-            <fieldset id="grupo-retirada" class="retirada" hidden disabled>
-              <legend class="itens__legenda">Local de retirada</legend>
-              <p class="campo__ajuda retirada__ajuda">Como você não tem endereço no cadastro, diga onde o alimento pode ser buscado. Na lista pública aparecem só a cidade e o seu primeiro nome; o endereço completo fica visível apenas para você.</p>
-              <div class="campo retirada__endereco">
-                <label for="retirada-endereco" class="campo__rotulo">Endereço</label>
-                <input id="retirada-endereco" name="retirada_endereco" class="campo__entrada" maxlength="200" autocomplete="street-address"
-                       placeholder="Rua, número e complemento" aria-describedby="retirada-endereco-erro" required>
-                <p id="retirada-endereco-erro" class="campo__erro" data-erro></p>
-              </div>
-              <div class="campo retirada__municipio">
-                <label for="retirada-municipio" class="campo__rotulo">Cidade</label>
-                <input id="retirada-municipio" name="retirada_municipio" class="campo__entrada" maxlength="80" autocomplete="address-level2"
-                       aria-describedby="retirada-municipio-erro" required>
-                <p id="retirada-municipio-erro" class="campo__erro" data-erro></p>
-              </div>
-              <div class="campo retirada__uf">
-                <label for="retirada-uf" class="campo__rotulo">UF</label>
-                <select id="retirada-uf" name="retirada_uf" class="campo__entrada" autocomplete="address-level1" aria-describedby="retirada-uf-erro" required>
-                  <option value="">UF</option>
-                  <option value="AC">AC</option>
-                  <option value="AL">AL</option>
-                  <option value="AP">AP</option>
-                  <option value="AM">AM</option>
-                  <option value="BA">BA</option>
-                  <option value="CE">CE</option>
-                  <option value="DF">DF</option>
-                  <option value="ES">ES</option>
-                  <option value="GO">GO</option>
-                  <option value="MA">MA</option>
-                  <option value="MT">MT</option>
-                  <option value="MS">MS</option>
-                  <option value="MG">MG</option>
-                  <option value="PA">PA</option>
-                  <option value="PB">PB</option>
-                  <option value="PR">PR</option>
-                  <option value="PE">PE</option>
-                  <option value="PI">PI</option>
-                  <option value="RJ">RJ</option>
-                  <option value="RN">RN</option>
-                  <option value="RS">RS</option>
-                  <option value="RO">RO</option>
-                  <option value="RR">RR</option>
-                  <option value="SC">SC</option>
-                  <option value="SP">SP</option>
-                  <option value="SE">SE</option>
-                  <option value="TO">TO</option>
-                </select>
-                <p id="retirada-uf-erro" class="campo__erro" data-erro></p>
-              </div>
-            </fieldset>
-
             <fieldset class="itens">
-              <legend class="itens__legenda">Itens da doação</legend>
+              <legend class="itens__legenda">Itens que você precisa</legend>
               <p id="itens-erro" class="campo__erro" data-erro></p>
               <div id="lista-itens" class="itens__lista"></div>
               <button type="button" id="btn-add-item" class="btn btn--secundario btn--pequeno btn--add">
@@ -136,88 +82,29 @@
             <div id="aviso-doacao" class="aviso" role="alert" hidden></div>
 
             <button type="submit" id="btn-publicar" class="btn btn--primario">
-              Publicar doação
+              Publicar pedido
             </button>
           </form>
         </section>
 
-        <section class="cartao" aria-labelledby="minhas-t">
+        <section class="cartao" id="meus-pedidos" aria-labelledby="minhas-t">
           <div class="cartao__linha">
-            <h2 id="minhas-t" class="cartao__titulo">Minhas doações</h2>
+            <h2 id="minhas-t" class="cartao__titulo">Meus pedidos</h2>
             <button type="button" id="btn-recarregar" class="link-seta">Atualizar</button>
           </div>
           <div id="lista-doacoes" class="doacoes" aria-live="polite"></div>
         </section>
       </div>
 
-      <!-- ===== ações de arrecadação (só empresa cria) ===== -->
-      <div id="bloco-acoes" class="painel__grade" hidden>
-        <section class="cartao" id="acoes" aria-labelledby="acoes-t">
+      <!-- ===== o que a pessoa doou: empresa e doador ===== -->
+      <div id="bloco-minhas-doacoes" class="painel__grade" hidden>
+        <section class="cartao" id="minhas-doacoes" aria-labelledby="minhas-doacoes-t">
           <div class="cartao__linha">
-            <h2 id="acoes-t" class="cartao__titulo">Minhas ações de arrecadação</h2>
-            <button type="button" id="btn-nova-acao" class="btn btn--primario btn--pequeno" aria-expanded="false" aria-controls="form-acao">Nova ação</button>
+            <h2 id="minhas-doacoes-t" class="cartao__titulo">Minhas doações</h2>
+            <a class="link-seta" href="/#doacoes">Ver doações disponíveis <span aria-hidden="true">→</span></a>
           </div>
-          <p class="cartao__sub">Abra uma ação com um objetivo (por exemplo, arrecadar arroz e feijão até o fim do mês). Pessoas com CPF e outras empresas doam pelo site, com um questionário rápido e uma foto do alimento.</p>
-
-          <form id="form-acao" class="form-acao" novalidate hidden aria-labelledby="form-acao-t">
-            <h3 id="form-acao-t" class="form-acao__titulo" tabindex="-1">Nova ação de arrecadação</h3>
-            <div class="campo form-acao__largo">
-              <label class="campo__rotulo" for="a-titulo">Título</label>
-              <input id="a-titulo" class="campo__entrada" maxlength="80" placeholder="Ex.: Arrecadação de arroz e feijão" aria-describedby="a-titulo-erro" required>
-              <p id="a-titulo-erro" class="campo__erro" data-erro></p>
-            </div>
-            <div class="campo form-acao__largo">
-              <label class="campo__rotulo" for="a-descricao">Descrição</label>
-              <textarea id="a-descricao" class="campo__entrada" maxlength="500" rows="3" placeholder="Para quem vai, o que mais ajuda, como entregar." aria-describedby="a-descricao-ajuda a-descricao-erro" required></textarea>
-              <p id="a-descricao-ajuda" class="campo__ajuda">De 10 a 500 caracteres.</p>
-              <p id="a-descricao-erro" class="campo__erro" data-erro></p>
-            </div>
-            <fieldset class="form-acao__cats form-acao__largo" id="a-categorias" aria-describedby="a-categorias-erro">
-              <legend class="campo__rotulo">Categorias aceitas</legend>
-              <div class="form-acao__cats-lista" id="a-categorias-lista"></div>
-              <p id="a-categorias-erro" class="campo__erro" data-erro></p>
-            </fieldset>
-            <div class="campo form-acao__largo">
-              <label class="campo__rotulo" for="a-meta">Meta <span class="campo__opcional">(opcional)</span></label>
-              <input id="a-meta" class="campo__entrada" maxlength="120" placeholder="Ex.: 200 kg de arroz e feijão" aria-describedby="a-meta-erro">
-              <p id="a-meta-erro" class="campo__erro" data-erro></p>
-            </div>
-            <div class="campo form-acao__largo">
-              <label class="campo__rotulo" for="a-entrega">Endereço de entrega <span class="campo__opcional">(opcional)</span></label>
-              <input id="a-entrega" class="campo__entrada" maxlength="200" aria-describedby="a-entrega-ajuda a-entrega-erro">
-              <p id="a-entrega-ajuda" class="campo__ajuda">Se ficar em branco, usamos o endereço da empresa na Receita. Ele só aparece para quem tiver a doação confirmada.</p>
-              <p id="a-entrega-erro" class="campo__erro" data-erro></p>
-            </div>
-            <div class="campo">
-              <label class="campo__rotulo" for="a-inicio">Começa em</label>
-              <input id="a-inicio" type="date" class="campo__entrada" aria-describedby="a-inicio-erro" required>
-              <p id="a-inicio-erro" class="campo__erro" data-erro></p>
-            </div>
-            <div class="campo">
-              <label class="campo__rotulo" for="a-fim">Termina em</label>
-              <input id="a-fim" type="date" class="campo__entrada" aria-describedby="a-fim-erro" required>
-              <p id="a-fim-erro" class="campo__erro" data-erro></p>
-            </div>
-            <div id="aviso-acao" class="aviso form-acao__largo" role="alert" hidden></div>
-            <div class="form-acao__botoes form-acao__largo">
-              <button type="submit" id="btn-criar-acao" class="btn btn--primario">Criar ação</button>
-              <button type="button" id="btn-cancelar-acao" class="btn btn--fantasma">Cancelar</button>
-            </div>
-          </form>
-
-          <div id="lista-acoes" class="minhas-acoes" aria-live="polite"></div>
-        </section>
-      </div>
-
-      <!-- ===== contribuições feitas (empresa e doador) ===== -->
-      <div id="bloco-contribuicoes" class="painel__grade" hidden>
-        <section class="cartao" id="contribuicoes" aria-labelledby="contribuicoes-t">
-          <div class="cartao__linha">
-            <h2 id="contribuicoes-t" class="cartao__titulo">Minhas contribuições</h2>
-            <a class="link-seta" href="/arrecadacoes">Ver ações de arrecadação <span aria-hidden="true">→</span></a>
-          </div>
-          <p class="cartao__sub" id="contribuicoes-sub">Doações que você fez para ações de arrecadação, com o local e o prazo de entrega.</p>
-          <div id="lista-contribuicoes" class="minhas-contribuicoes" aria-live="polite"></div>
+          <p class="cartao__sub">O que você doou para pedidos de empresas, com o endereço e o prazo de entrega.</p>
+          <div id="lista-minhas-doacoes" class="doacoes" aria-live="polite"></div>
         </section>
       </div>
 
@@ -230,12 +117,8 @@
         </section>
 
         <section class="cartao" aria-labelledby="disponiveis-t">
-          <h2 id="disponiveis-t" class="cartao__titulo">Doações disponíveis agora</h2>
+          <h2 id="disponiveis-t" class="cartao__titulo">Pedidos abertos agora</h2>
           <div id="lista-disponiveis" class="doacoes" aria-live="polite"></div>
-          <p class="nota-honesta">
-            Por enquanto as doações ficam só em exibição: a reserva pelas instituições
-            é a próxima etapa da plataforma.
-          </p>
         </section>
       </div>
     </div>
