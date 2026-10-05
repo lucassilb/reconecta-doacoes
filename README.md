@@ -130,7 +130,7 @@ A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que f
 python -m pytest -q
 ```
 
-150 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
+154 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
 
 ## Endpoints
 
