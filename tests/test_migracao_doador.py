@@ -24,7 +24,11 @@ def test_migracao_sqlite_antiga_duas_vezes_preserva_doacao_itens_e_reserva(tmp_p
         conexao.execute(text("INSERT INTO reservas VALUES (1, 1)"))
     aplicar_migracoes(engine)
     aplicar_migracoes(engine)
-    assert {"arrecadacoes", "contribuicoes"} <= set(inspect(engine).get_table_names())
+    assert "arrecadacoes" not in inspect(engine).get_table_names()
+    assert "contribuicoes" in inspect(engine).get_table_names()
+    assert {"doacao_id", "item_doacao_id"} <= {
+        coluna["name"] for coluna in inspect(engine).get_columns("contribuicoes")}
+    assert inspect(engine).get_columns("itens_doacao")[-1]["name"] == "validade"
     colunas = {coluna["name"]: coluna for coluna in inspect(engine).get_columns("doacoes")}
     assert colunas["estabelecimento_id"]["nullable"]
     assert {"doador_id", "retirada_endereco", "retirada_municipio", "retirada_uf"} <= colunas.keys()

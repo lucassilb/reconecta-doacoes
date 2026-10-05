@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS itens_doacao (
     categoria VARCHAR(50) NOT NULL,
     quantidade DECIMAL(10,2) NOT NULL CHECK (quantidade > 0),
     unidade_medida VARCHAR(20) NOT NULL,
-    validade DATE NOT NULL,
+    validade DATE,
     CONSTRAINT fk_item_doacao FOREIGN KEY (doacao_id) REFERENCES doacoes (id) ON DELETE CASCADE
 );
 
@@ -64,23 +64,10 @@ CREATE TABLE IF NOT EXISTS reservas (
     CONSTRAINT fk_reserva_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes (id) ON DELETE RESTRICT
 );
 
-CREATE TABLE IF NOT EXISTS arrecadacoes (
-    id SERIAL PRIMARY KEY,
-    estabelecimento_id INT NOT NULL REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
-    titulo VARCHAR(80) NOT NULL,
-    descricao VARCHAR(500) NOT NULL,
-    categorias VARCHAR(300) NOT NULL,
-    meta_descricao VARCHAR(120),
-    entrega_endereco VARCHAR(200) NOT NULL,
-    data_inicio DATE NOT NULL,
-    data_fim DATE NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'ATIVA' CHECK (status IN ('ATIVA', 'ENCERRADA')),
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS contribuicoes (
     id SERIAL PRIMARY KEY,
-    arrecadacao_id INT NOT NULL REFERENCES arrecadacoes(id) ON DELETE RESTRICT,
+    doacao_id INT NOT NULL REFERENCES doacoes(id) ON DELETE RESTRICT,
+    item_doacao_id INT NOT NULL REFERENCES itens_doacao(id) ON DELETE RESTRICT,
     doador_id INT REFERENCES doadores(id) ON DELETE RESTRICT,
     estabelecimento_id INT REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
     alimento VARCHAR(100) NOT NULL,
