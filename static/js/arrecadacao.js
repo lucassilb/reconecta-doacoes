@@ -61,9 +61,9 @@
     $("det").hidden = false;
   }
 
-  /* pode_contribuir só vem para quem está logado */
+  /* sem sessão: o servidor responde pode_contribuir=false com "Entre para doar" (ou omite o campo) */
   function estadoInicial(a) {
-    var logado = a.pode_contribuir !== undefined;
+    var logado = a.pode_contribuir !== undefined && a.motivo_bloqueio !== "Entre para doar";
     var encerrada = a.status && a.status !== "ATIVA";
     $("btn-abrir").hidden = true; $("link-entrar").hidden = true; $("doar-bloqueio").hidden = true; $("doar-cadastro").hidden = true;
     if (encerrada) {
