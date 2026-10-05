@@ -531,7 +531,7 @@
 
   function cartaoMinhaDoacao(c) {
     var ped = c.doacao || c.pedido || {};
-    var emp = ped.empresa || {};
+    var emp = typeof ped.empresa === "string" ? { nome: ped.empresa } : (ped.empresa || {});
     var ent = c.entrega || {};
     var STATUS = { ACEITA: ["Aceita", ""], ENTREGUE: ["Entregue", "selo--cinza"], CANCELADA: ["Cancelada", "selo--acento"] };
     var st = STATUS[c.status] || STATUS.ACEITA;

@@ -112,7 +112,7 @@
       var p = d.doador || {};
       return { nome: p.nome || "Doador", municipio_uf: p.municipio_uf, pf: true };
     }
-    var e = d.estabelecimento || {};
+    var e = d.empresa || d.estabelecimento || {}; // pedidos (rodada 9) vêm com "empresa"
     return { nome: e.nome, municipio_uf: e.municipio_uf, pf: false };
   }
   function tituloOrigem(o) { return o.pf ? String(o.nome || "") : titulo(o.nome); }
@@ -159,7 +159,7 @@
     }
     var est = origem(d);
     c.append(
-      el("p", { classe: "sobretitulo" }, ["Pedido mais recente · ", haQuanto(d.data_cadastro)]),
+      el("p", { classe: "sobretitulo", texto: d.data_cadastro ? "Pedido mais recente · " + haQuanto(d.data_cadastro) : "Pedido mais recente" }),
       el("p", { classe: "ultima__nome" }, [tituloOrigem(est)]),
       est.municipio_uf ? el("p", { classe: "ultima__local", texto: local(est.municipio_uf) }) : null,
       el("p", { classe: "ultima__itens", texto: "Precisa de " + resumoItens(d.itens || [], 3).toLowerCase() }),

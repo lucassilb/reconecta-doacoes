@@ -161,7 +161,7 @@
 .pedido-linha { display: grid; gap: 4px; }
 .pedido-linha__topo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
 .pedido-linha__qtd { color: var(--tinta-suave); font-size: .9rem; font-variant-numeric: tabular-nums; }
-.pedido-linha__barra { display: block; height: 8px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
+.pedido-linha__barra { display: block; height: 8px; border-radius: 999px; background: var(--linha); overflow: hidden; } /* trilho visível sobre o cartão cinza */
 .pedido-linha__barra > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); }
 .doacao__recebidas summary { cursor: pointer; font-weight: 700; font-size: .92rem; color: var(--verde-texto); }
 .doacao__recebidas ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
