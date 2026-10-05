@@ -70,10 +70,11 @@ TEXTO = "Precisamos de 100 caixas de leite e 100 pães até sexta-feira"
 
 def test_interpretar_pedido_aceita_saida_valida_e_envia_ao_ollama_local(monkeypatch):
     cliente = _cliente_autenticado("empresa")
+    texto = "Precisamos de 100 caixas de leite até sexta-feira"
     chamadas = []
     saida = {"itens": [{"nome": "Leite", "categoria": "Laticínios",
                         "quantidade": 100, "unidade_medida": "caixa"}],
-             "receber_ate": (date.today() + timedelta(days=5)).isoformat(),
+             "receber_ate": llm_service._prazo_regras(texto),
              "observacoes": "Conferir disponibilidade."}
 
     def responder(_self, url, **kwargs):
@@ -81,16 +82,20 @@ def test_interpretar_pedido_aceita_saida_valida_e_envia_ao_ollama_local(monkeypa
         return RespostaOllama(json.dumps(saida))
 
     monkeypatch.setattr(requests.Session, "post", responder)
-    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO})
+    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": texto})
     assert resposta.status_code == 200
     assert resposta.json == {**saida, "itens": [{**saida["itens"][0], "quantidade": 100.0}],
                              "fonte": "llm", "modelo": "qwen2.5:3b"}
     assert chamadas[0][0] == "http://localhost:11434/api/chat"
     corpo = chamadas[0][1]["json"]
     assert corpo["model"] == "qwen2.5:3b"
-    assert corpo["format"] == "json" and corpo["stream"] is False
+    assert corpo["format"]["properties"]["itens"]["items"]["properties"]["categoria"]["enum"] == llm_service.CATEGORIAS
+    assert corpo["format"]["properties"]["itens"]["items"]["properties"]["unidade_medida"]["enum"] == llm_service.UNIDADES
+    assert corpo["stream"] is False
     assert corpo["options"]["temperature"] == 0.2
-    assert corpo["messages"][1]["content"] == TEXTO
+    assert corpo["messages"][1]["content"] == texto
+    assert date.today().isoformat() in corpo["messages"][0]["content"]
+    assert "2 kg de arroz e 3 caixas de leite" in corpo["messages"][0]["content"]
     assert chamadas[0][1]["allow_redirects"] is False
 
 
@@ -98,15 +103,77 @@ def test_categoria_invalida_normalizada_e_maximo_de_dez_itens(monkeypatch):
     cliente = _cliente_autenticado("empresa")
     itens = [{"nome": "leite", "categoria": "Categoria inventada", "quantidade": 1,
               "unidade_medida": "caixas"}] * 12
+    assert len(llm_service._validar_pedido({"itens": itens})["itens"]) == 10
     monkeypatch.setattr(requests.Session, "post", lambda *_a, **_k:
                         RespostaOllama(json.dumps({"itens": itens})))
     resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO})
     assert resposta.status_code == 200
-    assert len(resposta.json["itens"]) == 10
-    assert all(item["categoria"] == "Laticínios" and item["unidade_medida"] == "caixa"
-               for item in resposta.json["itens"])
+    assert len(resposta.json["itens"]) == 2
+    assert resposta.json["itens"][0]["categoria"] == "Laticínios"
+    assert resposta.json["itens"][1]["categoria"] == "Padaria"
     assert resposta.json["fonte"] == "llm"
     assert resposta.json["receber_ate"] == llm_service._prazo_regras(TEXTO)
+
+
+def test_objeto_plano_de_um_item_e_aceito_sem_data_passada(monkeypatch):
+    cliente = _cliente_autenticado("empresa")
+    plano = {"nome": "Leite", "categoria": "Laticínios", "quantidade": "100",
+             "unidade_medida": "caixa", "receber_ate": "2022-07-15",
+             "observacoes": ""}
+    monkeypatch.setattr(requests.Session, "post", lambda *_a, **_k:
+                        RespostaOllama(json.dumps(plano)))
+    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={
+        "texto": "Precisamos de 100 caixas de leite até sexta-feira"})
+    assert resposta.status_code == 200
+    assert resposta.json["fonte"] == "llm"
+    assert resposta.json["itens"] == [{"nome": "Leite", "categoria": "Laticínios",
+                                      "quantidade": 100.0, "unidade_medida": "caixa"}]
+    assert resposta.json["receber_ate"] == llm_service._prazo_regras("até sexta-feira")
+
+
+def test_objeto_plano_com_segundo_item_em_observacoes_recupera_dois(monkeypatch):
+    cliente = _cliente_autenticado("empresa")
+    plano = {"nome": "Leite", "categoria": "Laticínios", "quantidade": "100",
+             "unidade_medida": "caixa", "receber_ate": "2022-07-15",
+             "observacoes": "100 pães"}
+    monkeypatch.setattr(requests.Session, "post", lambda *_a, **_k:
+                        RespostaOllama(json.dumps(plano)))
+    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO})
+    assert resposta.status_code == 200 and resposta.json["fonte"] == "llm"
+    assert [(i["nome"].lower(), i["quantidade"], i["unidade_medida"])
+            for i in resposta.json["itens"]] == [
+                ("leite", 100.0, "caixa"), ("pães", 100.0, "unidade")]
+    assert resposta.json["receber_ate"] == llm_service._prazo_regras(TEXTO)
+
+
+def test_modelo_erra_unidade_quantidade_e_dia_e_e_corrigido(monkeypatch):
+    cliente = _cliente_autenticado("empresa")
+    saida = {"itens": [
+        {"nome": "Leite", "categoria": "Laticínios", "quantidade": 100,
+         "unidade_medida": "caixa"},
+        {"nome": "Pés", "categoria": "Padaria", "quantidade": 1,
+         "unidade_medida": "caixa"}],
+        "receber_ate": (date.today() + timedelta(days=5)).isoformat(),
+        "observacoes": ""}
+    monkeypatch.setattr(requests.Session, "post", lambda *_a, **_k:
+                        RespostaOllama(json.dumps(saida)))
+    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO})
+    assert resposta.status_code == 200 and resposta.json["fonte"] == "llm"
+    assert [(i["nome"].lower(), i["quantidade"], i["unidade_medida"], i["categoria"])
+            for i in resposta.json["itens"]] == [
+                ("leite", 100.0, "caixa", "Laticínios"),
+                ("pães", 100.0, "unidade", "Padaria")]
+    assert resposta.json["receber_ate"] == llm_service._prazo_regras(TEXTO)
+
+
+def test_prazo_dia_do_mes_e_removido_do_nome_do_item():
+    texto = "50 kg de arroz, 30 kg de feijão e 20 litros de leite para o dia 20"
+    dados = llm_service._pedido_regras(texto)
+    assert [(item["nome"], item["quantidade"], item["unidade_medida"])
+            for item in dados["itens"]] == [
+                ("arroz", 50.0, "kg"), ("feijão", 30.0, "kg"),
+                ("leite", 20.0, "L")]
+    assert dados["receber_ate"] is not None
 
 
 @pytest.mark.parametrize("resposta_modelo", ["{quebrado", json.dumps({"itens": []})])
