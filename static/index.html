@@ -11,9 +11,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/home.css">
+  <link rel="stylesheet" href="/static/css/arrecadacoes.css">
   <link rel="preload" as="image" href="/static/img/hero/caixote.webp" type="image/webp">
   
   <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/arrecadacao-util.js" defer></script>
   <script src="/static/js/home.js" defer></script>
 </head>
 <body class="home">
@@ -179,6 +181,19 @@
           </ul>
         </aside>
       </div>
+    </section>
+
+    <!-- ============ AÇÕES DE ARRECADAÇÃO ============ -->
+    <section class="home-acoes container" id="arrecadacoes" aria-labelledby="home-acoes-titulo">
+      <div class="home-acoes__topo">
+        <div>
+          <p class="sobretitulo sobretitulo--acento">Ações de arrecadação</p>
+          <h2 id="home-acoes-titulo">Ações abertas agora</h2>
+          <p class="home-acoes__texto">Empresas do setor abrem ações com um objetivo. Pessoas e outras empresas doam com um questionário rápido e uma foto do alimento.</p>
+        </div>
+        <a class="home-acoes__todas" href="/arrecadacoes">Ver todas as ações <span aria-hidden="true">→</span></a>
+      </div>
+      <div id="home-acoes-conteudo" aria-live="polite" aria-busy="true"></div>
     </section>
 
     <!-- ============ COMO FUNCIONA ============ -->
