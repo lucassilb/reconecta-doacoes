@@ -20,7 +20,6 @@
     { rotulo: "Início", href: "/" },
     { rotulo: "Sobre", href: "/sobre" },
     { rotulo: "Doações", href: "/#doacoes" },
-    { rotulo: "Arrecadações", href: "/arrecadacoes" },
     { rotulo: "Como funciona", href: "/#como-funciona" }
   ];
 
@@ -64,7 +63,6 @@
   }
 
   function ehAtual(href) {
-    if (href === "/arrecadacoes" && caminho.indexOf("/arrecadacoes/") === 0) return true; // detalhe de uma ação
     return href.indexOf("#") === -1 && normalizar(href) === caminho;
   }
 
@@ -201,10 +199,10 @@
     alvo.append(
       el("div", { classe: "rodape__marca" }, [
         linkMarca(),
-        el("p", { texto: "Plataforma que conecta estabelecimentos com alimento excedente a instituições que alimentam quem precisa." })
+        el("p", { texto: "Plataforma em que empresas do setor de alimentos publicam o que precisam e pessoas e empresas doam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Ações de arrecadação", "/arrecadacoes"], ["Como funciona", "/#como-funciona"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Como funciona", "/#como-funciona"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [

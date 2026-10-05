@@ -1,0 +1,124 @@
+/* ReConecta — detalhe do pedido de doação (/doacoes/<id>) e questionário. Depende de base.css. */
+
+.pedido main { padding-bottom: 24px; }
+.det-carregando { color: var(--tinta-suave); padding: 24px 0; }
+
+/* ---------- detalhe ---------- */
+
+.voltar-lista { display: inline-flex; align-items: center; gap: 8px; margin: 18px 0 8px; color: var(--tinta-suave); font-weight: 600; text-decoration: none; }
+.voltar-lista:hover { color: var(--verde-texto); }
+.voltar-lista svg { width: 18px; height: 18px; }
+
+.det { display: grid; gap: 24px; padding-bottom: 8px; }
+@media (min-width: 1000px) { .det { grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr); gap: 48px; align-items: start; } }
+
+.det__info { display: grid; gap: 14px; align-content: start; }
+.det__info h1 { font-size: clamp(2rem, 4.6vw, 3.4rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; overflow-wrap: anywhere; }
+.det__empresa { display: flex; align-items: center; gap: 10px; color: var(--tinta-suave); }
+.det__empresa strong { color: var(--tinta); }
+.det__empresa-icone { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--verde-suave); color: var(--verde-texto); }
+.det__empresa-icone svg { width: 20px; height: 20px; }
+.det__descricao { font-size: 1.08rem; line-height: 1.6; color: var(--tinta); max-width: 42em; white-space: pre-line; }
+.det__fatos { margin: 6px 0 0; display: grid; gap: 0; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--linha); }
+.det__fato { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--linha); }
+.det__fato dt { font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); padding-top: 3px; }
+.det__fato dd { margin: 0; color: var(--tinta); }
+.det__subtitulo { font-family: var(--fonte-texto); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-suave); margin-top: 8px; }
+.det__como { margin-top: 6px; padding: 18px 20px; border-radius: 18px; background: var(--verde-suave); }
+.det__passos { margin: 8px 0 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--tinta); }
+
+.det__doar { padding: clamp(20px, 3vw, 32px); border-radius: 26px; box-shadow: 0 1px 2px rgba(27, 29, 34, .04), 0 30px 60px -40px rgba(46, 102, 24, .45); }
+@media (min-width: 1000px) { .det__doar { position: sticky; top: 16px; } }
+.det__doar h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 700; outline: none; margin-bottom: 4px; }
+.doar__texto { color: var(--tinta-suave); margin-bottom: 14px; }
+.doar__bloqueio { padding: 14px 16px; border-radius: 14px; background: var(--superficie-2); color: var(--tinta); font-weight: 600; }
+.doar__nota { margin-top: 12px; font-size: .92rem; color: var(--tinta-suave); }
+
+/* ---------- questionário ---------- */
+
+.quest { display: grid; gap: 18px; margin-top: 8px; }
+.quest__item { border: 0; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-width: 0; }
+.quest__legenda, .quest__perguntas::before { padding: 0; font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-suave); grid-column: 1 / -1; }
+.quest__largo { grid-column: 1 / -1; }
+.campo__unidade { font-weight: 400; color: var(--tinta-suave); }
+
+.quest__perguntas { display: grid; gap: 10px; }
+.quest__perguntas::before { content: "Verificação rápida"; display: block; margin-bottom: 2px; }
+.pergunta { border: 1px solid var(--linha); border-radius: 16px; margin: 0; padding: 12px 14px; display: grid; gap: 10px; min-width: 0; transition: border-color .15s ease, background-color .15s ease; }
+.pergunta__texto { float: left; width: 100%; display: flex; gap: 10px; align-items: flex-start; padding: 0; font-weight: 600; line-height: 1.4; } /* float: o enunciado fica dentro do cartão, não sobre a borda */
+.pergunta__opcoes { clear: both; }
+.pergunta__n { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--verde-suave); color: var(--verde-texto); font-size: .85rem; font-weight: 700; }
+.pergunta__opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pergunta__opcao {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; border-radius: 12px; cursor: pointer;
+  border: 1.5px solid var(--linha-forte); background: var(--superficie);
+  font-weight: 700; color: var(--tinta);
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.pergunta__radio { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pergunta__opcao:has(.pergunta__radio:focus-visible) { outline: 3px solid var(--foco); outline-offset: 2px; }
+.pergunta__opcao--sim:has(.pergunta__radio:checked) { border-color: var(--verde); background: var(--verde-suave); color: var(--verde-texto); }
+.pergunta__opcao--nao:has(.pergunta__radio:checked) { border-color: var(--erro); background: var(--erro-suave); color: var(--erro); }
+.pergunta__opcao:hover { border-color: var(--tinta-suave); }
+.pergunta__aviso { font-size: .86rem; color: var(--erro); }
+.pergunta__aviso:empty { display: none; }
+.pergunta--nao { border-color: var(--erro-linha); }
+.pergunta--erro { border-color: var(--erro); background: var(--erro-suave); }
+
+/* foto com pré-visualização */
+.foto {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px; border-radius: 16px; cursor: pointer;
+  border: 1.5px dashed var(--linha-forte); background: var(--superficie);
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.foto:hover { border-color: var(--verde); background: color-mix(in srgb, var(--verde-suave) 40%, var(--superficie)); }
+.foto:has(.foto__input:focus-visible) { outline: 3px solid var(--foco); outline-offset: 2px; }
+.foto:has(.foto__input[aria-invalid="true"]) { border-color: var(--erro); }
+.foto__input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.foto__previa {
+  flex: none; width: 72px; height: 72px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: var(--verde-suave) center / cover no-repeat; color: var(--verde-texto);
+}
+.foto__previa svg { width: 32px; height: 32px; }
+.foto__previa--img svg { display: none; }
+.foto__texto { display: grid; gap: 2px; min-width: 0; font-size: .88rem; color: var(--tinta-suave); }
+.foto__texto strong { color: var(--tinta); font-size: 1rem; overflow-wrap: anywhere; }
+
+.quest__aviso { padding: 16px 18px; border-radius: 16px; background: var(--alerta-suave); border: 1px solid color-mix(in srgb, var(--alerta) 30%, transparent); display: grid; gap: 8px; }
+.quest__aviso--recusa { background: var(--erro-suave); border-color: var(--erro-linha); }
+.quest__aviso-titulo { font-weight: 700; }
+.quest__aviso ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.quest__aviso-rodape { font-size: .9rem; color: var(--tinta-suave); }
+
+/* confirmação */
+.doar-ok { display: grid; gap: 12px; justify-items: start; outline: none; margin-top: 6px; }
+.doar-ok__selo { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--verde-suave); color: var(--verde-texto); }
+.doar-ok__selo svg { width: 30px; height: 30px; }
+.doar-ok h3 { font-size: 1.6rem; font-weight: 700; }
+.doar-ok p { color: var(--tinta-suave); }
+.doar-ok__dados { margin: 4px 0 8px; width: 100%; display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; background: var(--verde-suave); }
+.doar-ok__dados dt { font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--verde-texto); }
+.doar-ok__dados dd { margin: 0 0 8px; font-weight: 600; overflow-wrap: anywhere; }
+
+@media (max-width: 479.98px) {
+  .quest__item { grid-template-columns: minmax(0, 1fr); }
+  .det__fato { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+
+/* ---------- itens do pedido com progresso ---------- */
+
+.pedido-itens { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 10px; }
+.pedido-item { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 16px; background: var(--superficie); border: 1px solid var(--linha); }
+.pedido-item__img { flex: none; width: 44px; height: 44px; object-fit: contain; padding: 4px; border-radius: 12px; background: var(--superficie-2); }
+.pedido-item__texto { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.pedido-item__linha { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.pedido-item__linha strong { font-size: 1.05rem; }
+.pedido-item__linha span { color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.pedido-item__falta { font-size: .86rem; color: var(--tinta-suave); }
+.pedido-item--completo .pedido-item__falta { color: var(--verde-texto); font-weight: 600; }
+.barra { height: 10px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
+.barra__cheia { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); min-width: 0; transition: width .4s ease; }

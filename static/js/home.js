@@ -123,11 +123,11 @@
   function preencherResumo(r) {
     var alvo = $("resumo");
     var valores = r ? {
-      kg: numero.format(Number(r.kg_disponiveis) || 0) + " kg",
-      doacoes: inteiro.format(Number(r.doacoes_disponiveis) || 0),
+      doacoes: inteiro.format(Number(r.doacoes_disponiveis) || 0),      // pedidos abertos
+      recebidas: typeof r.doacoes_recebidas === "number" ? inteiro.format(r.doacoes_recebidas) : "—",
       // "instituicoes" vem do backend a partir da rodada 4; sem ele, mostra traço
       instituicoes: typeof r.instituicoes === "number" ? inteiro.format(r.instituicoes) : "—"
-    } : { kg: "—", doacoes: "—", instituicoes: "—" };
+    } : { doacoes: "—", recebidas: "—", instituicoes: "—" };
     Object.keys(valores).forEach(function (k) {
       alvo.querySelector('[data-resumo="' + k + '"]').textContent = valores[k];
     });
@@ -151,47 +151,60 @@
     var d = doacoes[0];
     if (!d) {
       c.append(
-        el("p", { classe: "sobretitulo", texto: "Doações abertas" }),
-        el("p", { classe: "ultima__vazia" }, ["Nenhuma doação aberta neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua empresa", "data-convite": "" }), " e publique a primeira."])
+        el("p", { classe: "sobretitulo", texto: "Pedidos abertos" }),
+        el("p", { classe: "ultima__vazia" }, ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua empresa", "data-convite": "" }), " e publique o primeiro."])
       );
       ajustarConvites();
       return;
     }
     var est = origem(d);
     c.append(
-      el("p", { classe: "sobretitulo" }, ["Mais recente · ", haQuanto(d.data_cadastro)]),
-      el("p", { classe: "ultima__nome" }, [tituloOrigem(est), est.pf ? seloPF() : null]),
+      el("p", { classe: "sobretitulo" }, ["Pedido mais recente · ", haQuanto(d.data_cadastro)]),
+      el("p", { classe: "ultima__nome" }, [tituloOrigem(est)]),
       est.municipio_uf ? el("p", { classe: "ultima__local", texto: local(est.municipio_uf) }) : null,
-      el("p", { classe: "ultima__itens", texto: resumoItens(d.itens || [], 3) }),
+      el("p", { classe: "ultima__itens", texto: "Precisa de " + resumoItens(d.itens || [], 3).toLowerCase() }),
       el("div", { classe: "ultima__rodape" }, [
-        el("span", null, ["Retirar até ", el("strong", { texto: prazo(d.data_limite_retirada) })]),
-        el("a", { href: "#doacoes", texto: "Ver todas" })
+        el("span", null, ["Receber até ", el("strong", { texto: prazo(receberAte(d)) })]),
+        el("a", { href: "/doacoes/" + d.id, texto: "Doar" })
       ])
     );
   }
 
   /* ---------- carrossel ---------- */
 
+  function receberAte(d) { return d.receber_ate || d.data_limite_retirada; }
+
+  /* "Leite · 12 de 100 unidades" com uma barra fina de progresso */
+  function itemPedido(i) {
+    var meta = Number(i.quantidade) || 0, recebido = Number(i.recebido) || 0;
+    var pct = meta > 0 ? Math.min(100, Math.round(recebido / meta * 100)) : 0;
+    var texto = numero.format(recebido) + " de " + quantidade(i);
+    return el("li", { classe: "pedido-linha" }, [
+      el("span", { classe: "pedido-linha__topo" }, [el("span", { classe: "pedido-linha__nome", texto: i.nome, title: i.nome }), el("span", { classe: "pedido-linha__qtd", texto: texto })]),
+      el("span", { classe: "pedido-linha__barra", role: "progressbar", "aria-label": "Recebido de " + i.nome, "aria-valuemin": "0", "aria-valuemax": String(meta), "aria-valuenow": String(Math.min(recebido, meta)), "aria-valuetext": texto }, [
+        el("span", { style: "width:" + pct + "%" })
+      ])
+    ]);
+  }
+
   function cartaoDoacao(d) {
     var est = origem(d);
     var itens = d.itens || [];
     var categorias = d.categorias && d.categorias.length ? d.categorias : [itens[0] && itens[0].categoria];
     var MAX = 3;
-    var lista = el("ul", { classe: "doacao__itens" }, itens.slice(0, MAX).map(function (i) {
-      return el("li", null, [el("span", { texto: i.nome, title: i.nome }), el("span", { texto: quantidade(i) })]);
-    }));
     var corpo = el("div", { classe: "doacao__corpo" }, [
-      el("h3", { classe: "doacao__nome" }, [tituloOrigem(est), est.pf ? seloPF() : null]),
+      el("h3", { classe: "doacao__nome" }, [tituloOrigem(est)]),
       el("p", { classe: "doacao__local", texto: local(est.municipio_uf) }),
-      lista,
+      el("p", { classe: "doacao__precisa", texto: "Precisa de" }),
+      el("ul", { classe: "doacao__itens doacao__itens--pedido" }, itens.slice(0, MAX).map(itemPedido)),
       itens.length > MAX ? el("p", { classe: "doacao__mais", texto: "+ " + (itens.length - MAX) + (itens.length - MAX === 1 ? " item" : " itens") }) : null
     ]);
-    return el("li", { classe: "doacao" }, [
+    return el("li", { classe: "doacao doacao--pedido" }, [
       imgCategoria(categorias[0], 76, ""),
       corpo,
       el("div", { classe: "doacao__rodape" }, [
-        el("span", { classe: "doacao__prazo" }, ["Retirar até ", el("strong", { texto: prazo(d.data_limite_retirada) })]),
-        el("span", { classe: "doacao__cats" }, categorias.filter(Boolean).map(function (c) { return el("span", { classe: "selo", texto: c }); }))
+        el("span", { classe: "doacao__prazo" }, ["Receber até ", el("strong", { texto: prazo(receberAte(d)) })]),
+        el("a", { classe: "btn btn--primario btn--pequeno doacao__doar", href: "/doacoes/" + d.id, "aria-label": "Doar para o pedido de " + tituloOrigem(est) }, ["Doar"])
       ])
     ]);
   }
@@ -248,7 +261,7 @@
     alvo.replaceChildren(el("div", { classe: "vazio" }, [
       el("div", { classe: "vazio__texto" }, [
         el("h3", { texto: "Nenhuma doação aberta agora" }),
-        el("p", { texto: "Assim que uma empresa ou um doador publicar alimento para doar, ele aparece aqui. Estas são as categorias que a plataforma recebe:" })
+        el("p", { texto: "Assim que uma empresa publicar um pedido, ele aparece aqui para quem quiser doar. Estas são as categorias que a plataforma recebe:" })
       ]),
       el("ul", { classe: "categorias" }, categorias.map(function (c) {
         var slug = IMG_CATEGORIA[c] || "outros";
@@ -303,25 +316,6 @@
     });
   }
 
-  /* ---------- ações de arrecadação abertas (até 3) ---------- */
-
-  function carregarAcoes() {
-    var alvo = $("home-acoes-conteudo"), R = window.RCArrecadacao;
-    if (!alvo || !R) return;
-    R.requisitar("/reconecta/arrecadacoes").then(function (r) {
-      var lista = r.ok && Array.isArray(r.corpo) ? r.corpo : [];
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      alvo.replaceChildren(lista.length
-        ? el("ul", { classe: "acoes" }, lista.slice(0, 3).map(function (a) { return el("li", null, [R.cartaoAcao(a)]); }))
-        : el("p", { classe: "home-acoes__vazio" }, [
-            "Nenhuma ação aberta agora. Empresas do setor de alimentos podem criar uma pelo painel. ",
-            el("a", { href: "/arrecadacoes", texto: "Saiba como funciona" }), "."
-          ]));
-    }).catch(function () {
-      alvo.replaceChildren(el("p", { classe: "home-acoes__vazio", texto: "Não conseguimos carregar as ações agora." }));
-    }).then(function () { alvo.setAttribute("aria-busy", "false"); });
-  }
-
   /* ---------- CTA conforme a sessão ---------- */
 
   var usuarioAtual = null;
@@ -340,11 +334,16 @@
     var cta = $("hero-cta");
     if (!cta) return;
     var rotulo = cta.querySelector("[data-cta-rotulo]");
-    if (u && u.tipo === "empresa") { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; }
-    else if (u) { cta.href = "/painel"; rotulo.textContent = "Publicar doação"; } // doador também publica (rodada 7)
-    else { cta.href = "/cadastro"; rotulo.textContent = "Quero doar"; }
+    var sec = $("hero-secundario");
+    // empresa publica pedidos; quem tem CPF (ou visita) vai direto aos pedidos para doar
+    if (u && u.tipo === "empresa") {
+      cta.href = "/painel#publicar"; rotulo.textContent = "Publicar pedido";
+      if (sec) { sec.href = "#doacoes"; sec.textContent = "Ver doações disponíveis"; }
+    } else {
+      cta.href = "#doacoes"; rotulo.textContent = "Quero doar";
+      if (sec && u) { sec.href = "#como-funciona"; sec.textContent = "Como funciona"; }
+    }
   });
 
   carregar();
-  carregarAcoes();
 })();

@@ -109,10 +109,13 @@
     return (window.ReConecta && window.ReConecta.formatarTelefone) ? window.ReConecta.formatarTelefone(t) : t;
   }
 
+  var PLURAL_UN = { unidade: "unidades", pacote: "pacotes", caixa: "caixas" };
   function fmtQtd(q, unidade) {
     var n = Number(q);
     var txt = isNaN(n) ? String(q) : n.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
-    return txt + " " + (unidade || "");
+    var u = unidade || "";
+    if (PLURAL_UN[u] && n !== 1) u = PLURAL_UN[u];
+    return (txt + " " + u).trim();
   }
 
   /* ---------- sessão ---------- */
@@ -174,18 +177,13 @@
       ["Telefone", telefone(u.telefone)]
     ]);
 
-    iniciarDoacoes(false);
+    iniciarDoacoes();
+    carregarMinhasDoacoes();
   }
 
-  /* Publicar e "Minhas doações": comum a empresa e doador. O doador informa o
-     local de retirada (não tem endereço no cadastro); a empresa usa o da Receita. */
-  var ehDoador = false;
-  function iniciarDoacoes(doador) {
-    ehDoador = doador;
+  /* Publicar pedido e "Meus pedidos": só empresa (rodada 9). */
+  function iniciarDoacoes() {
     $("bloco-doacoes").hidden = false;
-    var grupo = $("grupo-retirada");
-    grupo.hidden = !doador;
-    grupo.disabled = !doador;
     listaItens = $("lista-itens");
     requisitar("/reconecta/publico/opcoes")
       .then(function (r) { if (r.ok) OPCOES = r.corpo; })
@@ -193,23 +191,8 @@
       .then(function () {
         adicionarItem();
         carregarDoacoes();
+        if (location.hash === "#publicar") $("publicar-t").scrollIntoView({ block: "start" });
       });
-  }
-
-  var UFS = "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
-  var retiradaInputs = {
-    "retirada.endereco": $("retirada-endereco"),
-    "retirada.municipio": $("retirada-municipio"),
-    "retirada.uf": $("retirada-uf")
-  };
-  function validarRetirada(campos) {
-    if (!ehDoador) return;
-    var end = retiradaInputs["retirada.endereco"].value.trim();
-    var mun = retiradaInputs["retirada.municipio"].value.trim();
-    var uf = retiradaInputs["retirada.uf"].value;
-    if (end.length < 5) campos["retirada.endereco"] = "Informe o endereço de retirada (rua e número).";
-    if (mun.length < 2) campos["retirada.municipio"] = "Informe a cidade.";
-    if (UFS.indexOf(uf) === -1) campos["retirada.uf"] = "Escolha a UF.";
   }
 
   /* ---------- itens do formulário ---------- */
@@ -235,15 +218,13 @@
     var categoria = selectItem("categoria", OPCOES.categorias, "Categoria");
     var quantidade = el("input", { classe: "campo__entrada", "data-campo": "quantidade", id: "item-" + i + "-quantidade", inputmode: "decimal", type: "text", placeholder: "0" });
     var unidade = selectItem("unidade_medida", OPCOES.unidades, "Unid.");
-    var validade = el("input", { classe: "campo__entrada campo__entrada--mono", "data-campo": "validade", id: "item-" + i + "-validade", type: "date", min: hojeISO() });
 
     var linha = el("div", { classe: "item" });
     var grade = el("div", { classe: "item__grade" }, [
       campoItem("Item", "nome", nome),
       campoItem("Categoria", "categoria", categoria),
       campoItem("Qtd.", "quantidade", quantidade),
-      campoItem("Unidade", "unidade", unidade),
-      campoItem("Validade", "validade", validade)
+      campoItem("Unidade", "unidade", unidade)
     ]);
     var remover = el("button", {
       type: "button", classe: "item__remover", "aria-label": "Remover item"
@@ -257,7 +238,7 @@
     linha.append(grade, remover);
     listaItens.appendChild(linha);
 
-    var registro = { no: linha, campos: { nome: nome, categoria: categoria, quantidade: quantidade, unidade_medida: unidade, validade: validade } };
+    var registro = { no: linha, campos: { nome: nome, categoria: categoria, quantidade: quantidade, unidade_medida: unidade } };
     linhasItens.push(registro);
     nome.focus();
   }
@@ -270,18 +251,11 @@
   function validarFormulario() {
     var campos = {};
     var limiteV = limiteInput.value;
-    var limiteOk = false;
-    if (!limiteV) {
-      campos["data_limite_retirada"] = "Informe até quando a doação pode ser retirada.";
-    } else if (new Date(limiteV) <= new Date()) {
-      campos["data_limite_retirada"] = "A retirada precisa ser no futuro.";
-    } else {
-      limiteOk = true;
-    }
+    if (!limiteV) campos["data_limite_retirada"] = "Informe até quando você pode receber as doações.";
+    else if (new Date(limiteV) <= new Date()) campos["data_limite_retirada"] = "A data precisa ser no futuro.";
 
-    if (!linhasItens.length) campos["itens"] = "Adicione pelo menos um item à doação.";
+    if (!linhasItens.length) campos["itens"] = "Adicione pelo menos um item ao pedido.";
 
-    var menorVal = null;
     linhasItens.forEach(function (linha, i) {
       var f = linha.campos;
       if (!f.nome.value.trim()) campos["itens[" + i + "].nome"] = "Informe o nome do item.";
@@ -289,16 +263,8 @@
       var q = Number(String(f.quantidade.value).replace(",", "."));
       if (!f.quantidade.value.trim() || isNaN(q) || q <= 0) campos["itens[" + i + "].quantidade"] = "Quantidade deve ser maior que zero.";
       if (!f.unidade_medida.value) campos["itens[" + i + "].unidade_medida"] = "Escolha a unidade.";
-      var v = f.validade.value;
-      if (!v) campos["itens[" + i + "].validade"] = "Informe a validade.";
-      else if (v < hojeISO()) campos["itens[" + i + "].validade"] = "A validade não pode estar no passado.";
-      else if (menorVal === null || v < menorVal) menorVal = v;
     });
 
-    validarRetirada(campos);
-    if (limiteOk && menorVal && limiteV.slice(0, 10) > menorVal) {
-      campos["data_limite_retirada"] = "A retirada não pode ser depois da menor validade dos itens (" + fmtData(menorVal) + ").";
-    }
     return campos;
   }
 
@@ -307,7 +273,6 @@
     Object.keys(campos).forEach(function (chave) {
       var input = null;
       if (chave === "data_limite_retirada") input = limiteInput;
-      else if (retiradaInputs[chave]) input = retiradaInputs[chave];
       else if (chave === "itens") { var p = $("itens-erro"); p.textContent = campos[chave]; return; }
       else {
         var m = chave.match(/^itens\[(\d+)\]\.(\w+)$/);
@@ -320,7 +285,6 @@
 
   function limparErrosForm() {
     mostrarErro(limiteInput, "");
-    Object.keys(retiradaInputs).forEach(function (k) { mostrarErro(retiradaInputs[k], ""); });
     $("itens-erro").textContent = "";
     linhasItens.forEach(function (l) {
       Object.keys(l.campos).forEach(function (c) { mostrarErro(l.campos[c], ""); });
@@ -341,8 +305,7 @@
         nome: l.campos.nome.value.trim(),
         categoria: l.campos.categoria.value,
         quantidade: Number(String(l.campos.quantidade.value).replace(",", ".")),
-        unidade_medida: l.campos.unidade_medida.value,
-        validade: l.campos.validade.value
+        unidade_medida: l.campos.unidade_medida.value
       };
     });
 
@@ -350,18 +313,13 @@
     btn.classList.add("is-carregando");
     btn.disabled = true;
     var corpo = { data_limite_retirada: limiteInput.value, itens: itens };
-    if (ehDoador) corpo.retirada = {
-      endereco: retiradaInputs["retirada.endereco"].value.trim(),
-      municipio: retiradaInputs["retirada.municipio"].value.trim(),
-      uf: retiradaInputs["retirada.uf"].value
-    };
     postJson("/reconecta/painel/doacoes", corpo).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) {
         limparFormulario();
         carregarDoacoes();
-        mostrarAviso(avisoDoacao, "Doação publicada",
-          "Ela já aparece na lista pública de doações.", { ok: true });
+        mostrarAviso(avisoDoacao, "Pedido publicado",
+          "Ele já aparece em Doações disponíveis para quem quiser doar.", { ok: true });
         $("minhas-t").scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
       }
@@ -394,7 +352,7 @@
   /* ---------- minhas doações ---------- */
 
   var SELOS = {
-    DISPONIVEL: ["Disponível", ""],
+    DISPONIVEL: ["Aberto", ""],
     RESERVADA: ["Reservada", "selo--acento"],
     RETIRADA: ["Retirada", "selo--cinza"]
   };
@@ -406,7 +364,7 @@
       if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
       lista.replaceChildren();
       if (!r.ok || !Array.isArray(r.corpo) || !r.corpo.length) {
-        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhuma doação publicada ainda. Quando sobrar alimento bom, publique aqui." }));
+        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhum pedido publicado ainda. Use o formulário acima para dizer do que você precisa." }));
         return;
       }
       r.corpo.forEach(function (d) { lista.appendChild(cartaoDoacao(d, true)); });
@@ -415,39 +373,66 @@
     }).then(function () { lista.setAttribute("aria-busy", "false"); });
   }
 
+  function nomeTitulo(n) { return window.ReConecta && window.ReConecta.nomeTitulo ? window.ReConecta.nomeTitulo(n) : String(n || ""); }
+  function receberAte(d) { return d.receber_ate || d.data_limite_retirada; }
+  function localTitulo(mu) { var x = String(mu).split("/"); return nomeTitulo(x[0]) + (x[1] ? "/" + x[1].toUpperCase() : ""); }
+
+  function linhaItem(i) {
+    var meta = Number(i.quantidade) || 0;
+    var temProgresso = i.recebido != null;
+    var recebido = Number(i.recebido) || 0;
+    var pct = meta > 0 ? Math.min(100, Math.round(recebido / meta * 100)) : 0;
+    var texto = temProgresso ? fmtQtd(recebido, "") + " de " + fmtQtd(meta, i.unidade_medida) : fmtQtd(meta, i.unidade_medida);
+    return el("li", { classe: "pedido-linha" }, [
+      el("span", { classe: "pedido-linha__topo" }, [el("strong", { texto: i.nome }), el("span", { classe: "pedido-linha__qtd", texto: texto })]),
+      temProgresso ? el("span", { classe: "pedido-linha__barra", role: "progressbar", "aria-label": "Recebido de " + i.nome,
+        "aria-valuemin": "0", "aria-valuemax": String(meta), "aria-valuenow": String(Math.min(recebido, meta)), "aria-valuetext": texto }, [el("span", { style: "width:" + pct + "%" })]) : null
+    ]);
+  }
+
+  function quemDoou(c) {
+    var q = c.quem;
+    if (q && typeof q === "object") q = q.nome;
+    return nomeTitulo(q || (c.doador && c.doador.nome) || (c.empresa && c.empresa.nome) || "");
+  }
+  function nomeItem(c) { return (c.item && c.item.nome) || c.item_nome || c.alimento || "Item"; }
+  function unidadeDe(c) { return c.unidade_medida || (c.item && c.item.unidade_medida) || ""; }
+
+  function recebida(c) {
+    return el("li", { classe: "recebida" }, [
+      c.foto_url
+        ? el("a", { classe: "recebida__foto", href: c.foto_url, target: "_blank", rel: "noopener" }, [
+            el("img", { src: c.foto_url, alt: "Foto de " + nomeItem(c) + " enviada por " + quemDoou(c), width: "56", height: "56", loading: "lazy" })])
+        : el("span", { classe: "recebida__foto", "aria-hidden": "true" }),
+      el("div", { classe: "recebida__texto" }, [
+        el("p", null, [el("strong", { texto: nomeItem(c) }), " · " + fmtQtd(c.quantidade, unidadeDe(c))]),
+        el("p", { classe: "recebida__meta", texto: [quemDoou(c), c.validade ? "val. " + fmtData(c.validade) : "", c.criado_em ? "em " + fmtDataHora(c.criado_em) : ""].filter(Boolean).join(" · ") })
+      ])
+    ]);
+  }
+
   function cartaoDoacao(d, propria) {
     var selo = SELOS[d.status] || null;
     var art = el("article", { classe: "doacao" });
-
-    var pf = d.origem === "doador" || (!d.estabelecimento && d.doador);
-    var quem = pf ? (d.doador || {}) : (d.estabelecimento || {});
-    var onde = el("p", { classe: "doacao__onde" }, [
-      quem.nome || "Doação",
-      quem.municipio_uf ? el("span", { classe: "doacao__uf", texto: " · " + quem.municipio_uf }) : null,
-      pf ? el("span", { classe: "selo selo--pf", texto: "Pessoa física" }) : null
-    ]);
-
+    var emp = d.empresa || d.estabelecimento || {};
     art.appendChild(el("div", { classe: "doacao__topo" }, [
-      onde,
+      el("p", { classe: "doacao__onde" }, [nomeTitulo(emp.nome) || "Pedido",
+        emp.municipio_uf ? el("span", { classe: "doacao__uf", texto: " · " + localTitulo(emp.municipio_uf) }) : null]),
       selo ? el("span", { classe: "selo " + selo[1], texto: selo[0] }) : null
     ]));
+    art.appendChild(el("p", { classe: "doacao__prazo", texto: "Receber até " + fmtDataHora(receberAte(d)) }));
+    if (d.itens && d.itens.length) art.appendChild(el("ul", { classe: "pedido-itens-painel" }, d.itens.map(linhaItem)));
 
-    art.appendChild(el("p", {
-      classe: "doacao__prazo",
-      texto: "Retirar até " + fmtDataHora(d.data_limite_retirada)
-    }));
-    if (propria && d.retirada && d.retirada.endereco) {
-      art.appendChild(el("p", { classe: "doacao__retirada" }, [
-        el("strong", { texto: "Local de retirada: " }),
-        d.retirada.endereco + ", " + d.retirada.municipio + "/" + d.retirada.uf
-      ]));
-    }
-
-    if (d.itens && d.itens.length) {
-      art.appendChild(el("ul", { classe: "doacao__itens" }, d.itens.map(function (i) {
-        var validade = i.validade ? " · val. " + fmtData(i.validade) : "";
-        return el("li", { classe: "doacao__item", texto: i.nome + " — " + fmtQtd(i.quantidade, i.unidade_medida) + validade });
-      })));
+    var recebidas = Array.isArray(d.contribuicoes) ? d.contribuicoes : (Array.isArray(d.doacoes_recebidas) ? d.doacoes_recebidas : []);
+    if (propria) {
+      art.appendChild(recebidas.length
+        ? el("details", { classe: "doacao__recebidas", open: recebidas.length <= 4 }, [
+            el("summary", { texto: "Doações recebidas (" + recebidas.length + ")" }),
+            el("ul", null, recebidas.map(recebida))
+          ])
+        : el("p", { classe: "doacao__sem", texto: "Ainda não chegou nenhuma doação para este pedido." }));
+    } else {
+      art.appendChild(el("a", { classe: "btn btn--primario btn--pequeno doacao__doar", href: "/doacoes/" + d.id }, ["Doar para este pedido"]));
     }
 
     if (propria && d.status === "DISPONIVEL") {
@@ -515,7 +500,7 @@
       ["E-mail", u.email],
       ["Telefone", telefone(u.telefone)]
     ]);
-    iniciarDoacoes(true);
+    carregarMinhasDoacoes();
 
     requisitar("/reconecta/publico/resumo").then(function (r) {
       if (!r.ok) return;
@@ -524,8 +509,8 @@
       resumo.replaceChildren(
         resumoNumero(c.empresas, "empresas"),
         resumoNumero(c.doadores, "doadores"),
-        resumoNumero(c.doacoes_disponiveis, "doações abertas"),
-        resumoNumero(c.kg_disponiveis != null ? Number(c.kg_disponiveis).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "—", "kg disponíveis")
+        resumoNumero(c.doacoes_disponiveis, "pedidos abertos"),
+        resumoNumero(c.doacoes_recebidas, "doações recebidas")
       );
     }).catch(function () {});
 
@@ -533,12 +518,55 @@
     requisitar("/reconecta/publico/doacoes?limite=8").then(function (r) {
       lista.replaceChildren();
       if (!r.ok || !Array.isArray(r.corpo) || !r.corpo.length) {
-        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhuma doação disponível agora. Quando alguém publicar, aparece aqui." }));
+        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhum pedido aberto agora. Quando uma empresa publicar, ele aparece aqui." }));
         return;
       }
       r.corpo.forEach(function (d) { lista.appendChild(cartaoDoacao(d, false)); });
     }).catch(function () {
       lista.replaceChildren(el("p", { classe: "doacoes__vazio", texto: "Não foi possível carregar as doações. Recarregue a página." }));
+    });
+  }
+
+  /* ---------- minhas doações: o que a pessoa doou (doador e empresa) ---------- */
+
+  function cartaoMinhaDoacao(c) {
+    var ped = c.doacao || c.pedido || {};
+    var emp = ped.empresa || {};
+    var ent = c.entrega || {};
+    var STATUS = { ACEITA: ["Aceita", ""], ENTREGUE: ["Entregue", "selo--cinza"], CANCELADA: ["Cancelada", "selo--acento"] };
+    var st = STATUS[c.status] || STATUS.ACEITA;
+    var ate = ent.receber_ate || ped.receber_ate || ped.data_limite_retirada;
+    return el("article", { classe: "doacao minha-doacao" }, [
+      c.foto_url ? el("img", { classe: "minha-doacao__foto", src: c.foto_url, alt: "Foto enviada de " + nomeItem(c), width: "64", height: "64", loading: "lazy" }) : null,
+      el("div", { classe: "minha-doacao__texto" }, [
+        el("div", { classe: "doacao__topo" }, [
+          el("p", { classe: "doacao__onde" }, [nomeItem(c) + " · " + fmtQtd(c.quantidade, unidadeDe(c))]),
+          el("span", { classe: "selo " + st[1], texto: st[0] })
+        ]),
+        el("p", { classe: "doacao__prazo" }, ["Para ", ped.id ? el("a", { href: "/doacoes/" + ped.id, texto: nomeTitulo(emp.nome) || "o pedido" }) : (nomeTitulo(emp.nome) || "o pedido")]),
+        ent.endereco ? el("p", { classe: "doacao__retirada" }, [el("strong", { texto: "Entregar em: " }), ent.endereco]) : null,
+        ate ? el("p", { classe: "doacao__prazo", texto: "Até " + fmtDataHora(ate) }) : null
+      ])
+    ]);
+  }
+
+  function carregarMinhasDoacoes() {
+    $("bloco-minhas-doacoes").hidden = false;
+    var lista = $("lista-minhas-doacoes");
+    lista.setAttribute("aria-busy", "true");
+    requisitar("/reconecta/painel/minhas-doacoes").then(function (r) {
+      lista.replaceChildren();
+      var itens = r.ok && Array.isArray(r.corpo) ? r.corpo : [];
+      if (!itens.length) {
+        lista.appendChild(el("p", { classe: "doacoes__vazio" }, ["Você ainda não doou para nenhum pedido. ", el("a", { href: "/#doacoes", texto: "Veja as doações disponíveis" }), "."]));
+        return;
+      }
+      itens.forEach(function (c) { lista.appendChild(cartaoMinhaDoacao(c)); });
+    }).catch(function () {
+      lista.replaceChildren(el("p", { classe: "doacoes__vazio", texto: "Não foi possível carregar suas doações." }));
+    }).then(function () {
+      lista.setAttribute("aria-busy", "false");
+      if (location.hash === "#minhas-doacoes") $("minhas-doacoes").scrollIntoView({ block: "start" });
     });
   }
 
