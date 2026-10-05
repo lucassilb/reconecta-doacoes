@@ -293,6 +293,48 @@
 
   $("btn-add-item").addEventListener("click", adicionarItem);
 
+  /* ---------- preencher o pedido com IA (modelo local gratuito; a empresa revisa antes de publicar) ---------- */
+
+  function preencherComIA() {
+    var texto = $("ia-texto").value.trim();
+    var aviso = $("ia-aviso"), erro = $("ia-erro"), btn = $("btn-ia");
+    erro.textContent = ""; $("ia-texto").removeAttribute("aria-invalid"); esconderAviso(aviso);
+    if (texto.length < 5) { erro.textContent = "Escreva o que vocês precisam (por exemplo: 100 litros de leite e 50 pães até sexta)."; $("ia-texto").setAttribute("aria-invalid", "true"); $("ia-texto").focus(); return; }
+    btn.disabled = true; btn.classList.add("is-carregando");
+    postJson("/reconecta/ia/interpretar-pedido", { texto: texto }).then(function (r) {
+      var c = r.corpo;
+      if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
+      if (r.status === 400 && c.campos && c.campos.texto) { erro.textContent = c.campos.texto; $("ia-texto").setAttribute("aria-invalid", "true"); return; }
+      if (r.status === 429) { mostrarAviso(aviso, "Muitos pedidos seguidos", c.mensagem || "Aguarde um pouco e tente de novo.", { erro: true }); return; }
+      if (!r.ok) { mostrarAviso(aviso, "Não foi possível interpretar o texto", c.mensagem || "Preencha os itens manualmente.", { erro: true }); return; }
+      var itens = Array.isArray(c.itens) ? c.itens : [];
+      if (!itens.length) {
+        mostrarAviso(aviso, "Não encontramos itens no texto", "Tente citar quantidade e alimento (ex.: 100 pães) ou preencha os itens manualmente.", { erro: true });
+        return;
+      }
+      // troca as linhas atuais pelas sugeridas
+      linhasItens = []; listaItens.replaceChildren();
+      itens.forEach(function (it) {
+        adicionarItem();
+        var f = linhasItens[linhasItens.length - 1].campos;
+        f.nome.value = it.nome || "";
+        if (OPCOES.categorias.indexOf(it.categoria) !== -1) f.categoria.value = it.categoria;
+        f.quantidade.value = it.quantidade != null ? String(it.quantidade).replace(".", ",") : "";
+        if (OPCOES.unidades.indexOf(it.unidade_medida) !== -1) f.unidade_medida.value = it.unidade_medida;
+      });
+      if (c.receber_ate) limiteInput.value = String(c.receber_ate).slice(0, 10) + "T18:00";
+      var fonte = c.fonte === "llm" ? "Sugerido pelo modelo local gratuito " + (c.modelo || "") + "." : "Sugerido por regras automáticas (IA indisponível no momento).";
+      var partes = [fonte, "Revise os itens, as categorias, as quantidades e o prazo antes de publicar."];
+      if (!c.receber_ate) partes.push("O texto não trazia uma data: escolha o \"Receber até\".");
+      if (c.observacoes) partes.push("Observação: " + c.observacoes);
+      mostrarAviso(aviso, "Preenchemos " + itens.length + (itens.length === 1 ? " item" : " itens") + " a partir do texto", partes.join(" "), { ok: true });
+      $("publicar-t").scrollIntoView({ block: "nearest" });
+    }).catch(function () {
+      mostrarAviso(aviso, "Não conseguimos falar com o servidor", "Verifique sua conexão ou preencha os itens manualmente.", { erro: true });
+    }).then(function () { btn.disabled = false; btn.classList.remove("is-carregando"); });
+  }
+  $("btn-ia").addEventListener("click", preencherComIA);
+
   $("form-doacao").addEventListener("submit", function (e) {
     e.preventDefault();
     esconderAviso(avisoDoacao);

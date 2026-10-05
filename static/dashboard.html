@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · ReConecta</title>
+  <meta name="description" content="Indicadores do ReConecta com dados reais: pedidos abertos, doações recebidas, atendimento por categoria, doações por dia, empresas e alertas.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <script src="/static/js/layout.js" defer></script>
+  <!-- Chart.js (MIT), servido pela jsDelivr, CDN gratuita -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="/static/js/dashboard.js" defer></script>
+</head>
+<body class="dash">
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="container">
+    <section class="dash-topo" aria-labelledby="dash-titulo">
+      <div>
+        <p class="sobretitulo sobretitulo--acento">Dashboard</p>
+        <h1 id="dash-titulo">A rede em <em>números</em></h1>
+        <p class="lead">Dados reais da plataforma: pedidos das empresas, doações recebidas, atendimento por categoria e o que precisa de atenção agora.</p>
+      </div>
+      <div class="dash-topo__acoes">
+        <p class="dash-gerado" id="dash-gerado" aria-live="polite">Carregando…</p>
+        <button type="button" class="btn btn--secundario btn--pequeno" id="btn-atualizar">Atualizar dados</button>
+      </div>
+    </section>
+
+    <div id="dash-erro" class="aviso aviso--erro" role="alert" hidden></div>
+
+    <!-- indicadores -->
+    <section aria-labelledby="ind-titulo">
+      <h2 id="ind-titulo" class="sr-only">Indicadores</h2>
+      <ul class="indicadores" id="indicadores" aria-busy="true">
+        <li class="indicador indicador--destaque" data-ind="percentual_atendimento">
+          <span class="indicador__rotulo">Atendimento dos pedidos abertos</span>
+          <span class="indicador__valor">—</span>
+          <span class="indicador__barra" aria-hidden="true"><span></span></span>
+          <span class="indicador__nota" id="ind-itens">—</span>
+        </li>
+        <li class="indicador" data-ind="pedidos_abertos"><span class="indicador__rotulo">Pedidos abertos</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="doacoes_recebidas"><span class="indicador__rotulo">Doações recebidas</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="pedidos_encerrados"><span class="indicador__rotulo">Pedidos encerrados</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="empresas"><span class="indicador__rotulo">Empresas</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="doadores"><span class="indicador__rotulo">Doadores (CPF)</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="instituicoes"><span class="indicador__rotulo">Instituições</span><span class="indicador__valor">—</span></li>
+      </ul>
+    </section>
+
+    <!-- resumo com IA -->
+    <section class="dash-ia cartao" aria-labelledby="ia-titulo">
+      <div class="dash-ia__topo">
+        <div>
+          <h2 id="ia-titulo">Resumo com IA</h2>
+          <p class="dash-ia__sub">Um modelo de linguagem gratuito, rodando no próprio servidor, lê só os números agregados desta página e escreve um resumo com recomendações. Nenhum dado pessoal é enviado.</p>
+        </div>
+        <button type="button" class="btn btn--primario" id="btn-resumo">Gerar resumo com IA</button>
+      </div>
+      <div id="ia-resultado" class="dash-ia__resultado" aria-live="polite" hidden></div>
+    </section>
+
+    <div class="dash-grade">
+      <!-- pedido × recebido por categoria -->
+      <section class="cartao dash-graf" aria-labelledby="g-cat-titulo">
+        <h2 id="g-cat-titulo">Pedido × recebido por categoria</h2>
+        <p class="dash-graf__sub">Quantidades somadas dos itens dos pedidos abertos e do que já chegou.</p>
+        <figure class="dash-graf__area">
+          <canvas id="g-categoria" role="img" aria-label="Gráfico de barras com o pedido e o recebido por categoria"></canvas>
+          <p class="dash-vazio" id="g-categoria-vazio" hidden>Ainda não há pedidos abertos.</p>
+        </figure>
+        <details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-categoria"></div></details>
+      </section>
+
+      <!-- doações por dia -->
+      <section class="cartao dash-graf" aria-labelledby="g-dia-titulo">
+        <h2 id="g-dia-titulo">Doações por dia</h2>
+        <p class="dash-graf__sub">Doações aceitas nos últimos 30 dias.</p>
+        <figure class="dash-graf__area">
+          <canvas id="g-dia" role="img" aria-label="Gráfico de linha com as doações aceitas por dia nos últimos 30 dias"></canvas>
+        </figure>
+        <details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-dia"></div></details>
+      </section>
+
+      <!-- alertas -->
+      <section class="cartao dash-alertas" aria-labelledby="alertas-titulo">
+        <h2 id="alertas-titulo">Alertas</h2>
+        <ul class="alertas" id="alertas" aria-live="polite"></ul>
+      </section>
+
+      <!-- top empresas -->
+      <section class="cartao" aria-labelledby="top-titulo">
+        <h2 id="top-titulo">Empresas com mais doações recebidas</h2>
+        <div class="dash-tabela" id="top-empresas"></div>
+      </section>
+    </div>
+
+    <!-- histórico -->
+    <section class="cartao dash-historico" aria-labelledby="ult-titulo">
+      <h2 id="ult-titulo">Últimas doações</h2>
+      <div class="dash-tabela" id="ultimas"></div>
+    </section>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>

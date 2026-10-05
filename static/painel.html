@@ -60,6 +60,17 @@
           <h2 id="publicar-t" class="cartao__titulo">Publicar pedido de doação</h2>
           <p class="cartao__sub">Diga do que você precisa: cada item, a quantidade e até quando pode receber. O pedido aparece em Doações disponíveis e pessoas com CPF ou outras empresas doam, com questionário e foto.</p>
 
+          <div class="ia-pedido" id="ia-pedido">
+            <label for="ia-texto" class="campo__rotulo">Descreva o que vocês precisam <span class="ia-pedido__opcional">(opcional)</span></label>
+            <textarea id="ia-texto" class="campo__entrada" rows="2" maxlength="600"
+                      placeholder="Ex.: Precisamos de 100 caixas de leite e 100 pães até sexta"
+                      aria-describedby="ia-ajuda ia-erro"></textarea>
+            <p id="ia-ajuda" class="campo__ajuda">Um modelo de linguagem gratuito, rodando no próprio servidor, transforma o texto nos itens abaixo. Você revisa tudo antes de publicar.</p>
+            <p id="ia-erro" class="campo__erro" data-erro></p>
+            <button type="button" id="btn-ia" class="btn btn--secundario btn--pequeno">Preencher com IA</button>
+            <div id="ia-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+          </div>
+
           <form id="form-doacao" class="form-doacao" novalidate>
             <div class="campo campo--limite">
               <label for="limite" class="campo__rotulo">Receber até</label>

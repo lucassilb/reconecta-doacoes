@@ -1,0 +1,83 @@
+/* ReConecta — dashboard. Depende de base.css. */
+
+.dash main { padding-bottom: 32px; }
+.dash h1 em { font-style: normal; color: var(--verde-texto); }
+
+.dash-topo { display: grid; gap: 18px; padding-block: clamp(16px, 4vw, 44px) clamp(18px, 3vw, 28px); }
+.dash-topo h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; margin: 6px 0 12px; }
+.dash-topo .lead { max-width: 44em; }
+.dash-topo__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.dash-gerado { font-size: .9rem; color: var(--tinta-suave); }
+@media (min-width: 900px) { .dash-topo { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } .dash-topo__acoes { justify-content: flex-end; } }
+
+/* indicadores */
+.indicadores { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .indicadores { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .indicadores { grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr)); } }
+.indicador {
+  display: grid; gap: 6px; align-content: start;
+  padding: 18px 20px; border-radius: 20px;
+  background: var(--superficie); border: 1px solid var(--linha);
+  box-shadow: 0 1px 2px rgba(27, 29, 34, .04);
+}
+.indicador__rotulo { font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.indicador__valor { font-family: var(--fonte-texto); font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 700; color: var(--tinta); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.indicador--destaque { grid-column: 1 / -1; background: var(--verde-suave); border-color: transparent; }
+.indicador--destaque .indicador__valor { color: var(--verde-texto); font-size: clamp(2.2rem, 4vw, 3rem); }
+.indicador__barra { display: block; height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .8); overflow: hidden; }
+.indicador__barra span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); transition: width .5s ease; }
+.indicador__nota { font-size: .9rem; color: var(--tinta); }
+@media (min-width: 1100px) { .indicador--destaque { grid-column: 1; grid-row: span 2; align-content: center; } }
+
+/* resumo com IA */
+.dash-ia { margin-bottom: 20px; display: grid; gap: 16px; }
+.dash-ia__topo { display: grid; gap: 14px; }
+@media (min-width: 760px) { .dash-ia__topo { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+.dash-ia h2 { font-size: 1.5rem; font-weight: 700; }
+.dash-ia__sub { color: var(--tinta-suave); margin-top: 6px; max-width: 52em; font-size: .95rem; }
+.dash-ia__resultado { display: grid; gap: 10px; padding: 18px 20px; border-radius: 16px; background: var(--superficie-2); }
+.dash-ia__resultado .selo { justify-self: start; }
+.selo--ia { background: var(--verde-suave); color: var(--verde-texto); }
+.selo--regras { background: var(--acento-suave); color: var(--acento-texto); }
+.dash-ia__texto { font-size: 1.05rem; line-height: 1.6; white-space: pre-line; }
+.dash-ia__rec-titulo { font-family: var(--fonte-texto); font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); margin-bottom: 4px; }
+.dash-ia__rec { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.dash-ia__nota, .dash-ia__carregando { font-size: .86rem; color: var(--tinta-suave); }
+
+/* grade de gráficos e tabelas */
+.dash-grade { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); margin-bottom: 20px; }
+@media (min-width: 1000px) { .dash-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dash-grade .cartao, .dash-historico { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.dash main h2 { font-size: 1.3rem; font-weight: 700; } /* só o conteúdo; o rodapé tem estilo próprio */
+.dash-graf__sub { color: var(--tinta-suave); font-size: .9rem; }
+.dash-graf__area { position: relative; margin: 0; height: 280px; }
+.dash-graf__area canvas { width: 100% !important; }
+.dash-dados summary { cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--verde-texto); }
+.dash-dados[open] summary { margin-bottom: 8px; }
+.dash-vazio { color: var(--tinta-suave); font-size: .95rem; padding: 12px 0; }
+
+.alertas { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.alerta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--superficie-2); border-left: 4px solid var(--linha-forte); }
+.alerta__tipo { grid-column: 1 / -1; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.alerta__msg { font-size: .95rem; }
+.alerta__link { font-weight: 700; font-size: .9rem; white-space: nowrap; }
+.alerta--prazo { border-left-color: #C8621E; background: #FDF0E5; }
+.alerta--prazo .alerta__tipo { color: #9A4A12; }
+.alerta--sem { border-left-color: #A8261D; background: var(--erro-suave); }
+.alerta--sem .alerta__tipo { color: var(--erro); }
+.alerta--quase { border-left-color: #7DBB55; background: var(--verde-suave); }
+.alerta--quase .alerta__tipo, .alerta--meta .alerta__tipo { color: var(--verde-texto); }
+.alerta--meta { border-left-color: var(--verde); background: var(--verde-suave); }
+.alerta--nenhum { grid-template-columns: 1fr; color: var(--tinta-suave); }
+
+/* tabelas */
+.dash-tabela { overflow-x: auto; }
+.tabela { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.tabela th, .tabela td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+.tabela thead th { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-suave); white-space: nowrap; }
+.tabela tbody th { font-weight: 600; }
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 559.98px) {
+  .tabela { font-size: .86rem; }
+  .tabela th, .tabela td { padding: 8px 6px; }
+}
