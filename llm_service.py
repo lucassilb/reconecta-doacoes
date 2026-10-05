@@ -15,6 +15,25 @@ from Publico import CATEGORIAS, UNIDADES
 
 URL_PADRAO = "http://localhost:11434"
 MODELO_PADRAO = "qwen2.5:3b"
+ESQUEMA_PEDIDO = {
+    "type": "object",
+    "properties": {
+        "itens": {"type": "array", "minItems": 1, "maxItems": 10,
+                  "items": {"type": "object",
+                            "properties": {
+                                "nome": {"type": "string"},
+                                "categoria": {"type": "string", "enum": CATEGORIAS},
+                                "quantidade": {"type": "number", "exclusiveMinimum": 0},
+                                "unidade_medida": {"type": "string", "enum": UNIDADES},
+                            },
+                            "required": ["nome", "categoria", "quantidade", "unidade_medida"],
+                            "additionalProperties": False}},
+        "receber_ate": {"type": ["string", "null"]},
+        "observacoes": {"type": "string"},
+    },
+    "required": ["itens", "receber_ate", "observacoes"],
+    "additionalProperties": False,
+}
 
 
 def _sem_acentos(valor):
@@ -58,7 +77,7 @@ def _modelo():
     return configurado if configurado == MODELO_PADRAO else None
 
 
-def _chamar_ollama(sistema, usuario):
+def _chamar_ollama(sistema, usuario, *, formato="json"):
     """Retorna o objeto JSON do modelo ou None; nunca envia para endereço externo."""
     base = _url_local()
     modelo = _modelo()
@@ -72,7 +91,7 @@ def _chamar_ollama(sistema, usuario):
             json={"model": modelo,
                   "messages": [{"role": "system", "content": sistema},
                                {"role": "user", "content": usuario}],
-                  "format": "json", "stream": False,
+                  "format": formato, "stream": False,
                   "options": {"temperature": 0.2}},
             timeout=(2, 90), allow_redirects=False,
         )
@@ -94,7 +113,8 @@ def _categoria(nome):
         ("Hortifrúti", ("fruta", "banana", "maca", "laranja", "tomate", "batata",
                         "cebola", "verdura", "alface", "legume")),
         ("Carnes e peixes", ("carne", "frango", "peixe", "ovo", "linguica")),
-        ("Grãos e cereais", ("arroz", "feijao", "lentilha", "grao", "cereal", "aveia")),
+        ("Grãos e cereais", ("arroz", "feijao", "lentilha", "grao", "cereal",
+                             "aveia", "macarrao")),
         ("Refeições prontas", ("marmita", "refeicao", "sopa", "prato pronto")),
         ("Bebidas não alcoólicas", ("agua", "suco", "refrigerante", "cha")),
     )
@@ -141,6 +161,9 @@ def _data(valor):
 
 
 def _validar_pedido(objeto):
+    if isinstance(objeto, dict) and "itens" not in objeto and all(
+            chave in objeto for chave in ("nome", "quantidade", "unidade_medida")):
+        objeto = {**objeto, "itens": [objeto]}
     if not isinstance(objeto, dict) or not isinstance(objeto.get("itens"), list):
         return None
     itens = []
@@ -175,7 +198,24 @@ def _prazo_regras(texto):
         intervalo = (dias[encontrado.group(1)] - date.today().weekday()) % 7 or 7
         return (date.today() + timedelta(days=intervalo)).isoformat()
     explicita = re.search(r"\bate\s+(\d{4}-\d{2}-\d{2})\b", simples)
-    return _data(explicita.group(1)) if explicita else None
+    if explicita:
+        return _data(explicita.group(1))
+    dia_mes = re.search(r"\b(?:para\s+o\s+)?dia\s+([1-9]|[12]\d|3[01])\b", simples)
+    if dia_mes:
+        dia = int(dia_mes.group(1))
+        hoje = date.today()
+        ano, mes = hoje.year, hoje.month
+        for _ in range(12):
+            try:
+                candidato = date(ano, mes, dia)
+            except ValueError:
+                candidato = None
+            if candidato and candidato > hoje:
+                return candidato.isoformat()
+            mes += 1
+            if mes == 13:
+                mes, ano = 1, ano + 1
+    return None
 
 
 def _pedido_regras(texto):
@@ -186,7 +226,9 @@ def _pedido_regras(texto):
         r"(?:(?P<unidade>caixas?|pacotes?|unidades?|kg|g|litros?|l|quilos?|gramas?)\b\s*)?"
         r"(?:de\s+|d[oa]s?\s+)?(?P<nome>.+)", re.IGNORECASE)
     for trecho in trechos[:10]:
-        trecho = re.split(r"\s+at[eé]\s+", trecho, maxsplit=1, flags=re.IGNORECASE)[0]
+        trecho = re.split(r"\s+(?:at[eé]\s+|para\s+o\s+dia\s+)", trecho,
+                          maxsplit=1, flags=re.IGNORECASE)[0]
+        trecho = re.split(r"[.!?]\s+", trecho, maxsplit=1)[0]
         achado = padrao.search(trecho.strip())
         if not achado:
             continue
@@ -200,21 +242,64 @@ def _pedido_regras(texto):
             "observacoes": "Revise os itens e o prazo antes de publicar."}
 
 
+def _conferir_com_texto(validado, texto):
+    """Confere números, unidades e datas explícitos sem confiar no cálculo do modelo."""
+    regras = _pedido_regras(_sem_identificadores(texto))
+    itens_regras = regras["itens"]
+    if itens_regras:
+        # Só atribui fonte LLM quando ao menos um alimento retornado foi reconhecido.
+        nomes_modelo = {_sem_acentos(item["nome"]) for item in validado["itens"]}
+        if not any(_sem_acentos(item["nome"]) in nomes_modelo for item in itens_regras):
+            return None
+        conferidos = []
+        for indice, item in enumerate(itens_regras):
+            modelo = validado["itens"][indice] if indice < len(validado["itens"]) else None
+            nome = (modelo["nome"] if modelo and
+                    _sem_acentos(modelo["nome"]) == _sem_acentos(item["nome"])
+                    else item["nome"])
+            categoria = (modelo["categoria"] if modelo and item["categoria"] == "Outros"
+                         else item["categoria"])
+            conferidos.append({**item, "nome": nome, "categoria": categoria})
+        validado["itens"] = conferidos
+    if regras["receber_ate"]:
+        validado["receber_ate"] = regras["receber_ate"]
+    elif not re.search(r"\b(at[eé]|amanh[aã]|dia|semana|m[eê]s)\b", texto,
+                       flags=re.IGNORECASE):
+        validado["receber_ate"] = None
+    return validado
+
+
 def interpretar_pedido(texto):
+    hoje = date.today()
+    dias = ("segunda-feira", "terça-feira", "quarta-feira", "quinta-feira",
+            "sexta-feira", "sábado", "domingo")
+    exemplo = {"itens": [
+        {"nome": "Arroz", "categoria": "Grãos e cereais", "quantidade": 2,
+         "unidade_medida": "kg"},
+        {"nome": "Leite", "categoria": "Laticínios", "quantidade": 3,
+         "unidade_medida": "caixa"}],
+        "receber_ate": None, "observacoes": ""}
     sistema = (
-        "Você extrai itens de um pedido de alimentos. Responda somente JSON com "
-        "itens (até 10 objetos nome, categoria, quantidade, unidade_medida), "
-        "receber_ate (data YYYY-MM-DD futura ou null) e observacoes (texto curto). "
+        "Você extrai pedidos de ALIMENTOS para uma empresa. Responda sempre um objeto "
+        "JSON com a chave itens contendo uma lista. Cada grupo de quantidade e alimento "
+        "é um item separado; não junte dois alimentos num item ou nas observações. "
+        "Pães são alimentos de Padaria; não confunda com pés. "
+        f"Hoje é {hoje.isoformat()} ({dias[hoje.weekday()]}). "
+        "Calcule prazos relativos a partir de hoje; se não houver prazo, use null. "
+        "receber_ate deve ser uma data futura YYYY-MM-DD ou null. "
         f"Categorias permitidas: {', '.join(CATEGORIAS)}. "
         f"Unidades permitidas: {', '.join(UNIDADES)}. "
-        "Não invente quantidades, itens, validade ou prazo."
+        "Exemplo: entrada 'Quero 2 kg de arroz e 3 caixas de leite'; saída "
+        f"{json.dumps(exemplo, ensure_ascii=False)}. "
+        "Não invente quantidades, itens, validade ou prazo. "
+        f"Formato obrigatório: {json.dumps(ESQUEMA_PEDIDO, ensure_ascii=False)}"
     )
-    bruto = _chamar_ollama(sistema, _sem_identificadores(texto))
+    bruto = _chamar_ollama(sistema, _sem_identificadores(texto), formato=ESQUEMA_PEDIDO)
     validado = _validar_pedido(bruto)
     if validado:
-        if validado["receber_ate"] is None:
-            validado["receber_ate"] = _prazo_regras(texto)
-        return {**validado, "fonte": "llm", "modelo": _modelo()}
+        conferido = _conferir_com_texto(validado, texto)
+        if conferido:
+            return {**conferido, "fonte": "llm", "modelo": _modelo()}
     return {**_pedido_regras(texto), "fonte": "regras", "modelo": None}
 
 
