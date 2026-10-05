@@ -18,6 +18,7 @@ class Estabelecimento(db.Model):
     endereco = db.Column(db.Text, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=True)
     doacoes = db.relationship('Doacao', backref='estabelecimento', lazy=True)
+    arrecadacoes = db.relationship('Arrecadacao', backref='estabelecimento', lazy=True)
 
 class Doador(db.Model):
     __tablename__ = 'doadores'
@@ -75,3 +76,48 @@ class Reserva(db.Model):
     data_reserva = db.Column(db.DateTime, default=_utc_naive)
     data_retirada = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(20), default='ATIVA')
+
+
+class Arrecadacao(db.Model):
+    __tablename__ = 'arrecadacoes'
+    __table_args__ = (
+        db.CheckConstraint("status IN ('ATIVA', 'ENCERRADA')", name='ck_arrecadacoes_status'),
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'), nullable=False)
+    titulo = db.Column(db.String(80), nullable=False)
+    descricao = db.Column(db.String(500), nullable=False)
+    categorias = db.Column(db.String(300), nullable=False)
+    meta_descricao = db.Column(db.String(120))
+    entrega_endereco = db.Column(db.String(200), nullable=False)
+    data_inicio = db.Column(db.Date, nullable=False)
+    data_fim = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='ATIVA', server_default='ATIVA')
+    criado_em = db.Column(db.DateTime, nullable=False, default=_utc_naive)
+    contribuicoes = db.relationship('Contribuicao', backref='arrecadacao', lazy=True)
+
+
+class Contribuicao(db.Model):
+    __tablename__ = 'contribuicoes'
+    __table_args__ = (
+        db.CheckConstraint('(doador_id IS NOT NULL) <> (estabelecimento_id IS NOT NULL)',
+                           name='ck_contribuicoes_uma_origem'),
+        db.CheckConstraint('quantidade > 0', name='ck_contribuicoes_quantidade'),
+        db.CheckConstraint("status IN ('ACEITA', 'ENTREGUE', 'CANCELADA')",
+                           name='ck_contribuicoes_status'),
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    arrecadacao_id = db.Column(db.Integer, db.ForeignKey('arrecadacoes.id', ondelete='RESTRICT'), nullable=False)
+    doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'))
+    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'))
+    alimento = db.Column(db.String(100), nullable=False)
+    categoria = db.Column(db.String(50), nullable=False)
+    quantidade = db.Column(db.Numeric(10, 2), nullable=False)
+    unidade_medida = db.Column(db.String(20), nullable=False)
+    validade = db.Column(db.Date, nullable=False)
+    respostas = db.Column(db.Text, nullable=False)
+    foto_arquivo = db.Column(db.String(80), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='ACEITA', server_default='ACEITA')
+    criado_em = db.Column(db.DateTime, nullable=False, default=_utc_naive)
+    doador = db.relationship('Doador', backref='contribuicoes')
+    estabelecimento = db.relationship('Estabelecimento', backref='contribuicoes')

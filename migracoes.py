@@ -2,7 +2,7 @@
 
 from sqlalchemy import inspect, text
 
-from models import db
+from models import Arrecadacao, Contribuicao, db
 
 
 def _migrar_doacoes_sqlite(engine, colunas):
@@ -86,9 +86,11 @@ def aplicar_migracoes(engine=None):
         if "senha_hash" not in colunas:
             with engine.begin() as conexao:
                 conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN senha_hash VARCHAR(255)"))
-    if not inspector.has_table("doacoes"):
-        return
-    if engine.dialect.name == "sqlite":
-        _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))
-    elif engine.dialect.name == "postgresql":
-        _migrar_doacoes_postgresql(engine)
+    if inspector.has_table("doacoes"):
+        if engine.dialect.name == "sqlite":
+            _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))
+        elif engine.dialect.name == "postgresql":
+            _migrar_doacoes_postgresql(engine)
+    # Tabelas novas: checkfirst permite rodar duas vezes e também migrar sem create_all.
+    Arrecadacao.__table__.create(engine, checkfirst=True)
+    Contribuicao.__table__.create(engine, checkfirst=True)

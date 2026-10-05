@@ -36,6 +36,14 @@ def entrar_page():
 def painel_page():
     return send_from_directory(app.static_folder, "painel.html")
 
+@app.get("/arrecadacoes")
+def arrecadacoes_page():
+    return send_from_directory(app.static_folder, "arrecadacoes.html")
+
+@app.get("/arrecadacoes/<int:arrecadacao_id>")
+def arrecadacao_page(arrecadacao_id):
+    return send_from_directory(app.static_folder, "arrecadacao.html")
+
 api = Api(
     app,
     version="1.0",
@@ -51,6 +59,7 @@ from Cadastro import ns as cadastro_ns
 from Auth import ns as auth_ns
 from Publico import ns as publico_ns
 from Painel import ns as painel_ns
+from Arrecadacoes import ns as arrecadacoes_ns
 
 api.add_namespace(estabelecimentos_ns, path="/reconecta/estabelecimentos")
 api.add_namespace(instituicoes_ns, path="/reconecta/instituicoes")
@@ -59,6 +68,7 @@ api.add_namespace(cadastro_ns, path="/reconecta/cadastro")
 api.add_namespace(auth_ns, path="/reconecta/auth")
 api.add_namespace(publico_ns, path="/reconecta/publico")
 api.add_namespace(painel_ns, path="/reconecta/painel")
+api.add_namespace(arrecadacoes_ns, path="/reconecta/arrecadacoes")
 
 with app.app_context():
     db.create_all()
