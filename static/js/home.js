@@ -303,6 +303,25 @@
     });
   }
 
+  /* ---------- ações de arrecadação abertas (até 3) ---------- */
+
+  function carregarAcoes() {
+    var alvo = $("home-acoes-conteudo"), R = window.RCArrecadacao;
+    if (!alvo || !R) return;
+    R.requisitar("/reconecta/arrecadacoes").then(function (r) {
+      var lista = r.ok && Array.isArray(r.corpo) ? r.corpo : [];
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      alvo.replaceChildren(lista.length
+        ? el("ul", { classe: "acoes" }, lista.slice(0, 3).map(function (a) { return el("li", null, [R.cartaoAcao(a)]); }))
+        : el("p", { classe: "home-acoes__vazio" }, [
+            "Nenhuma ação aberta agora. Empresas do setor de alimentos podem criar uma pelo painel. ",
+            el("a", { href: "/arrecadacoes", texto: "Saiba como funciona" }), "."
+          ]));
+    }).catch(function () {
+      alvo.replaceChildren(el("p", { classe: "home-acoes__vazio", texto: "Não conseguimos carregar as ações agora." }));
+    }).then(function () { alvo.setAttribute("aria-busy", "false"); });
+  }
+
   /* ---------- CTA conforme a sessão ---------- */
 
   var usuarioAtual = null;
@@ -327,4 +346,5 @@
   });
 
   carregar();
+  carregarAcoes();
 })();

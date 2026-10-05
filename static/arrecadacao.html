@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ação de arrecadação · ReConecta</title>
+  <meta name="description" content="Detalhes de uma ação de arrecadação de alimentos e o questionário rápido para doar.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/arrecadacoes.css">
+  <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/arrecadacao-util.js" defer></script>
+  <script src="/static/js/arrecadacao.js" defer></script>
+</head>
+<body class="arrecadacoes">
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="container">
+    <a class="voltar-lista" href="/arrecadacoes">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Todas as ações
+    </a>
+
+    <div id="det-carregando" class="arr-carregando" role="status">Carregando a ação…</div>
+    <div id="det-erro" class="aviso aviso--erro" role="alert" hidden></div>
+
+    <div id="det" class="det" hidden>
+      <!-- ===== sobre a ação ===== -->
+      <article class="det__info" aria-labelledby="det-titulo">
+        <p class="sobretitulo sobretitulo--acento">Ação de arrecadação</p>
+        <h1 id="det-titulo"></h1>
+        <p class="det__empresa" id="det-empresa"></p>
+        <p class="det__descricao" id="det-descricao"></p>
+
+        <dl class="det__fatos">
+          <div class="det__fato" id="det-meta-bloco" hidden><dt>Meta</dt><dd id="det-meta"></dd></div>
+          <div class="det__fato"><dt>Período</dt><dd id="det-periodo"></dd></div>
+          <div class="det__fato"><dt>Entrega</dt><dd id="det-entrega"></dd></div>
+          <div class="det__fato"><dt>Doações aceitas</dt><dd id="det-contagem"></dd></div>
+        </dl>
+
+        <h2 class="det__subtitulo">Categorias aceitas</h2>
+        <div id="det-categorias"></div>
+
+        <div class="det__como">
+          <h2 class="det__subtitulo">Como doar</h2>
+          <ol class="det__passos">
+            <li>Responda ao questionário rápido sobre o alimento (4 perguntas de sim ou não).</li>
+            <li>Mande uma foto do alimento, com a embalagem e a validade à vista.</li>
+            <li>Se estiver tudo de acordo, a doação é confirmada e você recebe o endereço de entrega.</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- ===== doar ===== -->
+      <section class="det__doar cartao" aria-labelledby="doar-titulo" id="doar">
+        <h2 id="doar-titulo" tabindex="-1">Doar para esta ação</h2>
+
+        <!-- estado inicial: botão, convite para entrar ou motivo de bloqueio -->
+        <div id="doar-inicio">
+          <p class="doar__texto" id="doar-texto">Leva menos de dois minutos. Tenha em mãos o alimento e o celular para a foto.</p>
+          <button type="button" id="btn-abrir" class="btn btn--primario btn--largo" hidden>Doar para esta ação</button>
+          <a id="link-entrar" class="btn btn--primario btn--largo" href="/entrar" hidden>Entre para doar</a>
+          <p id="doar-bloqueio" class="doar__bloqueio" hidden></p>
+          <p id="doar-cadastro" class="doar__nota" hidden>Ainda não tem conta? <a href="/cadastro">Cadastre-se como doador ou empresa</a>.</p>
+        </div>
+
+        <!-- questionário curto -->
+        <form id="form-contribuicao" class="quest" novalidate hidden>
+          <fieldset class="quest__item">
+            <legend class="quest__legenda">O alimento</legend>
+            <div class="campo quest__alimento">
+              <label class="campo__rotulo" for="c-alimento">Alimento</label>
+              <input id="c-alimento" name="alimento" class="campo__entrada" maxlength="100" placeholder="Ex.: Arroz agulhinha 5 kg" required aria-describedby="c-alimento-erro">
+              <p id="c-alimento-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo">
+              <label class="campo__rotulo" for="c-categoria">Categoria</label>
+              <select id="c-categoria" name="categoria" class="campo__entrada" required aria-describedby="c-categoria-erro"></select>
+              <p id="c-categoria-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo">
+              <label class="campo__rotulo" for="c-validade">Validade</label>
+              <input id="c-validade" name="validade" type="date" class="campo__entrada" required aria-describedby="c-validade-erro">
+              <p id="c-validade-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo">
+              <label class="campo__rotulo" for="c-quantidade">Quantidade</label>
+              <input id="c-quantidade" name="quantidade" class="campo__entrada" inputmode="decimal" placeholder="0" required aria-describedby="c-quantidade-erro">
+              <p id="c-quantidade-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="campo">
+              <label class="campo__rotulo" for="c-unidade">Unidade</label>
+              <select id="c-unidade" name="unidade_medida" class="campo__entrada" required aria-describedby="c-unidade-erro"></select>
+              <p id="c-unidade-erro" class="campo__erro" data-erro></p>
+            </div>
+          </fieldset>
+
+          <div class="quest__perguntas" id="quest-perguntas"></div>
+
+          <div class="campo quest__foto">
+            <span class="campo__rotulo" id="c-foto-rotulo">Foto do alimento</span>
+            <label class="foto" for="c-foto">
+              <input id="c-foto" name="foto" type="file" accept="image/*" capture="environment" class="foto__input"
+                     aria-labelledby="c-foto-rotulo" aria-describedby="c-foto-ajuda c-foto-erro" required>
+              <span class="foto__previa" id="c-foto-previa" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13.3" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+              </span>
+              <span class="foto__texto">
+                <strong id="c-foto-nome">Tirar ou escolher foto</strong>
+                <span id="c-foto-ajuda">JPEG, PNG ou WebP, até 5 MB. Mostre a embalagem e a validade.</span>
+              </span>
+            </label>
+            <p id="c-foto-erro" class="campo__erro" data-erro></p>
+          </div>
+
+          <div id="quest-aviso" class="quest__aviso" role="alert" hidden></div>
+
+          <button type="submit" id="btn-doar" class="btn btn--primario btn--largo">Doar para esta ação</button>
+          <button type="button" id="btn-cancelar" class="btn btn--fantasma btn--largo">Cancelar</button>
+        </form>
+
+        <!-- confirmação -->
+        <div id="doar-ok" class="doar-ok" hidden tabindex="-1">
+          <span class="doar-ok__selo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <h3>Doação confirmada</h3>
+          <p>Obrigado! Agora é só levar o alimento até o local de entrega.</p>
+          <dl class="doar-ok__dados">
+            <dt>Endereço de entrega</dt><dd id="ok-endereco"></dd>
+            <dt>Entregue até</dt><dd id="ok-prazo"></dd>
+          </dl>
+          <a class="btn btn--secundario btn--largo" href="/painel#contribuicoes">Ver minhas contribuições</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>

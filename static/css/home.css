@@ -497,3 +497,11 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 
 /* doação de pessoa física (rodada 7) */
 .selo--pf { margin-left: 8px; vertical-align: 3px; font-size: .62rem; background: var(--acento-suave); color: var(--acento-texto); white-space: nowrap; }
+
+/* ---------- ações de arrecadação abertas (rodada 8) ---------- */
+.home-acoes { margin-top: clamp(40px, 6vw, 72px); }
+.home-acoes__topo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; margin-bottom: 22px; }
+.home-acoes h2 { font-size: clamp(1.9rem, 3.6vw, 3rem); margin-top: 6px; }
+.home-acoes__texto { color: var(--tinta-suave); margin-top: 8px; max-width: 48em; }
+.home-acoes__todas { font-weight: 700; color: var(--verde-texto); text-decoration: none; border-bottom: 2px solid currentColor; padding-bottom: 2px; }
+.home-acoes__vazio { padding: 22px 24px; border-radius: 22px; background: var(--superficie); border: 1px dashed var(--linha-forte); color: var(--tinta-suave); }
