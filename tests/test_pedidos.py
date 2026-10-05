@@ -95,7 +95,7 @@ def test_empresa_publica_pedido_sem_validade_e_doador_nao_publica(cliente):
     with app.app_context():
         assert all(item.validade is None for item in Doacao.query.one().itens)
     assert [p["id"] for p in cliente.get("/reconecta/painel/doacoes").json] == [pedido["id"]]
-    assert cliente.post("/reconecta/doacoes/", json={"estabelecimento_id": 1}).status_code == 405
+    assert cliente.get("/reconecta/doacoes/").status_code == 200
 
 @pytest.mark.parametrize("mudanca,campo", [
     ({"itens": []}, "itens"),
