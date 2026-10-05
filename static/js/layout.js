@@ -20,7 +20,8 @@
     { rotulo: "Início", href: "/" },
     { rotulo: "Sobre", href: "/sobre" },
     { rotulo: "Doações", href: "/#doacoes" },
-    { rotulo: "Como funciona", href: "/#como-funciona" }
+    { rotulo: "Como funciona", href: "/#como-funciona" },
+    { rotulo: "Dashboard", href: "/dashboard" }
   ];
 
   var MARCA_SVG =
@@ -202,7 +203,7 @@
         el("p", { texto: "Plataforma em que empresas do setor de alimentos publicam o que precisam e pessoas e empresas doam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Como funciona", "/#como-funciona"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [

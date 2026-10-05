@@ -176,3 +176,9 @@
 .minha-doacao:not(:has(.minha-doacao__foto)) { grid-template-columns: minmax(0, 1fr); }
 .minha-doacao__foto { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
 .minha-doacao__texto { display: grid; gap: 6px; min-width: 0; }
+
+/* preencher pedido com IA (CP2) */
+.ia-pedido { display: grid; gap: 8px; padding: 16px; border-radius: 16px; background: var(--verde-suave); }
+.ia-pedido textarea { resize: vertical; min-height: 64px; background: var(--superficie); }
+.ia-pedido__opcional { font-weight: 400; color: var(--tinta-suave); }
+.ia-pedido .btn { justify-self: start; }
