@@ -2,7 +2,66 @@
 
 from sqlalchemy import inspect, text
 
-from models import Arrecadacao, Contribuicao, db
+from models import Contribuicao, db
+
+
+def _migrar_pedidos(engine):
+    """Descarta somente tabelas vazias da rodada 8 e libera validade do pedido."""
+    inspector = inspect(engine)
+    tabelas = set(inspector.get_table_names())
+    contribuicoes_antigas = ("contribuicoes" in tabelas and
+                            "arrecadacao_id" in {c["name"] for c in inspector.get_columns("contribuicoes")})
+    if "arrecadacoes" in tabelas or contribuicoes_antigas:
+        with engine.connect() as conexao:
+            for tabela in ("arrecadacoes", "contribuicoes"):
+                if tabela in tabelas and (tabela == "arrecadacoes" or contribuicoes_antigas):
+                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
+                        raise RuntimeError(
+                            f"Migração de pedidos interrompida: {tabela} contém dados; "
+                            "não é seguro descartá-los automaticamente.")
+        with engine.begin() as conexao:
+            if contribuicoes_antigas:
+                conexao.execute(text("DROP TABLE contribuicoes"))
+            if "arrecadacoes" in tabelas:
+                conexao.execute(text("DROP TABLE arrecadacoes"))
+
+    inspector = inspect(engine)
+    if inspector.has_table("itens_doacao"):
+        colunas = {c["name"]: c for c in inspector.get_columns("itens_doacao")}
+        if "validade" not in colunas:
+            with engine.begin() as conexao:
+                conexao.execute(text("ALTER TABLE itens_doacao ADD COLUMN validade DATE"))
+        elif not colunas["validade"]["nullable"]:
+            if engine.dialect.name == "postgresql":
+                with engine.begin() as conexao:
+                    conexao.execute(text("ALTER TABLE itens_doacao ALTER COLUMN validade DROP NOT NULL"))
+            elif engine.dialect.name == "sqlite":
+                with engine.connect() as conexao:
+                    conexao.exec_driver_sql("PRAGMA foreign_keys=OFF")
+                    conexao.commit()
+                    try:
+                        with conexao.begin():
+                            conexao.exec_driver_sql("""CREATE TABLE itens_doacao_nova (
+                                id INTEGER PRIMARY KEY,
+                                doacao_id INTEGER NOT NULL REFERENCES doacoes(id),
+                                nome VARCHAR(100) NOT NULL,
+                                categoria VARCHAR(50) NOT NULL,
+                                quantidade NUMERIC(10,2) NOT NULL,
+                                unidade_medida VARCHAR(20) NOT NULL,
+                                validade DATE
+                            )""")
+                            campos = "id, doacao_id, nome, categoria, quantidade, unidade_medida, validade"
+                            conexao.exec_driver_sql(
+                                f"INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao")
+                            conexao.exec_driver_sql("DROP TABLE itens_doacao")
+                            conexao.exec_driver_sql("ALTER TABLE itens_doacao_nova RENAME TO itens_doacao")
+                    finally:
+                        conexao.exec_driver_sql("PRAGMA foreign_keys=ON")
+                        conexao.commit()
+                    violacoes = conexao.exec_driver_sql("PRAGMA foreign_key_check").fetchall()
+                    if violacoes:
+                        raise RuntimeError(f"Migração de itens deixou referências inválidas: {violacoes}")
+    Contribuicao.__table__.create(engine, checkfirst=True)
 
 
 def _migrar_doacoes_sqlite(engine, colunas):
@@ -78,6 +137,15 @@ def _migrar_doacoes_postgresql(engine):
 
 def aplicar_migracoes(engine=None):
     engine = engine or db.engine
+    # A checagem de perda de dados antecede qualquer alteração do esquema.
+    inspector = inspect(engine)
+    tabelas = set(inspector.get_table_names())
+    if "arrecadacoes" in tabelas or ("contribuicoes" in tabelas and
+        "arrecadacao_id" in {c["name"] for c in inspector.get_columns("contribuicoes")}):
+        with engine.connect() as conexao:
+            for tabela in ("arrecadacoes", "contribuicoes"):
+                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
+                    raise RuntimeError(f"Migração de pedidos interrompida: {tabela} contém dados.")
     inspector = inspect(engine)
     for tabela in ("estabelecimentos", "doadores"):
         if not inspector.has_table(tabela):
@@ -91,6 +159,4 @@ def aplicar_migracoes(engine=None):
             _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))
         elif engine.dialect.name == "postgresql":
             _migrar_doacoes_postgresql(engine)
-    # Tabelas novas: checkfirst permite rodar duas vezes e também migrar sem create_all.
-    Arrecadacao.__table__.create(engine, checkfirst=True)
-    Contribuicao.__table__.create(engine, checkfirst=True)
+    _migrar_pedidos(engine)
