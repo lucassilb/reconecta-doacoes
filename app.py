@@ -38,6 +38,10 @@ def entrar_page():
 def painel_page():
     return send_from_directory(app.static_folder, "painel.html")
 
+@app.get("/dashboard")
+def dashboard_page():
+    return send_from_directory(app.static_folder, "dashboard.html")
+
 @app.get("/doacoes/<int:doacao_id>")
 def doacao_page(doacao_id):
     return send_from_directory(app.static_folder, "doacao.html")
@@ -68,6 +72,7 @@ from Auth import ns as auth_ns
 from Publico import ns as publico_ns
 from Painel import ns as painel_ns
 from Contribuicoes import ns as contribuicoes_ns
+from Dashboard import ns as dashboard_ns
 
 api.add_namespace(estabelecimentos_ns, path="/reconecta/estabelecimentos")
 api.add_namespace(instituicoes_ns, path="/reconecta/instituicoes")
@@ -77,6 +82,7 @@ api.add_namespace(auth_ns, path="/reconecta/auth")
 api.add_namespace(publico_ns, path="/reconecta/publico")
 api.add_namespace(painel_ns, path="/reconecta/painel")
 api.add_namespace(contribuicoes_ns, path="/reconecta/contribuicoes")
+api.add_namespace(dashboard_ns, path="/reconecta/dashboard")
 
 with app.app_context():
     db.create_all()
