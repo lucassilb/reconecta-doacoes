@@ -111,6 +111,7 @@ from Publico import ns as publico_ns
 from Painel import ns as painel_ns
 from Contribuicoes import ns as contribuicoes_ns
 from Dashboard import ns as dashboard_ns
+from IA import ns as ia_ns
 
 api.add_namespace(estabelecimentos_ns, path="/reconecta/estabelecimentos")
 api.add_namespace(instituicoes_ns, path="/reconecta/instituicoes")
@@ -121,6 +122,7 @@ api.add_namespace(publico_ns, path="/reconecta/publico")
 api.add_namespace(painel_ns, path="/reconecta/painel")
 api.add_namespace(contribuicoes_ns, path="/reconecta/contribuicoes")
 api.add_namespace(dashboard_ns, path="/reconecta/dashboard")
+api.add_namespace(ia_ns, path="/reconecta/ia")
 
 with app.app_context():
     db.create_all()
