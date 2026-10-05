@@ -48,7 +48,7 @@
 .dash-grade { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); margin-bottom: 20px; }
 @media (min-width: 1000px) { .dash-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .dash-grade .cartao, .dash-historico { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.dash h2 { font-size: 1.3rem; font-weight: 700; }
+.dash main h2 { font-size: 1.3rem; font-weight: 700; } /* só o conteúdo; o rodapé tem estilo próprio */
 .dash-graf__sub { color: var(--tinta-suave); font-size: .9rem; }
 .dash-graf__area { position: relative; margin: 0; height: 280px; }
 .dash-graf__area canvas { width: 100% !important; }
