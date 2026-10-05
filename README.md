@@ -286,3 +286,9 @@ O grupo utiliza o Trello para distribuir responsabilidades e acompanhar o andame
 ## Status
 
 Projeto em desenvolvimento para a entrega do CP1 - 2026.
+
+## IA local do CP2
+
+O ReConecta oferece sugestões para preencher pedidos e resumir os indicadores do dashboard. O serviço usa apenas Ollama local com `qwen2.5:3b`, sem API ou chave paga. Configure `OLLAMA_URL=http://localhost:11434` e `OLLAMA_MODELO=qwen2.5:3b` no `.env` (são os valores padrão) e execute `ollama pull qwen2.5:3b` após instalar o Ollama. Se ele estiver fora do ar, os endpoints usam regras locais e indicam `fonte: "regras"`.
+
+`POST /reconecta/ia/interpretar-pedido` aceita texto de 5 a 600 caracteres somente de uma empresa autenticada; sugere até dez itens e um prazo para revisão no formulário, sem publicar nada. `POST /reconecta/ia/resumo-dashboard` é público, usa os agregados do servidor e limita a dez chamadas por minuto por IP. Detalhes de instalação, dados enviados, validação, fallback e licença do modelo estão em [docs/llm.md](docs/llm.md).
