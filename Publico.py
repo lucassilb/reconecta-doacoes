@@ -4,8 +4,10 @@ from datetime import datetime
 from decimal import Decimal
 from flask import request
 from flask_restx import Namespace, Resource, fields
+from sqlalchemy import or_
+from sqlalchemy.orm import selectinload
 from Auth import usuario_atual
-from models import Contribuicao, Doacao, Doador, Estabelecimento, Instituicao, db
+from models import Contribuicao, Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, db
 
 ns = Namespace("publico", description="Resumo e pedidos disponíveis")
 CATEGORIAS = ["Hortifrúti", "Padaria", "Laticínios", "Carnes e peixes",
@@ -78,11 +80,24 @@ def _disponiveis():
                                Doacao.status == "DISPONIVEL",
                                Doacao.data_limite_retirada > datetime.now())
 
+
+def _com_relacionamentos(query):
+    return query.options(selectinload(Doacao.estabelecimento),
+                         selectinload(Doacao.itens),
+                         selectinload(Doacao.contribuicoes))
+
+
+def _inteiro_positivo(campo, padrao, maximo):
+    valor = request.args.get(campo, str(padrao))
+    if not valor.isascii() or not valor.isdigit() or not 1 <= int(valor) <= maximo:
+        return None
+    return int(valor)
+
 @ns.route("/resumo")
 class Resumo(Resource):
     @ns.response(200, "Contadores públicos", resumo_model)
     def get(self):
-        doacoes = _disponiveis().all()
+        doacoes = _disponiveis().options(selectinload(Doacao.itens)).all()
         itens = [item for doacao in doacoes for item in doacao.itens]
         peso = sum((Decimal(str(item.quantidade)) *
                     (Decimal("0.001") if item.unidade_medida == "g" else Decimal("1"))
@@ -100,18 +115,52 @@ class Resumo(Resource):
 class DoacoesPublicas(Resource):
     @ns.response(200, "Pedidos disponíveis", [doacao_model])
     def get(self):
-        limite_raw = request.args.get("limite", "8")
-        if not limite_raw.isascii() or not limite_raw.isdigit() or not 1 <= int(limite_raw) <= 100:
-            return {"codigo": "DADOS_INVALIDOS", "mensagem": "Informe um limite entre 1 e 100.",
-                    "campos": {"limite": "Use um número entre 1 e 100."}}, 400
-        doacoes = _disponiveis().order_by(Doacao.data_cadastro.desc(), Doacao.id.desc()).limit(
-            int(limite_raw)).all()
-        return [serializar_doacao(doacao) for doacao in doacoes], 200
+        pagina = _inteiro_positivo("pagina", 1, 1000000)
+        campo_tamanho = "por_pagina" if "por_pagina" in request.args else "limite"
+        tamanho = _inteiro_positivo(campo_tamanho, 8, 50 if campo_tamanho == "por_pagina" else 100)
+        campos = {}
+        if pagina is None:
+            campos["pagina"] = "Use um número inteiro positivo."
+        if tamanho is None:
+            campos[campo_tamanho] = ("Use um número entre 1 e 50." if campo_tamanho == "por_pagina"
+                                     else "Use um número entre 1 e 100.")
+        categoria = request.args.get("categoria", "").strip()
+        uf = request.args.get("uf", "").strip().upper()
+        busca = request.args.get("busca", "").strip()
+        if categoria and categoria not in CATEGORIAS:
+            campos["categoria"] = "Selecione uma categoria da lista."
+        if uf and not re.fullmatch(r"[A-Z]{2}", uf):
+            campos["uf"] = "Informe a sigla da UF com duas letras."
+        if len(busca) > 100:
+            campos["busca"] = "Use até 100 caracteres."
+        if campos:
+            return {"codigo": "DADOS_INVALIDOS", "mensagem": "Corrija os filtros indicados.",
+                    "campos": campos}, 400
+        query = _disponiveis()
+        if categoria:
+            query = query.filter(Doacao.itens.any(categoria=categoria))
+        if uf or busca:
+            query = query.join(Doacao.estabelecimento)
+        if uf:
+            query = query.filter(or_(Estabelecimento.endereco.ilike(f"%/{uf} - %"),
+                                     Estabelecimento.endereco.ilike(f"%/{uf}")))
+        if busca:
+            termo = busca.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            padrao = f"%{termo}%"
+            query = query.filter(or_(Estabelecimento.nome.ilike(padrao, escape="\\"),
+                                     Doacao.itens.any(ItemDoacao.nome.ilike(padrao, escape="\\"))))
+        total = query.count()
+        doacoes = (_com_relacionamentos(query)
+                   .order_by(Doacao.data_cadastro.desc(), Doacao.id.desc())
+                   .offset((pagina - 1) * tamanho).limit(tamanho).all())
+        return [serializar_doacao(doacao) for doacao in doacoes], 200, {
+            "X-Total-Count": str(total), "X-Pagina": str(pagina),
+            "X-Por-Pagina": str(tamanho)}
 
 @ns.route("/doacoes/<int:doacao_id>")
 class PedidoPublico(Resource):
     def get(self, doacao_id):
-        doacao = db.session.get(Doacao, doacao_id)
+        doacao = _com_relacionamentos(Doacao.query).filter_by(id=doacao_id).first()
         if not doacao or doacao.estabelecimento_id is None:
             return {"codigo": "PEDIDO_NAO_ENCONTRADO", "mensagem": "Pedido não encontrado."}, 404
         return serializar_doacao(doacao, detalhe=True), 200

@@ -44,7 +44,10 @@ class Doacao(db.Model):
     __tablename__ = 'doacoes'
     __table_args__ = (db.CheckConstraint(
         '(estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)',
-        name='ck_doacoes_uma_origem'),)
+        name='ck_doacoes_uma_origem'),
+        db.Index('ix_doacoes_estabelecimento_id', 'estabelecimento_id'),
+        db.Index('ix_doacoes_doador_id', 'doador_id'),
+        db.Index('ix_doacoes_status_prazo', 'status', 'data_limite_retirada'))
     id = db.Column(db.Integer, primary_key=True)
     estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id'), nullable=True)
     doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'), nullable=True)
@@ -60,6 +63,7 @@ class Doacao(db.Model):
 
 class ItemDoacao(db.Model):
     __tablename__ = 'itens_doacao'
+    __table_args__ = (db.Index('ix_itens_doacao_doacao_id', 'doacao_id'),)
     id = db.Column(db.Integer, primary_key=True)
     doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id'), nullable=False)
     nome = db.Column(db.String(100), nullable=False)
@@ -87,6 +91,10 @@ class Contribuicao(db.Model):
         db.CheckConstraint('quantidade > 0', name='ck_contribuicoes_quantidade'),
         db.CheckConstraint("status IN ('ACEITA', 'ENTREGUE', 'CANCELADA')",
                            name='ck_contribuicoes_status'),
+        db.Index('ix_contribuicoes_doacao_status', 'doacao_id', 'status'),
+        db.Index('ix_contribuicoes_item_doacao_id', 'item_doacao_id'),
+        db.Index('ix_contribuicoes_doador_id', 'doador_id'),
+        db.Index('ix_contribuicoes_estabelecimento_id', 'estabelecimento_id'),
     )
     id = db.Column(db.Integer, primary_key=True)
     doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id', ondelete='RESTRICT'), nullable=False)

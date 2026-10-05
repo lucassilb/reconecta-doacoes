@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 from flask import current_app, request
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import selectinload
 from Auth import usuario_atual
 from Contribuicoes import serializar_contribuicao
 from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
@@ -101,7 +102,12 @@ class DoacoesPainel(Resource):
         empresa, erro = _empresa()
         if erro:
             return erro
-        doacoes = Doacao.query.filter_by(estabelecimento_id=empresa.id).order_by(
+        doacoes = Doacao.query.options(
+            selectinload(Doacao.estabelecimento), selectinload(Doacao.itens),
+            selectinload(Doacao.contribuicoes).selectinload(Contribuicao.item_doacao),
+            selectinload(Doacao.contribuicoes).selectinload(Contribuicao.doador),
+            selectinload(Doacao.contribuicoes).selectinload(Contribuicao.estabelecimento)
+        ).filter_by(estabelecimento_id=empresa.id).order_by(
             Doacao.data_cadastro.desc(), Doacao.id.desc()).all()
         resultado = []
         for doacao in doacoes:
@@ -160,6 +166,10 @@ class MinhasDoacoes(Resource):
         tipo, usuario = atual
         filtro = ({"doador_id": usuario.id} if tipo == "doador" else
                   {"estabelecimento_id": usuario.id})
-        contribuicoes = Contribuicao.query.filter_by(**filtro).order_by(
+        contribuicoes = Contribuicao.query.options(
+            selectinload(Contribuicao.item_doacao), selectinload(Contribuicao.doador),
+            selectinload(Contribuicao.estabelecimento),
+            selectinload(Contribuicao.doacao).selectinload(Doacao.estabelecimento)
+        ).filter_by(**filtro).order_by(
             Contribuicao.criado_em.desc(), Contribuicao.id.desc()).all()
         return [serializar_contribuicao(c, entrega=True) for c in contribuicoes], 200
