@@ -1,7 +1,7 @@
 import os
-from flask import Flask, send_from_directory
+from flask import Flask, request, send_from_directory
 from flask_restx import Api
-from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.exceptions import HTTPException, MethodNotAllowed, NotFound, RequestEntityTooLarge
 from dotenv import load_dotenv
 from models import db
 from Auth import configurar_chave_secreta
@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL") or "sqlite:///reconecta.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # foto até 5 MB + campos do questionário
+app.config["ERROR_INCLUDE_MESSAGE"] = False  # erros RESTX usam codigo/mensagem da API
 configurar_chave_secreta(app)
 
 db.init_app(app)
@@ -63,6 +64,43 @@ api = Api(
 def requisicao_grande(_erro):
     return {"codigo": "ARQUIVO_GRANDE", "mensagem": "O envio excede o limite de 6 MB.",
             "campos": {"foto": "Escolha uma foto de até 5 MB."}}, 413
+
+
+def _erro_api(codigo, mensagem, status):
+    return {"codigo": codigo, "mensagem": mensagem}, status
+
+
+@app.errorhandler(404)
+def pagina_nao_encontrada(erro):
+    if request.path.startswith("/reconecta/"):
+        return _erro_api("NAO_ENCONTRADO", "Rota não encontrada.", 404)
+    return erro
+
+
+@api.errorhandler(NotFound)
+def recurso_nao_encontrado(_erro):
+    return _erro_api("NAO_ENCONTRADO", "Rota não encontrada.", 404)
+
+
+@api.errorhandler(MethodNotAllowed)
+def metodo_nao_permitido(_erro):
+    return _erro_api("METODO_NAO_PERMITIDO", "Método não permitido.", 405)
+
+
+@api.errorhandler(Exception)
+def erro_api_interno(erro):
+    if isinstance(erro, HTTPException) and 400 <= erro.code < 500:
+        return _erro_api("REQUISICAO_INVALIDA", erro.description, erro.code)
+    app.logger.exception("Falha em %s", request.path, exc_info=erro)
+    return _erro_api("ERRO_INTERNO", "Não foi possível concluir a solicitação.", 500)
+
+
+@app.errorhandler(500)
+def erro_interno(erro):
+    if request.path.startswith("/reconecta/"):
+        app.logger.exception("Falha em %s", request.path, exc_info=erro)
+        return _erro_api("ERRO_INTERNO", "Não foi possível concluir a solicitação.", 500)
+    return erro
 
 from Estabelecimentos import ns as estabelecimentos_ns
 from Instituicoes import ns as instituicoes_ns

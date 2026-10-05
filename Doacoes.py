@@ -1,6 +1,6 @@
-from datetime import datetime
-from flask import request
 from flask_restx import Namespace, Resource, fields
+from sqlalchemy.exc import IntegrityError
+from crud_validacao import corpo_json, erro_campos, validar_doacao
 from models import db, Doacao as DoacaoModel
 
 ns = Namespace(
@@ -36,10 +36,11 @@ class DoacaoList(Resource):
     @ns.doc("Criar uma nova doação")
     def post(self):
         """Criar uma nova doação e salvar no PostgreSQL"""
-        data = request.json
+        data = corpo_json()
+        campos, data_limite = validar_doacao(data, criar=True)
+        if campos:
+            return erro_campos(campos)
 
-        # Converte a string enviada pelo Swagger em datetime para o banco
-        data_limite = datetime.fromisoformat(data["data_limite_retirada"])
 
         nova_doacao = DoacaoModel(
             estabelecimento_id=data["estabelecimento_id"],
@@ -48,7 +49,11 @@ class DoacaoList(Resource):
         )
 
         db.session.add(nova_doacao)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return erro_campos({"estabelecimento_id": "Referência inválida."})
 
         return {
             "id": nova_doacao.id,
@@ -66,7 +71,7 @@ class Doacao(Resource):
     @ns.doc("Obter uma doação pelo ID")
     def get(self, id):
         """Obter uma doação pelo ID direto do banco"""
-        d = DoacaoModel.query.get(id)
+        d = db.session.get(DoacaoModel, id)
         if d:
             return {
                 "id": d.id,
@@ -82,17 +87,24 @@ class Doacao(Resource):
     @ns.doc("Atualizar uma doação pelo ID")
     def put(self, id):
         """Atualizar uma doação pelo ID no PostgreSQL"""
-        d = DoacaoModel.query.get(id)
+        d = db.session.get(DoacaoModel, id)
         if d:
-            data = request.json
+            data = corpo_json()
+            campos, data_limite = validar_doacao(data, criar=False)
+            if campos:
+                return erro_campos(campos)
             if "estabelecimento_id" in data:
                 d.estabelecimento_id = data["estabelecimento_id"]
             if "data_limite_retirada" in data:
-                d.data_limite_retirada = datetime.fromisoformat(data["data_limite_retirada"])
+                d.data_limite_retirada = data_limite
             if "status" in data:
                 d.status = data["status"]
 
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                return erro_campos({"estabelecimento_id": "Referência inválida."})
             return {
                 "id": d.id,
                 "estabelecimento_id": d.estabelecimento_id,
@@ -106,7 +118,7 @@ class Doacao(Resource):
     @ns.doc("Deletar uma doação pelo ID")
     def delete(self, id):
         """Deletar uma doação pelo ID no PostgreSQL"""
-        d = DoacaoModel.query.get(id)
+        d = db.session.get(DoacaoModel, id)
         if d:
             db.session.delete(d)
             db.session.commit()

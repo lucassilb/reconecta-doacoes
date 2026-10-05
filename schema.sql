@@ -84,3 +84,12 @@ CREATE TABLE IF NOT EXISTS contribuicoes (
 
 ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
 ALTER TABLE doadores ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
+
+CREATE INDEX IF NOT EXISTS ix_doacoes_estabelecimento_id ON doacoes (estabelecimento_id);
+CREATE INDEX IF NOT EXISTS ix_doacoes_doador_id ON doacoes (doador_id);
+CREATE INDEX IF NOT EXISTS ix_doacoes_status_prazo ON doacoes (status, data_limite_retirada);
+CREATE INDEX IF NOT EXISTS ix_itens_doacao_doacao_id ON itens_doacao (doacao_id);
+CREATE INDEX IF NOT EXISTS ix_contribuicoes_doacao_status ON contribuicoes (doacao_id, status);
+CREATE INDEX IF NOT EXISTS ix_contribuicoes_item_doacao_id ON contribuicoes (item_doacao_id);
+CREATE INDEX IF NOT EXISTS ix_contribuicoes_doador_id ON contribuicoes (doador_id);
+CREATE INDEX IF NOT EXISTS ix_contribuicoes_estabelecimento_id ON contribuicoes (estabelecimento_id);

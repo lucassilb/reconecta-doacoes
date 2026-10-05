@@ -2,7 +2,15 @@
 
 from sqlalchemy import inspect, text
 
-from models import Contribuicao, db
+from models import Contribuicao, Doacao, ItemDoacao, db
+
+
+def _migrar_indices(engine):
+    """Cria os índices ausentes sem alterar dados, em SQLite e PostgreSQL."""
+    for modelo in (Doacao, ItemDoacao, Contribuicao):
+        if inspect(engine).has_table(modelo.__tablename__):
+            for indice in modelo.__table__.indexes:
+                indice.create(bind=engine, checkfirst=True)
 
 
 def _migrar_pedidos(engine):
@@ -160,3 +168,4 @@ def aplicar_migracoes(engine=None):
         elif engine.dialect.name == "postgresql":
             _migrar_doacoes_postgresql(engine)
     _migrar_pedidos(engine)
+    _migrar_indices(engine)

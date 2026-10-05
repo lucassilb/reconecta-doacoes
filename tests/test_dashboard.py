@@ -47,7 +47,7 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
         pedido = Doacao(estabelecimento_id=empresa.id, status="DISPONIVEL",
                          data_cadastro=_utc_naive() - timedelta(days=4),
                          data_limite_retirada=datetime.now() + timedelta(days=2))
-        encerrado = Doacao(estabelecimento_id=empresa.id, status="ENCERRADA",
+        encerrado = Doacao(estabelecimento_id=empresa.id, status="RESERVADA",
                            data_limite_retirada=datetime.now() + timedelta(days=5))
         db.session.add_all((pedido, encerrado))
         db.session.flush()

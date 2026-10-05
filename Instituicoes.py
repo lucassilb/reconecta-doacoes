@@ -1,5 +1,6 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
+from sqlalchemy.exc import IntegrityError
+from crud_validacao import corpo_json, erro_campos, validar_contato
 from models import db, Instituicao as InstituicaoModel
 
 ns = Namespace(
@@ -38,7 +39,10 @@ class InstituicaoList(Resource):
     @ns.doc("Criar uma nova instituição")
     def post(self):
         """Criar uma nova instituição e persistir no PostgreSQL"""
-        data = request.json
+        data = corpo_json()
+        campos = validar_contato(data, criar=True)
+        if campos:
+            return erro_campos(campos)
         nova_instituicao = InstituicaoModel(
             nome=data["nome"],
             cnpj=data["cnpj"],
@@ -49,7 +53,12 @@ class InstituicaoList(Resource):
         
     
         db.session.add(nova_instituicao)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return erro_campos({"cnpj": "CNPJ ou email já cadastrado.",
+                                "email": "CNPJ ou email já cadastrado."})
         
         return {
             "id": nova_instituicao.id,
@@ -68,7 +77,7 @@ class Instituicao(Resource):
     @ns.doc("Obter uma instituição pelo ID")
     def get(self, id):
         """Obter uma instituição pelo ID direto do banco"""
-        i = InstituicaoModel.query.get(id)
+        i = db.session.get(InstituicaoModel, id)
         if i:
             return {
                 "id": i.id,
@@ -85,16 +94,24 @@ class Instituicao(Resource):
     @ns.doc("Atualizar uma instituição pelo ID")
     def put(self, id):
         """Atualizar uma instituição pelo ID no PostgreSQL"""
-        i = InstituicaoModel.query.get(id)
+        i = db.session.get(InstituicaoModel, id)
         if i:
-            data = request.json
+            data = corpo_json()
+            campos = validar_contato(data, criar=False)
+            if campos:
+                return erro_campos(campos)
             i.nome = data.get("nome", i.nome)
             i.cnpj = data.get("cnpj", i.cnpj)
             i.email = data.get("email", i.email)
             i.telefone = data.get("telefone", i.telefone)
             i.endereco = data.get("endereco", i.endereco)
             
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                return erro_campos({"cnpj": "CNPJ ou email já cadastrado.",
+                                    "email": "CNPJ ou email já cadastrado."})
             return {
                 "id": i.id,
                 "nome": i.nome,
@@ -109,7 +126,7 @@ class Instituicao(Resource):
     @ns.doc("Deletar uma instituição pelo ID")
     def delete(self, id):
         """Deletar uma instituição pelo ID no PostgreSQL"""
-        i = InstituicaoModel.query.get(id)
+        i = db.session.get(InstituicaoModel, id)
         if i:
             db.session.delete(i)
             db.session.commit()
