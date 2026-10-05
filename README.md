@@ -1,276 +1,193 @@
 # ReConecta
 
-Plataforma de Redistribuição de Excedentes Alimentares.
+Plataforma de doação de alimentos que conecta empresas do setor alimentício a pessoas e outras empresas dispostas a doar.
 
-Projeto acadêmico desenvolvido para o CP1 da disciplina **Computational Thinking with Python**, com o objetivo de construir a primeira versão funcional do backend de uma plataforma que conecta estabelecimentos doadores a instituições receptoras.
+Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM local e gratuita.
 
 ## Sobre o projeto
 
-O desperdício de alimentos é um problema econômico, social e ambiental. Estabelecimentos alimentícios frequentemente possuem produtos excedentes que continuam adequados para consumo, enquanto instituições sociais necessitam de doações para atender pessoas em situação de vulnerabilidade.
+O desperdício de alimentos convive com a falta de alimento em outro lugar. O **ReConecta** organiza a ponte entre quem precisa e quem pode doar:
 
-O **ReConecta** centraliza esse processo em uma plataforma digital. Por meio de uma API REST, estabelecimentos podem cadastrar doações e seus respectivos alimentos, enquanto instituições podem consultar as ofertas disponíveis, reservar doações e registrar as retiradas.
+1. Uma **empresa com CNPJ ativo e atividade ligada a alimentação** publica um **pedido de doação** (ex.: "precisamos de 100 caixas de leite e 100 pães até sexta").
+2. O pedido aparece em **Doações disponíveis**. Qualquer **pessoa com CPF válido** ou **outra empresa** escolhe um item e doa.
+3. Antes de confirmar, quem doa responde um **questionário curto** (4 perguntas de segurança alimentar) e envia uma **foto** do alimento. Se tudo estiver de acordo, a doação é aceita, o progresso do pedido é atualizado e a pessoa recebe o endereço e o prazo de entrega.
 
 ## Público-alvo
 
-- **Estabelecimentos doadores:** padarias, restaurantes, mercados, hortifrutis e outros estabelecimentos com excedentes adequados para doação.
-- **Instituições receptoras:** ONGs, associações, projetos sociais e organizações aptas a receber e distribuir alimentos.
+- **Empresas do setor de alimentos** (restaurantes, padarias, mercados, indústrias, associações com atividade alimentar): publicam pedidos e também podem doar a pedidos de outras empresas.
+- **Doadores pessoa física** (CPF): doam alimentos para os pedidos abertos.
+- **Instituições receptoras**: entidade mantida do CP1 (CRUD na API).
 
-## Objetivo
+## Funcionalidades
 
-Conectar estabelecimentos que possuem excedentes alimentares a instituições interessadas em recebê-los, contribuindo para reduzir o desperdício e tornar o processo de doação mais organizado, eficiente e rastreável.
-
-## Escopo do CP1
-
-O CP1 contempla:
-
-- estruturação do backend;
-- criação da API REST;
-- persistência em banco de dados;
-- implementação das entidades principais;
-- operações CRUD;
-- regras fundamentais do processo de doação;
-- documentação Swagger/OpenAPI.
-
-Interfaces gráficas, recursos inteligentes e outras evoluções estão fora do escopo desta primeira versão.
-
-## Principais funcionalidades
-
-- CRUD de estabelecimentos doadores;
-- CRUD de instituições receptoras;
-- cadastro e gerenciamento de doações;
-- cadastro dos itens de cada doação;
-- consulta de doações disponíveis;
-- reserva de uma doação por uma instituição;
-- cancelamento de reservas;
-- atualização do status das doações;
-- confirmação da retirada;
-- consulta do histórico de doações e reservas.
+| Área | O que faz |
+|---|---|
+| Cadastro de empresa | Valida o CNPJ (dígitos), consulta a Receita Federal em fontes públicas gratuitas (BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas), exige situação **ATIVA** e atividade econômica (CNAE principal ou secundária) ligada a alimentos. |
+| Cadastro de doador | Valida o CPF pelos dígitos verificadores; CPF sempre devolvido mascarado. |
+| Login | E-mail, CNPJ ou CPF + senha (hash scrypt). Sessão em cookie HttpOnly/SameSite=Lax; 5 falhas em 15 min bloqueiam novas tentativas. |
+| Pedidos de doação | Só empresa publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
+| Doar para um pedido | Pessoa (CPF) ou outra empresa; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A empresa não doa no próprio pedido. |
+| Progresso | Cada item mostra recebido × meta e quanto falta. |
+| Painéis | Empresa: publicar pedido (com "Preencher com IA"), meus pedidos com progresso e doações recebidas com foto, minhas doações. Doador: minhas doações. |
+| Dashboard | Indicadores, gráfico pedido × recebido por categoria, doações por dia (30 dias), empresas com mais doações, alertas e últimas doações, com dados reais do banco. Botão "Gerar resumo com IA". |
+| LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
+| CRUDs do CP1 | Estabelecimentos, Instituições e Doações (`/reconecta/...`), agora com validação e erros em JSON. |
 
 ## Regras de negócio
 
 | Código | Regra |
 |---|---|
-| RN01 | Todo item disponibilizado deverá possuir quantidade maior que zero. |
-| RN02 | Alimentos com a data limite para consumo expirada não poderão ser disponibilizados para retirada. |
-| RN03 | Somente doações com status `DISPONIVEL` poderão ser reservadas. |
-| RN04 | Uma doação não poderá possuir mais de uma reserva ativa simultaneamente. |
-| RN05 | Ao registrar uma reserva, o status da doação deverá mudar de `DISPONIVEL` para `RESERVADA`. |
-| RN06 | Somente uma doação previamente reservada poderá ter sua retirada confirmada. |
-| RN07 | Após a confirmação da retirada, o status da doação deverá mudar para `RETIRADA`. |
-| RN08 | Uma reserva poderá ser cancelada antes da retirada. Se a doação continuar válida, poderá retornar ao status `DISPONIVEL`. |
-| RN09 | Toda reserva deverá estar associada a uma instituição e a uma doação existentes. |
-| RN10 | Reservas e retiradas deverão permanecer registradas para garantir rastreabilidade. |
+| RN01 | Empresa só se cadastra com CNPJ válido, situação ATIVA e CNAE ligado a alimentação. |
+| RN02 | Só empresa publica pedido de doação; pessoa com CPF só doa. |
+| RN03 | Todo item de pedido tem quantidade maior que zero; categoria e unidade vêm de listas fixas. |
+| RN04 | Só recebe doações o pedido DISPONÍVEL e dentro do prazo "receber até". |
+| RN05 | Doação só é aceita com as 4 respostas "sim" (dentro da validade, embalagem íntegra, armazenamento correto, não é comida caseira), validade não vencida e foto válida. Caso contrário nada é registrado e o motivo é exibido. |
+| RN06 | A empresa dona não doa no próprio pedido. |
+| RN07 | A foto da doação só é visível para quem doou e para a empresa dona do pedido. |
+| RN08 | Dados pessoais (CPF, e-mail, telefone, endereço completo) não aparecem em telas ou respostas públicas. |
+| RN09 | E-mail, CNPJ e CPF são únicos. |
 
-## Entidades
-
-### Estabelecimento
-
-Representa o estabelecimento doador. Possui, inicialmente: ID, nome, CNPJ, e-mail, telefone e endereço.
-
-### Instituição
-
-Representa a organização receptora. Possui, inicialmente: ID, nome, CNPJ, e-mail, telefone e endereço.
-
-### Doação
-
-Representa uma oferta criada por um estabelecimento. Possui: ID, data de cadastro, data limite para retirada, status e ID do estabelecimento.
-
-Estados previstos: `DISPONIVEL`, `RESERVADA` e `RETIRADA`.
-
-### Item da Doação
-
-Representa um alimento pertencente a uma doação. Possui: ID, nome, categoria, quantidade, unidade de medida, validade e ID da doação.
-
-### Reserva
-
-Representa a reserva feita por uma instituição. Possui: ID, data da reserva, data da retirada, status, ID da doação e ID da instituição.
-
-Estados previstos: `ATIVA`, `CANCELADA` e `CONCLUIDA`.
-
-## Relacionamentos
-
-| Origem | Relação | Destino |
-|---|---:|---|
-| Estabelecimento | 1:N | Doação |
-| Doação | 1:N | Item da Doação |
-| Instituição | 1:N | Reserva |
-| Doação | 1:N | Reserva (histórico) |
-
-## Fluxo principal
-
-1. Um estabelecimento cadastra uma doação e informa os alimentos disponíveis.
-2. Após a validação, a doação recebe o status `DISPONIVEL`.
-3. Uma instituição consulta as doações e realiza uma reserva.
-4. A reserva fica `ATIVA` e a doação passa para `RESERVADA`.
-5. Após a retirada, a reserva passa para `CONCLUIDA` e a doação para `RETIRADA`.
-6. Se houver cancelamento antes da retirada e dentro do prazo, a reserva passa para `CANCELADA` e a doação pode voltar a `DISPONIVEL`.
-
-## Restrições
-
-- campos obrigatórios não podem ser enviados vazios;
-- quantidades devem ser maiores que zero;
-- itens só podem ser associados a doações existentes;
-- reservas só podem ser associadas a instituições e doações existentes;
-- doações expiradas ou já retiradas não podem ser reservadas;
-- identificadores inexistentes devem gerar respostas de erro apropriadas;
-- os dados devem ser validados antes da persistência;
-- senhas, tokens e credenciais não podem ser armazenados no código-fonte;
-- configurações sensíveis devem ser definidas por variáveis de ambiente.
-
-## Tecnologias
-
-- Python
-- Flask
-- Flask-RESTX
-- SQLAlchemy
-- PostgreSQL
-- Swagger/OpenAPI
-- Python-dotenv
-- Git e GitHub
-- Trello
-
-## Arquitetura inicial
-
-O backend segue uma separação de responsabilidades entre configuração, modelos, rotas, regras de negócio e acesso ao banco de dados.
+## Arquitetura
 
 ```text
 ReConecta/
-├── app/
-│   ├── models/       # Entidades do banco de dados
-│   ├── routes/       # Endpoints da API
-│   ├── services/     # Regras de negócio
-│   └── extensions.py # Banco e demais extensões
-├── app.py            # Inicialização da aplicação
-├── requirements.txt  # Dependências do projeto
-├── .env.example      # Exemplo de configuração
-├── .gitignore
-└── README.md
+├── app.py                 # Flask + flask-restx: configuração, rotas das páginas, erros JSON, registro dos namespaces
+├── models.py              # Modelos SQLAlchemy (entidades, CHECKs, índices)
+├── migracoes.py           # Migrações idempotentes aplicadas no boot (SQLite e PostgreSQL)
+├── schema.sql             # Esquema para instalação manual no PostgreSQL
+├── Cadastro.py            # /reconecta/cadastro  (CNPJ, empresa, doador)
+├── cnpj_service.py        # Consulta e cache de CNPJ nas fontes públicas
+├── cnae_alimentos.py      # Critério "atividade ligada a alimentos" por CNAE
+├── Auth.py                # /reconecta/auth      (login, logout, me)
+├── Publico.py             # /reconecta/publico   (resumo, opções, pedidos, detalhe)
+├── Contribuicoes.py       # doação para um pedido (questionário + foto)
+├── Painel.py              # /reconecta/painel    (pedidos da empresa, minhas doações)
+├── Dashboard.py           # /reconecta/dashboard (agregados)
+├── IA.py, llm_service.py  # /reconecta/ia        (LLM local via Ollama + regras automáticas se ele estiver fora)
+├── Estabelecimentos.py, Instituicoes.py, Doacoes.py, crud_validacao.py  # CRUDs do CP1
+├── static/                # Front-end: HTML, CSS e JS (sem build)
+├── tests/                 # pytest
+└── docs/                  # modelagem, otimizações, LLM, critério CNAE
 ```
 
-> A estrutura acima deve ser ajustada caso os nomes das pastas e do arquivo principal sejam diferentes no código final.
+Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`.
+
+## Tecnologias
+
+Python 3.10+ (testado em 3.14), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, PostgreSQL (ou SQLite para desenvolvimento), psycopg 3, python-dotenv, requests, pytest, Ollama + `qwen2.5:3b` (opcional, gratuito e local), Chart.js.
 
 ## Instalação
 
 ### Pré-requisitos
 
-- Python 3.10 ou superior;
-- PostgreSQL (opcional; sem `DATABASE_URL`, usa SQLite);
-- Git.
+- Python 3.10 ou superior e Git;
+- PostgreSQL (opcional: sem `DATABASE_URL` a aplicação usa SQLite em `instance/reconecta.db`);
+- Ollama (opcional, gratuito) para a LLM local — sem ele as funções de IA usam regras automáticas.
 
 ### Passos
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
 cd ReConecta
-
 python -m venv .venv
-```
-
-Ative o ambiente virtual:
-
-```bash
 # Windows
 .venv\Scripts\activate
-
 # Linux ou macOS
 source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Instale as dependências:
+LLM local (opcional, gratuito): instale o Ollama (https://ollama.com/download) e baixe o modelo:
 
 ```bash
-pip install -r requirements.txt
+ollama pull qwen2.5:3b
+ollama serve
 ```
 
 ## Variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto a partir do `.env.example`:
+Crie um `.env` a partir do `.env.example` (não publique o `.env`):
 
-```env
-DATABASE_URL=postgresql://USUARIO:SENHA@localhost:5432/reconecta
-FLASK_APP=app.py
-FLASK_DEBUG=0
-# SECRET_KEY=uma_chave_longa_e_aleatoria
-```
-
-Não publique o arquivo `.env` no GitHub.
+| Variável | Obrigatória | Padrão | Uso |
+|---|---|---|---|
+| `DATABASE_URL` | não | SQLite `instance/reconecta.db` | Ex.: `postgresql://USUARIO:SENHA@localhost:5432/reconecta` |
+| `SECRET_KEY` | não | gerada e guardada em `instance/secret_key` | Assina o cookie de sessão; defina em produção. |
+| `FLASK_DEBUG` | não | `0` | `1` liga o modo debug. |
+| `OLLAMA_URL` | não | `http://localhost:11434` | Endereço do Ollama local. |
+| `OLLAMA_MODELO` | não | `qwen2.5:3b` | Modelo gratuito usado pela IA. |
 
 ## Execução
 
-Com o banco configurado e o ambiente virtual ativado, execute:
+```bash
+python app.py
+```
+
+A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que faltarem e aplica as migrações (colunas, índices) de forma idempotente. Swagger em `http://localhost:5000/swagger`.
+
+## Testes
 
 ```bash
-flask run
+python -m pytest -q
 ```
 
-Por padrão, a aplicação estará disponível em:
+150 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
 
-```text
-http://localhost:5000
-```
+## Endpoints
 
-## Cadastro de doadores
-
-Sem `DATABASE_URL`, a aplicação usa SQLite em `instance/reconecta.db`. Ela cria as tabelas ausentes e adiciona a coluna `senha_hash` às tabelas antigas ao iniciar. Para PostgreSQL, configure `DATABASE_URL` como no `.env.example`. `SECRET_KEY` pode vir do ambiente; se faltar, a aplicação gera uma chave persistente em `instance/secret_key`. A documentação continua em `/swagger`.
-
-As páginas são `/` (Home), `/sobre`, `/cadastro`, `/entrar` e `/painel`. O painel consulta `/reconecta/auth/me` para exigir uma sessão válida.
-
-| Método | Endpoint | Resultado |
-|---|---|---|
-| GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ nas fontes públicas, situação cadastral e atividades alimentares; informa `apto` e `motivos`. |
-| POST | `/reconecta/cadastro/empresa` | Cadastra estabelecimento doador após repetir a verificação do CNPJ. Corpo: `cnpj`, `email`, `telefone`, `senha`. |
-| POST | `/reconecta/cadastro/doador` | Cadastra pessoa física com validação local do CPF. Corpo: `nome`, `cpf`, `email`, `telefone`, `senha`. |
-
-CNPJ e CPF aceitam dígitos ou máscara completa. O CPF volta mascarado na resposta. A consulta de CNPJ usa BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas, e guarda resultados por dez minutos em memória. O cadastro exige e-mail válido, telefone com DDD (10 ou 11 dígitos) e senha de pelo menos oito caracteres com letra e número. Só o hash da senha é salvo; o cadastro já inicia a sessão. Um e-mail já usado por empresa ou doador é recusado.
-
-## Entrada e doações
-
-| Método | Endpoint | Resultado |
-|---|---|---|
-| POST | `/reconecta/auth/login` | Entra por e-mail, CNPJ ou CPF com senha. Cinco falhas em 15 minutos bloqueiam a sexta tentativa para o identificador. |
-| GET | `/reconecta/auth/me` | Retorna o perfil da sessão, com CPF mascarado para doadores. |
-| POST | `/reconecta/auth/logout` | Encerra a sessão. |
-| GET | `/reconecta/publico/resumo` | Contadores e peso disponível em kg. |
-| GET | `/reconecta/publico/doacoes?limite=8` | Doações disponíveis com prazo futuro, sem contato ou documentos. |
-| GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
-| GET/POST | `/reconecta/painel/doacoes` | Lista ou cria doações com itens para a empresa autenticada. |
-| DELETE | `/reconecta/painel/doacoes/{id}` | Remove doação própria ainda disponível e sem reservas. |
-
-A sessão usa cookie HttpOnly com SameSite=Lax. Contas antigas sem senha ainda existem no banco, mas não podem entrar até receberem uma senha por um fluxo futuro de recuperação ou migração assistida.
-
-## Principais endpoints previstos
-
-Os caminhos abaixo representam os recursos definidos para o CP1 e devem ser atualizados para coincidir exatamente com a implementação final.
+Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `campos` em erros de validação).
 
 | Método | Endpoint | Descrição |
 |---|---|---|
-| GET | `/estabelecimentos` | Lista os estabelecimentos. |
-| GET | `/estabelecimentos/{id}` | Busca um estabelecimento. |
-| POST | `/estabelecimentos` | Cadastra um estabelecimento. |
-| PUT | `/estabelecimentos/{id}` | Atualiza um estabelecimento. |
-| DELETE | `/estabelecimentos/{id}` | Exclui um estabelecimento. |
-| GET/POST | `/instituicoes` | Lista ou cadastra instituições. |
-| GET/PUT/DELETE | `/instituicoes/{id}` | Consulta, atualiza ou exclui uma instituição. |
-| GET/POST | `/doacoes` | Lista ou cadastra doações. |
-| GET/PUT/DELETE | `/doacoes/{id}` | Consulta, atualiza ou exclui uma doação. |
-| GET/POST | `/doacoes/{id}/itens` | Lista ou adiciona itens a uma doação. |
-| POST | `/doacoes/{id}/reservas` | Reserva uma doação. |
-| PATCH | `/reservas/{id}/cancelamento` | Cancela uma reserva ativa. |
-| PATCH | `/reservas/{id}/retirada` | Confirma a retirada. |
-| GET | `/reservas` | Consulta o histórico de reservas. |
+| GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ: situação, atividades alimentares, `apto` e `motivos`. |
+| POST | `/reconecta/cadastro/empresa` | Cadastra empresa (refaz a verificação do CNPJ) e inicia a sessão. |
+| POST | `/reconecta/cadastro/doador` | Cadastra pessoa física e inicia a sessão. |
+| POST | `/reconecta/auth/login` | Login por e-mail, CNPJ ou CPF + senha. |
+| POST | `/reconecta/auth/logout` | Encerra a sessão. |
+| GET | `/reconecta/auth/me` | Perfil da sessão. |
+| GET | `/reconecta/publico/resumo` | Contadores públicos. |
+| GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
+| GET | `/reconecta/publico/doacoes` | Pedidos abertos. Paginação `pagina`/`por_pagina` (máx. 50), filtros `categoria`, `uf`, `busca`; cabeçalhos `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`. |
+| GET | `/reconecta/publico/doacoes/{id}` | Detalhe do pedido com progresso por item. |
+| POST | `/reconecta/publico/doacoes/{id}/contribuicoes` | Doar (multipart: item, quantidade, validade, 4 respostas, foto). |
+| GET | `/reconecta/contribuicoes/{id}/foto` | Foto da doação (só quem doou ou a empresa dona). |
+| GET/POST | `/reconecta/painel/doacoes` | Pedidos da empresa logada / publicar pedido. |
+| DELETE | `/reconecta/painel/doacoes/{id}` | Remover pedido próprio. |
+| GET | `/reconecta/painel/minhas-doacoes` | Doações feitas pela pessoa ou empresa logada. |
+| GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
+| POST | `/reconecta/ia/interpretar-pedido` | Empresa logada: texto livre → itens sugeridos para revisão. |
+| POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados (10/min por IP). |
+| GET/POST | `/reconecta/estabelecimentos/` | CRUD do CP1. |
+| GET/PUT/DELETE | `/reconecta/estabelecimentos/{id}` | CRUD do CP1. |
+| GET/POST | `/reconecta/instituicoes/` | CRUD do CP1. |
+| GET/PUT/DELETE | `/reconecta/instituicoes/{id}` | CRUD do CP1. |
+| GET/POST | `/reconecta/doacoes/` | CRUD do CP1. |
+| GET/PUT/DELETE | `/reconecta/doacoes/{id}` | CRUD do CP1. |
+
+O arquivo [swagger.json](swagger.json) é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+
+## Banco de dados
+
+Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao` (itens pedidos), `contribuicoes` (doações recebidas, com respostas do questionário e foto) e `reservas` (modelo do CP1, sem endpoints nesta versão). Diagrama ER, chaves, CHECKs, índices e as decisões de normalização estão em [docs/modelagem.md](docs/modelagem.md).
+
+## Documentação complementar
+
+- [docs/modelagem.md](docs/modelagem.md) — modelagem, normalização e índices;
+- [docs/otimizacoes.md](docs/otimizacoes.md) — otimizações da API com medições;
+- [docs/llm.md](docs/llm.md) — LLM: modelo, finalidade, dados enviados, uso, limitações e segurança;
+- [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar.
+
+## Limitações conhecidas
+
+- Reserva e retirada por instituições (modelo `reservas` do CP1) ainda não têm fluxo na aplicação.
+- Recuperação de senha não implementada.
+- A consulta de CNPJ depende de serviços públicos externos (com cache de 10 minutos e fontes alternativas).
+- A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam regras automáticas e indicam `fonte: "regras"`.
 
 ## Documentação Swagger
 
-A documentação interativa da API está disponível em:
-
-**[Acessar Swagger/OpenAPI do ReConecta](https://reconecta.onrender.com/swagger)**
-
-Por meio dessa página, é possível consultar os endpoints, parâmetros, corpos das
-requisições, respostas e códigos HTTP documentados pelo projeto.
+Interativa em `/swagger` (local) e no deploy do CP1: **[Swagger/OpenAPI do ReConecta](https://reconecta.onrender.com/swagger)**.
 
 ## Organização no Trello
-
-O grupo utiliza o Trello para distribuir responsabilidades e acompanhar o andamento do CP1:
 
 [Quadro ReConecta no Trello](https://trello.com/invite/b/6a96cdf34f25b339652662c3/ATTI4b7785042036ae55024963ac1546279b355F294D/reconecta)
 
@@ -285,10 +202,4 @@ O grupo utiliza o Trello para distribuir responsabilidades e acompanhar o andame
 
 ## Status
 
-Projeto em desenvolvimento para a entrega do CP1 - 2026.
-
-## IA local do CP2
-
-O ReConecta oferece sugestões para preencher pedidos e resumir os indicadores do dashboard. O serviço usa apenas Ollama local com `qwen2.5:3b`, sem API ou chave paga. Configure `OLLAMA_URL=http://localhost:11434` e `OLLAMA_MODELO=qwen2.5:3b` no `.env` (são os valores padrão) e execute `ollama pull qwen2.5:3b` após instalar o Ollama. Se ele estiver fora do ar, os endpoints usam regras locais e indicam `fonte: "regras"`.
-
-`POST /reconecta/ia/interpretar-pedido` aceita texto de 5 a 600 caracteres somente de uma empresa autenticada; sugere até dez itens e um prazo para revisão no formulário, sem publicar nada. `POST /reconecta/ia/resumo-dashboard` é público, usa os agregados do servidor e limita a dez chamadas por minuto por IP. Detalhes de instalação, dados enviados, validação, fallback e licença do modelo estão em [docs/llm.md](docs/llm.md).
+Entrega do CP2 — 2026.

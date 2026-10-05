@@ -1,183 +1,1465 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "ReConecta API",
-    "description": "API REST para Plataforma de Redistribuição de Excedentes Alimentares",
-    "version": "1.0.0"
-  },
+  "swagger": "2.0",
+  "basePath": "/",
   "paths": {
-    "/estabelecimentos": {
-      "get": {
-        "summary": "Listar estabelecimentos cadastrados",
+    "/reconecta/auth/login": {
+      "post": {
         "responses": {
-          "200": { "description": "Lista de estabelecimentos retornada com sucesso." }
+          "429": {
+            "description": "Muitas tentativas",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "200": {
+            "description": "Sessão iniciada",
+            "schema": {
+              "$ref": "#/definitions/LoginSaida"
+            }
+          }
+        },
+        "summary": "Entra por e-mail, CNPJ ou CPF",
+        "operationId": "post_login",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/LoginEntrada"
+            }
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/reconecta/auth/logout": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "Sessão encerrada"
+          }
+        },
+        "summary": "Encerra a sessão atual",
+        "operationId": "post_logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/reconecta/auth/me": {
+      "get": {
+        "responses": {
+          "401": {
+            "description": "Não autenticado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "200": {
+            "description": "Usuário atual",
+            "schema": {
+              "$ref": "#/definitions/UsuarioAutenticado"
+            }
+          }
+        },
+        "summary": "Retorna o perfil mínimo da sessão atual",
+        "operationId": "get_me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/reconecta/cadastro/cnpj/{cnpj}": {
+      "parameters": [
+        {
+          "name": "cnpj",
+          "in": "path",
+          "required": true,
+          "type": "string"
         }
+      ],
+      "get": {
+        "responses": {
+          "503": {
+            "description": "Consulta indisponível",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "404": {
+            "description": "CNPJ não encontrado",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "400": {
+            "description": "CNPJ inválido",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "200": {
+            "description": "Resultado da consulta",
+            "schema": {
+              "$ref": "#/definitions/ConsultaCNPJ"
+            }
+          }
+        },
+        "summary": "Consulta existência, situação e atividades do CNPJ",
+        "operationId": "get_consulta_cnpj",
+        "tags": [
+          "cadastro"
+        ]
+      }
+    },
+    "/reconecta/cadastro/doador": {
+      "post": {
+        "responses": {
+          "409": {
+            "description": "CPF ou e-mail já cadastrado",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "201": {
+            "description": "Doador cadastrado",
+            "schema": {
+              "$ref": "#/definitions/CadastroDoadorSaida"
+            }
+          }
+        },
+        "summary": "Cadastra pessoa física após verificar os dígitos do CPF",
+        "operationId": "post_cadastro_doador",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CadastroDoadorEntrada"
+            }
+          }
+        ],
+        "tags": [
+          "cadastro"
+        ]
+      }
+    },
+    "/reconecta/cadastro/empresa": {
+      "post": {
+        "responses": {
+          "503": {
+            "description": "Consulta indisponível",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "422": {
+            "description": "Empresa não apta",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "409": {
+            "description": "CNPJ ou e-mail já cadastrado",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "404": {
+            "description": "CNPJ não encontrado",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "400": {
+            "description": "Dados ou CNPJ inválidos",
+            "schema": {
+              "$ref": "#/definitions/CadastroErro"
+            }
+          },
+          "201": {
+            "description": "Empresa cadastrada",
+            "schema": {
+              "$ref": "#/definitions/CadastroEmpresaSaida"
+            }
+          }
+        },
+        "summary": "Cadastra empresa ativa com atividade alimentar verificada na Receita",
+        "operationId": "post_cadastro_empresa",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CadastroEmpresaEntrada"
+            }
+          }
+        ],
+        "tags": [
+          "cadastro"
+        ]
+      }
+    },
+    "/reconecta/contribuicoes/{contribuicao_id}/foto": {
+      "parameters": [
+        {
+          "name": "contribuicao_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_foto_contribuicao",
+        "tags": [
+          "contribuicoes"
+        ]
+      }
+    },
+    "/reconecta/dashboard": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_dashboard",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/reconecta/doacoes/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todas as doações cadastradas no PostgreSQL",
+        "operationId": "Listar todas as doações",
+        "tags": [
+          "doacoes"
+        ]
       },
       "post": {
-        "summary": "Cadastrar um novo estabelecimento",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nome": { "type": "string", "example": "Padaria Doce Pão" },
-                  "cnpj": { "type": "string", "example": "12.345.678/0001-90" },
-                  "email": { "type": "string", "example": "contato@docepao.com" },
-                  "telefone": { "type": "string", "example": "11999998888" },
-                  "endereco": { "type": "string", "example": "Rua A, 123 - São Paulo/SP" }
-                },
-                "required": ["nome", "cnpj", "email", "telefone", "endereco"]
-              }
-            }
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         },
-        "responses": {
-          "201": { "description": "Estabelecimento cadastrado com sucesso." },
-          "400": { "description": "Dados inválidos ou CNPJ/e-mail já existente." }
-        }
+        "summary": "Criar uma nova doação e salvar no PostgreSQL",
+        "operationId": "Criar uma nova doação",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Doacao"
+            }
+          }
+        ],
+        "tags": [
+          "doacoes"
+        ]
       }
     },
-    "/instituicoes": {
-      "get": {
-        "summary": "Listar instituições receptoras cadastradas",
-        "responses": {
-          "200": { "description": "Lista de instituições retornada com sucesso." }
+    "/reconecta/doacoes/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "description": "ID da doação",
+          "name": "id",
+          "required": true,
+          "type": "integer"
         }
+      ],
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar uma doação pelo ID no PostgreSQL",
+        "operationId": "Deletar uma doação pelo ID",
+        "tags": [
+          "doacoes"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter uma doação pelo ID direto do banco",
+        "operationId": "Obter uma doação pelo ID",
+        "tags": [
+          "doacoes"
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Atualizar uma doação pelo ID no PostgreSQL",
+        "operationId": "Atualizar uma doação pelo ID",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Doacao"
+            }
+          }
+        ],
+        "tags": [
+          "doacoes"
+        ]
+      }
+    },
+    "/reconecta/estabelecimentos/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todos os estabelecimentos cadastrados no banco",
+        "operationId": "Listar todos os estabelecimentos",
+        "tags": [
+          "estabelecimentos"
+        ]
       },
       "post": {
-        "summary": "Cadastrar uma nova instituição receptora",
-        "requestBody": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Criar um novo estabelecimento e persistir no PostgreSQL",
+        "operationId": "Criar um novo estabelecimento",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Estabelecimento"
+            }
+          }
+        ],
+        "tags": [
+          "estabelecimentos"
+        ]
+      }
+    },
+    "/reconecta/estabelecimentos/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "description": "ID do estabelecimento",
+          "name": "id",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nome": { "type": "string", "example": "ONG Mãos Dadas" },
-                  "cnpj": { "type": "string", "example": "98.765.432/0001-10" },
-                  "email": { "type": "string", "example": "contato@maosdadas.org" },
-                  "telefone": { "type": "string", "example": "11988887777" },
-                  "endereco": { "type": "string", "example": "Av. B, 456 - São Paulo/SP" }
-                },
-                "required": ["nome", "cnpj", "email", "telefone", "endereco"]
-              }
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar um estabelecimento pelo ID no PostgreSQL",
+        "operationId": "Deletar um estabelecimento pelo ID",
+        "tags": [
+          "estabelecimentos"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter um estabelecimento pelo ID direto do banco",
+        "operationId": "Obter um estabelecimento pelo ID",
+        "tags": [
+          "estabelecimentos"
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Atualizar um estabelecimento pelo ID no PostgreSQL",
+        "operationId": "Atualizar um estabelecimento pelo ID",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Estabelecimento"
+            }
+          }
+        ],
+        "tags": [
+          "estabelecimentos"
+        ]
+      }
+    },
+    "/reconecta/ia/interpretar-pedido": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Sugestão para revisão",
+            "schema": {
+              "$ref": "#/definitions/PedidoSugeridoIA"
             }
           }
         },
-        "responses": {
-          "201": { "description": "Instituição cadastrada com sucesso." },
-          "400": { "description": "Dados inválidos." }
-        }
+        "operationId": "post_interpretar_pedido",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/TextoPedidoIA"
+            }
+          }
+        ],
+        "tags": [
+          "ia"
+        ]
       }
     },
-    "/doacoes": {
-      "get": {
-        "summary": "Listar doações disponíveis (RN03)",
+    "/reconecta/ia/resumo-dashboard": {
+      "post": {
         "responses": {
-          "200": { "description": "Lista de doações retornada com sucesso." }
-        }
+          "200": {
+            "description": "Resumo dos indicadores",
+            "schema": {
+              "$ref": "#/definitions/ResumoDashboardIA"
+            }
+          }
+        },
+        "operationId": "post_resumo_dashboard",
+        "tags": [
+          "ia"
+        ]
+      }
+    },
+    "/reconecta/instituicoes/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todas as instituições cadastradas no PostgreSQL",
+        "operationId": "Listar todas as instituições",
+        "tags": [
+          "instituicoes"
+        ]
       },
       "post": {
-        "summary": "Cadastrar uma nova doação",
-        "requestBody": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Criar uma nova instituição e persistir no PostgreSQL",
+        "operationId": "Criar uma nova instituição",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Instituicao"
+            }
+          }
+        ],
+        "tags": [
+          "instituicoes"
+        ]
+      }
+    },
+    "/reconecta/instituicoes/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "description": "ID da instituição",
+          "name": "id",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "estabelecimento_id": { "type": "integer", "example": 1 },
-                  "data_limite_retirada": { "type": "string", "format": "date-time", "example": "2026-10-15T18:00:00Z" }
-                },
-                "required": ["estabelecimento_id", "data_limite_retirada"]
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar uma instituição pelo ID no PostgreSQL",
+        "operationId": "Deletar uma instituição pelo ID",
+        "tags": [
+          "instituicoes"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter uma instituição pelo ID direto do banco",
+        "operationId": "Obter uma instituição pelo ID",
+        "tags": [
+          "instituicoes"
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Atualizar uma instituição pelo ID no PostgreSQL",
+        "operationId": "Atualizar uma instituição pelo ID",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Instituicao"
+            }
+          }
+        ],
+        "tags": [
+          "instituicoes"
+        ]
+      }
+    },
+    "/reconecta/painel/doacoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Pedidos da empresa",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PedidoPainel"
               }
             }
           }
         },
-        "responses": {
-          "201": { "description": "Doação cadastrada com sucesso com status DISPONIVEL." },
-          "400": { "description": "Dados inválidos ou estabelecimento inexistente." }
-        }
-      }
-    },
-    "/doacoes/{id}/itens": {
+        "operationId": "get_doacoes_painel",
+        "tags": [
+          "painel"
+        ]
+      },
       "post": {
-        "summary": "Adicionar item a uma doação (RN01, RN02)",
+        "responses": {
+          "201": {
+            "description": "Pedido criado",
+            "schema": {
+              "$ref": "#/definitions/PedidoPainel"
+            }
+          }
+        },
+        "operationId": "post_doacoes_painel",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/PedidoEntradaPainel"
+            }
+          }
         ],
-        "requestBody": {
+        "tags": [
+          "painel"
+        ]
+      }
+    },
+    "/reconecta/painel/doacoes/{doacao_id}": {
+      "parameters": [
+        {
+          "name": "doacao_id",
+          "in": "path",
           "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nome": { "type": "string", "example": "Pão Francês" },
-                  "categoria": { "type": "string", "example": "Padaria" },
-                  "quantidade": { "type": "number", "example": 5.0 },
-                  "unidade_medida": { "type": "string", "example": "kg" },
-                  "validade": { "type": "string", "format": "date", "example": "2026-10-14" }
-                },
-                "required": ["nome", "categoria", "quantidade", "unidade_medida", "validade"]
+          "type": "integer"
+        }
+      ],
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "delete_doacao_painel",
+        "tags": [
+          "painel"
+        ]
+      }
+    },
+    "/reconecta/painel/minhas-doacoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_minhas_doacoes",
+        "tags": [
+          "painel"
+        ]
+      }
+    },
+    "/reconecta/publico/doacoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Pedidos disponíveis",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PedidoPublico"
               }
             }
           }
         },
-        "responses": {
-          "201": { "description": "Item adicionado com sucesso." },
-          "400": { "description": "Quantidade deve ser maior que zero ou validade expirada." }
-        }
+        "operationId": "get_doacoes_publicas",
+        "tags": [
+          "publico"
+        ]
       }
     },
-    "/reservas": {
+    "/reconecta/publico/doacoes/{doacao_id}": {
+      "parameters": [
+        {
+          "name": "doacao_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_pedido_publico",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/reconecta/publico/doacoes/{doacao_id}/contribuicoes": {
+      "parameters": [
+        {
+          "name": "doacao_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
       "post": {
-        "summary": "Realizar reserva de doação disponível (RN03, RN04, RN05, RN09)",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "doacao_id": { "type": "integer", "example": 1 },
-                  "instituicao_id": { "type": "integer", "example": 1 }
-                },
-                "required": ["doacao_id", "instituicao_id"]
-              }
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "post_contribuir",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/reconecta/publico/opcoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Categorias e unidades aceitas",
+            "schema": {
+              "$ref": "#/definitions/OpcoesDoacao"
             }
           }
         },
-        "responses": {
-          "201": { "description": "Reserva criada com sucesso. Status da doação alterado para RESERVADA." },
-          "400": { "description": "Doação indisponível ou já reservada." }
-        }
+        "operationId": "get_opcoes",
+        "tags": [
+          "publico"
+        ]
       }
     },
-    "/reservas/{id}/confirmar-retirada": {
-      "patch": {
-        "summary": "Confirmar retirada da doação (RN06, RN07)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
+    "/reconecta/publico/resumo": {
+      "get": {
         "responses": {
-          "200": { "description": "Retirada confirmada. Status da doação alterado para RETIRADA e reserva CONCLUIDA." },
-          "400": { "description": "Reserva não encontrada ou não ativa." }
-        }
-      }
-    },
-    "/reservas/{id}/cancelar": {
-      "patch": {
-        "summary": "Cancelar uma reserva ativa (RN08)",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
-        "responses": {
-          "200": { "description": "Reserva marcada como CANCELADA. Doação retornou para DISPONIVEL." }
-        }
+          "200": {
+            "description": "Contadores públicos",
+            "schema": {
+              "$ref": "#/definitions/ResumoPublico"
+            }
+          }
+        },
+        "operationId": "get_resumo",
+        "tags": [
+          "publico"
+        ]
       }
     }
+  },
+  "info": {
+    "title": "ReConecta API",
+    "version": "1.0",
+    "description": "API REST da plataforma ReConecta para redistribuição de excedentes alimentares"
+  },
+  "produces": [
+    "application/json"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "estabelecimentos",
+      "description": "Operações relacionadas aos estabelecimentos doadores"
+    },
+    {
+      "name": "instituicoes",
+      "description": "Operações relacionadas às instituições receptoras"
+    },
+    {
+      "name": "doacoes",
+      "description": "Operações relacionadas às doações de alimentos"
+    },
+    {
+      "name": "cadastro",
+      "description": "Verificação de CNPJ e cadastro de doadores"
+    },
+    {
+      "name": "auth",
+      "description": "Entrada, saída e sessão do usuário"
+    },
+    {
+      "name": "publico",
+      "description": "Resumo e pedidos disponíveis"
+    },
+    {
+      "name": "painel",
+      "description": "Pedidos e doações do usuário"
+    },
+    {
+      "name": "contribuicoes",
+      "description": "Fotos privadas das doações recebidas"
+    },
+    {
+      "name": "dashboard",
+      "description": "Indicadores públicos agregados"
+    },
+    {
+      "name": "ia",
+      "description": "Sugestões com modelo local e regras de fallback"
+    }
+  ],
+  "definitions": {
+    "Estabelecimento": {
+      "required": [
+        "cnpj",
+        "email",
+        "endereco",
+        "nome"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID do estabelecimento",
+          "readOnly": true
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome do estabelecimento"
+        },
+        "cnpj": {
+          "type": "string",
+          "description": "CNPJ do estabelecimento"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email do estabelecimento"
+        },
+        "telefone": {
+          "type": "string",
+          "description": "Telefone do estabelecimento"
+        },
+        "endereco": {
+          "type": "string",
+          "description": "Endereço do estabelecimento"
+        }
+      },
+      "type": "object"
+    },
+    "Instituicao": {
+      "required": [
+        "cnpj",
+        "email",
+        "endereco",
+        "nome"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID da instituição",
+          "readOnly": true
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome da instituição"
+        },
+        "cnpj": {
+          "type": "string",
+          "description": "CNPJ da instituição"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email da instituição"
+        },
+        "telefone": {
+          "type": "string",
+          "description": "Telefone da instituição"
+        },
+        "endereco": {
+          "type": "string",
+          "description": "Endereço da instituição"
+        }
+      },
+      "type": "object"
+    },
+    "Doacao": {
+      "required": [
+        "data_limite_retirada",
+        "estabelecimento_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID da doação",
+          "readOnly": true
+        },
+        "estabelecimento_id": {
+          "type": "integer",
+          "description": "ID do estabelecimento doador"
+        },
+        "data_limite_retirada": {
+          "type": "string",
+          "description": "Data limite para retirada (Ex: 2026-09-10T18:00:00)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status (DISPONIVEL, RESERVADA, RETIRADA)",
+          "default": "DISPONIVEL"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroErro": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "mensagem": {
+          "type": "string"
+        },
+        "campos": {
+          "type": "object"
+        },
+        "motivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CadastroMotivo"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "CadastroMotivo": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "mensagem": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ConsultaCNPJ": {
+      "properties": {
+        "cnpj": {
+          "type": "string"
+        },
+        "cnpj_formatado": {
+          "type": "string"
+        },
+        "razao_social": {
+          "type": "string"
+        },
+        "nome_fantasia": {
+          "type": "string"
+        },
+        "situacao": {
+          "type": "string"
+        },
+        "ativo": {
+          "type": "boolean"
+        },
+        "cnae_principal": {
+          "$ref": "#/definitions/CadastroAtividade"
+        },
+        "atividades_alimentares": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CadastroAtividade"
+          }
+        },
+        "relacionado_alimentacao": {
+          "type": "boolean"
+        },
+        "endereco": {
+          "$ref": "#/definitions/CadastroEndereco"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "ja_cadastrado": {
+          "type": "boolean"
+        },
+        "apto": {
+          "type": "boolean"
+        },
+        "motivos": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CadastroMotivo"
+          }
+        },
+        "fonte": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroAtividade": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "descricao": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroEndereco": {
+      "properties": {
+        "logradouro": {
+          "type": "string"
+        },
+        "numero": {
+          "type": "string"
+        },
+        "complemento": {
+          "type": "string"
+        },
+        "bairro": {
+          "type": "string"
+        },
+        "municipio": {
+          "type": "string"
+        },
+        "uf": {
+          "type": "string"
+        },
+        "cep": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroEmpresaEntrada": {
+      "required": [
+        "cnpj",
+        "email",
+        "senha",
+        "telefone"
+      ],
+      "properties": {
+        "cnpj": {
+          "type": "string",
+          "description": "CNPJ com ou sem máscara"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string",
+          "description": "DDD e telefone, 10 ou 11 dígitos"
+        },
+        "senha": {
+          "type": "string",
+          "description": "Mínimo 8 caracteres, com letra e número"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroEmpresaSaida": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "tipo": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "cnpj": {
+          "type": "string"
+        },
+        "cnpj_formatado": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "endereco": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroDoadorEntrada": {
+      "required": [
+        "cpf",
+        "email",
+        "nome",
+        "senha",
+        "telefone"
+      ],
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "cpf": {
+          "type": "string",
+          "description": "CPF com ou sem máscara"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "senha": {
+          "type": "string",
+          "description": "Mínimo 8 caracteres, com letra e número"
+        }
+      },
+      "type": "object"
+    },
+    "CadastroDoadorSaida": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "tipo": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "cpf_formatado": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "LoginEntrada": {
+      "required": [
+        "identificador",
+        "senha"
+      ],
+      "properties": {
+        "identificador": {
+          "type": "string",
+          "description": "E-mail, CNPJ ou CPF"
+        },
+        "senha": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AuthErro": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "mensagem": {
+          "type": "string"
+        },
+        "campos": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "LoginSaida": {
+      "properties": {
+        "usuario": {
+          "$ref": "#/definitions/UsuarioAutenticado"
+        }
+      },
+      "type": "object"
+    },
+    "UsuarioAutenticado": {
+      "properties": {
+        "tipo": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "cnpj_formatado": {
+          "type": "string"
+        },
+        "endereco": {
+          "type": "string"
+        },
+        "cpf_formatado": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ResumoPublico": {
+      "properties": {
+        "empresas": {
+          "type": "integer"
+        },
+        "doadores": {
+          "type": "integer"
+        },
+        "instituicoes": {
+          "type": "integer"
+        },
+        "doacoes_disponiveis": {
+          "type": "integer"
+        },
+        "itens_disponiveis": {
+          "type": "integer"
+        },
+        "kg_disponiveis": {
+          "type": "number"
+        },
+        "doacoes_recebidas": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "PedidoPublico": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "empresa": {
+          "$ref": "#/definitions/EmpresaPedidoPublico"
+        },
+        "receber_ate": {
+          "type": "string"
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemPedidoPublico"
+          }
+        },
+        "doacoes_recebidas": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "EmpresaPedidoPublico": {
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "municipio_uf": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ItemPedidoPublico": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        },
+        "quantidade": {
+          "type": "number"
+        },
+        "unidade_medida": {
+          "type": "string"
+        },
+        "recebido": {
+          "type": "number"
+        },
+        "faltam": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "OpcoesDoacao": {
+      "properties": {
+        "categorias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unidades": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PedidoEntradaPainel": {
+      "required": [
+        "itens"
+      ],
+      "properties": {
+        "receber_ate": {
+          "type": "string",
+          "description": "Data e hora ISO local"
+        },
+        "data_limite_retirada": {
+          "type": "string",
+          "description": "Alias anterior de receber_ate"
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemPedidoEntradaPainel"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "ItemPedidoEntradaPainel": {
+      "required": [
+        "categoria",
+        "nome",
+        "quantidade",
+        "unidade_medida"
+      ],
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        },
+        "quantidade": {
+          "type": "number"
+        },
+        "unidade_medida": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PedidoPainel": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/PedidoPublico"
+        },
+        {
+          "properties": {
+            "contribuicoes": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "TextoPedidoIA": {
+      "required": [
+        "texto"
+      ],
+      "properties": {
+        "texto": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PedidoSugeridoIA": {
+      "properties": {
+        "itens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemSugeridoIA"
+          }
+        },
+        "receber_ate": {
+          "type": "string"
+        },
+        "observacoes": {
+          "type": "string"
+        },
+        "fonte": {
+          "type": "string"
+        },
+        "modelo": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ItemSugeridoIA": {
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        },
+        "quantidade": {
+          "type": "number"
+        },
+        "unidade_medida": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ResumoDashboardIA": {
+      "properties": {
+        "resumo": {
+          "type": "string"
+        },
+        "recomendacoes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fonte": {
+          "type": "string"
+        },
+        "modelo": {
+          "type": "string"
+        },
+        "gerado_em": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "responses": {
+    "ParseError": {
+      "description": "When a mask can't be parsed"
+    },
+    "MaskError": {
+      "description": "When any error occurs on mask"
+    },
+    "RequestEntityTooLarge": {},
+    "NotFound": {},
+    "MethodNotAllowed": {},
+    "Exception": {}
   }
 }
