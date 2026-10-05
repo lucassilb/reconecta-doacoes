@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL") or "sqlite:///reconecta.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # foto até 5 MB + campos do questionário
 configurar_chave_secreta(app)
 
 db.init_app(app)
