@@ -1,73 +1,47 @@
-"""Gestão das doações pelo titular autenticado."""
-
-from datetime import date, datetime
+"""Pedidos criados por empresas e doações feitas por usuários autenticados."""
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
-
 from flask import current_app, request
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy.exc import SQLAlchemyError
-
 from Auth import usuario_atual
+from Contribuicoes import serializar_contribuicao
 from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
-from models import Doacao, ItemDoacao, db
+from models import Contribuicao, Doacao, ItemDoacao, db
 
-
-ns = Namespace("painel", description="Doações do titular autenticado")
-item_entrada = ns.model("ItemDoacaoEntradaPainel", {
+ns = Namespace("painel", description="Pedidos e doações do usuário")
+item_entrada = ns.model("ItemPedidoEntradaPainel", {
     "nome": fields.String(required=True), "categoria": fields.String(required=True),
     "quantidade": fields.Float(required=True), "unidade_medida": fields.String(required=True),
-    "validade": fields.String(required=True, description="AAAA-MM-DD"),
 })
-retirada_entrada = ns.model("RetiradaEntradaPainel", {
-    "endereco": fields.String(required=True),
-    "municipio": fields.String(required=True),
-    "uf": fields.String(required=True),
-})
-doacao_entrada = ns.model("DoacaoEntradaPainel", {
-    "data_limite_retirada": fields.String(required=True, description="Data e hora ISO local"),
+doacao_entrada = ns.model("PedidoEntradaPainel", {
+    "receber_ate": fields.String(description="Data e hora ISO local"),
+    "data_limite_retirada": fields.String(description="Alias anterior de receber_ate"),
     "itens": fields.List(fields.Nested(item_entrada), required=True),
-    "retirada": fields.Nested(retirada_entrada, description="Obrigatório para doador pessoa física"),
 })
-doacao_saida = ns.inherit("DoacaoPainel", doacao_model, {
-    "status": fields.String, "retirada": fields.Nested(retirada_entrada),
+doacao_saida = ns.inherit("PedidoPainel", doacao_model, {
+    "contribuicoes": fields.List(fields.Raw),
 })
 erro_model = ns.model("PainelErro", {
     "codigo": fields.String, "mensagem": fields.String, "campos": fields.Raw,
 })
 
-
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
-
-def _titular_autenticado():
+def _usuario():
     atual = usuario_atual()
     if not atual:
         return None, _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
     return atual, None
 
-
-UFS = frozenset("AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split())
-
-
-def _validar_retirada(corpo):
-    retirada = corpo.get("retirada")
-    retirada = retirada if isinstance(retirada, dict) else {}
-    campos = {}
-    for chave, minimo, maximo in (("endereco", 5, 200), ("municipio", 2, 80)):
-        valor = retirada.get(chave)
-        if not isinstance(valor, str) or not minimo <= len(valor.strip()) <= maximo:
-            campos[f"retirada.{chave}"] = f"Informe entre {minimo} e {maximo} caracteres."
-    uf = retirada.get("uf")
-    if not isinstance(uf, str) or uf not in UFS:
-        campos["retirada.uf"] = "Selecione uma UF válida."
-    return ({chave: retirada[chave].strip() for chave in ("endereco", "municipio", "uf")}
-            if not campos else None), campos
-
-
-def _filtro_titular(tipo, usuario):
-    return {"estabelecimento_id": usuario.id} if tipo == "empresa" else {"doador_id": usuario.id}
-
+def _empresa():
+    atual, erro = _usuario()
+    if erro:
+        return None, erro
+    if atual[0] != "empresa":
+        return None, _erro("APENAS_EMPRESAS", "Somente empresas podem publicar pedidos.", 403)
+    return atual[1], None
 
 def _data_hora(valor):
     if not isinstance(valor, str):
@@ -77,16 +51,6 @@ def _data_hora(valor):
     except ValueError:
         return None
     return resultado if resultado.tzinfo is None else None
-
-
-def _data(valor):
-    if not isinstance(valor, str):
-        return None
-    try:
-        return date.fromisoformat(valor)
-    except ValueError:
-        return None
-
 
 def _quantidade(valor):
     if isinstance(valor, bool) or not isinstance(valor, (int, float, str, Decimal)):
@@ -98,12 +62,11 @@ def _quantidade(valor):
     return (numero if numero.is_finite() and Decimal("0.01") <= numero <= Decimal("99999999.99")
             and numero == numero.quantize(Decimal("0.01")) else None)
 
-
-def _validar_doacao(corpo):
+def _validar_pedido(corpo):
     campos = {}
-    limite = _data_hora(corpo.get("data_limite_retirada"))
+    limite = _data_hora(corpo.get("receber_ate", corpo.get("data_limite_retirada")))
     if not limite or limite <= datetime.now():
-        campos["data_limite_retirada"] = "Informe uma data e hora futuras."
+        campos["receber_ate"] = "Informe uma data e hora futuras."
     itens_raw = corpo.get("itens")
     if not isinstance(itens_raw, list) or not itens_raw:
         campos["itens"] = "Inclua pelo menos um item."
@@ -114,98 +77,89 @@ def _validar_doacao(corpo):
             campos[f"itens[{indice}]"] = "Informe um item válido."
             continue
         nome = item.get("nome")
+        categoria = item.get("categoria")
+        quantidade = _quantidade(item.get("quantidade"))
+        unidade = item.get("unidade_medida")
         if not isinstance(nome, str) or not 1 <= len(nome.strip()) <= 100:
             campos[f"itens[{indice}].nome"] = "Informe um nome de até 100 caracteres."
-        categoria = item.get("categoria")
         if categoria not in CATEGORIAS:
             campos[f"itens[{indice}].categoria"] = "Selecione uma categoria da lista."
-        quantidade = _quantidade(item.get("quantidade"))
         if quantidade is None:
             campos[f"itens[{indice}].quantidade"] = "Informe uma quantidade maior que zero, com até duas casas decimais."
-        unidade = item.get("unidade_medida")
         if unidade not in UNIDADES:
             campos[f"itens[{indice}].unidade_medida"] = "Selecione uma unidade da lista."
-        validade = _data(item.get("validade"))
-        if validade is None or validade < date.today():
-            campos[f"itens[{indice}].validade"] = "Informe uma validade igual ou posterior a hoje."
-        elif limite and limite.date() > validade:
-            campos[f"itens[{indice}].validade"] = "A validade deve ser igual ou posterior ao limite de retirada."
         if (isinstance(nome, str) and 1 <= len(nome.strip()) <= 100 and
-                categoria in CATEGORIAS and quantidade is not None and
-                unidade in UNIDADES and validade and validade >= date.today() and
-                (not limite or limite.date() <= validade)):
+                categoria in CATEGORIAS and quantidade is not None and unidade in UNIDADES):
             itens.append({"nome": nome.strip(), "categoria": categoria,
-                          "quantidade": quantidade, "unidade_medida": unidade,
-                          "validade": validade})
+                          "quantidade": quantidade, "unidade_medida": unidade})
     return limite, itens, campos
-
 
 @ns.route("/doacoes")
 class DoacoesPainel(Resource):
-    @ns.response(200, "Doações do titular", [doacao_saida])
-    @ns.response(401, "Não autenticado", erro_model)
+    @ns.response(200, "Pedidos da empresa", [doacao_saida])
     def get(self):
-        """Lista todas as doações do titular da sessão, inclusive encerradas."""
-        titular, erro = _titular_autenticado()
+        empresa, erro = _empresa()
         if erro:
             return erro
-        tipo, usuario = titular
-        doacoes = Doacao.query.filter_by(**_filtro_titular(tipo, usuario)).order_by(
+        doacoes = Doacao.query.filter_by(estabelecimento_id=empresa.id).order_by(
             Doacao.data_cadastro.desc(), Doacao.id.desc()).all()
-        return [serializar_doacao(doacao, incluir_status=True) for doacao in doacoes], 200
+        resultado = []
+        for doacao in doacoes:
+            dados = serializar_doacao(doacao, incluir_status=True)
+            dados["contribuicoes"] = [serializar_contribuicao(c) for c in doacao.contribuicoes]
+            resultado.append(dados)
+        return resultado, 200
 
     @ns.expect(doacao_entrada)
-    @ns.response(201, "Doação criada", doacao_saida)
-    @ns.response(400, "Dados inválidos", erro_model)
-    @ns.response(401, "Não autenticado", erro_model)
+    @ns.response(201, "Pedido criado", doacao_saida)
     def post(self):
-        """Cria doação e itens juntos após validar quantidade, prazo e validade."""
-        titular, erro = _titular_autenticado()
+        empresa, erro = _empresa()
         if erro:
             return erro
-        tipo, usuario = titular
         corpo = request.get_json(silent=True)
         corpo = corpo if isinstance(corpo, dict) else {}
-        limite, itens, campos = _validar_doacao(corpo)
-        retirada = None
-        if tipo == "doador":
-            retirada, campos_retirada = _validar_retirada(corpo)
-            campos.update(campos_retirada)
+        limite, itens, campos = _validar_pedido(corpo)
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
-        doacao = Doacao(**_filtro_titular(tipo, usuario),
-                        **({f"retirada_{chave}": valor for chave, valor in retirada.items()}
-                           if retirada else {}),
-                        data_limite_retirada=limite, status="DISPONIVEL")
+        pedido = Doacao(estabelecimento_id=empresa.id, data_limite_retirada=limite,
+                         status="DISPONIVEL")
         try:
-            db.session.add(doacao)
+            db.session.add(pedido)
             db.session.flush()
-            db.session.add_all(ItemDoacao(doacao_id=doacao.id, **item) for item in itens)
+            db.session.add_all(ItemDoacao(doacao_id=pedido.id, **item) for item in itens)
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            current_app.logger.exception("Falha ao criar doação")
-            return _erro("ERRO_INTERNO", "Não foi possível criar a doação.", 500)
-        return serializar_doacao(doacao, incluir_status=True), 201
-
+            current_app.logger.exception("Falha ao criar pedido")
+            return _erro("ERRO_INTERNO", "Não foi possível criar o pedido.", 500)
+        dados = serializar_doacao(pedido, incluir_status=True)
+        dados["contribuicoes"] = []
+        return dados, 201
 
 @ns.route("/doacoes/<int:doacao_id>")
 class DoacaoPainel(Resource):
-    @ns.response(204, "Doação removida")
-    @ns.response(401, "Não autenticado", erro_model)
-    @ns.response(404, "Não encontrada", erro_model)
-    @ns.response(409, "Não removível", erro_model)
     def delete(self, doacao_id):
-        """Remove apenas doação disponível, própria e sem reservas."""
-        titular, erro = _titular_autenticado()
+        empresa, erro = _empresa()
         if erro:
             return erro
-        tipo, usuario = titular
-        doacao = Doacao.query.filter_by(id=doacao_id, **_filtro_titular(tipo, usuario)).first()
-        if not doacao:
-            return _erro("DOACAO_NAO_ENCONTRADA", "Doação não encontrada.", 404)
-        if doacao.status != "DISPONIVEL" or doacao.reservas:
-            return _erro("DOACAO_NAO_REMOVIVEL", "Esta doação não pode ser removida.", 409)
-        db.session.delete(doacao)
+        pedido = Doacao.query.filter_by(id=doacao_id, estabelecimento_id=empresa.id).first()
+        if not pedido:
+            return _erro("PEDIDO_NAO_ENCONTRADO", "Pedido não encontrado.", 404)
+        if pedido.status != "DISPONIVEL" or pedido.reservas or pedido.contribuicoes:
+            return _erro("PEDIDO_NAO_REMOVIVEL", "Este pedido não pode ser removido.", 409)
+        db.session.delete(pedido)
         db.session.commit()
         return "", 204
+
+@ns.route("/minhas-doacoes")
+class MinhasDoacoes(Resource):
+    def get(self):
+        atual, erro = _usuario()
+        if erro:
+            return erro
+        tipo, usuario = atual
+        filtro = ({"doador_id": usuario.id} if tipo == "doador" else
+                  {"estabelecimento_id": usuario.id})
+        contribuicoes = Contribuicao.query.filter_by(**filtro).order_by(
+            Contribuicao.criado_em.desc(), Contribuicao.id.desc()).all()
+        return [serializar_contribuicao(c, entrega=True) for c in contribuicoes], 200

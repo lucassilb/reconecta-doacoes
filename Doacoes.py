@@ -37,7 +37,7 @@ class DoacaoList(Resource):
     def post(self):
         """Criar uma nova doação e salvar no PostgreSQL"""
         data = request.json
-        
+
         # Converte a string enviada pelo Swagger em datetime para o banco
         data_limite = datetime.fromisoformat(data["data_limite_retirada"])
 
@@ -46,10 +46,10 @@ class DoacaoList(Resource):
             data_limite_retirada=data_limite,
             status=data.get("status", "DISPONIVEL")
         )
-        
+
         db.session.add(nova_doacao)
         db.session.commit()
-        
+
         return {
             "id": nova_doacao.id,
             "estabelecimento_id": nova_doacao.estabelecimento_id,
@@ -91,7 +91,7 @@ class Doacao(Resource):
                 d.data_limite_retirada = datetime.fromisoformat(data["data_limite_retirada"])
             if "status" in data:
                 d.status = data["status"]
-            
+
             db.session.commit()
             return {
                 "id": d.id,

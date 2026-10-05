@@ -1,48 +1,38 @@
-"""Dados públicos da Home, sem identificadores ou contatos privados."""
-
+"""Pedidos públicos de empresas e indicadores sem dados de contato."""
 import re
 from datetime import datetime
 from decimal import Decimal
-
 from flask import request
 from flask_restx import Namespace, Resource, fields
+from Auth import usuario_atual
+from models import Contribuicao, Doacao, Doador, Estabelecimento, Instituicao, db
 
-from models import Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, db
-
-
-ns = Namespace("publico", description="Resumo e doações disponíveis")
-
+ns = Namespace("publico", description="Resumo e pedidos disponíveis")
 CATEGORIAS = ["Hortifrúti", "Padaria", "Laticínios", "Carnes e peixes",
               "Grãos e cereais", "Refeições prontas", "Bebidas não alcoólicas", "Outros"]
 UNIDADES = ["kg", "g", "L", "unidade", "pacote", "caixa"]
-
 resumo_model = ns.model("ResumoPublico", {
     "empresas": fields.Integer, "doadores": fields.Integer,
-    "instituicoes": fields.Integer,
-    "doacoes_disponiveis": fields.Integer, "itens_disponiveis": fields.Integer,
-    "kg_disponiveis": fields.Float,
+    "instituicoes": fields.Integer, "doacoes_disponiveis": fields.Integer,
+    "itens_disponiveis": fields.Integer, "kg_disponiveis": fields.Float,
+    "doacoes_recebidas": fields.Integer,
 })
 opcoes_model = ns.model("OpcoesDoacao", {
     "categorias": fields.List(fields.String), "unidades": fields.List(fields.String),
 })
-item_model = ns.model("ItemDoacaoPublico", {
-    "nome": fields.String, "categoria": fields.String, "quantidade": fields.Float,
-    "unidade_medida": fields.String, "validade": fields.String,
+item_model = ns.model("ItemPedidoPublico", {
+    "id": fields.Integer, "nome": fields.String, "categoria": fields.String,
+    "quantidade": fields.Float, "unidade_medida": fields.String,
+    "recebido": fields.Float, "faltam": fields.Float,
 })
-estabelecimento_model = ns.model("EstabelecimentoPublico", {
+empresa_model = ns.model("EmpresaPedidoPublico", {
     "nome": fields.String, "municipio_uf": fields.String,
 })
-doador_model = ns.model("DoadorPublico", {
-    "nome": fields.String, "municipio_uf": fields.String,
+doacao_model = ns.model("PedidoPublico", {
+    "id": fields.Integer, "empresa": fields.Nested(empresa_model),
+    "receber_ate": fields.String, "itens": fields.List(fields.Nested(item_model)),
+    "doacoes_recebidas": fields.Integer, "status": fields.String,
 })
-doacao_model = ns.model("DoacaoPublica", {
-    "id": fields.Integer, "origem": fields.String,
-    "estabelecimento": fields.Nested(estabelecimento_model),
-    "doador": fields.Nested(doador_model),
-    "data_cadastro": fields.String, "data_limite_retirada": fields.String,
-    "categorias": fields.List(fields.String), "itens": fields.List(fields.Nested(item_model)),
-})
-
 
 def _municipio_uf(endereco):
     for parte in (endereco or "").split(" - "):
@@ -51,51 +41,47 @@ def _municipio_uf(endereco):
             return candidato
     return None
 
-
-def serializar_doacao(doacao, incluir_status=False):
-    itens = [{"nome": item.nome, "categoria": item.categoria,
-              "quantidade": float(item.quantidade), "unidade_medida": item.unidade_medida,
-              "validade": item.validade.isoformat()}
-             for item in doacao.itens]
+def serializar_doacao(doacao, incluir_status=False, detalhe=False):
+    aceitas = [c for c in doacao.contribuicoes if c.status == "ACEITA"]
+    itens = []
+    for item in doacao.itens:
+        recebido = sum((c.quantidade for c in aceitas if c.item_doacao_id == item.id), Decimal("0"))
+        meta = Decimal(str(item.quantidade))
+        itens.append({"id": item.id, "nome": item.nome, "categoria": item.categoria,
+                      "quantidade": float(meta), "unidade_medida": item.unidade_medida,
+                      "recebido": float(recebido), "faltam": float(max(meta - recebido, 0))})
     dados = {
         "id": doacao.id,
-        "origem": "doador" if doacao.doador_id is not None else "empresa",
-        "data_cadastro": doacao.data_cadastro.isoformat() if doacao.data_cadastro else None,
-        "data_limite_retirada": doacao.data_limite_retirada.isoformat(),
-        "categorias": list(dict.fromkeys(item["categoria"] for item in itens)),
-        "itens": itens,
+        "empresa": {"nome": doacao.estabelecimento.nome,
+                    "municipio_uf": _municipio_uf(doacao.estabelecimento.endereco)},
+        "receber_ate": doacao.data_limite_retirada.isoformat(),
+        "itens": itens, "doacoes_recebidas": len(aceitas),
     }
-    if doacao.doador_id is not None:
-        dados["doador"] = {
-            "nome": doacao.doador.nome.split()[0],
-            "municipio_uf": f"{doacao.retirada_municipio}/{doacao.retirada_uf}",
-        }
-        if incluir_status:
-            dados["retirada"] = {
-                "endereco": doacao.retirada_endereco,
-                "municipio": doacao.retirada_municipio,
-                "uf": doacao.retirada_uf,
-            }
-    else:
-        dados["estabelecimento"] = {
-            "nome": doacao.estabelecimento.nome,
-            "municipio_uf": _municipio_uf(doacao.estabelecimento.endereco),
-        }
-    if incluir_status:
+    if incluir_status or detalhe:
         dados["status"] = doacao.status
+    if detalhe:
+        atual = usuario_atual()
+        if not atual:
+            motivo = "Entre para doar"
+        elif atual[0] == "empresa" and atual[1].id == doacao.estabelecimento_id:
+            motivo = "Este é o seu próprio pedido"
+        elif doacao.status != "DISPONIVEL" or doacao.data_limite_retirada <= datetime.now():
+            motivo = "Pedido encerrado"
+        else:
+            motivo = None
+        dados["pode_doar"] = motivo is None
+        dados["motivo_bloqueio"] = motivo
     return dados
 
-
 def _disponiveis():
-    return Doacao.query.filter(Doacao.status == "DISPONIVEL",
+    return Doacao.query.filter(Doacao.estabelecimento_id.isnot(None),
+                               Doacao.status == "DISPONIVEL",
                                Doacao.data_limite_retirada > datetime.now())
-
 
 @ns.route("/resumo")
 class Resumo(Resource):
     @ns.response(200, "Contadores públicos", resumo_model)
     def get(self):
-        """Contadores da plataforma e peso disponível em quilogramas."""
         doacoes = _disponiveis().all()
         itens = [item for doacao in doacoes for item in doacao.itens]
         peso = sum((Decimal(str(item.quantidade)) *
@@ -106,27 +92,41 @@ class Resumo(Resource):
             "doadores": db.session.query(Doador.id).count(),
             "instituicoes": db.session.query(Instituicao.id).count(),
             "doacoes_disponiveis": len(doacoes),
-            "itens_disponiveis": len(itens),
-            "kg_disponiveis": float(peso),
+            "itens_disponiveis": len(itens), "kg_disponiveis": float(peso),
+            "doacoes_recebidas": Contribuicao.query.filter_by(status="ACEITA").count(),
         }, 200
-
 
 @ns.route("/doacoes")
 class DoacoesPublicas(Resource):
-    @ns.response(200, "Doações disponíveis", [doacao_model])
+    @ns.response(200, "Pedidos disponíveis", [doacao_model])
     def get(self):
-        """Lista doações disponíveis e futuras, sem dados de contato."""
         limite_raw = request.args.get("limite", "8")
         if not limite_raw.isascii() or not limite_raw.isdigit() or not 1 <= int(limite_raw) <= 100:
             return {"codigo": "DADOS_INVALIDOS", "mensagem": "Informe um limite entre 1 e 100.",
                     "campos": {"limite": "Use um número entre 1 e 100."}}, 400
-        doacoes = _disponiveis().order_by(Doacao.data_cadastro.desc(), Doacao.id.desc()).limit(int(limite_raw)).all()
+        doacoes = _disponiveis().order_by(Doacao.data_cadastro.desc(), Doacao.id.desc()).limit(
+            int(limite_raw)).all()
         return [serializar_doacao(doacao) for doacao in doacoes], 200
 
+@ns.route("/doacoes/<int:doacao_id>")
+class PedidoPublico(Resource):
+    def get(self, doacao_id):
+        doacao = db.session.get(Doacao, doacao_id)
+        if not doacao or doacao.estabelecimento_id is None:
+            return {"codigo": "PEDIDO_NAO_ENCONTRADO", "mensagem": "Pedido não encontrado."}, 404
+        return serializar_doacao(doacao, detalhe=True), 200
+
+@ns.route("/doacoes/<int:doacao_id>/contribuicoes")
+class Contribuir(Resource):
+    def post(self, doacao_id):
+        doacao = db.session.get(Doacao, doacao_id)
+        if not doacao or doacao.estabelecimento_id is None:
+            return {"codigo": "PEDIDO_NAO_ENCONTRADO", "mensagem": "Pedido não encontrado."}, 404
+        from Contribuicoes import criar_contribuicao
+        return criar_contribuicao(doacao)
 
 @ns.route("/opcoes")
 class Opcoes(Resource):
     @ns.response(200, "Categorias e unidades aceitas", opcoes_model)
     def get(self):
-        """Listas fixas usadas no formulário de doação."""
         return {"categorias": CATEGORIAS, "unidades": UNIDADES}, 200
