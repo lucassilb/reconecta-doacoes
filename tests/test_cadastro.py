@@ -250,11 +250,11 @@ def test_validacoes_e_rotas_existentes(cliente, monkeypatch, tmp_path):
     assert cliente.get("/reconecta/estabelecimentos/").status_code == 200
     assert cliente.get("/reconecta/instituicoes/").status_code == 200
     assert cliente.get("/reconecta/doacoes/").status_code == 200
-    for pagina in ("index", "sobre", "cadastro", "entrar", "painel"):
+    for pagina in ("index", "sobre", "cadastro", "entrar", "painel", "doacao"):
         (tmp_path / f"{pagina}.html").write_text(f"<h1>{pagina}</h1>", encoding="utf-8")
     monkeypatch.setattr(app, "static_folder", str(tmp_path))
     raiz = cliente.get("/")
     assert raiz.status_code == 200
     assert b"index" in raiz.data
-    for rota in ("/sobre", "/cadastro", "/entrar", "/painel"):
+    for rota in ("/sobre", "/cadastro", "/entrar", "/painel", "/doacoes/1"):
         assert cliente.get(rota).status_code == 200

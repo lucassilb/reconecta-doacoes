@@ -38,6 +38,10 @@ def entrar_page():
 def painel_page():
     return send_from_directory(app.static_folder, "painel.html")
 
+@app.get("/doacoes/<int:doacao_id>")
+def doacao_page(doacao_id):
+    return send_from_directory(app.static_folder, "doacao.html")
+
 @app.errorhandler(413)
 def arquivo_grande(_erro):
     return {"codigo": "ARQUIVO_GRANDE", "mensagem": "O envio excede o limite de 6 MB.",
