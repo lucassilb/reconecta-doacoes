@@ -87,6 +87,22 @@ Cada item do critério e onde ele está no código. As páginas ficam em `static
 | Tratamento visual de erros | Erros por campo (borda vermelha, `aria-invalid` e mensagem abaixo do campo) no cadastro, login, publicar pedido, questionário e "Seus dados". Os erros do servidor em `campos` vão para o campo certo, como e-mail já cadastrado (409) e senha atual errada. Avisos com `role="alert"`/`aria-live`, com "Tentar novamente" quando falta conexão. Mensagens para CNPJ inapto (motivos da Receita), login bloqueado (429), pedido não encontrado, foto inválida e falha ao carregar o dashboard | respostas `{codigo, mensagem, campos}` dos endpoints acima |
 | Feedback das operações realizadas | "Pedido publicado" e "Preenchemos N itens a partir do texto" (`painel.js`). "Doação confirmada", com o endereço de entrega (`doacao.js`). Tela de sucesso do cadastro (`cadastro.js`). "Dados atualizados", com o "Olá, …" do painel e do cabeçalho atualizado sem recarregar (`painel.js`). Lista recarregada depois de remover um pedido. Botões em estado de carregamento durante o envio. Selo da origem do resumo: modelo local ou regras automáticas (`dashboard.js`) | os mesmos endpoints de escrita |
 
+## Dashboard (critério 3 do CP2)
+
+Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligada no cabeçalho e no rodapé de todas as páginas. Os dados vêm de **uma única requisição** `GET /reconecta/dashboard`, montada por `montar_dashboard()` em `Dashboard.py` com consultas agregadas (`COUNT`/`SUM` com `GROUP BY`) direto do banco da aplicação — nada é fixo no HTML. O botão "Atualizar dados" refaz a consulta; "Dados de …" mostra quando os números foram gerados, em horário de Brasília.
+
+| Item do critério | Onde aparece na página | Campo do `GET /reconecta/dashboard` |
+|---|---|---|
+| Indicadores | Cartões: pedidos abertos, pedidos encerrados, doações recebidas, empresas, doadores (CPF) e instituições | `indicadores.pedidos_abertos`, `pedidos_encerrados`, `doacoes_recebidas`, `empresas`, `doadores`, `instituicoes` |
+| Métricas | "Atendimento dos pedidos abertos" em % com barra de progresso e "X de Y itens pedidos com a meta completa" | `indicadores.percentual_atendimento` (Σ min(recebido, meta) ÷ Σ meta × 100), `itens_pedidos`, `itens_atendidos` |
+| Gráficos | Barras "Pedido × recebido por categoria" e linha "Doações por dia" (Chart.js) | `por_categoria[]`, `por_dia[]` |
+| Tabelas | "Empresas com mais doações recebidas", "Últimas doações" e "Ver dados em tabela" embaixo de cada gráfico | `top_empresas[]`, `ultimas_doacoes[]`, `por_categoria[]`, `por_dia[]` |
+| Históricos | Série dos últimos 30 dias (dias sem doação aparecem com 0) e as 10 últimas doações com data e hora | `por_dia[]` (30 dias, fuso de Brasília), `ultimas_doacoes[]` |
+| Alertas | Lista "Alertas" com link "Ver pedido": prazo terminando em até 3 dias, pedido aberto há 3 dias ou mais sem doação, item com 80% ou mais da meta, meta atingida | `alertas[]` com `tipo` = `PRAZO_PROXIMO`, `SEM_DOACOES`, `QUASE_COMPLETO`, `META_ATINGIDA` |
+| Dados consolidados | Totais por categoria, por dia e por empresa; resumo e recomendações gerados pela LLM local a partir desses agregados ("Gerar resumo com IA") | `por_categoria`, `por_dia`, `top_empresas`, `indicadores`; `POST /reconecta/ia/resumo-dashboard` |
+
+Privacidade: o dashboard é público e só traz dados agregados. "Últimas doações" mostra o item, a quantidade, a empresa que recebeu e se quem doou foi pessoa ou empresa, sem nome, CPF ou contato de pessoas. Testes em `tests/test_dashboard.py`, `tests/test_fuso.py` e `tests/test_cp2_api.py` (agregação, limite da meta, ausência de dados pessoais, fuso e número de consultas).
+
 ## Tecnologias
 
 Python 3.10+ (testado em 3.14), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, PostgreSQL (ou SQLite para desenvolvimento), psycopg 3, python-dotenv, requests, pytest, Ollama + `qwen2.5:3b` (opcional, gratuito e local), Chart.js.
