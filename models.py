@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
+from sqlalchemy.orm import foreign
 
 db = SQLAlchemy()
 
@@ -42,14 +44,16 @@ class Instituicao(db.Model):
 
 class Doacao(db.Model):
     __tablename__ = 'doacoes'
-    __table_args__ = (db.CheckConstraint(
-        '(estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)',
-        name='ck_doacoes_uma_origem'),
+    __table_args__ = (
+        db.CheckConstraint('(estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)',
+                           name='ck_doacoes_uma_origem'),
+        db.CheckConstraint("status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA')",
+                           name='ck_doacoes_status'),
         db.Index('ix_doacoes_estabelecimento_id', 'estabelecimento_id'),
         db.Index('ix_doacoes_doador_id', 'doador_id'),
         db.Index('ix_doacoes_status_prazo', 'status', 'data_limite_retirada'))
     id = db.Column(db.Integer, primary_key=True)
-    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id'), nullable=True)
+    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'), nullable=True)
     doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'), nullable=True)
     retirada_endereco = db.Column(db.String(200), nullable=True)
     retirada_municipio = db.Column(db.String(80), nullable=True)
@@ -63,21 +67,34 @@ class Doacao(db.Model):
 
 class ItemDoacao(db.Model):
     __tablename__ = 'itens_doacao'
-    __table_args__ = (db.Index('ix_itens_doacao_doacao_id', 'doacao_id'),)
+    __table_args__ = (
+        db.CheckConstraint('quantidade > 0', name='ck_itens_doacao_quantidade'),
+        db.UniqueConstraint('id', 'doacao_id', name='uq_itens_doacao_id_doacao_id'),
+        db.Index('ix_itens_doacao_doacao_id', 'doacao_id'),
+    )
     id = db.Column(db.Integer, primary_key=True)
-    doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id'), nullable=False)
+    doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id', ondelete='CASCADE'), nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     categoria = db.Column(db.String(50), nullable=False)
     quantidade = db.Column(db.Numeric(10, 2), nullable=False)
     unidade_medida = db.Column(db.String(20), nullable=False)
     validade = db.Column(db.Date, nullable=True)
-    contribuicoes = db.relationship('Contribuicao', backref='item_doacao', lazy=True)
+    contribuicoes = db.relationship(
+        'Contribuicao',
+        primaryjoin=lambda: and_(
+            ItemDoacao.id == foreign(Contribuicao.item_doacao_id),
+            ItemDoacao.doacao_id == Contribuicao.doacao_id),
+        backref='item_doacao', lazy=True)
 
 class Reserva(db.Model):
     __tablename__ = 'reservas'
+    __table_args__ = (
+        db.CheckConstraint("status IN ('ATIVA', 'CANCELADA', 'CONCLUIDA')",
+                           name='ck_reservas_status'),
+    )
     id = db.Column(db.Integer, primary_key=True)
-    doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id'), nullable=False)
-    instituicao_id = db.Column(db.Integer, db.ForeignKey('instituicoes.id'), nullable=False)
+    doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id', ondelete='RESTRICT'), nullable=False)
+    instituicao_id = db.Column(db.Integer, db.ForeignKey('instituicoes.id', ondelete='RESTRICT'), nullable=False)
     data_reserva = db.Column(db.DateTime, default=_utc_naive)
     data_retirada = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(20), default='ATIVA')
@@ -86,6 +103,9 @@ class Reserva(db.Model):
 class Contribuicao(db.Model):
     __tablename__ = 'contribuicoes'
     __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['item_doacao_id', 'doacao_id'], ['itens_doacao.id', 'itens_doacao.doacao_id'],
+            name='fk_contribuicoes_item_pedido', ondelete='RESTRICT'),
         db.CheckConstraint('(doador_id IS NOT NULL) <> (estabelecimento_id IS NOT NULL)',
                            name='ck_contribuicoes_uma_origem'),
         db.CheckConstraint('quantidade > 0', name='ck_contribuicoes_quantidade'),
@@ -98,7 +118,7 @@ class Contribuicao(db.Model):
     )
     id = db.Column(db.Integer, primary_key=True)
     doacao_id = db.Column(db.Integer, db.ForeignKey('doacoes.id', ondelete='RESTRICT'), nullable=False)
-    item_doacao_id = db.Column(db.Integer, db.ForeignKey('itens_doacao.id', ondelete='RESTRICT'), nullable=False)
+    item_doacao_id = db.Column(db.Integer, nullable=False)
     doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'))
     estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'))
     alimento = db.Column(db.String(100), nullable=False)

@@ -1,6 +1,7 @@
 """Migrações pequenas e idempotentes para bancos existentes."""
 
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import DBAPIError
 
 from models import Contribuicao, Doacao, ItemDoacao, db
 
@@ -11,6 +12,55 @@ def _migrar_indices(engine):
         if inspect(engine).has_table(modelo.__tablename__):
             for indice in modelo.__table__.indexes:
                 indice.create(bind=engine, checkfirst=True)
+
+
+def _restricao_postgresql(conexao, tabela, nome):
+    """None se ausente; caso contrário informa se já foi validada."""
+    linha = conexao.execute(text("""
+        SELECT convalidated FROM pg_constraint
+        WHERE conrelid = to_regclass(:tabela) AND conname = :nome
+    """), {"tabela": tabela, "nome": nome}).first()
+    return None if linha is None else linha[0]
+
+
+def _migrar_chave_item_postgresql(engine):
+    """Prepara a chave referenciada antes de criar a tabela de contribuições."""
+    if not inspect(engine).has_table("itens_doacao"):
+        return
+    with engine.begin() as conexao:
+        if _restricao_postgresql(conexao, "itens_doacao", "uq_itens_doacao_id_doacao_id") is None:
+            conexao.execute(text("""ALTER TABLE itens_doacao
+                ADD CONSTRAINT uq_itens_doacao_id_doacao_id UNIQUE (id, doacao_id)"""))
+
+
+def _migrar_integridade_postgresql(engine):
+    """Acrescenta restrições sem varrer a tabela no ADD e valida dados existentes."""
+    existentes = set(inspect(engine).get_table_names())
+    restricoes = (
+        ("doacoes", "ck_doacoes_status",
+         "CHECK (status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA'))"),
+        ("reservas", "ck_reservas_status",
+         "CHECK (status IN ('ATIVA', 'CANCELADA', 'CONCLUIDA'))"),
+        ("itens_doacao", "ck_itens_doacao_quantidade", "CHECK (quantidade > 0)"),
+        ("contribuicoes", "fk_contribuicoes_item_pedido",
+         "FOREIGN KEY (item_doacao_id, doacao_id) "
+         "REFERENCES itens_doacao (id, doacao_id) ON DELETE RESTRICT"),
+    )
+    with engine.begin() as conexao:
+        for tabela, nome, definicao in restricoes:
+            if tabela not in existentes:
+                continue
+            validada = _restricao_postgresql(conexao, tabela, nome)
+            if validada is None:
+                conexao.execute(text(f"ALTER TABLE {tabela} ADD CONSTRAINT {nome} {definicao} NOT VALID"))
+            if validada is not True:
+                try:
+                    conexao.execute(text(f"ALTER TABLE {tabela} VALIDATE CONSTRAINT {nome}"))
+                except DBAPIError as erro:
+                    raise RuntimeError(
+                        f"Migração de integridade interrompida: dados existentes violam "
+                        f"{nome} em {tabela}; corrija os registros e repita a migração."
+                    ) from erro
 
 
 def _migrar_pedidos(engine):
@@ -51,12 +101,14 @@ def _migrar_pedidos(engine):
                         with conexao.begin():
                             conexao.exec_driver_sql("""CREATE TABLE itens_doacao_nova (
                                 id INTEGER PRIMARY KEY,
-                                doacao_id INTEGER NOT NULL REFERENCES doacoes(id),
+                                doacao_id INTEGER NOT NULL REFERENCES doacoes(id) ON DELETE CASCADE,
                                 nome VARCHAR(100) NOT NULL,
                                 categoria VARCHAR(50) NOT NULL,
                                 quantidade NUMERIC(10,2) NOT NULL,
                                 unidade_medida VARCHAR(20) NOT NULL,
-                                validade DATE
+                                validade DATE,
+                                CONSTRAINT ck_itens_doacao_quantidade CHECK (quantidade > 0),
+                                CONSTRAINT uq_itens_doacao_id_doacao_id UNIQUE (id, doacao_id)
                             )""")
                             campos = "id, doacao_id, nome, categoria, quantidade, unidade_medida, validade"
                             conexao.exec_driver_sql(
@@ -88,16 +140,18 @@ def _migrar_doacoes_sqlite(engine, colunas):
                 conexao.exec_driver_sql("""
                     CREATE TABLE doacoes_nova (
                         id INTEGER PRIMARY KEY,
-                        estabelecimento_id INTEGER REFERENCES estabelecimentos(id),
+                        estabelecimento_id INTEGER REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
                         doador_id INTEGER REFERENCES doadores(id) ON DELETE RESTRICT,
                         retirada_endereco VARCHAR(200),
                         retirada_municipio VARCHAR(80),
                         retirada_uf VARCHAR(2),
                         data_cadastro DATETIME,
                         data_limite_retirada DATETIME NOT NULL,
-                        status VARCHAR(20) CHECK (status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA')),
+                        status VARCHAR(20),
                         CONSTRAINT ck_doacoes_uma_origem CHECK (
-                            (estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL))
+                            (estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)),
+                        CONSTRAINT ck_doacoes_status CHECK (
+                            status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA'))
                     )
                 """)
                 campos = ["id", "estabelecimento_id", "doador_id", "retirada_endereco",
@@ -167,5 +221,9 @@ def aplicar_migracoes(engine=None):
             _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))
         elif engine.dialect.name == "postgresql":
             _migrar_doacoes_postgresql(engine)
+    if engine.dialect.name == "postgresql":
+        _migrar_chave_item_postgresql(engine)
     _migrar_pedidos(engine)
     _migrar_indices(engine)
+    if engine.dialect.name == "postgresql":
+        _migrar_integridade_postgresql(engine)
