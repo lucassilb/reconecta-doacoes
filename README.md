@@ -29,6 +29,7 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | Doar para um pedido | Pessoa (CPF) ou outra empresa; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A empresa não doa no próprio pedido. |
 | Progresso | Cada item mostra recebido × meta e quanto falta. |
 | Painéis | Empresa: publicar pedido (com "Preencher com IA"), meus pedidos com progresso e doações recebidas com foto, minhas doações. Doador: minhas doações. |
+| Meus dados | No painel, "Editar" altera os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha informando a atual. CNPJ e CPF não mudam. |
 | Dashboard | Indicadores, gráfico pedido × recebido por categoria, doações por dia (30 dias), empresas com mais doações, alertas e últimas doações, com dados reais do banco. Botão "Gerar resumo com IA". |
 | LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
 | CRUDs do CP1 | Estabelecimentos, Instituições e Doações (`/reconecta/...`): leitura pública sem contatos; escrita só com token de administrador, CNPJ verificado e erros em JSON. |
@@ -65,7 +66,8 @@ ReConecta/
 ├── Painel.py              # /reconecta/painel    (pedidos da empresa, minhas doações)
 ├── Dashboard.py           # /reconecta/dashboard (agregados)
 ├── IA.py, llm_service.py  # /reconecta/ia        (LLM local via Ollama + regras automáticas se ele estiver fora)
-├── Estabelecimentos.py, Instituicoes.py, Doacoes.py, crud_validacao.py  # CRUDs do CP1
+├── Estabelecimentos.py, Instituicoes.py, Doacoes.py  # CRUDs do CP1
+├── crud_validacao.py, crud_admin.py  # validação dos CRUDs do CP1 e token de administrador (X-Admin-Token)
 ├── static/                # Front-end: HTML, CSS e JS (sem build)
 ├── tests/                 # pytest
 └── docs/                  # modelagem, otimizações, LLM, critério CNAE
@@ -219,6 +221,22 @@ Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `
 
 Datas de eventos (`data_cadastro`, `criado_em`) são gravadas em UTC no banco. O prazo `receber_ate` é informado como hora local de Brasília. As respostas da API trazem datas e horas ISO com offset, e as páginas mostram horários no fuso `America/Sao_Paulo`, mesmo em navegadores configurados para outro fuso. O dashboard agrupa doações pelo dia civil de Brasília. Em Windows, o pacote gratuito `tzdata` fornece as regras desse fuso.
 
+## Documentação (critério 6 do CP2)
+
+Onde cada item exigido está atualizado:
+
+| Item do critério | Onde está |
+|---|---|
+| README | Este arquivo, reescrito para o CP2 (fluxo de pedidos e doações, dashboard, LLM, segurança) |
+| Swagger | `/swagger` (gerado do código pelo Flask-RESTX) e [swagger.json](swagger.json) exportado da API atual, com todos os endpoints, modelos de entrada/saída, códigos de resposta e o cabeçalho `X-Admin-Token` |
+| Instruções de instalação | Seções **Instalação** (Python, venv, `pip install -r requirements.txt`, PostgreSQL ou SQLite, Ollama gratuito), **Execução** e **Testes** |
+| Endpoints | Seção **Endpoints**: todas as 35 operações da API (24 caminhos) com método, caminho e descrição, mais as rotas de página em **Arquitetura** |
+| Arquitetura | Seção **Arquitetura**: um arquivo por responsabilidade, front-end em `static/`, testes em `tests/`, docs em `docs/` |
+| Funcionalidades | Seções **Funcionalidades** e **Regras de negócio** (RN01–RN10), mais as tabelas dos critérios 2, 3 e 4 |
+| Variáveis de ambiente | Seção **Variáveis de ambiente** (`DATABASE_URL`, `SECRET_KEY`, `FLASK_DEBUG`, `OLLAMA_URL`, `OLLAMA_MODELO`, `ADMIN_TOKEN`) e o arquivo `.env.example` |
+
+Documentos complementares: [docs/modelagem.md](docs/modelagem.md) (banco), [docs/otimizacoes.md](docs/otimizacoes.md) (otimizações com medições), [docs/llm.md](docs/llm.md) (LLM) e [docs/cnae-alimentos.md](docs/cnae-alimentos.md) (critério de atividade alimentar).
+
 ## Documentação complementar
 
 - [docs/modelagem.md](docs/modelagem.md) — modelagem, normalização e índices;
@@ -235,7 +253,7 @@ Datas de eventos (`data_cadastro`, `criado_em`) são gravadas em UTC no banco. O
 
 ## Documentação Swagger
 
-Interativa em `/swagger` (local) e no deploy do CP1: **[Swagger/OpenAPI do ReConecta](https://reconecta.onrender.com/swagger)**.
+Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir do código (sempre igual à API em execução). A especificação exportada está em [swagger.json](swagger.json) e é regenerada a cada mudança de endpoint. O endereço publicado no CP1 (https://reconecta.onrender.com/swagger) mostra a versão do CP1 até ser atualizado.
 
 ## Organização no Trello
 
