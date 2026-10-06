@@ -247,6 +247,32 @@ Onde cada item exigido está atualizado:
 
 Documentos complementares: [docs/modelagem.md](docs/modelagem.md) (banco), [docs/otimizacoes.md](docs/otimizacoes.md) (otimizações com medições), [docs/llm.md](docs/llm.md) (LLM) e [docs/cnae-alimentos.md](docs/cnae-alimentos.md) (critério de atividade alimentar).
 
+## Testes (critério 7 do CP2)
+
+Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente virtual ativo):
+
+```bash
+python -m pytest -v
+```
+
+Resultado atual: **185 passed, 3 skipped** (os 3 "skipped" são as provas opcionais em PostgreSQL; com `CP2_PG_SUPERUSER_PASSWORD_FILE` definido, os 188 passam). Os testes usam SQLite em memória e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real.
+
+| Tipo de teste | Arquivos | O que cobrem |
+|---|---|---|
+| Unitários | `test_cnae_alimentos.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, normalização e validação da saída da LLM, fallback por regras |
+| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_crud_seguro.py`, `test_cp2_api.py` | Códigos HTTP, formato das respostas e erros JSON de cada rota (cadastro, login, edição de dados, pedidos, doação com foto, painel, dashboard, IA, CRUDs do CP1, paginação e filtros) |
+| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_crud_seguro.py`, `test_auth.py` | RN01–RN10: CNPJ ativo e alimentar, só empresa publica, questionário e validade, empresa não doa no próprio pedido, foto privada, dados pessoais fora do público, limite de tentativas de login, escrita do CP1 só com token |
+| De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_fuso.py`, `test_cp2_api.py` | Aplicação + banco: migrações idempotentes preservando dados, CHECKs e FK composta, fuso de Brasília no dashboard, número de consultas SQL das listas |
+
+## LLM (critério 8 do CP2)
+
+O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API paga) em duas funções ligadas às regras de negócio — não é um chatbot genérico:
+
+1. **"Preencher com IA"** (painel da empresa → "Publicar pedido de doação"): a empresa escreve, por exemplo, "Precisamos de 100 caixas de leite e 100 pães até sexta-feira"; a LLM classifica e estrutura os itens nas **categorias e unidades fixas da plataforma** e sugere o prazo. O formulário é preenchido para a empresa revisar; a publicação continua passando pelas validações do pedido.
+2. **"Gerar resumo com IA"** (dashboard): a LLM interpreta os indicadores agregados dos pedidos e doações e devolve um resumo e recomendações para apoiar decisões.
+
+Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados enviados, resposta obtida, uso da resposta, limitações e segurança/dados sensíveis — está na tabela do início de [docs/llm.md](docs/llm.md), com exemplos reais de entrada e saída. Endpoints: `POST /reconecta/ia/interpretar-pedido` e `POST /reconecta/ia/resumo-dashboard`; código em `llm_service.py` e `IA.py`; testes em `tests/test_ia.py`.
+
 ## Documentação complementar
 
 - [docs/modelagem.md](docs/modelagem.md) — modelagem, normalização e índices;

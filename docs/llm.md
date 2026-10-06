@@ -1,5 +1,17 @@
 # IA local no ReConecta
 
+## Resumo para a apresentação (critério 8 do CP2)
+
+| O que o critério pede explicar | Resposta |
+|---|---|
+| Modelo ou serviço utilizado | **Ollama** (código aberto, gratuito) rodando no próprio computador, com o modelo aberto **`qwen2.5:3b`**. Sem API paga, sem chave, sem nuvem. Detalhes em "Serviço e finalidade". |
+| Finalidade da LLM | (1) **Interpretar o pedido** escrito em texto livre pela empresa e transformar em itens estruturados (nome, categoria, quantidade, unidade, prazo) — classificação de informações e análise textual. (2) **Resumir o dashboard** e sugerir **recomendações** — interpretação de dados, geração de relatório e apoio à tomada de decisão. |
+| Dados enviados | (1) Só o texto que a empresa digitou, com e-mail, telefone, CPF e CNPJ removidos, mais as listas fixas de categorias e unidades e a data de hoje. (2) Só números agregados do dashboard (contadores, percentual, totais por categoria, contagem de alertas). Nenhum nome, documento, contato ou endereço. Ver "O que a aplicação envia e recebe". |
+| Resposta obtida | JSON com `itens`, `receber_ate` e `observacoes` (pedido) ou `resumo` e `recomendacoes` (dashboard), sempre com `fonte` (`llm` ou `regras`) e `modelo`. Exemplos reais abaixo. |
+| Como a resposta é usada | (1) **Pré-preenche** o formulário "Publicar pedido de doação" no painel; a empresa revisa e só então publica — o endpoint de IA não grava nada e o POST de publicação valida tudo de novo. (2) Mostra o resumo e as recomendações no cartão "Resumo com IA" do dashboard, com o selo da origem. |
+| Limitações identificadas | Ver "Limitações identificadas". |
+| Cuidados com segurança e dados sensíveis | Ver "Segurança e dados sensíveis". |
+
 ## Serviço e finalidade
 
 O recurso usa **Ollama rodando no próprio computador**, com o modelo `qwen2.5:3b`. Não usa API paga, conta de nuvem, chave, OpenAI, Anthropic, Gemini, Groq ou Hugging Face. O backend chama somente `POST http://localhost:11434/api/chat`, via `requests`, com `stream: false`, temperatura `0.2` e tempo limite. A interpretação de pedidos envia um JSON Schema em `format` para exigir a lista `itens` e valores das listas fixas; o resumo usa `format: "json"`. A implementação aceita `OLLAMA_URL` apenas com HTTP em `localhost`, `127.0.0.1` ou `::1`, e `OLLAMA_MODELO` apenas como `qwen2.5:3b`; modelos `:cloud` não são chamados. Redirecionamentos e proxies do ambiente são desativados. Se o serviço não responder, responder mal ou devolver dados fora do contrato, regras locais geram a resposta com `fonte: "regras"` e `modelo: null`.
@@ -32,3 +44,21 @@ No fallback, o resumo tem três frases e recomendações determinísticas calcul
 4. Inicie o ReConecta normalmente. Consulte `/reconecta/ia/interpretar-pedido` com sessão de empresa ou `/reconecta/ia/resumo-dashboard` sem sessão. A [referência oficial de `/api/chat`](https://docs.ollama.com/api/chat) documenta `messages`, `format`, `options` e `stream`.
 
 O serviço funciona sem Ollama, com sugestões por regras. O primeiro uso do modelo pode demorar para carregá-lo; a chamada tem timeout de conexão de 2 s e de leitura de 90 s. O limite por IP é mantido em memória por processo: múltiplos workers não compartilham a contagem. Os padrões de remoção de identificadores não cobrem todos os formatos possíveis; evite escrever dados pessoais no texto livre. A interpretação de alimentos e datas relativas é heurística, e toda sugestão precisa da revisão da empresa.
+
+## Limitações identificadas
+
+- O `qwen2.5:3b` é um modelo pequeno: às vezes omite um item, devolve um objeto de um item só ou inventa datas. Por isso a saída passa por JSON Schema, validação contra as listas fixas, conferência com o texto original e, se necessário, recuperação por regras.
+- Datas relativas ("sexta", "amanhã") e nomes de alimentos são interpretados de forma heurística; a hora do prazo sempre precisa ser informada/revisada pela empresa.
+- O primeiro uso pode demorar enquanto o modelo carrega; em máquina sem GPU a resposta é mais lenta (timeout de 90 s).
+- O Ollama precisa estar instalado e ativo no servidor; sem ele as funções continuam funcionando por regras automáticas, avisando `fonte: "regras"`.
+- O limite de 10 chamadas por minuto do resumo fica na memória de cada processo.
+- Licença do modelo: Qwen Research License — adequada ao uso acadêmico; revisar antes de qualquer uso comercial.
+
+## Segurança e dados sensíveis
+
+- **Local**: o modelo roda no próprio PC; nenhum dado sai para serviços externos. O backend só aceita `OLLAMA_URL` em `localhost`, ignora proxies e redirecionamentos e não chama modelos `:cloud`.
+- **Mínimo de dados**: o texto do pedido passa por remoção de e-mail, telefone, CPF e CNPJ antes de ir ao modelo; o resumo usa só agregados calculados no servidor (o cliente não consegue injetar dados nele).
+- **Acesso**: interpretar pedido exige sessão de empresa; o resumo tem limite de chamadas por IP.
+- **Saída tratada como dado não confiável**: validada contra listas e tamanhos, exibida com `textContent` (nunca como HTML) e nunca grava no banco nem decide publicação sozinha.
+- **Transparência**: toda resposta informa se veio do modelo (`fonte: "llm"`, com o nome do modelo) ou das regras.
+- **Sem segredos**: não há chave de API; nada sensível em variáveis da IA.
