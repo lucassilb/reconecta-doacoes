@@ -36,9 +36,14 @@
       <!-- ===== empresa ===== -->
       <div id="bloco-empresa" class="painel__grade" hidden>
 
-        <section class="cartao" aria-labelledby="dados-empresa-t">
-          <h2 id="dados-empresa-t" class="cartao__titulo">Seus dados</h2>
+        <section class="cartao meus-dados" aria-labelledby="dados-empresa-t">
+          <div class="cartao__linha">
+            <h2 id="dados-empresa-t" class="cartao__titulo">Seus dados</h2>
+            <button type="button" class="btn btn--secundario btn--pequeno" id="editar-empresa" aria-controls="form-dados-empresa" aria-expanded="false">Editar</button>
+          </div>
+          <div id="aviso-dados-empresa" class="aviso" role="status" aria-live="polite" hidden></div>
           <dl class="dados" id="dados-empresa"></dl>
+          <form id="form-dados-empresa" class="form-dados" novalidate hidden></form>
         </section>
 
       </div>
@@ -46,9 +51,14 @@
       <!-- ===== doador ===== -->
       <div id="bloco-doador" class="painel__grade" hidden>
 
-        <section class="cartao" aria-labelledby="dados-doador-t">
-          <h2 id="dados-doador-t" class="cartao__titulo">Seus dados</h2>
+        <section class="cartao meus-dados" aria-labelledby="dados-doador-t">
+          <div class="cartao__linha">
+            <h2 id="dados-doador-t" class="cartao__titulo">Seus dados</h2>
+            <button type="button" class="btn btn--secundario btn--pequeno" id="editar-doador" aria-controls="form-dados-doador" aria-expanded="false">Editar</button>
+          </div>
+          <div id="aviso-dados-doador" class="aviso" role="status" aria-live="polite" hidden></div>
           <dl class="dados" id="dados-doador"></dl>
+          <form id="form-dados-doador" class="form-dados" novalidate hidden></form>
         </section>
 
       </div>

@@ -182,3 +182,29 @@
 .ia-pedido textarea { resize: vertical; min-height: 64px; background: var(--superficie); }
 .ia-pedido__opcional { font-weight: 400; color: var(--tinta-suave); }
 .ia-pedido .btn { justify-self: start; }
+
+/* meus dados: edição inline (CP2, PUT /reconecta/auth/me) */
+.form-dados { display: grid; gap: 16px; }
+.form-dados__grade { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 640px) {
+  .form-dados__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.form-dados__senha {
+  border: 1.5px solid var(--linha); border-radius: var(--raio);
+  background: var(--superficie-2); padding: 0 16px;
+}
+.form-dados__senha[open] { padding-bottom: 16px; }
+.form-dados__senha summary {
+  cursor: pointer; font-weight: 700; font-size: .95rem; color: var(--verde-texto);
+  padding: 14px 0; min-height: 44px; box-sizing: border-box;
+}
+.form-dados__senha .campo__entrada { background: var(--superficie); }
+.form-dados__mostrar { display: inline-flex; gap: 8px; align-items: center; margin-top: 12px; font-size: .92rem; cursor: pointer; }
+.form-dados__mostrar input { width: 18px; height: 18px; accent-color: var(--verde); }
+.form-dados__acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.senha-forca { display: flex; gap: 6px; }
+.senha-forca i { flex: 1; height: 5px; border-radius: 999px; background: var(--linha); transition: background-color .2s ease; }
+.senha-forca[data-nivel="1"] i:nth-child(1) { background: var(--erro); }
+.senha-forca[data-nivel="2"] i:nth-child(-n+2) { background: var(--alerta); }
+.senha-forca[data-nivel="3"] i { background: var(--ok); }

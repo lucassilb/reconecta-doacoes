@@ -158,6 +158,282 @@
     });
   }
 
+  /* ================= MEUS DADOS (editar: PUT /reconecta/auth/me) ================= */
+
+  /* Empresa altera e-mail e telefone (nome, CNPJ e endereço vêm da Receita);
+     doador altera nome, e-mail e telefone (CPF fixo). Troca de senha é opcional.
+     Envia só o que mudou; o servidor repete as regras do cadastro. */
+
+  var MSG_DADOS = {
+    nome: "Informe seu nome completo (de 3 a 100 caracteres).",
+    email: "Informe um e-mail válido, como nome@dominio.com.",
+    telefone: "Informe o telefone com DDD (10 ou 11 dígitos).",
+    senhaAtual: "Informe sua senha atual para trocar a senha.",
+    senha: "A nova senha precisa de pelo menos 8 caracteres, com letra e número.",
+    confirmar: "As senhas não são iguais.",
+    emailUsado: "Este e-mail já está em uso em outra conta."
+  };
+
+  function digitos(v) { return String(v || "").replace(/\D+/g, ""); }
+  function emailValido(v) { v = String(v).trim(); return v.length <= 100 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+  function telefoneValido(v) { var n = digitos(v).length; return n === 10 || n === 11; }
+  function senhaValida(v) { return v.length >= 8 && /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(v) && /\d/.test(v); }
+  function nivelSenha(v) {
+    if (!v) return 0;
+    if (!senhaValida(v)) return 1;
+    if (v.length >= 12 && /[^A-Za-zÀ-ÖØ-öø-ÿ\d]/.test(v)) return 3;
+    return 2;
+  }
+  function mascaraTelefone(v) {
+    var d = digitos(v);
+    if (d.length > 11 && d.charAt(0) === "0") d = d.slice(1);
+    d = d.slice(0, 11);
+    if (d.length <= 2) return d.length ? "(" + d : "";
+    var ddd = d.slice(0, 2), resto = d.slice(2);
+    var corte = d.length === 11 ? 5 : 4;
+    if (resto.length <= corte) return "(" + ddd + ") " + resto;
+    return "(" + ddd + ") " + resto.slice(0, corte) + "-" + resto.slice(corte);
+  }
+
+  function paresDados(u) {
+    if (u.tipo === "empresa") {
+      return [
+        ["Empresa", u.nome],
+        ["CNPJ", u.cnpj_formatado],
+        ["Endereço", u.endereco],
+        ["E-mail", u.email],
+        ["Telefone", telefone(u.telefone)]
+      ];
+    }
+    return [
+      ["Nome", u.nome],
+      ["CPF", u.cpf_formatado],
+      ["E-mail", u.email],
+      ["Telefone", telefone(u.telefone)]
+    ];
+  }
+
+  function campoDados(id, rotulo, input, ajuda) {
+    input.id = id;
+    input.classList.add("campo__entrada");
+    var desc = [ajuda ? id + "-ajuda" : null, id + "-erro"].filter(Boolean).join(" ");
+    input.setAttribute("aria-describedby", desc);
+    return el("div", { classe: "campo" }, [
+      el("label", { for: id, classe: "campo__rotulo", texto: rotulo }),
+      input,
+      ajuda ? el("p", { id: id + "-ajuda", classe: "campo__ajuda", texto: ajuda }) : null,
+      el("p", { id: id + "-erro", classe: "campo__erro", "data-erro": "" })
+    ]);
+  }
+
+  function iniciarMeusDados(u) {
+    var t = u.tipo === "empresa" ? "empresa" : "doador";
+    var dl = $("dados-" + t);
+    var form = $("form-dados-" + t);
+    var btnEditar = $("editar-" + t);
+    var aviso = $("aviso-dados-" + t);
+    var atual = u;
+    var entradas = {};
+
+    dlDados(dl, paresDados(atual));
+
+    function entrada(nome, tipoInput, attrs) {
+      var i = el("input", Object.assign({ type: tipoInput, name: nome }, attrs || {}));
+      entradas[nome] = i;
+      return i;
+    }
+
+    /* ---- monta o formulário uma vez ---- */
+    var p = "ed-" + t + "-";
+    var grade = el("div", { classe: "form-dados__grade" });
+    if (t === "doador") {
+      grade.appendChild(campoDados(p + "nome", "Nome completo", entrada("nome", "text", { autocomplete: "name", maxlength: "100", required: "" })));
+    }
+    grade.appendChild(campoDados(p + "email", "E-mail", entrada("email", "email", { autocomplete: "email", maxlength: "100", inputmode: "email", required: "" })));
+    grade.appendChild(campoDados(p + "telefone", "Telefone", entrada("telefone", "tel", { autocomplete: "tel", inputmode: "tel", maxlength: "16", placeholder: "(11) 98765-4321", required: "" })));
+
+    var medidor = el("div", { classe: "senha-forca", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]);
+    var campoNova = campoDados(p + "nova", "Nova senha", entrada("nova_senha", "password", { autocomplete: "new-password", maxlength: "72" }), "Pelo menos 8 caracteres, com letra e número.");
+    campoNova.insertBefore(medidor, campoNova.querySelector(".campo__ajuda"));
+    var mostrar = el("input", { type: "checkbox", id: p + "mostrar" });
+    var blocoSenha = el("details", { classe: "form-dados__senha" }, [
+      el("summary", { texto: "Trocar senha (opcional)" }),
+      el("div", { classe: "form-dados__grade" }, [
+        campoDados(p + "atual", "Senha atual", entrada("senha_atual", "password", { autocomplete: "current-password", maxlength: "72" })),
+        campoNova,
+        campoDados(p + "confirmar", "Confirmar nova senha", entrada("confirmar", "password", { autocomplete: "new-password", maxlength: "72" }))
+      ]),
+      el("label", { classe: "form-dados__mostrar", for: p + "mostrar" }, [mostrar, " Mostrar senhas"])
+    ]);
+    var avisoForm = el("div", { classe: "aviso", role: "alert", hidden: "" });
+    var btnSalvar = el("button", { type: "submit", classe: "btn btn--primario", texto: "Salvar" });
+    var btnCancelar = el("button", { type: "button", classe: "btn btn--secundario", texto: "Cancelar" });
+
+    form.append(
+      el("p", { classe: "campo__ajuda", texto: t === "empresa"
+        ? "Nome, CNPJ e endereço vêm da Receita Federal e não podem ser alterados aqui."
+        : "O CPF não pode ser alterado." }),
+      grade, blocoSenha, avisoForm,
+      el("div", { classe: "form-dados__acoes" }, [btnSalvar, btnCancelar])
+    );
+
+    entradas.telefone.addEventListener("input", function () {
+      entradas.telefone.value = mascaraTelefone(entradas.telefone.value);
+    });
+    entradas.nova_senha.addEventListener("input", function () {
+      medidor.setAttribute("data-nivel", String(nivelSenha(entradas.nova_senha.value)));
+    });
+    mostrar.addEventListener("change", function () {
+      ["senha_atual", "nova_senha", "confirmar"].forEach(function (n) { entradas[n].type = mostrar.checked ? "text" : "password"; });
+    });
+    // o erro some quando a pessoa corrige o campo
+    Object.keys(entradas).forEach(function (n) {
+      entradas[n].addEventListener("input", function () {
+        if (entradas[n].getAttribute("aria-invalid")) mostrarErro(entradas[n], "");
+      });
+    });
+
+    function limparErros() {
+      Object.keys(entradas).forEach(function (n) { mostrarErro(entradas[n], ""); });
+      esconderAviso(avisoForm);
+    }
+
+    function preencher() {
+      if (entradas.nome) entradas.nome.value = atual.nome || "";
+      entradas.email.value = atual.email || "";
+      entradas.telefone.value = mascaraTelefone(atual.telefone || "");
+      ["senha_atual", "nova_senha", "confirmar"].forEach(function (n) { entradas[n].value = ""; entradas[n].type = "password"; });
+      mostrar.checked = false;
+      medidor.setAttribute("data-nivel", "0");
+      blocoSenha.open = false;
+      limparErros();
+    }
+
+    function abrir() {
+      preencher();
+      esconderAviso(aviso);
+      dl.hidden = true;
+      form.hidden = false;
+      btnEditar.hidden = true;
+      btnEditar.setAttribute("aria-expanded", "true");
+      (entradas.nome || entradas.email).focus();
+    }
+
+    function fechar() {
+      form.hidden = true;
+      dl.hidden = false;
+      btnEditar.hidden = false;
+      btnEditar.setAttribute("aria-expanded", "false");
+      btnEditar.focus();
+    }
+
+    btnEditar.addEventListener("click", abrir);
+    btnCancelar.addEventListener("click", fechar);
+    form.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !btnSalvar.disabled) { e.preventDefault(); fechar(); }
+    });
+
+    /* corpo só com o que mudou; erros locais por campo */
+    function montarCorpo(erros) {
+      var corpo = {};
+      if (entradas.nome) {
+        var nome = entradas.nome.value.trim().replace(/\s+/g, " ");
+        if (nome.length < 3 || nome.length > 100) erros.nome = MSG_DADOS.nome;
+        else if (nome !== atual.nome) corpo.nome = nome;
+      }
+      var email = entradas.email.value.trim();
+      if (!emailValido(email)) erros.email = MSG_DADOS.email;
+      else if (email.toLowerCase() !== String(atual.email || "").toLowerCase()) corpo.email = email;
+      var tel = digitos(entradas.telefone.value);
+      if (!telefoneValido(tel)) erros.telefone = MSG_DADOS.telefone;
+      else if (tel !== digitos(atual.telefone)) corpo.telefone = tel;
+
+      var sa = entradas.senha_atual.value, ns = entradas.nova_senha.value, cf = entradas.confirmar.value;
+      if (sa || ns || cf) {
+        if (!sa) erros.senha_atual = MSG_DADOS.senhaAtual;
+        if (!senhaValida(ns)) erros.nova_senha = MSG_DADOS.senha;
+        if (cf !== ns) erros.confirmar = MSG_DADOS.confirmar;
+        corpo.senha_atual = sa;
+        corpo.nova_senha = ns;
+      }
+      return corpo;
+    }
+
+    function aplicarErrosDados(campos) {
+      var primeiro = null;
+      Object.keys(campos).forEach(function (n) {
+        var i = entradas[n];
+        if (!i) return;
+        if (n === "senha_atual" || n === "nova_senha" || n === "confirmar") blocoSenha.open = true;
+        var m = campos[n];
+        mostrarErro(i, Array.isArray(m) ? m.join(" ") : String(m));
+        if (!primeiro) primeiro = i;
+      });
+      if (primeiro) primeiro.focus();
+      return primeiro;
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      limparErros();
+      var erros = {};
+      var corpo = montarCorpo(erros);
+      if (Object.keys(erros).length) {
+        aplicarErrosDados(erros);
+        mostrarAviso(avisoForm, "Confira os campos destacados.", "", { erro: true });
+        return;
+      }
+      if (!Object.keys(corpo).length) {
+        mostrarAviso(avisoForm, "Nada para salvar.", "Você não alterou nenhum dado.");
+        return;
+      }
+
+      var trocouSenha = "nova_senha" in corpo;
+      btnSalvar.disabled = true; btnCancelar.disabled = true;
+      btnSalvar.classList.add("is-carregando");
+      btnSalvar.textContent = "Salvando…";
+
+      requisitar("/reconecta/auth/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(corpo)
+      }).then(function (r) {
+        if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
+        if (r.ok) {
+          atual = r.corpo && r.corpo.tipo ? r.corpo : Object.assign({}, atual, corpo);
+          dlDados(dl, paresDados(atual));
+          saudacao(atual, t === "empresa" ? "Painel da empresa" : "Painel do doador");
+          if (window.ReConecta && window.ReConecta.atualizarSessao) window.ReConecta.atualizarSessao(); // "Olá, …" no cabeçalho
+          fechar();
+          mostrarAviso(aviso, "Dados atualizados.",
+            trocouSenha ? "Sua senha foi trocada. Use a nova senha no próximo login." : "As alterações já valem para o seu acesso.",
+            { ok: true });
+          return;
+        }
+        var c = r.corpo || {};
+        if (r.status === 409 || c.codigo === "EMAIL_JA_CADASTRADO") {
+          aplicarErrosDados({ email: MSG_DADOS.emailUsado });
+          mostrarAviso(avisoForm, "Não foi possível salvar.", MSG_DADOS.emailUsado, { erro: true });
+          return;
+        }
+        var campos = c.campos && typeof c.campos === "object" ? c.campos : {};
+        var achou = aplicarErrosDados(campos);
+        mostrarAviso(avisoForm, "Não foi possível salvar.",
+          achou ? "Confira os campos destacados." : (c.mensagem || "Tente novamente em instantes."),
+          { erro: true });
+      }).catch(function () {
+        mostrarAviso(avisoForm, "Sem conexão com o servidor.", "Seus dados não foram alterados. Tente novamente.", {
+          erro: true,
+          acao: { rotulo: "Tentar novamente", fn: function () { form.requestSubmit(); } }
+        });
+      }).then(function () {
+        btnSalvar.disabled = false; btnCancelar.disabled = false;
+        btnSalvar.classList.remove("is-carregando");
+        btnSalvar.textContent = "Salvar";
+      });
+    });
+  }
+
   /* ================= EMPRESA ================= */
 
   var OPCOES = { categorias: [], unidades: [] };
@@ -168,13 +444,7 @@
     saudacao(u, "Painel da empresa");
     $("bloco-empresa").hidden = false;
 
-    dlDados($("dados-empresa"), [
-      ["Empresa", u.nome],
-      ["CNPJ", u.cnpj_formatado],
-      ["Endereço", u.endereco],
-      ["E-mail", u.email],
-      ["Telefone", telefone(u.telefone)]
-    ]);
+    iniciarMeusDados(u);
 
     iniciarDoacoes();
     carregarMinhasDoacoes();
@@ -535,12 +805,7 @@
     $("bloco-doador").hidden = false;
     $("bloco-rede").hidden = false;
 
-    dlDados($("dados-doador"), [
-      ["Nome", u.nome],
-      ["CPF", u.cpf_formatado],
-      ["E-mail", u.email],
-      ["Telefone", telefone(u.telefone)]
-    ]);
+    iniciarMeusDados(u);
     carregarMinhasDoacoes();
 
     requisitar("/reconecta/publico/resumo").then(function (r) {
