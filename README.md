@@ -103,6 +103,21 @@ Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligad
 
 Privacidade: o dashboard é público e só traz dados agregados. "Últimas doações" mostra o item, a quantidade, a empresa que recebeu e se quem doou foi pessoa ou empresa, sem nome, CPF ou contato de pessoas. Testes em `tests/test_dashboard.py`, `tests/test_fuso.py` e `tests/test_cp2_api.py` (agregação, limite da meta, ausência de dados pessoais, fuso e número de consultas).
 
+## Otimização da API (critério 4 do CP2)
+
+Detalhes, medições e como repetir em [docs/otimizacoes.md](docs/otimizacoes.md).
+
+| Item do critério | O que foi feito | Onde |
+|---|---|---|
+| Redução de requisições desnecessárias | Dashboard inteiro em **1** requisição; sessão consultada **1** vez por página (antes `/painel` e `/entrar` faziam 2 `GET /auth/me`); cache de 10 min das consultas de CNPJ (a verificação ao digitar e a do envio usam o mesmo resultado); "Seus dados" não envia nada se nada mudou; Home busca só a 1ª página de pedidos | `Dashboard.py`, `static/js/layout.js`, `painel.js`, `entrar.js`, `cnpj_service.py` |
+| Paginação | `GET /reconecta/publico/doacoes?pagina=&por_pagina=` (máx. 50) com `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`; `limite` antigo continua aceito | `Publico.py` |
+| Filtros | `categoria`, `uf` e `busca` (nome do item ou da empresa) na mesma lista, com `EXISTS` para não duplicar pedidos | `Publico.py` |
+| Consultas otimizadas | `selectinload` (carregamento em lote) nas listas e no painel; agregações `COUNT`/`SUM` + `GROUP BY` no dashboard; índices nas chaves estrangeiras, em `doacoes(status, data_limite_retirada)` e `contribuicoes(doacao_id, status)` | `Publico.py`, `Painel.py`, `Dashboard.py`, `models.py`, `migracoes.py`, `schema.sql` |
+| Melhor tratamento de erros | Erros JSON padronizados para 404/405/413/500 sob `/reconecta/` (sem stack trace); CRUDs do CP1 deixaram de dar 500 com campo faltando; falhas da Receita e do Ollama viram 503 ou fallback explícito | `app.py`, `crud_validacao.py`, `cnpj_service.py`, `llm_service.py` |
+| Validações | Parâmetros de paginação/filtro validados (400 com `campos`); CRUDs do CP1 validados e protegidos por `X-Admin-Token`; cadastro, pedido, doação (questionário + foto pelos bytes) e edição de dados validados no servidor | `Publico.py`, `crud_validacao.py`, `crud_admin.py`, `Cadastro.py`, `Painel.py`, `Contribuicoes.py`, `Auth.py` |
+| Organização das respostas | Formato único `{codigo, mensagem, campos/motivos}`; códigos HTTP com significado fixo; paginação em cabeçalhos mantendo a lista; datas com fuso `-03:00`; CPF mascarado; modelos no Swagger | todos os namespaces, `swagger.json` |
+| Melhorias de desempenho | Lista de 25 pedidos: **52 → 5** consultas SELECT (~21 ms → ~15 ms); dashboard com **10** consultas fixas, independentemente do volume; limite de 6 MB por requisição | `tests/test_cp2_api.py` (mede as consultas), `app.py` |
+
 ## Tecnologias
 
 Python 3.10+ (testado em 3.14), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, PostgreSQL (ou SQLite para desenvolvimento), psycopg 3, python-dotenv, requests, pytest, Ollama + `qwen2.5:3b` (opcional, gratuito e local), Chart.js.
