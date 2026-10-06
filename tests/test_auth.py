@@ -171,3 +171,156 @@ def test_chave_secreta_local_persiste(tmp_path, monkeypatch):
     configurar_chave_secreta(segundo)
     assert primeiro.secret_key == segundo.secret_key
     assert len(primeiro.secret_key) >= 64
+
+
+def test_perfil_exige_sessao_e_corpo_valido(cliente, monkeypatch):
+    sem_sessao = cliente.put("/reconecta/auth/me", json={"telefone": "11988887777"})
+    assert sem_sessao.status_code == 401
+    assert sem_sessao.json["codigo"] == "NAO_AUTENTICADO"
+
+    cadastrar_empresa(cliente, monkeypatch)
+    for corpo in ({}, [], None):
+        resposta = cliente.put("/reconecta/auth/me", json=corpo)
+        assert resposta.status_code == 400
+        assert resposta.json["codigo"] == "DADOS_INVALIDOS"
+        assert resposta.json["campos"]
+    for campo in ("cnpj", "cpf", "nome", "id", "endereco", "senha_hash"):
+        resposta = cliente.put("/reconecta/auth/me", json={campo: "alterado"})
+        assert resposta.status_code == 400
+        assert campo in resposta.json["campos"]
+    assert cliente.get("/reconecta/auth/me").json["telefone"] == "11999998888"
+
+
+def test_empresa_edita_contatos_sem_mudar_dados_da_receita(cliente, monkeypatch):
+    cadastrar_empresa(cliente, monkeypatch)
+    original = cliente.get("/reconecta/auth/me").json
+    resposta = cliente.put("/reconecta/auth/me", json={
+        "email": "  NOVO@Exemplo.com ", "telefone": "(11) 98888-7777",
+    })
+    assert resposta.status_code == 200
+    assert resposta.json == cliente.get("/reconecta/auth/me").json
+    assert resposta.json["email"] == "novo@exemplo.com"
+    assert resposta.json["telefone"] == "11988887777"
+    for campo in ("id", "nome", "cnpj_formatado", "endereco"):
+        assert resposta.json[campo] == original[campo]
+    assert cliente.put("/reconecta/auth/me", json={
+        "email": "NOVO@EXEMPLO.COM"}).status_code == 200
+
+
+def test_doador_edita_nome_e_contatos(cliente):
+    cadastrar_doador(cliente)
+    resposta = cliente.put("/reconecta/auth/me", json={
+        "nome": "  Maria Nova  ", "email": "  NOVA@Exemplo.com ",
+        "telefone": "(11) 4004-0010",
+    })
+    assert resposta.status_code == 200
+    assert resposta.json == cliente.get("/reconecta/auth/me").json
+    assert (resposta.json["nome"], resposta.json["email"], resposta.json["telefone"]) == (
+        "Maria Nova", "nova@exemplo.com", "1140040010")
+    assert resposta.json["cpf_formatado"] == "***.982.247-**"
+    for campo in ("cpf", "cnpj", "id"):
+        invalido = cliente.put("/reconecta/auth/me", json={campo: "alterado"})
+        assert invalido.status_code == 400
+        assert campo in invalido.json["campos"]
+
+
+@pytest.mark.parametrize("tipo", ["empresa", "doador"])
+def test_perfil_valida_campos_e_preserva_estado_em_erro(cliente, monkeypatch, tipo):
+    if tipo == "empresa":
+        cadastrar_empresa(cliente, monkeypatch)
+    else:
+        cadastrar_doador(cliente)
+    original = cliente.get("/reconecta/auth/me").json
+    invalidos = {"email": "invalido", "telefone": "123", "nova_senha": "abcdefghi"}
+    if tipo == "doador":
+        invalidos["nome"] = " A "
+    resposta = cliente.put("/reconecta/auth/me", json=invalidos)
+    assert resposta.status_code == 400
+    assert resposta.json["codigo"] == "DADOS_INVALIDOS"
+    assert set(invalidos) <= set(resposta.json["campos"])
+    assert "senha_atual" in resposta.json["campos"]
+    assert cliente.get("/reconecta/auth/me").json == original
+
+
+def test_perfil_aplica_limites_do_cadastro(cliente):
+    cadastrar_doador(cliente)
+    original = cliente.get("/reconecta/auth/me").json
+    for campo, valor in (
+        ("nome", "x" * 101),
+        ("email", "x" * 90 + "@exemplo.com"),
+        ("telefone", "119999988889"),
+        ("nova_senha", "12345678"),
+        ("nova_senha", "Ab12345"),
+    ):
+        corpo = {campo: valor, "senha_atual": SENHA} if campo == "nova_senha" else {campo: valor}
+        resposta = cliente.put("/reconecta/auth/me", json=corpo)
+        assert resposta.status_code == 400
+        assert campo in resposta.json["campos"]
+    misto = cliente.put("/reconecta/auth/me", json={
+        "nome": "Maria Nova", "cpf": "11144477735"})
+    assert misto.status_code == 400
+    assert "cpf" in misto.json["campos"]
+    assert cliente.get("/reconecta/auth/me").json == original
+
+
+@pytest.mark.parametrize("tipo", ["empresa", "doador"])
+def test_perfil_email_unico_entre_tipos(cliente, monkeypatch, tipo):
+    cadastrar_empresa(cliente, monkeypatch)
+    cliente.post("/reconecta/auth/logout")
+    cadastrar_doador(cliente)
+    if tipo == "empresa":
+        cliente.post("/reconecta/auth/logout")
+        login = cliente.post("/reconecta/auth/login", json={
+            "identificador": "empresa@exemplo.com", "senha": SENHA})
+        assert login.status_code == 200
+        email_alheio = "MARIA@EXEMPLO.COM"
+    else:
+        email_alheio = "EMPRESA@EXEMPLO.COM"
+    original = cliente.get("/reconecta/auth/me").json
+    resposta = cliente.put("/reconecta/auth/me", json={
+        "email": email_alheio, "telefone": "11988887777"})
+    assert resposta.status_code == 409
+    assert resposta.json["codigo"] == "EMAIL_JA_CADASTRADO"
+    assert cliente.get("/reconecta/auth/me").json == original
+
+
+@pytest.mark.parametrize("tipo", ["empresa", "doador"])
+def test_perfil_troca_senha_mantem_sessao_e_login_novo(cliente, monkeypatch, tipo):
+    if tipo == "empresa":
+        cadastrar_empresa(cliente, monkeypatch)
+        email = "empresa@exemplo.com"
+    else:
+        cadastrar_doador(cliente)
+        email = "maria@exemplo.com"
+    for corpo, campos in (
+        ({"senha_atual": SENHA}, {"nova_senha"}),
+        ({"nova_senha": "SenhaNova123"}, {"senha_atual"}),
+        ({"senha_atual": "Errada123", "nova_senha": "SenhaNova123"}, {"senha_atual"}),
+        ({"senha_atual": SENHA, "nova_senha": "semnumero"}, {"nova_senha"}),
+    ):
+        resposta = cliente.put("/reconecta/auth/me", json=corpo)
+        assert resposta.status_code == 400
+        assert resposta.json["codigo"] == "DADOS_INVALIDOS"
+        assert campos <= set(resposta.json["campos"])
+    sucesso = cliente.put("/reconecta/auth/me", json={
+        "senha_atual": SENHA, "nova_senha": "SenhaNova123"})
+    assert sucesso.status_code == 200
+    assert sucesso.json == cliente.get("/reconecta/auth/me").json
+    assert "senha_hash" not in sucesso.json
+    assert cliente.post("/reconecta/auth/logout").status_code == 204
+    antigo = cliente.post("/reconecta/auth/login", json={
+        "identificador": email, "senha": SENHA})
+    assert antigo.status_code == 401
+    novo = cliente.post("/reconecta/auth/login", json={
+        "identificador": email, "senha": "SenhaNova123"})
+    assert novo.status_code == 200
+
+
+def test_perfil_put_documentado_no_swagger(cliente):
+    especificacao = cliente.get("/swagger.json").json
+    operacao = especificacao["paths"]["/reconecta/auth/me"]["put"]
+    assert operacao["responses"]["200"]["schema"]["$ref"] == "#/definitions/UsuarioAutenticado"
+    assert {"400", "401", "409"} <= set(operacao["responses"])
+    entrada = operacao["parameters"][0]["schema"]["$ref"]
+    assert set(especificacao["definitions"][entrada.split("/")[-1]]["properties"]) == {
+        "nome", "email", "telefone", "senha_atual", "nova_senha"}
