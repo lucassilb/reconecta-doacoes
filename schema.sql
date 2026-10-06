@@ -36,10 +36,11 @@ CREATE TABLE IF NOT EXISTS doacoes (
     retirada_uf CHAR(2),
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_limite_retirada TIMESTAMP NOT NULL,
-    status VARCHAR(20) DEFAULT 'DISPONIVEL' CHECK (status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA')),
+    status VARCHAR(20) DEFAULT 'DISPONIVEL',
     CONSTRAINT fk_doacao_estabelecimento FOREIGN KEY (estabelecimento_id) REFERENCES estabelecimentos (id) ON DELETE RESTRICT,
     CONSTRAINT fk_doacao_doador FOREIGN KEY (doador_id) REFERENCES doadores (id) ON DELETE RESTRICT,
-    CONSTRAINT ck_doacoes_uma_origem CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL))
+    CONSTRAINT ck_doacoes_uma_origem CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)),
+    CONSTRAINT ck_doacoes_status CHECK (status IN ('DISPONIVEL', 'RESERVADA', 'RETIRADA'))
 );
 
 CREATE TABLE IF NOT EXISTS itens_doacao (
@@ -47,10 +48,12 @@ CREATE TABLE IF NOT EXISTS itens_doacao (
     doacao_id INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
     categoria VARCHAR(50) NOT NULL,
-    quantidade DECIMAL(10,2) NOT NULL CHECK (quantidade > 0),
+    quantidade DECIMAL(10,2) NOT NULL,
     unidade_medida VARCHAR(20) NOT NULL,
     validade DATE,
-    CONSTRAINT fk_item_doacao FOREIGN KEY (doacao_id) REFERENCES doacoes (id) ON DELETE CASCADE
+    CONSTRAINT fk_item_doacao FOREIGN KEY (doacao_id) REFERENCES doacoes (id) ON DELETE CASCADE,
+    CONSTRAINT ck_itens_doacao_quantidade CHECK (quantidade > 0),
+    CONSTRAINT uq_itens_doacao_id_doacao_id UNIQUE (id, doacao_id)
 );
 
 CREATE TABLE IF NOT EXISTS reservas (
@@ -59,27 +62,32 @@ CREATE TABLE IF NOT EXISTS reservas (
     instituicao_id INT NOT NULL,
     data_reserva TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_retirada TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'ATIVA' CHECK (status IN ('ATIVA', 'CANCELADA', 'CONCLUIDA')),
+    status VARCHAR(20) DEFAULT 'ATIVA',
     CONSTRAINT fk_reserva_doacao FOREIGN KEY (doacao_id) REFERENCES doacoes (id) ON DELETE RESTRICT,
-    CONSTRAINT fk_reserva_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes (id) ON DELETE RESTRICT
+    CONSTRAINT fk_reserva_instituicao FOREIGN KEY (instituicao_id) REFERENCES instituicoes (id) ON DELETE RESTRICT,
+    CONSTRAINT ck_reservas_status CHECK (status IN ('ATIVA', 'CANCELADA', 'CONCLUIDA'))
 );
 
 CREATE TABLE IF NOT EXISTS contribuicoes (
     id SERIAL PRIMARY KEY,
     doacao_id INT NOT NULL REFERENCES doacoes(id) ON DELETE RESTRICT,
-    item_doacao_id INT NOT NULL REFERENCES itens_doacao(id) ON DELETE RESTRICT,
+    item_doacao_id INT NOT NULL,
     doador_id INT REFERENCES doadores(id) ON DELETE RESTRICT,
     estabelecimento_id INT REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
     alimento VARCHAR(100) NOT NULL,
     categoria VARCHAR(50) NOT NULL,
-    quantidade NUMERIC(10,2) NOT NULL CHECK (quantidade > 0),
+    quantidade NUMERIC(10,2) NOT NULL,
     unidade_medida VARCHAR(20) NOT NULL,
     validade DATE NOT NULL,
     respostas TEXT NOT NULL,
     foto_arquivo VARCHAR(80) NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'ACEITA' CHECK (status IN ('ACEITA', 'ENTREGUE', 'CANCELADA')),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACEITA',
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT ck_contribuicoes_uma_origem CHECK ((doador_id IS NOT NULL) <> (estabelecimento_id IS NOT NULL))
+    CONSTRAINT ck_contribuicoes_uma_origem CHECK ((doador_id IS NOT NULL) <> (estabelecimento_id IS NOT NULL)),
+    CONSTRAINT ck_contribuicoes_quantidade CHECK (quantidade > 0),
+    CONSTRAINT ck_contribuicoes_status CHECK (status IN ('ACEITA', 'ENTREGUE', 'CANCELADA')),
+    CONSTRAINT fk_contribuicoes_item_pedido FOREIGN KEY (item_doacao_id, doacao_id)
+        REFERENCES itens_doacao (id, doacao_id) ON DELETE RESTRICT
 );
 
 ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
