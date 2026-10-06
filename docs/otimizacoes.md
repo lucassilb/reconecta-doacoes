@@ -25,4 +25,6 @@ O cenário "antes" executa a consulta e a serialização da lista original, com 
 
 `models.py` e `migracoes.py` criam, de modo idempotente em SQLite e PostgreSQL, índices para as chaves estrangeiras de `doacoes`, `itens_doacao` e `contribuicoes`, além de `(status, data_limite_retirada)` para pedidos disponíveis e `(doacao_id, status)` para contribuições aceitas. `schema.sql` declara os mesmos índices para instalação manual. Índices aceleram os filtros e junções, com custo de espaço e de escrita.
 
-Sob `/reconecta/`, erros 404, 405 e 500 retornam JSON com `codigo` e `mensagem`, sem detalhes internos. Os CRUDs originais rejeitam corpo ausente, campos obrigatórios faltando e tipos inválidos com 400 e mapa `campos`. As respostas de sucesso e rotas antigas continuam com seus formatos anteriores.
+Sob `/reconecta/`, erros 404, 405 e 500 retornam JSON com `codigo` e `mensagem`, sem detalhes internos. Com token válido, os CRUDs originais rejeitam corpo ausente, campos obrigatórios faltando e tipos inválidos com 400 e mapa `campos`. As respostas de sucesso da escrita e as rotas antigas mantêm seus formatos anteriores.
+
+Os CRUDs legados exigem `ADMIN_TOKEN` via `X-Admin-Token` para POST/PUT/DELETE; GET de estabelecimentos e instituições oculta e-mail e telefone sem token válido. CNPJ e dependências são verificados antes da escrita, com erros JSON 400/409/422.

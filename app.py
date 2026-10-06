@@ -57,6 +57,7 @@ api = Api(
     version="1.0",
     title="ReConecta API",
     description="API REST da plataforma ReConecta para redistribuição de excedentes alimentares",
+    authorizations={"AdminToken": {"type": "apiKey", "in": "header", "name": "X-Admin-Token"}},
     doc="/swagger"
 )
 

@@ -288,6 +288,11 @@
             }
           }
         ],
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "tags": [
           "doacoes"
         ]
@@ -311,6 +316,11 @@
         },
         "summary": "Deletar uma doação pelo ID no PostgreSQL",
         "operationId": "Deletar uma doação pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "tags": [
           "doacoes"
         ]
@@ -345,6 +355,11 @@
             }
           }
         ],
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "tags": [
           "doacoes"
         ]
@@ -358,6 +373,7 @@
           }
         },
         "summary": "Listar todos os estabelecimentos cadastrados no banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
         "operationId": "Listar todos os estabelecimentos",
         "tags": [
           "estabelecimentos"
@@ -379,6 +395,11 @@
             "schema": {
               "$ref": "#/definitions/Estabelecimento"
             }
+          }
+        ],
+        "security": [
+          {
+            "AdminToken": []
           }
         ],
         "tags": [
@@ -404,6 +425,11 @@
         },
         "summary": "Deletar um estabelecimento pelo ID no PostgreSQL",
         "operationId": "Deletar um estabelecimento pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "tags": [
           "estabelecimentos"
         ]
@@ -415,6 +441,7 @@
           }
         },
         "summary": "Obter um estabelecimento pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
         "operationId": "Obter um estabelecimento pelo ID",
         "tags": [
           "estabelecimentos"
@@ -436,6 +463,11 @@
             "schema": {
               "$ref": "#/definitions/Estabelecimento"
             }
+          }
+        ],
+        "security": [
+          {
+            "AdminToken": []
           }
         ],
         "tags": [
@@ -493,6 +525,7 @@
           }
         },
         "summary": "Listar todas as instituições cadastradas no PostgreSQL",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
         "operationId": "Listar todas as instituições",
         "tags": [
           "instituicoes"
@@ -514,6 +547,11 @@
             "schema": {
               "$ref": "#/definitions/Instituicao"
             }
+          }
+        ],
+        "security": [
+          {
+            "AdminToken": []
           }
         ],
         "tags": [
@@ -539,6 +577,11 @@
         },
         "summary": "Deletar uma instituição pelo ID no PostgreSQL",
         "operationId": "Deletar uma instituição pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
         "tags": [
           "instituicoes"
         ]
@@ -550,6 +593,7 @@
           }
         },
         "summary": "Obter uma instituição pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
         "operationId": "Obter uma instituição pelo ID",
         "tags": [
           "instituicoes"
@@ -571,6 +615,11 @@
             "schema": {
               "$ref": "#/definitions/Instituicao"
             }
+          }
+        ],
+        "security": [
+          {
+            "AdminToken": []
           }
         ],
         "tags": [
@@ -760,6 +809,13 @@
   "consumes": [
     "application/json"
   ],
+  "securityDefinitions": {
+    "AdminToken": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-Admin-Token"
+    }
+  },
   "tags": [
     {
       "name": "estabelecimentos",

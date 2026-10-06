@@ -1,7 +1,8 @@
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy.exc import IntegrityError
-from crud_validacao import corpo_json, erro_campos, validar_doacao
-from models import db, Doacao as DoacaoModel
+from crud_admin import exigir_admin
+from crud_validacao import corpo_json, erro, erro_campos, validar_doacao
+from models import Contribuicao, ItemDoacao, Reserva, db, Doacao as DoacaoModel
 
 ns = Namespace(
     "doacoes",
@@ -33,9 +34,12 @@ class DoacaoList(Resource):
         ], 200
 
     @ns.expect(doacao_model)
-    @ns.doc("Criar uma nova doação")
+    @ns.doc("Criar uma nova doação", security="AdminToken")
     def post(self):
         """Criar uma nova doação e salvar no PostgreSQL"""
+        bloqueio = exigir_admin()
+        if bloqueio:
+            return bloqueio
         data = corpo_json()
         campos, data_limite = validar_doacao(data, criar=True)
         if campos:
@@ -84,9 +88,12 @@ class Doacao(Resource):
         return {"message": "Doação não encontrada"}, 404
 
     @ns.expect(doacao_model)
-    @ns.doc("Atualizar uma doação pelo ID")
+    @ns.doc("Atualizar uma doação pelo ID", security="AdminToken")
     def put(self, id):
         """Atualizar uma doação pelo ID no PostgreSQL"""
+        bloqueio = exigir_admin()
+        if bloqueio:
+            return bloqueio
         d = db.session.get(DoacaoModel, id)
         if d:
             data = corpo_json()
@@ -115,13 +122,26 @@ class Doacao(Resource):
 
         return {"message": "Doação não encontrada"}, 404
 
-    @ns.doc("Deletar uma doação pelo ID")
+    @ns.doc("Deletar uma doação pelo ID", security="AdminToken")
     def delete(self, id):
         """Deletar uma doação pelo ID no PostgreSQL"""
+        bloqueio = exigir_admin()
+        if bloqueio:
+            return bloqueio
         d = db.session.get(DoacaoModel, id)
         if d:
+            if (ItemDoacao.query.filter_by(doacao_id=id).first() or
+                    Contribuicao.query.filter_by(doacao_id=id).first() or
+                    Reserva.query.filter_by(doacao_id=id).first()):
+                return erro("REGISTROS_DEPENDENTES",
+                            "Doação possui itens, contribuições ou reservas vinculados.", 409)
             db.session.delete(d)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                return erro("REGISTROS_DEPENDENTES",
+                            "Doação possui registros vinculados.", 409)
             return {"message": "Doação deletada com sucesso"}, 200
 
         return {"message": "Doação não encontrada"}, 404
