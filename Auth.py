@@ -10,7 +10,8 @@ from pathlib import Path
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy import func
-from werkzeug.security import check_password_hash
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from cnpj_service import formatar_cnpj
 from models import Doador, Estabelecimento, db
@@ -31,6 +32,13 @@ me_model = ns.model("UsuarioAutenticado", {
     "email": fields.String, "telefone": fields.String,
     "cnpj_formatado": fields.String, "endereco": fields.String,
     "cpf_formatado": fields.String,
+})
+me_atualizar_entrada = ns.model("AtualizarPerfilEntrada", {
+    "nome": fields.String(description="Apenas doador; 3 a 100 caracteres"),
+    "email": fields.String(description="E-mail válido e único; até 100 caracteres"),
+    "telefone": fields.String(description="DDD e telefone, 10 ou 11 dígitos"),
+    "senha_atual": fields.String(description="Obrigatória junto com nova_senha"),
+    "nova_senha": fields.String(description="Mínimo 8 caracteres, com letra e número"),
 })
 login_saida = ns.model("LoginSaida", {"usuario": fields.Nested(me_model)})
 erro_model = ns.model("AuthErro", {
@@ -191,3 +199,67 @@ class Me(Resource):
         if not atual:
             return _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
         return dados_usuario(*atual), 200
+
+    @ns.expect(me_atualizar_entrada)
+    @ns.response(200, "Perfil atualizado", me_model)
+    @ns.response(400, "Dados inválidos", erro_model)
+    @ns.response(401, "Não autenticado", erro_model)
+    @ns.response(409, "E-mail já cadastrado", erro_model)
+    def put(self):
+        """Atualiza contatos e, para doadores, nome; pode trocar a senha."""
+        atual = usuario_atual()
+        if not atual:
+            return _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
+        tipo, usuario = atual
+        corpo = request.get_json(silent=True)
+        if not isinstance(corpo, dict) or not corpo:
+            return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400,
+                         campos={"corpo": "Informe ao menos um campo para atualizar."})
+
+        # Mesmas regras de entrada usadas no cadastro, sem importar Cadastro no
+        # topo deste módulo (Cadastro usa iniciar_sessao de Auth).
+        from Cadastro import _email, _email_cadastrado, _senha_valida, _telefone
+
+        permitidos = {"email", "telefone", "senha_atual", "nova_senha"}
+        if tipo == "doador":
+            permitidos.add("nome")
+        campos = {chave: "Campo não permitido para este perfil."
+                  for chave in corpo if chave not in permitidos}
+        if "nome" in corpo and tipo == "doador":
+            nome = corpo["nome"]
+            if not isinstance(nome, str) or not 3 <= len(nome.strip()) <= 100:
+                campos["nome"] = "Informe um nome entre 3 e 100 caracteres."
+        if "email" in corpo and not _email(corpo["email"]):
+            campos["email"] = "Informe um e-mail válido de até 100 caracteres."
+        if "telefone" in corpo and not _telefone(corpo["telefone"]):
+            campos["telefone"] = "Informe um telefone com DDD e 10 ou 11 dígitos."
+        trocando_senha = "senha_atual" in corpo or "nova_senha" in corpo
+        if trocando_senha:
+            senha_atual = corpo.get("senha_atual")
+            if (not isinstance(senha_atual, str) or not senha_atual or
+                    not usuario.senha_hash or
+                    not check_password_hash(usuario.senha_hash, senha_atual)):
+                campos["senha_atual"] = "Informe a senha atual correta."
+            if not _senha_valida(corpo.get("nova_senha")):
+                campos["nova_senha"] = "Use pelo menos 8 caracteres, com uma letra e um número."
+        if campos:
+            return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400,
+                         campos=campos)
+
+        if "email" in corpo:
+            email = corpo["email"].strip().lower()
+            if email != usuario.email.lower() and _email_cadastrado(email):
+                return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+            usuario.email = email
+        if "telefone" in corpo:
+            usuario.telefone = _telefone(corpo["telefone"])
+        if "nome" in corpo and tipo == "doador":
+            usuario.nome = corpo["nome"].strip()
+        if trocando_senha:
+            usuario.senha_hash = generate_password_hash(corpo["nova_senha"])
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+        return dados_usuario(tipo, usuario), 200

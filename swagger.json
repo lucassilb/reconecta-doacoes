@@ -82,6 +82,49 @@
         "tags": [
           "auth"
         ]
+      },
+      "put": {
+        "responses": {
+          "409": {
+            "description": "E-mail já cadastrado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "401": {
+            "description": "Não autenticado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "200": {
+            "description": "Perfil atualizado",
+            "schema": {
+              "$ref": "#/definitions/UsuarioAutenticado"
+            }
+          }
+        },
+        "summary": "Atualiza contatos e, para doadores, nome; pode trocar a senha",
+        "operationId": "put_me",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AtualizarPerfilEntrada"
+            }
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/reconecta/cadastro/cnpj/{cnpj}": {
@@ -1504,6 +1547,31 @@
         },
         "gerado_em": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AtualizarPerfilEntrada": {
+      "properties": {
+        "nome": {
+          "type": "string",
+          "description": "Apenas doador; 3 a 100 caracteres"
+        },
+        "email": {
+          "type": "string",
+          "description": "E-mail válido e único; até 100 caracteres"
+        },
+        "telefone": {
+          "type": "string",
+          "description": "DDD e telefone, 10 ou 11 dígitos"
+        },
+        "senha_atual": {
+          "type": "string",
+          "description": "Obrigatória junto com nova_senha"
+        },
+        "nova_senha": {
+          "type": "string",
+          "description": "Mínimo 8 caracteres, com letra e número"
         }
       },
       "type": "object"
