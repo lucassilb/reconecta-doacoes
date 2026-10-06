@@ -12,9 +12,12 @@ from migracoes import aplicar_migracoes  # noqa: E402
 from models import Doacao, Estabelecimento, ItemDoacao, db  # noqa: E402
 from Publico import _disponiveis, serializar_doacao  # noqa: E402
 
+ADMIN_HEADERS = {"X-Admin-Token": "teste-admin"}
+
 
 @pytest.fixture(autouse=True)
-def banco():
+def banco(monkeypatch):
+    monkeypatch.setenv("ADMIN_TOKEN", ADMIN_HEADERS["X-Admin-Token"])
     app.config["TESTING"] = True
     with app.app_context():
         db.drop_all()
@@ -147,7 +150,7 @@ def test_migracao_de_indices_e_idempotente():
 def test_cruds_originais_rejeitam_corpo_ausente_e_campos_faltando(rota):
     cliente = app.test_client()
     for kwargs in ({}, {"json": {}}):
-        resposta = cliente.post("/reconecta/" + rota + "/", **kwargs)
+        resposta = cliente.post("/reconecta/" + rota + "/", headers=ADMIN_HEADERS, **kwargs)
         assert resposta.status_code == 400
         assert resposta.json["codigo"] == "DADOS_INVALIDOS"
         assert resposta.json["campos"]
@@ -158,17 +161,17 @@ def test_crud_original_valida_tipos_e_referencia_em_post_e_put():
     cliente = app.test_client()
     assert cliente.post("/reconecta/estabelecimentos/", json={
         "nome": 5, "cnpj": [], "email": None, "endereco": True
-    }).status_code == 400
+    }, headers=ADMIN_HEADERS).status_code == 400
     assert cliente.post("/reconecta/instituicoes/", json={
         "nome": 5, "cnpj": [], "email": None, "endereco": True
-    }).status_code == 400
+    }, headers=ADMIN_HEADERS).status_code == 400
     assert cliente.post("/reconecta/doacoes/", json={
         "estabelecimento_id": 999999, "data_limite_retirada": "ontem"
-    }).status_code == 400
+    }, headers=ADMIN_HEADERS).status_code == 400
     assert cliente.put(f"/reconecta/estabelecimentos/{empresa_id}", json={
-        "email": 7}).json["codigo"] == "DADOS_INVALIDOS"
+        "email": 7}, headers=ADMIN_HEADERS).json["codigo"] == "DADOS_INVALIDOS"
     assert cliente.put("/reconecta/doacoes/1", json={
-        "data_limite_retirada": "ontem"}).json["codigo"] == "DADOS_INVALIDOS"
+        "data_limite_retirada": "ontem"}, headers=ADMIN_HEADERS).json["codigo"] == "DADOS_INVALIDOS"
 
 
 def test_erros_404_405_500_api_sao_json_sem_traceback(monkeypatch):

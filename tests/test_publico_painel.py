@@ -13,11 +13,13 @@ from models import Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, Res
 
 
 SENHA = "Segredo123"
+ADMIN_HEADERS = {"X-Admin-Token": "teste-admin"}
 
 
 @pytest.fixture(autouse=True)
-def banco():
+def banco(monkeypatch):
     app.config["TESTING"] = True
+    monkeypatch.setenv("ADMIN_TOKEN", ADMIN_HEADERS["X-Admin-Token"])
     _falhas.clear()
     with app.app_context():
         db.drop_all()
@@ -242,7 +244,8 @@ def test_crud_original_doacoes_mantem_campos_respostas_e_swagger(cliente):
     primeira_id, segunda_id = criar_usuarios()
     prazo = (datetime.now() + timedelta(days=2)).isoformat(timespec="seconds")
     novo = cliente.post("/reconecta/doacoes/", json={
-        "estabelecimento_id": primeira_id, "data_limite_retirada": prazo})
+        "estabelecimento_id": primeira_id, "data_limite_retirada": prazo},
+        headers=ADMIN_HEADERS)
     assert novo.status_code == 201
     assert set(novo.json) == {"id", "estabelecimento_id", "data_cadastro",
                              "data_limite_retirada", "status"}
@@ -255,11 +258,11 @@ def test_crud_original_doacoes_mantem_campos_respostas_e_swagger(cliente):
     outro_prazo = (datetime.now() + timedelta(days=4)).isoformat(timespec="seconds")
     alterado = cliente.put(f"/reconecta/doacoes/{identificador}", json={
         "estabelecimento_id": segunda_id, "data_limite_retirada": outro_prazo,
-        "status": "RESERVADA"})
+        "status": "RESERVADA"}, headers=ADMIN_HEADERS)
     assert alterado.status_code == 200
     assert alterado.json == {**novo.json, "estabelecimento_id": segunda_id,
                             "data_limite_retirada": outro_prazo, "status": "RESERVADA"}
-    assert cliente.delete(f"/reconecta/doacoes/{identificador}").json == {
+    assert cliente.delete(f"/reconecta/doacoes/{identificador}", headers=ADMIN_HEADERS).json == {
         "message": "Doação deletada com sucesso"}
     assert cliente.get(f"/reconecta/doacoes/{identificador}").status_code == 404
     swagger = cliente.get("/swagger.json").json["paths"]
@@ -270,6 +273,7 @@ def test_crud_original_doacoes_mantem_campos_respostas_e_swagger(cliente):
 @pytest.mark.parametrize("metodo", ["get", "put", "delete"])
 def test_crud_original_doacoes_id_ausente_retorna_404(cliente, metodo):
     resposta = getattr(cliente, metodo)(
-        "/reconecta/doacoes/999", **({"json": {"status": "RESERVADA"}} if metodo == "put" else {}))
+        "/reconecta/doacoes/999", headers=ADMIN_HEADERS,
+        **({"json": {"status": "RESERVADA"}} if metodo == "put" else {}))
     assert resposta.status_code == 404
     assert resposta.json == {"message": "Doação não encontrada"}

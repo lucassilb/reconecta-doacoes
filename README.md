@@ -31,7 +31,7 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | Painéis | Empresa: publicar pedido (com "Preencher com IA"), meus pedidos com progresso e doações recebidas com foto, minhas doações. Doador: minhas doações. |
 | Dashboard | Indicadores, gráfico pedido × recebido por categoria, doações por dia (30 dias), empresas com mais doações, alertas e últimas doações, com dados reais do banco. Botão "Gerar resumo com IA". |
 | LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
-| CRUDs do CP1 | Estabelecimentos, Instituições e Doações (`/reconecta/...`), agora com validação e erros em JSON. |
+| CRUDs do CP1 | Estabelecimentos, Instituições e Doações (`/reconecta/...`): leitura pública sem contatos; escrita só com token de administrador, CNPJ verificado e erros em JSON. |
 
 ## Regras de negócio
 
@@ -44,8 +44,9 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | RN05 | Doação só é aceita com as 4 respostas "sim" (dentro da validade, embalagem íntegra, armazenamento correto, não é comida caseira), validade não vencida e foto válida. Caso contrário nada é registrado e o motivo é exibido. |
 | RN06 | A empresa dona não doa no próprio pedido. |
 | RN07 | A foto da doação só é visível para quem doou e para a empresa dona do pedido. |
-| RN08 | Dados pessoais (CPF, e-mail, telefone, endereço completo) não aparecem em telas ou respostas públicas. |
+| RN08 | CPF, e-mail, telefone e endereços privados não aparecem em telas ou respostas públicas; o endereço cadastrado de estabelecimentos e instituições permanece público nos CRUDs do CP1. |
 | RN09 | E-mail, CNPJ e CPF são únicos. |
+| RN10 | POST/PUT/DELETE dos CRUDs do CP1 exigem `X-Admin-Token` válido; sem `ADMIN_TOKEN` configurado, a escrita fica desativada. |
 
 ## Arquitetura
 
@@ -113,6 +114,7 @@ Crie um `.env` a partir do `.env.example` (não publique o `.env`):
 | `DATABASE_URL` | não | SQLite `instance/reconecta.db` | Ex.: `postgresql://USUARIO:SENHA@localhost:5432/reconecta` |
 | `SECRET_KEY` | não | gerada e guardada em `instance/secret_key` | Assina o cookie de sessão; defina em produção. |
 | `FLASK_DEBUG` | não | `0` | `1` liga o modo debug. |
+| `ADMIN_TOKEN` | para escrita dos CRUDs do CP1 | desativado | Token longo e aleatório enviado em `X-Admin-Token`. Sem configuração: escrita 403; token ausente/incorreto: 401. Não use no navegador nem publique no repositório. |
 | `OLLAMA_URL` | não | `http://localhost:11434` | Endereço do Ollama local. |
 | `OLLAMA_MODELO` | não | `qwen2.5:3b` | Modelo gratuito usado pela IA. |
 
@@ -130,7 +132,7 @@ A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que f
 python -m pytest -q
 ```
 
-154 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
+168 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
 
 ## Endpoints
 
@@ -156,12 +158,12 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
 | POST | `/reconecta/ia/interpretar-pedido` | Empresa logada: texto livre → itens sugeridos para revisão. |
 | POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados (10/min por IP). |
-| GET/POST | `/reconecta/estabelecimentos/` | CRUD do CP1. |
-| GET/PUT/DELETE | `/reconecta/estabelecimentos/{id}` | CRUD do CP1. |
-| GET/POST | `/reconecta/instituicoes/` | CRUD do CP1. |
-| GET/PUT/DELETE | `/reconecta/instituicoes/{id}` | CRUD do CP1. |
-| GET/POST | `/reconecta/doacoes/` | CRUD do CP1. |
-| GET/PUT/DELETE | `/reconecta/doacoes/{id}` | CRUD do CP1. |
+| GET público / POST admin | `/reconecta/estabelecimentos/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo e CNAE alimentar. |
+| GET público / PUT/DELETE admin | `/reconecta/estabelecimentos/{id}` | GET sem contato; admin recebe registro completo. DELETE com dependentes: 409. |
+| GET público / POST admin | `/reconecta/instituicoes/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo. |
+| GET público / PUT/DELETE admin | `/reconecta/instituicoes/{id}` | GET sem contato; admin recebe registro completo. DELETE com reservas: 409. |
+| GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
+| GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
 O arquivo [swagger.json](swagger.json) é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
@@ -178,7 +180,7 @@ Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `
 
 ## Limitações conhecidas
 
-- Reserva e retirada por instituições (modelo `reservas` do CP1) ainda não têm fluxo na aplicação.
+- O CP1 tinha apenas o modelo `reservas`, sem endpoints de reserva. O fluxo atual é pedido → contribuição; reserva e retirada por instituições ainda não têm fluxo na aplicação.
 - Recuperação de senha não implementada.
 - A consulta de CNPJ depende de serviços públicos externos (com cache de 10 minutos e fontes alternativas).
 - A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam regras automáticas e indicam `fonte: "regras"`.

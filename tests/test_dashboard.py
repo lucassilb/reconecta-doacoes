@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 import pytest
 
@@ -57,6 +57,7 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
                          quantidade=100, unidade_medida="unidade")
         db.session.add_all((leite, pao))
         db.session.flush()
+        # Mesmo dia da janela testada, inclusive depois das 21h no fuso de São Paulo.
         for item, quantidade, status in ((leite, 120, "ACEITA"),
                                           (pao, 80, "ACEITA"),
                                           (pao, 10, "CANCELADA")):
@@ -64,7 +65,8 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
                 doador_id=doador.id, alimento=item.nome, categoria=item.categoria,
                 quantidade=quantidade, unidade_medida=item.unidade_medida,
                 validade=date.today() + timedelta(days=10), respostas="{}",
-                foto_arquivo="foto.jpg", status=status, criado_em=_utc_naive()))
+                foto_arquivo="foto.jpg", status=status,
+                criado_em=datetime.combine(date.today(), time(12))))
         db.session.commit()
     resposta = app.test_client().get("/reconecta/dashboard")
     assert resposta.status_code == 200

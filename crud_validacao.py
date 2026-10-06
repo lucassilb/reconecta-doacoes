@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask import request
 
+import cnpj_service
 from models import Estabelecimento, db
 
 
@@ -17,7 +18,36 @@ def erro_campos(campos):
             "campos": campos}, 400
 
 
+def erro(codigo, mensagem, status, **extras):
+    return {"codigo": codigo, "mensagem": mensagem, **extras}, status
+
+
+def verificar_cnpj(valor, *, alimentar):
+    """Aplica a mesma consulta e os mesmos critérios de aptidão do cadastro."""
+    digitos = cnpj_service.validar_cnpj(valor)
+    if not digitos:
+        return None, erro("CNPJ_INVALIDO", "Informe um CNPJ válido.", 400)
+    try:
+        dados = cnpj_service.consultar_cnpj(digitos)
+    except cnpj_service.ConsultaCNPJError as falha:
+        return None, erro(falha.codigo, falha.mensagem, falha.status)
+    motivos = []
+    if not dados.get("ativo"):
+        motivos.append({"codigo": "CNPJ_INATIVO",
+                        "mensagem": f"CNPJ com situação {dados.get('situacao')}; a empresa precisa estar ativa."})
+    if alimentar and not dados.get("relacionado_alimentacao"):
+        motivos.append({"codigo": "SEM_RELACAO_ALIMENTAR",
+                        "mensagem": "As atividades da empresa não têm relação com alimentação ou doação de alimentos."})
+    if motivos:
+        tipo = "EMPRESA_NAO_APTA" if alimentar else "INSTITUICAO_NAO_APTA"
+        return None, erro(tipo, "Este CNPJ não atende aos critérios de cadastro.",
+                          422, motivos=motivos)
+    return digitos, None
+
+
 def validar_contato(dado, *, criar):
+    from Cadastro import _email, _telefone
+
     if dado is None:
         return {"corpo": "Envie um objeto JSON."}
     campos = {}
@@ -29,10 +59,12 @@ def validar_contato(dado, *, criar):
             continue
         valor = dado[nome]
         if not isinstance(valor, str) or (nome != "telefone" and not valor.strip()) or (
-                tamanho is not None and len(valor) > tamanho):
+                nome != "email" and tamanho is not None and len(valor) > tamanho):
             campos[nome] = "Informe um texto válido."
-        elif nome == "email" and ("@" not in valor or valor.startswith("@") or valor.endswith("@")):
+        elif nome == "email" and not _email(valor):
             campos[nome] = "Informe um email válido."
+        elif nome == "telefone" and valor and not _telefone(valor):
+            campos[nome] = "Informe um telefone com DDD e 10 ou 11 dígitos."
     return campos
 
 
