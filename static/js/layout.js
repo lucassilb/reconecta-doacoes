@@ -236,7 +236,10 @@
 
   /* ---------- sessão ---------- */
 
-  function consultarSessao() {
+  /* Uma única chamada a GET /reconecta/auth/me por página: o cabeçalho e a
+     página (painel.js, entrar.js) reaproveitam a mesma resposta em
+     window.ReConecta.sessaoResposta = Promise<{status, ok, corpo}> (rejeita sem rede). */
+  function buscarSessao() {
     var controle = typeof AbortController === "function" ? new AbortController() : null;
     var limite = setTimeout(function () { if (controle) controle.abort(); }, 6000);
     return fetch("/reconecta/auth/me", {
@@ -244,11 +247,16 @@
       headers: { "Accept": "application/json" },
       signal: controle ? controle.signal : undefined
     }).then(function (r) {
-      if (!r.ok) return null;
-      return r.json().catch(function () { return null; });
-    }).catch(function () { return null; })
+      clearTimeout(limite);
+      return r.json().catch(function () { return null; }).then(function (corpo) {
+        return { status: r.status, ok: r.ok, corpo: corpo || {} };
+      });
+    }, function (erro) { clearTimeout(limite); throw erro; });
+  }
+
+  function consultarSessao(resposta) {
+    return resposta.then(function (r) { return r.ok ? r.corpo : null; }, function () { return null; })
       .then(function (usuario) {
-        clearTimeout(limite);
         usuario = usuario && typeof usuario === "object" && usuario.nome !== undefined ? usuario : null;
         desenharAba(usuario);
         document.dispatchEvent(new CustomEvent("reconecta:sessao", { detail: { usuario: usuario } }));
@@ -262,7 +270,13 @@
   api.fuso = FUSO;
   api.dataBrasilia = dataBrasilia;
   api.diaISO = diaISO;
-  api.atualizarSessao = function () { api.sessao = consultarSessao(); return api.sessao; };
+  api.atualizarSessao = function () {
+    api.sessaoResposta = buscarSessao();
+    api.sessao = consultarSessao(api.sessaoResposta);
+    return api.sessao;
+  };
+  // A consulta começa já no carregamento do script, antes do DOM, para a página reaproveitar.
+  api.sessaoResposta = buscarSessao();
   api.sair = function () {
     return fetch("/reconecta/auth/logout", { method: "POST", credentials: "same-origin" })
       .catch(function () {})
@@ -272,7 +286,7 @@
   function iniciar() {
     document.querySelectorAll('[data-layout="cabecalho"]').forEach(montarCabecalho);
     document.querySelectorAll('[data-layout="rodape"]').forEach(montarRodape);
-    api.atualizarSessao();
+    api.sessao = consultarSessao(api.sessaoResposta);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciar);

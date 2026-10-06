@@ -30,3 +30,18 @@ Sob `/reconecta/`, erros 404, 405 e 500 retornam JSON com `codigo` e `mensagem`,
 Os CRUDs legados exigem `ADMIN_TOKEN` via `X-Admin-Token` para POST/PUT/DELETE; GET de estabelecimentos e instituições oculta e-mail e telefone sem token válido. CNPJ e dependências são verificados antes da escrita, com erros JSON 400/409/422.
 
 O dashboard filtra o intervalo de 30 dias pelas meias-noites de `America/Sao_Paulo` convertidas para UTC. O banco agrega contribuições por hora UTC com `extract` do SQLAlchemy (SQLite e PostgreSQL); Python atribui cada grupo ao dia de Brasília. Assim, a consulta retorna cerca de 720 grupos em vez de carregar todas as contribuições; uma mudança histórica de horário de verão pode alterar essa quantidade em uma hora.
+
+## Redução de requisições desnecessárias
+
+- **Dashboard em uma requisição**: a página `/dashboard` faz um único `GET /reconecta/dashboard`, que já traz indicadores, séries, ranking, alertas e últimas doações, em vez de um endpoint por cartão ou gráfico. O resumo da IA é calculado no servidor a partir dos mesmos agregados (o cliente não reenvia os dados).
+- **Sessão consultada uma vez por página**: antes, `/painel` e `/entrar` chamavam `GET /reconecta/auth/me` duas vezes ao abrir (uma no cabeçalho, em `layout.js`, e outra na própria página). Agora `layout.js` dispara a consulta logo no carregamento e expõe a resposta em `window.ReConecta.sessaoResposta`; `painel.js` e `entrar.js` reaproveitam essa mesma resposta. Medido no servidor com o navegador abrindo `/entrar` e `/painel`: 1 `GET /reconecta/auth/me` por página (eram 2).
+- **Cache de CNPJ**: `cnpj_service.py` guarda o resultado da consulta à Receita por 10 minutos (`CACHE_TTL = 600`). A verificação ao digitar o CNPJ e a nova verificação no envio do cadastro usam o mesmo resultado, sem uma segunda chamada externa. Cada fonte externa tem timeout de 8 s e há fontes alternativas.
+- **Edição de dados envia só o que mudou**: o formulário "Seus dados" compara com o valor atual e não faz requisição quando nada mudou.
+- **Lista pública paginada**: a Home pede só a primeira página (8 pedidos) em vez de todos os pedidos abertos.
+
+## Organização das respostas
+
+- Erros sempre no formato `{"codigo", "mensagem"}`, com `campos` (erro por campo) em validação e `motivos` em recusas de regra de negócio (CNPJ inapto, doação recusada). Os códigos HTTP seguem o significado: 400 dado inválido, 401 sem sessão, 403 sem permissão, 404 inexistente, 409 conflito/duplicado, 413 arquivo grande, 422 regra de negócio, 429 limite de tentativas, 503 serviço externo indisponível.
+- Paginação informada em cabeçalhos (`X-Total-Count`, `X-Pagina`, `X-Por-Pagina`) para manter o corpo como lista, compatível com quem já consumia a API.
+- Datas com fuso explícito (ISO 8601 com `-03:00`), CPF mascarado e nenhum dado de contato em respostas públicas.
+- Modelos de entrada e saída documentados no Swagger (`/swagger` e `swagger.json`).

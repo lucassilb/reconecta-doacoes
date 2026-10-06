@@ -122,7 +122,8 @@
   var carregando = $("painel-carregando");
   var corpo = $("painel-corpo");
 
-  requisitar("/reconecta/auth/me")
+  // reaproveita a consulta de sessão que o layout.js já fez (evita um GET /auth/me repetido)
+  ((window.ReConecta && window.ReConecta.sessaoResposta) || requisitar("/reconecta/auth/me"))
     .then(function (r) {
       if (r.status === 401) {
         location.replace("/entrar?proximo=/painel");

@@ -39,7 +39,9 @@
 
   /* ---------- já logado? ---------- */
 
-  requisitar("/reconecta/auth/me", { headers: { "Accept": "application/json" } })
+  // reaproveita a consulta de sessão que o layout.js já fez (evita um GET /auth/me repetido)
+  ((window.ReConecta && window.ReConecta.sessaoResposta) ||
+    requisitar("/reconecta/auth/me", { headers: { "Accept": "application/json" } }))
     .then(function (r) { if (r.status === 200) location.replace(destino()); })
     .catch(function () { /* offline: deixa o formulário tentar e mostrar o erro */ });
 
