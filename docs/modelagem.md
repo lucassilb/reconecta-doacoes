@@ -1,5 +1,7 @@
 # Modelagem do banco — Checkpoint 2
 
+Eventos (`data_cadastro`, `criado_em`, `data_reserva`) são armazenados como UTC sem offset nas colunas `DATETIME`. O prazo `data_limite_retirada` guarda a hora civil de `America/Sao_Paulo` informada no formulário. A API acrescenta o offset ao serializar cada tipo; o dashboard converte eventos UTC antes de agregá-los por dia de Brasília.
+
 ## Entidades e relações
 
 ```mermaid

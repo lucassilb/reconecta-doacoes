@@ -1,12 +1,12 @@
 """Pedidos públicos de empresas e indicadores sem dados de contato."""
 import re
-from datetime import datetime
 from decimal import Decimal
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy import or_
 from sqlalchemy.orm import selectinload
 from Auth import usuario_atual
+from fuso import agora_brasilia_sem_fuso, iso_evento, iso_prazo
 from models import Contribuicao, Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, db
 
 ns = Namespace("publico", description="Resumo e pedidos disponíveis")
@@ -32,7 +32,8 @@ empresa_model = ns.model("EmpresaPedidoPublico", {
 })
 doacao_model = ns.model("PedidoPublico", {
     "id": fields.Integer, "empresa": fields.Nested(empresa_model),
-    "receber_ate": fields.String, "itens": fields.List(fields.Nested(item_model)),
+    "data_cadastro": fields.String, "receber_ate": fields.String,
+    "itens": fields.List(fields.Nested(item_model)),
     "doacoes_recebidas": fields.Integer, "status": fields.String,
 })
 
@@ -56,7 +57,8 @@ def serializar_doacao(doacao, incluir_status=False, detalhe=False):
         "id": doacao.id,
         "empresa": {"nome": doacao.estabelecimento.nome,
                     "municipio_uf": _municipio_uf(doacao.estabelecimento.endereco)},
-        "receber_ate": doacao.data_limite_retirada.isoformat(),
+        "data_cadastro": iso_evento(doacao.data_cadastro),
+        "receber_ate": iso_prazo(doacao.data_limite_retirada),
         "itens": itens, "doacoes_recebidas": len(aceitas),
     }
     if incluir_status or detalhe:
@@ -67,7 +69,7 @@ def serializar_doacao(doacao, incluir_status=False, detalhe=False):
             motivo = "Entre para doar"
         elif atual[0] == "empresa" and atual[1].id == doacao.estabelecimento_id:
             motivo = "Este é o seu próprio pedido"
-        elif doacao.status != "DISPONIVEL" or doacao.data_limite_retirada <= datetime.now():
+        elif doacao.status != "DISPONIVEL" or doacao.data_limite_retirada <= agora_brasilia_sem_fuso():
             motivo = "Pedido encerrado"
         else:
             motivo = None
@@ -78,7 +80,7 @@ def serializar_doacao(doacao, incluir_status=False, detalhe=False):
 def _disponiveis():
     return Doacao.query.filter(Doacao.estabelecimento_id.isnot(None),
                                Doacao.status == "DISPONIVEL",
-                               Doacao.data_limite_retirada > datetime.now())
+                               Doacao.data_limite_retirada > agora_brasilia_sem_fuso())
 
 
 def _com_relacionamentos(query):

@@ -9,6 +9,7 @@ os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
 from Auth import _falhas  # noqa: E402
+from fuso import iso_prazo  # noqa: E402
 from models import Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, Reserva, db  # noqa: E402
 
 
@@ -250,7 +251,7 @@ def test_crud_original_doacoes_mantem_campos_respostas_e_swagger(cliente):
     assert set(novo.json) == {"id", "estabelecimento_id", "data_cadastro",
                              "data_limite_retirada", "status"}
     assert novo.json["estabelecimento_id"] == primeira_id
-    assert novo.json["data_limite_retirada"] == prazo
+    assert novo.json["data_limite_retirada"] == iso_prazo(datetime.fromisoformat(prazo))
     assert novo.json["status"] == "DISPONIVEL"
     identificador = novo.json["id"]
     assert cliente.get("/reconecta/doacoes/").json == [novo.json]
@@ -261,7 +262,8 @@ def test_crud_original_doacoes_mantem_campos_respostas_e_swagger(cliente):
         "status": "RESERVADA"}, headers=ADMIN_HEADERS)
     assert alterado.status_code == 200
     assert alterado.json == {**novo.json, "estabelecimento_id": segunda_id,
-                            "data_limite_retirada": outro_prazo, "status": "RESERVADA"}
+                            "data_limite_retirada": iso_prazo(datetime.fromisoformat(outro_prazo)),
+                            "status": "RESERVADA"}
     assert cliente.delete(f"/reconecta/doacoes/{identificador}", headers=ADMIN_HEADERS).json == {
         "message": "Doação deletada com sucesso"}
     assert cliente.get(f"/reconecta/doacoes/{identificador}").status_code == 404

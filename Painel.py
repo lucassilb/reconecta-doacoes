@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from Auth import usuario_atual
 from Contribuicoes import serializar_contribuicao
+from fuso import agora_brasilia_sem_fuso
 from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
 from models import Contribuicao, Doacao, ItemDoacao, db
 
@@ -16,7 +17,7 @@ item_entrada = ns.model("ItemPedidoEntradaPainel", {
     "quantidade": fields.Float(required=True), "unidade_medida": fields.String(required=True),
 })
 doacao_entrada = ns.model("PedidoEntradaPainel", {
-    "receber_ate": fields.String(description="Data e hora ISO local"),
+    "receber_ate": fields.String(description="Data e hora ISO local de Brasília, sem offset"),
     "data_limite_retirada": fields.String(description="Alias anterior de receber_ate"),
     "itens": fields.List(fields.Nested(item_entrada), required=True),
 })
@@ -66,7 +67,7 @@ def _quantidade(valor):
 def _validar_pedido(corpo):
     campos = {}
     limite = _data_hora(corpo.get("receber_ate", corpo.get("data_limite_retirada")))
-    if not limite or limite <= datetime.now():
+    if not limite or limite <= agora_brasilia_sem_fuso():
         campos["receber_ate"] = "Informe uma data e hora futuras."
     itens_raw = corpo.get("itens")
     if not isinstance(itens_raw, list) or not itens_raw:

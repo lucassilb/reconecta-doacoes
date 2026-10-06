@@ -35,9 +35,9 @@
   var decimal = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
   function nome(n) { var R = window.ReConecta; return R && R.nomeTitulo ? R.nomeTitulo(n) : String(n || ""); }
   function local(mu) { if (!mu) return ""; var p = String(mu).split("/"); return nome(p[0]) + (p[1] ? "/" + p[1].toUpperCase() : ""); }
-  function data(iso) { if (!iso) return null; var d = new Date(String(iso).length <= 10 ? iso + "T12:00:00" : iso); return isNaN(d) ? null : d; }
-  function dataHora(iso) { var d = data(iso); return d ? d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : ""; }
-  function diaMes(iso) { var d = data(iso); return d ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : ""; }
+  function data(iso) { return window.ReConecta.dataBrasilia(iso); }
+  function dataHora(iso) { var d = data(iso); return d ? d.toLocaleString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : ""; }
+  function diaMes(iso) { var d = data(iso); return d ? d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit" }) : ""; }
   var PLURAL = { unidade: "unidades", pacote: "pacotes", caixa: "caixas" };
   function qtd(n, u) { var v = Number(n) || 0; return decimal.format(v) + " " + (PLURAL[u] && v !== 1 ? PLURAL[u] : (u || "")); }
 

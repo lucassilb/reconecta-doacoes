@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 
 import pytest
 
@@ -7,6 +7,7 @@ os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
 from Dashboard import montar_dashboard  # noqa: E402
+from fuso import hoje_brasilia  # noqa: E402
 from models import (Contribuicao, Doacao, Doador, Estabelecimento, Instituicao,
                     ItemDoacao, _utc_naive, db)  # noqa: E402
 
@@ -28,7 +29,7 @@ def test_dashboard_vazio_tem_contrato_e_30_dias():
                          "top_empresas", "alertas", "ultimas_doacoes"}
     assert all(valor == 0 for valor in dados["indicadores"].values())
     assert len(dados["por_dia"]) == 30
-    assert dados["por_dia"][-1] == {"data": date.today().isoformat(), "doacoes": 0}
+    assert dados["por_dia"][-1] == {"data": hoje_brasilia().isoformat(), "doacoes": 0}
     with app.app_context():
         assert montar_dashboard()["indicadores"] == dados["indicadores"]
 
@@ -57,7 +58,6 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
                          quantidade=100, unidade_medida="unidade")
         db.session.add_all((leite, pao))
         db.session.flush()
-        # Mesmo dia da janela testada, inclusive depois das 21h no fuso de São Paulo.
         for item, quantidade, status in ((leite, 120, "ACEITA"),
                                           (pao, 80, "ACEITA"),
                                           (pao, 10, "CANCELADA")):
@@ -65,8 +65,7 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
                 doador_id=doador.id, alimento=item.nome, categoria=item.categoria,
                 quantidade=quantidade, unidade_medida=item.unidade_medida,
                 validade=date.today() + timedelta(days=10), respostas="{}",
-                foto_arquivo="foto.jpg", status=status,
-                criado_em=datetime.combine(date.today(), time(12))))
+                foto_arquivo="foto.jpg", status=status, criado_em=_utc_naive()))
         db.session.commit()
     resposta = app.test_client().get("/reconecta/dashboard")
     assert resposta.status_code == 200
