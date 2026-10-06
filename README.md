@@ -146,7 +146,7 @@ A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que f
 python -m pytest -q
 ```
 
-169 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
+180 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
 
 ## Endpoints
 
@@ -160,6 +160,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | POST | `/reconecta/auth/login` | Login por e-mail, CNPJ ou CPF + senha. |
 | POST | `/reconecta/auth/logout` | Encerra a sessão. |
 | GET | `/reconecta/auth/me` | Perfil da sessão. |
+| PUT | `/reconecta/auth/me` | Edita os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha com a senha atual. |
 | GET | `/reconecta/publico/resumo` | Contadores públicos. |
 | GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
 | GET | `/reconecta/publico/doacoes` | Pedidos abertos. Paginação `pagina`/`por_pagina` (máx. 50), filtros `categoria`, `uf`, `busca`; cabeçalhos `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`. |
