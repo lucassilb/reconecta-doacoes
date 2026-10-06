@@ -215,11 +215,21 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 
 O arquivo [swagger.json](swagger.json) é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
-## Banco de dados
+## Banco de dados (critério 5 do CP2)
 
-Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao` (itens pedidos), `contribuicoes` (doações recebidas, com respostas do questionário e foto) e `reservas` (modelo do CP1, sem endpoints nesta versão). Diagrama ER, chaves, CHECKs, índices e as decisões de normalização estão em [docs/modelagem.md](docs/modelagem.md).
+Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao` (itens pedidos), `contribuicoes` (doações recebidas, com respostas do questionário e foto) e `reservas` (modelo do CP1, sem endpoints nesta versão). A revisão completa, com diagrama ER, está em [docs/modelagem.md](docs/modelagem.md), organizada por item do critério:
 
-Datas de eventos (`data_cadastro`, `criado_em`) são gravadas em UTC no banco. O prazo `receber_ate` é informado como hora local de Brasília. As respostas da API trazem datas e horas ISO com offset, e as páginas mostram horários no fuso `America/Sao_Paulo`, mesmo em navegadores configurados para outro fuso. O dashboard agrupa doações pelo dia civil de Brasília. Em Windows, o pacote gratuito `tzdata` fornece as regras desse fuso.
+| Item do critério | Seção em `docs/modelagem.md` | Resumo |
+|---|---|---|
+| Duplicidade de informações | Duplicidade de informações | Itens em linhas próprias; progresso calculado, não gravado; repetições que ficaram (fotografia do item na contribuição, `doacao_id`) são deliberadas e controladas |
+| Relacionamentos | Relacionamentos | Cardinalidades 1:N com chaves estrangeiras `ON DELETE RESTRICT` (nada some em cascata sem querer) |
+| Integridade dos dados | Integridade dos dados | PK, FK, UNIQUE (CNPJ, CPF, e-mail), NOT NULL e CHECKs nomeados de status, quantidade e origem — iguais no código (ORM) e no `schema.sql`; FK composta impede vincular um item a outro pedido |
+| Organização das entidades | Organização das entidades | O que cada tabela representa e quem escreve nela |
+| Índices quando necessários | Índices | 8 índices, cada um ligado à consulta que ele acelera |
+| Normalização | Normalização | 1FN, 2FN e 3FN com exemplos e as exceções deliberadas |
+| Justificar decisões | Decisões de modelagem | Tabela decisão × alternativa × motivo |
+
+As mudanças são aplicadas por `migracoes.py` no início da aplicação, de forma idempotente, em PostgreSQL (restrições com `NOT VALID` + `VALIDATE`, abortando sem apagar dados se houver registro inválido) e em SQLite. Testes em `tests/test_integridade_banco.py`; a prova em PostgreSQL roda com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário (cria e apaga um banco temporário).
 
 ## Documentação (critério 6 do CP2)
 
