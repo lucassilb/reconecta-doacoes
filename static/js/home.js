@@ -63,23 +63,21 @@
   }
 
   function data(valor) {
-    if (!valor) return null;
-    var d = new Date(String(valor).length <= 10 ? valor + "T00:00:00" : valor);
-    return isNaN(d) ? null : d;
+    return window.ReConecta.dataBrasilia(valor);
   }
 
   function prazo(valor) {
     var d = data(valor);
     if (!d) return "";
-    var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    var dia = new Date(d); dia.setHours(0, 0, 0, 0);
-    var dif = Math.round((dia - hoje) / 86400000);
-    var hora = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    var hoje = window.ReConecta.diaISO(new Date());
+    var dia = window.ReConecta.diaISO(d);
+    var dif = Math.round((Date.parse(dia + "T00:00:00Z") - Date.parse(hoje + "T00:00:00Z")) / 86400000);
+    var hora = d.toLocaleTimeString("pt-BR", { timeZone: window.ReConecta.fuso, hour: "2-digit", minute: "2-digit" });
     var quando;
     if (dif === 0) quando = "hoje";
     else if (dif === 1) quando = "amanhã";
-    else if (dif > 1 && dif < 7) quando = d.toLocaleDateString("pt-BR", { weekday: "long" }).replace("-feira", "");
-    else quando = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    else if (dif > 1 && dif < 7) quando = d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, weekday: "long" }).replace("-feira", "");
+    else quando = d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit" });
     return quando + ", " + hora;
   }
 

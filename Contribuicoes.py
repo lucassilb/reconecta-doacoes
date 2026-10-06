@@ -3,7 +3,7 @@
 import json
 import re
 import secrets
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -12,6 +12,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
 from Auth import usuario_atual
+from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
 from models import Contribuicao, Doacao, ItemDoacao, db
 
 ns = Namespace("contribuicoes", description="Fotos privadas das doações recebidas")
@@ -73,7 +74,7 @@ def serializar_contribuicao(contribuicao, *, entrega=False):
         "status": contribuicao.status,
         "quem": (contribuicao.doador.nome.split()[0] if contribuicao.doador_id
                  else contribuicao.estabelecimento.nome),
-        "criado_em": contribuicao.criado_em.isoformat(),
+        "criado_em": iso_evento(contribuicao.criado_em),
         "foto_url": foto_url(contribuicao),
     }
     if entrega:
@@ -81,7 +82,7 @@ def serializar_contribuicao(contribuicao, *, entrega=False):
                            "empresa": contribuicao.doacao.estabelecimento.nome}
         dados["entrega"] = {
             "endereco": contribuicao.doacao.estabelecimento.endereco,
-            "receber_ate": contribuicao.doacao.data_limite_retirada.isoformat(),
+            "receber_ate": iso_prazo(contribuicao.doacao.data_limite_retirada),
         }
     return dados
 
@@ -94,7 +95,7 @@ def criar_contribuicao(doacao):
     if tipo == "empresa" and usuario.id == doacao.estabelecimento_id:
         return _erro("PEDIDO_PROPRIO", "Sua empresa não pode doar para o próprio pedido.", 409)
     if (doacao.estabelecimento_id is None or doacao.status != "DISPONIVEL" or
-            doacao.data_limite_retirada <= datetime.now()):
+            doacao.data_limite_retirada <= agora_brasilia_sem_fuso()):
         return _erro("CONTRIBUICAO_RECUSADA", "Este pedido não recebe mais doações.", 422,
                      motivos=[{"codigo": "PEDIDO_INDISPONIVEL", "mensagem": "Pedido encerrado."}])
 
@@ -140,7 +141,7 @@ def criar_contribuicao(doacao):
         return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
     if item and formulario.get("categoria") and formulario["categoria"] != item.categoria:
         motivos.append({"codigo": "CATEGORIA_NAO_ACEITA", "mensagem": "Categoria diferente do item pedido."})
-    if validade < date.today():
+    if validade < hoje_brasilia():
         motivos.append({"codigo": "ALIMENTO_VENCIDO", "mensagem": "Alimento vencido não pode ser doado."})
     for pergunta, resposta in respostas.items():
         if resposta == "nao":
@@ -175,7 +176,7 @@ def criar_contribuicao(doacao):
         return _erro("ERRO_INTERNO", "Não foi possível salvar a doação.", 500)
     return {"id": contribuicao.id, "status": "ACEITA",
             "entrega": {"endereco": doacao.estabelecimento.endereco,
-                        "receber_ate": doacao.data_limite_retirada.isoformat()}}, 201
+                        "receber_ate": iso_prazo(doacao.data_limite_retirada)}}, 201
 
 
 @ns.route("/<int:contribuicao_id>/foto")

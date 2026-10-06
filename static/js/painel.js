@@ -88,20 +88,19 @@
   /* ---------- datas ---------- */
 
   function hojeISO() {
-    var d = new Date();
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    return window.ReConecta.diaISO(new Date());
   }
 
   function fmtDataHora(iso) {
-    var d = new Date(iso);
-    if (isNaN(d)) return String(iso || "");
-    return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    var d = window.ReConecta.dataBrasilia(iso);
+    if (!d) return String(iso || "");
+    return d.toLocaleString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
   }
 
   function fmtData(iso) {
-    var d = new Date(iso + "T12:00:00");
-    if (isNaN(d)) return String(iso || "");
-    return d.toLocaleDateString("pt-BR");
+    var d = window.ReConecta.dataBrasilia(iso);
+    if (!d) return String(iso || "");
+    return d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso });
   }
 
   function telefone(t) {
@@ -252,7 +251,7 @@
     var campos = {};
     var limiteV = limiteInput.value;
     if (!limiteV) campos["data_limite_retirada"] = "Informe até quando você pode receber as doações.";
-    else if (new Date(limiteV) <= new Date()) campos["data_limite_retirada"] = "A data precisa ser no futuro.";
+    else if (window.ReConecta.dataBrasilia(limiteV) <= new Date()) campos["data_limite_retirada"] = "A data precisa ser no futuro.";
 
     if (!linhasItens.length) campos["itens"] = "Adicione pelo menos um item ao pedido.";
 

@@ -12,6 +12,8 @@
      window.ReConecta.sair()            POST /reconecta/auth/logout e volta para /
      window.ReConecta.nomeTitulo(nome)  "PADARIA PAO DOURADO LTDA" → "Padaria Pao Dourado LTDA"
      window.ReConecta.formatarTelefone(t) "11987654321" → "(11) 98765-4321"
+     window.ReConecta.dataBrasilia(iso)  interpreta datas da API com fuso explícito
+     window.ReConecta.diaISO(data)       dia civil em Brasília (AAAA-MM-DD)
      evento "reconecta:sessao" no document, detail = { usuario }  (usuario null = deslogado) */
 (function () {
   "use strict";
@@ -144,6 +146,25 @@
     return String(t || "");
   }
 
+  var FUSO = "America/Sao_Paulo";
+  function dataBrasilia(iso) {
+    if (!iso) return null;
+    var valor = String(iso);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) valor += "T12:00:00Z";
+    else if (/^\d{4}-\d{2}-\d{2}T/.test(valor) && !/(Z|[+-]\d{2}:\d{2})$/.test(valor)) valor += "-03:00";
+    var data = new Date(valor);
+    return isNaN(data) ? null : data;
+  }
+
+  function diaISO(data) {
+    var partes = new Intl.DateTimeFormat("en-US", {
+      timeZone: FUSO, year: "numeric", month: "2-digit", day: "2-digit"
+    }).formatToParts(data);
+    var campos = {};
+    partes.forEach(function (parte) { campos[parte.type] = parte.value; });
+    return campos.year + "-" + campos.month + "-" + campos.day;
+  }
+
   function nomeCurto(usuario) {
     // empresa: as duas primeiras palavras do nome ("Arcos Dourados"); pessoa: primeiro nome.
     // O nome completo fica no title do elemento.
@@ -238,6 +259,9 @@
   var api = window.ReConecta = window.ReConecta || {};
   api.nomeTitulo = nomeTitulo;
   api.formatarTelefone = formatarTelefone;
+  api.fuso = FUSO;
+  api.dataBrasilia = dataBrasilia;
+  api.diaISO = diaISO;
   api.atualizarSessao = function () { api.sessao = consultarSessao(); return api.sessao; };
   api.sair = function () {
     return fetch("/reconecta/auth/logout", { method: "POST", credentials: "same-origin" })

@@ -132,7 +132,7 @@ A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que f
 python -m pytest -q
 ```
 
-168 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
+169 testes (unitários, de endpoints, de regras de negócio, de migração e da LLM com respostas simuladas). Os testes usam SQLite em memória e não acessam a internet nem o Ollama.
 
 ## Endpoints
 
@@ -170,6 +170,8 @@ O arquivo [swagger.json](swagger.json) é a exportação da especificação Open
 ## Banco de dados
 
 Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao` (itens pedidos), `contribuicoes` (doações recebidas, com respostas do questionário e foto) e `reservas` (modelo do CP1, sem endpoints nesta versão). Diagrama ER, chaves, CHECKs, índices e as decisões de normalização estão em [docs/modelagem.md](docs/modelagem.md).
+
+Datas de eventos (`data_cadastro`, `criado_em`) são gravadas em UTC no banco. O prazo `receber_ate` é informado como hora local de Brasília. As respostas da API trazem datas e horas ISO com offset, e as páginas mostram horários no fuso `America/Sao_Paulo`, mesmo em navegadores configurados para outro fuso. O dashboard agrupa doações pelo dia civil de Brasília. Em Windows, o pacote gratuito `tzdata` fornece as regras desse fuso.
 
 ## Documentação complementar
 

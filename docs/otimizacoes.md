@@ -28,3 +28,5 @@ O cenário "antes" executa a consulta e a serialização da lista original, com 
 Sob `/reconecta/`, erros 404, 405 e 500 retornam JSON com `codigo` e `mensagem`, sem detalhes internos. Com token válido, os CRUDs originais rejeitam corpo ausente, campos obrigatórios faltando e tipos inválidos com 400 e mapa `campos`. As respostas de sucesso da escrita e as rotas antigas mantêm seus formatos anteriores.
 
 Os CRUDs legados exigem `ADMIN_TOKEN` via `X-Admin-Token` para POST/PUT/DELETE; GET de estabelecimentos e instituições oculta e-mail e telefone sem token válido. CNPJ e dependências são verificados antes da escrita, com erros JSON 400/409/422.
+
+O dashboard filtra o intervalo de 30 dias pelas meias-noites de `America/Sao_Paulo` convertidas para UTC. O banco agrega contribuições por hora UTC com `extract` do SQLAlchemy (SQLite e PostgreSQL); Python atribui cada grupo ao dia de Brasília. Assim, a consulta retorna cerca de 720 grupos em vez de carregar todas as contribuições; uma mudança histórica de horário de verão pode alterar essa quantidade em uma hora.

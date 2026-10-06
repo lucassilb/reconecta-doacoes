@@ -948,7 +948,7 @@
         },
         "data_limite_retirada": {
           "type": "string",
-          "description": "Data limite para retirada (Ex: 2026-09-10T18:00:00)"
+          "description": "Entrada: hora local de Brasília sem offset (ex.: 2026-09-10T18:00:00); resposta: ISO com offset"
         },
         "status": {
           "type": "string",
@@ -1296,6 +1296,9 @@
         "empresa": {
           "$ref": "#/definitions/EmpresaPedidoPublico"
         },
+        "data_cadastro": {
+          "type": "string"
+        },
         "receber_ate": {
           "type": "string"
         },
@@ -1375,7 +1378,7 @@
       "properties": {
         "receber_ate": {
           "type": "string",
-          "description": "Data e hora ISO local"
+          "description": "Data e hora ISO local de Brasília, sem offset"
         },
         "data_limite_retirada": {
           "type": "string",

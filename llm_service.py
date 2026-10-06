@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 import requests
 
+from fuso import hoje_brasilia
 from Publico import CATEGORIAS, UNIDADES
 
 URL_PADRAO = "http://localhost:11434"
@@ -157,7 +158,7 @@ def _data(valor):
         data = date.fromisoformat(valor)
     except ValueError:
         return None
-    return data.isoformat() if data > date.today() else None
+    return data.isoformat() if data > hoje_brasilia() else None
 
 
 def _validar_pedido(objeto):
@@ -188,22 +189,22 @@ def _validar_pedido(objeto):
 
 def _prazo_regras(texto):
     simples = _sem_acentos(texto)
+    hoje = hoje_brasilia()
     if re.search(r"\bate\s+amanha\b", simples):
-        return (date.today() + timedelta(days=1)).isoformat()
+        return (hoje + timedelta(days=1)).isoformat()
     dias = {"segunda": 0, "terca": 1, "quarta": 2, "quinta": 3,
             "sexta": 4, "sabado": 5, "domingo": 6}
     encontrado = re.search(r"\bate\s+(segunda|terca|quarta|quinta|sexta|sabado|domingo)(?:-feira)?\b",
                            simples)
     if encontrado:
-        intervalo = (dias[encontrado.group(1)] - date.today().weekday()) % 7 or 7
-        return (date.today() + timedelta(days=intervalo)).isoformat()
+        intervalo = (dias[encontrado.group(1)] - hoje.weekday()) % 7 or 7
+        return (hoje + timedelta(days=intervalo)).isoformat()
     explicita = re.search(r"\bate\s+(\d{4}-\d{2}-\d{2})\b", simples)
     if explicita:
         return _data(explicita.group(1))
     dia_mes = re.search(r"\b(?:para\s+o\s+)?dia\s+([1-9]|[12]\d|3[01])\b", simples)
     if dia_mes:
         dia = int(dia_mes.group(1))
-        hoje = date.today()
         ano, mes = hoje.year, hoje.month
         for _ in range(12):
             try:
@@ -270,7 +271,7 @@ def _conferir_com_texto(validado, texto):
 
 
 def interpretar_pedido(texto):
-    hoje = date.today()
+    hoje = hoje_brasilia()
     dias = ("segunda-feira", "terça-feira", "quarta-feira", "quinta-feira",
             "sexta-feira", "sábado", "domingo")
     exemplo = {"itens": [

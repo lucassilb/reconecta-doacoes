@@ -36,9 +36,9 @@
 
   function nome(n) { var R = window.ReConecta; return R && R.nomeTitulo ? R.nomeTitulo(n) : String(n || ""); }
   function local(mu) { if (!mu) return ""; var p = String(mu).split("/"); return nome(p[0]) + (p[1] ? " / " + p[1].toUpperCase() : ""); }
-  function data(iso) { if (!iso) return null; var d = new Date(String(iso).length <= 10 ? iso + "T12:00:00" : iso); return isNaN(d) ? null : d; }
-  function dataLonga(iso) { var d = data(iso); return d ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) : ""; }
-  function hojeISO() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function data(iso) { return window.ReConecta.dataBrasilia(iso); }
+  function dataLonga(iso) { var d = data(iso); return d ? d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "long", year: "numeric" }) : ""; }
+  function hojeISO() { return window.ReConecta.diaISO(new Date()); }
   var numero = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
   var PLURAL = { unidade: "unidades", pacote: "pacotes", caixa: "caixas" };
   function unidade(u, n) { return PLURAL[u] && Number(n) !== 1 ? PLURAL[u] : (u || ""); }
