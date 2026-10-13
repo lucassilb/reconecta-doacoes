@@ -38,6 +38,16 @@ def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
 
+def _emitir(tipo, dados, *, publico=True, destinatarios=()):
+    try:
+        from eventos import emitir
+    except ModuleNotFoundError as erro:
+        if erro.name != "eventos":
+            raise
+        return
+    emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
+
+
 def _extensao_foto(dados):
     if dados.startswith(b"\xff\xd8\xff"):
         return "jpg"
@@ -195,6 +205,11 @@ def criar_contribuicao(doacao):
             foto_dados=dados_foto,
             status="ACEITA")
         db.session.add(contribuicao)
+        _emitir("doacao.aceita", {
+            "pedido_id": doacao.id, "item": item.nome,
+            "quantidade": float(quantidade), "unidade_medida": item.unidade_medida,
+            "origem": "pessoa" if tipo == "doador" else "empresa"},
+            destinatarios=(("empresa", doacao.estabelecimento_id),))
         db.session.commit()
     except SQLAlchemyError:
         db.session.rollback()

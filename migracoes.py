@@ -3,12 +3,12 @@
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import DBAPIError
 
-from models import Contribuicao, Doacao, ItemDoacao, db
+from models import Contribuicao, Doacao, Excedente, ItemDoacao, ItemExcedente, db
 
 
 def _migrar_indices(engine):
     """Cria os índices ausentes sem alterar dados, em SQLite e PostgreSQL."""
-    for modelo in (Doacao, ItemDoacao, Contribuicao):
+    for modelo in (Doacao, ItemDoacao, Contribuicao, Excedente, ItemExcedente):
         if inspect(engine).has_table(modelo.__tablename__):
             for indice in modelo.__table__.indexes:
                 indice.create(bind=engine, checkfirst=True)
@@ -228,6 +228,18 @@ def aplicar_migracoes(engine=None):
         if "senha_hash" not in colunas:
             with engine.begin() as conexao:
                 conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN senha_hash VARCHAR(255)"))
+    if inspector.has_table("estabelecimentos"):
+        colunas = {coluna["name"] for coluna in inspect(engine).get_columns("estabelecimentos")}
+        definicoes = {
+            "natureza_juridica_codigo": "VARCHAR(4)",
+            # O padrão preserva o uso dos cadastros anteriores até a revisão pela Receita.
+            "sem_fins_lucrativos": "BOOLEAN NOT NULL DEFAULT FALSE",
+            "atividade_alimentar": "BOOLEAN NOT NULL DEFAULT TRUE",
+        }
+        with engine.begin() as conexao:
+            for coluna, definicao in definicoes.items():
+                if coluna not in colunas:
+                    conexao.execute(text(f"ALTER TABLE estabelecimentos ADD COLUMN {coluna} {definicao}"))
     if inspector.has_table("doacoes"):
         if engine.dialect.name == "sqlite":
             _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))

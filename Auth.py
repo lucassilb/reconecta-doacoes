@@ -53,7 +53,17 @@ me_model = ns.model("UsuarioAutenticado", {
     "email": fields.String, "telefone": fields.String,
     "cnpj_formatado": fields.String, "endereco": fields.String,
     "cpf_formatado": fields.String,
+    "perfis": fields.List(fields.String),
 })
+
+
+def perfis_estabelecimento(usuario):
+    perfis = []
+    if usuario.sem_fins_lucrativos:
+        perfis.append("ong")
+    if usuario.atividade_alimentar:
+        perfis.append("empresa_alimentos")
+    return perfis
 me_atualizar_entrada = ns.model("AtualizarPerfilEntrada", {
     "nome": fields.String(description="Apenas doador; 3 a 100 caracteres"),
     "email": fields.String(description="E-mail válido e único; até 100 caracteres"),
@@ -113,7 +123,8 @@ def dados_usuario(tipo, usuario):
              "email": usuario.email, "telefone": usuario.telefone}
     if tipo == "empresa":
         cnpj = re.sub(r"\D", "", usuario.cnpj)
-        dados.update(cnpj_formatado=formatar_cnpj(cnpj), endereco=usuario.endereco)
+        dados.update(cnpj_formatado=formatar_cnpj(cnpj), endereco=usuario.endereco,
+                     perfis=perfis_estabelecimento(usuario))
     else:
         cpf = usuario.cpf
         dados["cpf_formatado"] = f"***.{cpf[3:6]}.{cpf[6:9]}-**"

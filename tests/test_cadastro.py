@@ -111,7 +111,7 @@ def test_inativo_e_tecnologia_recusados(cliente, monkeypatch):
     assert tecnologia.status_code == 200
     assert tecnologia.json["ativo"] is True
     assert tecnologia.json["apto"] is False
-    assert tecnologia.json["motivos"][0]["codigo"] == "SEM_RELACAO_ALIMENTAR"
+    assert tecnologia.json["motivos"][0]["codigo"] == "SEM_PERFIL_ACEITO"
 
 
 def test_atividade_alimentar_secundaria_e_cache(cliente, monkeypatch):
@@ -208,7 +208,7 @@ def test_empresa_nao_apta_e_email_duplicado(cliente, monkeypatch):
     nao_apta = cliente.post("/reconecta/cadastro/empresa", json=corpo)
     assert nao_apta.status_code == 422
     assert nao_apta.json["codigo"] == "EMPRESA_NAO_APTA"
-    assert nao_apta.json["motivos"][0]["codigo"] == "SEM_RELACAO_ALIMENTAR"
+    assert nao_apta.json["motivos"][0]["codigo"] == "SEM_PERFIL_ACEITO"
     with app.app_context():
         assert Estabelecimento.query.count() == 0
 

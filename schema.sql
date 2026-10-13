@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS estabelecimentos (
     email VARCHAR(100) NOT NULL UNIQUE,
     telefone VARCHAR(20) NOT NULL,
     endereco TEXT NOT NULL,
+    natureza_juridica_codigo VARCHAR(4),
+    sem_fins_lucrativos BOOLEAN NOT NULL DEFAULT FALSE,
+    atividade_alimentar BOOLEAN NOT NULL DEFAULT TRUE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -92,7 +95,43 @@ CREATE TABLE IF NOT EXISTS contribuicoes (
 );
 
 ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS natureza_juridica_codigo VARCHAR(4);
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS sem_fins_lucrativos BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS atividade_alimentar BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE doadores ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
+
+CREATE TABLE IF NOT EXISTS excedentes (
+    id SERIAL PRIMARY KEY,
+    estabelecimento_id INT NOT NULL REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+    retirar_ate TIMESTAMP NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'DISPONIVEL',
+    reservado_por_id INT REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+    reservado_em TIMESTAMP,
+    retirado_em TIMESTAMP,
+    observacao VARCHAR(200),
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_excedentes_status CHECK (status IN ('DISPONIVEL', 'RESERVADO', 'RETIRADO', 'CANCELADO', 'EXPIRADO')),
+    CONSTRAINT ck_excedentes_observacao CHECK (length(observacao) <= 200),
+    CONSTRAINT ck_excedentes_reservante CHECK (
+        (status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR
+        (status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL))
+);
+
+CREATE TABLE IF NOT EXISTS itens_excedente (
+    id SERIAL PRIMARY KEY,
+    excedente_id INT NOT NULL REFERENCES excedentes(id) ON DELETE CASCADE,
+    nome VARCHAR(100) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    quantidade NUMERIC(10,2) NOT NULL,
+    unidade_medida VARCHAR(20) NOT NULL,
+    validade DATE NOT NULL,
+    CONSTRAINT ck_itens_excedente_quantidade CHECK (quantidade > 0)
+);
+CREATE INDEX IF NOT EXISTS ix_excedentes_status_prazo ON excedentes(status, retirar_ate);
+CREATE INDEX IF NOT EXISTS ix_excedentes_estabelecimento ON excedentes(estabelecimento_id);
+CREATE INDEX IF NOT EXISTS ix_excedentes_reservado_por ON excedentes(reservado_por_id);
+CREATE INDEX IF NOT EXISTS ix_itens_excedente_excedente ON itens_excedente(excedente_id);
+CREATE INDEX IF NOT EXISTS ix_itens_excedente_categoria ON itens_excedente(categoria);
 
 CREATE INDEX IF NOT EXISTS ix_doacoes_estabelecimento_id ON doacoes (estabelecimento_id);
 CREATE INDEX IF NOT EXISTS ix_doacoes_doador_id ON doacoes (doador_id);

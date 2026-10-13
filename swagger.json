@@ -249,7 +249,7 @@
             }
           }
         },
-        "summary": "Cadastra empresa ativa com atividade alimentar verificada na Receita",
+        "summary": "Cadastra CNPJ ativo de ONG ou empresa alimentar verificado na Receita",
         "operationId": "post_cadastro_empresa",
         "parameters": [
           {
@@ -351,6 +351,18 @@
           "type": "integer"
         }
       ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter uma doação pelo ID direto do banco",
+        "operationId": "Obter uma doação pelo ID",
+        "tags": [
+          "doacoes"
+        ]
+      },
       "delete": {
         "responses": {
           "200": {
@@ -364,18 +376,6 @@
             "AdminToken": []
           }
         ],
-        "tags": [
-          "doacoes"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter uma doação pelo ID direto do banco",
-        "operationId": "Obter uma doação pelo ID",
         "tags": [
           "doacoes"
         ]
@@ -460,6 +460,19 @@
           "type": "integer"
         }
       ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter um estabelecimento pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Obter um estabelecimento pelo ID",
+        "tags": [
+          "estabelecimentos"
+        ]
+      },
       "delete": {
         "responses": {
           "200": {
@@ -473,19 +486,6 @@
             "AdminToken": []
           }
         ],
-        "tags": [
-          "estabelecimentos"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter um estabelecimento pelo ID direto do banco",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Obter um estabelecimento pelo ID",
         "tags": [
           "estabelecimentos"
         ]
@@ -518,17 +518,187 @@
         ]
       }
     },
+    "/reconecta/excedentes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Excedentes disponíveis",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExcedenteSaida"
+              }
+            }
+          }
+        },
+        "operationId": "get_excedentes",
+        "tags": [
+          "excedentes"
+        ]
+      },
+      "post": {
+        "responses": {
+          "429": {
+            "description": "Cota de 20 publicações por hora"
+          },
+          "201": {
+            "description": "Excedente publicado",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteSaida"
+            }
+          }
+        },
+        "operationId": "post_excedentes",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteEntrada"
+            }
+          }
+        ],
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/meus": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_meus_excedentes",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/reservas": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "get_reservas_excedentes",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/{excedente_id}": {
+      "parameters": [
+        {
+          "name": "excedente_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Detalhe do excedente",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteSaida"
+            }
+          }
+        },
+        "operationId": "get_excedente_detalhe",
+        "tags": [
+          "excedentes"
+        ]
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "delete_excedente_detalhe",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/{excedente_id}/cancelar-reserva": {
+      "parameters": [
+        {
+          "name": "excedente_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "post_cancelar_reserva",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/{excedente_id}/confirmar-retirada": {
+      "parameters": [
+        {
+          "name": "excedente_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "post_confirmar_retirada",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
+    "/reconecta/excedentes/{excedente_id}/reservar": {
+      "parameters": [
+        {
+          "name": "excedente_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "responses": {
+          "429": {
+            "description": "Cota de 30 reservas por hora"
+          }
+        },
+        "operationId": "post_reservar_excedente",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
     "/reconecta/ia/interpretar-pedido": {
       "post": {
         "responses": {
+          "429": {
+            "description": "Limite de 10 interpretações por minuto por empresa"
+          },
           "200": {
             "description": "Sugestão para revisão",
             "schema": {
               "$ref": "#/definitions/PedidoSugeridoIA"
             }
-          },
-          "429": {
-            "description": "Limite de 10 interpretações por minuto por empresa"
           }
         },
         "operationId": "post_interpretar_pedido",
@@ -615,6 +785,19 @@
           "type": "integer"
         }
       ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter uma instituição pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Obter uma instituição pelo ID",
+        "tags": [
+          "instituicoes"
+        ]
+      },
       "delete": {
         "responses": {
           "200": {
@@ -628,19 +811,6 @@
             "AdminToken": []
           }
         ],
-        "tags": [
-          "instituicoes"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter uma instituição pelo ID direto do banco",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Obter uma instituição pelo ID",
         "tags": [
           "instituicoes"
         ]
@@ -670,6 +840,50 @@
         ],
         "tags": [
           "instituicoes"
+        ]
+      }
+    },
+    "/reconecta/painel/contribuicoes/{contribuicao_id}/nao-recebida": {
+      "parameters": [
+        {
+          "name": "contribuicao_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Registra que a doação aceita não chegou ao destinatário",
+        "operationId": "post_nao_recebida",
+        "tags": [
+          "painel"
+        ]
+      }
+    },
+    "/reconecta/painel/contribuicoes/{contribuicao_id}/receber": {
+      "parameters": [
+        {
+          "name": "contribuicao_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Confirma a entrega da doação pelo destinatário do pedido",
+        "operationId": "post_receber_contribuicao",
+        "tags": [
+          "painel"
         ]
       }
     },
@@ -924,6 +1138,10 @@
       "description": "Indicadores públicos agregados"
     },
     {
+      "name": "excedentes",
+      "description": "Excedentes para reserva e retirada por ONGs"
+    },
+    {
       "name": "ia",
       "description": "Sugestões com modelo local e regras de fallback"
     }
@@ -1091,6 +1309,18 @@
         "relacionado_alimentacao": {
           "type": "boolean"
         },
+        "natureza_juridica": {
+          "type": "object"
+        },
+        "sem_fins_lucrativos": {
+          "type": "boolean"
+        },
+        "perfis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "endereco": {
           "$ref": "#/definitions/CadastroEndereco"
         },
@@ -1209,6 +1439,12 @@
         },
         "endereco": {
           "type": "string"
+        },
+        "perfis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "type": "object"
@@ -1328,6 +1564,37 @@
         },
         "cpf_formatado": {
           "type": "string"
+        },
+        "perfis": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "AtualizarPerfilEntrada": {
+      "properties": {
+        "nome": {
+          "type": "string",
+          "description": "Apenas doador; 3 a 100 caracteres"
+        },
+        "email": {
+          "type": "string",
+          "description": "E-mail válido e único; até 100 caracteres"
+        },
+        "telefone": {
+          "type": "string",
+          "description": "DDD e telefone, 10 ou 11 dígitos"
+        },
+        "senha_atual": {
+          "type": "string",
+          "description": "Obrigatória junto com nova_senha"
+        },
+        "nova_senha": {
+          "type": "string",
+          "description": "Mínimo 8 caracteres, com letra e número"
         }
       },
       "type": "object"
@@ -1418,6 +1685,9 @@
         "recebido": {
           "type": "number"
         },
+        "entregue": {
+          "type": "number"
+        },
         "faltam": {
           "type": "number"
         }
@@ -1504,6 +1774,104 @@
         }
       ]
     },
+    "ExcedenteEntrada": {
+      "required": [
+        "armazenado_ok",
+        "dentro_validade",
+        "embalagem_ok",
+        "itens",
+        "retirar_ate"
+      ],
+      "properties": {
+        "retirar_ate": {
+          "type": "string",
+          "description": "Data e hora ISO local de Brasília, sem offset"
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemExcedenteEntrada"
+          }
+        },
+        "observacao": {
+          "type": "string",
+          "description": "Até 200 caracteres"
+        },
+        "dentro_validade": {
+          "type": "boolean"
+        },
+        "embalagem_ok": {
+          "type": "boolean"
+        },
+        "armazenado_ok": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ItemExcedenteEntrada": {
+      "required": [
+        "categoria",
+        "nome",
+        "quantidade",
+        "unidade_medida",
+        "validade"
+      ],
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        },
+        "quantidade": {
+          "type": "number"
+        },
+        "unidade_medida": {
+          "type": "string"
+        },
+        "validade": {
+          "type": "string",
+          "description": "Data AAAA-MM-DD"
+        }
+      },
+      "type": "object"
+    },
+    "ExcedenteSaida": {
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "empresa": {
+          "type": "object"
+        },
+        "retirar_ate": {
+          "type": "string"
+        },
+        "itens": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "pode_reservar": {
+          "type": "boolean"
+        },
+        "motivo_bloqueio": {
+          "type": "string"
+        },
+        "retirada": {
+          "type": "object"
+        },
+        "reservado_por": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
     "TextoPedidoIA": {
       "required": [
         "texto"
@@ -1574,31 +1942,6 @@
         },
         "gerado_em": {
           "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "AtualizarPerfilEntrada": {
-      "properties": {
-        "nome": {
-          "type": "string",
-          "description": "Apenas doador; 3 a 100 caracteres"
-        },
-        "email": {
-          "type": "string",
-          "description": "E-mail válido e único; até 100 caracteres"
-        },
-        "telefone": {
-          "type": "string",
-          "description": "DDD e telefone, 10 ou 11 dígitos"
-        },
-        "senha_atual": {
-          "type": "string",
-          "description": "Obrigatória junto com nova_senha"
-        },
-        "nova_senha": {
-          "type": "string",
-          "description": "Mínimo 8 caracteres, com letra e número"
         }
       },
       "type": "object"

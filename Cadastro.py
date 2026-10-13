@@ -51,6 +51,9 @@ consulta_model = ns.model("ConsultaCNPJ", {
     "cnae_principal": fields.Nested(atividade_model),
     "atividades_alimentares": fields.List(fields.Nested(atividade_model)),
     "relacionado_alimentacao": fields.Boolean,
+    "natureza_juridica": fields.Raw,
+    "sem_fins_lucrativos": fields.Boolean,
+    "perfis": fields.List(fields.String),
     "endereco": fields.Nested(endereco_model),
     "email": fields.String,
     "telefone": fields.String,
@@ -63,6 +66,7 @@ empresa_saida = ns.model("CadastroEmpresaSaida", {
     "id": fields.Integer, "tipo": fields.String, "nome": fields.String,
     "cnpj": fields.String, "cnpj_formatado": fields.String,
     "email": fields.String, "telefone": fields.String, "endereco": fields.String,
+    "perfis": fields.List(fields.String),
 })
 doador_saida = ns.model("CadastroDoadorSaida", {
     "id": fields.Integer, "tipo": fields.String, "nome": fields.String,
@@ -128,14 +132,20 @@ def _empresa_cadastrada(cnpj):
 
 def _avaliar_empresa(dados):
     ja_cadastrado = _empresa_cadastrada(dados["cnpj"])
+    perfis = []
+    if dados.get("sem_fins_lucrativos"):
+        perfis.append("ong")
+    if dados["relacionado_alimentacao"]:
+        perfis.append("empresa_alimentos")
     motivos = []
     if not dados["ativo"]:
         motivos.append({"codigo": "CNPJ_INATIVO", "mensagem": f"CNPJ com situação {dados['situacao']}; a empresa precisa estar ativa."})
-    if not dados["relacionado_alimentacao"]:
-        motivos.append({"codigo": "SEM_RELACAO_ALIMENTAR", "mensagem": "As atividades da empresa não têm relação com alimentação ou doação de alimentos."})
+    if not perfis:
+        motivos.append({"codigo": "SEM_PERFIL_ACEITO", "mensagem": "O CNPJ não tem natureza jurídica de ONG nem atividade alimentar aceita."})
     if ja_cadastrado:
         motivos.append({"codigo": "CNPJ_JA_CADASTRADO", "mensagem": "Este CNPJ já está cadastrado."})
-    return {**dados, "ja_cadastrado": ja_cadastrado, "apto": not motivos, "motivos": motivos}
+    return {**dados, "perfis": perfis, "ja_cadastrado": ja_cadastrado,
+            "apto": not motivos, "motivos": motivos}
 
 
 def _endereco_texto(endereco):
@@ -170,7 +180,7 @@ class CadastroEmpresa(Resource):
     @ns.response(422, "Empresa não apta", erro_model)
     @ns.response(503, "Consulta indisponível", erro_model)
     def post(self):
-        """Cadastra empresa ativa com atividade alimentar verificada na Receita."""
+        """Cadastra CNPJ ativo de ONG ou empresa alimentar verificado na Receita."""
         corpo = request.get_json(silent=True)
         corpo = corpo if isinstance(corpo, dict) else {}
         cnpj = validar_cnpj(corpo.get("cnpj"))
@@ -194,7 +204,7 @@ class CadastroEmpresa(Resource):
             return _erro(erro.codigo, erro.mensagem, erro.status)
         if dados["ja_cadastrado"]:
             return _erro("CNPJ_JA_CADASTRADO", "Este CNPJ já está cadastrado.", 409)
-        if not dados["ativo"] or not dados["relacionado_alimentacao"]:
+        if not dados["apto"]:
             return _erro("EMPRESA_NAO_APTA", "Esta empresa não atende aos critérios de cadastro.", 422, motivos=dados["motivos"])
         if _email_cadastrado(email):
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
@@ -203,6 +213,9 @@ class CadastroEmpresa(Resource):
             cnpj=cnpj, email=email, telefone=telefone,
             endereco=_endereco_texto(dados["endereco"]),
             senha_hash=generate_password_hash(corpo["senha"]),
+            natureza_juridica_codigo=dados.get("natureza_juridica", {}).get("codigo") or None,
+            sem_fins_lucrativos=bool(dados.get("sem_fins_lucrativos")),
+            atividade_alimentar=bool(dados["relacionado_alimentacao"]),
         )
         db.session.add(empresa)
         try:
@@ -217,7 +230,7 @@ class CadastroEmpresa(Resource):
         return {"id": empresa.id, "tipo": "empresa", "nome": empresa.nome,
                 "cnpj": empresa.cnpj, "cnpj_formatado": formatar_cnpj(empresa.cnpj),
                 "email": empresa.email, "telefone": empresa.telefone,
-                "endereco": empresa.endereco}, 201
+                "endereco": empresa.endereco, "perfis": dados["perfis"]}, 201
 
 
 @ns.route("/doador")

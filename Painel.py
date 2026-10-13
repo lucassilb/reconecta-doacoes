@@ -3,12 +3,13 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from flask import current_app, request
 from flask_restx import Namespace, Resource, fields
+from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from Auth import registrar_auditoria, usuario_atual
 from Contribuicoes import serializar_contribuicao
 from fuso import agora_brasilia_sem_fuso
-from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
+from Publico import CATEGORIAS, UNIDADES, _municipio_uf, doacao_model, serializar_doacao
 from models import Contribuicao, Doacao, ItemDoacao, db
 
 ns = Namespace("painel", description="Pedidos e doações do usuário")
@@ -30,6 +31,16 @@ erro_model = ns.model("PainelErro", {
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
+
+
+def _emitir(tipo, dados, *, publico=True, destinatarios=()):
+    try:
+        from eventos import emitir
+    except ModuleNotFoundError as erro:
+        if erro.name != "eventos":
+            raise
+        return
+    emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
 
 def _usuario():
     atual = usuario_atual()
@@ -134,6 +145,10 @@ class DoacoesPainel(Resource):
             db.session.add(pedido)
             db.session.flush()
             db.session.add_all(ItemDoacao(doacao_id=pedido.id, **item) for item in itens)
+            _emitir("pedido.publicado", {
+                "pedido_id": pedido.id, "organizacao": empresa.nome,
+                "municipio_uf": _municipio_uf(empresa.endereco),
+                "categorias": sorted({item["categoria"] for item in itens})})
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
@@ -176,3 +191,49 @@ class MinhasDoacoes(Resource):
         ).filter_by(**filtro).order_by(
             Contribuicao.criado_em.desc(), Contribuicao.id.desc()).all()
         return [serializar_contribuicao(c, entrega=True) for c in contribuicoes], 200
+
+
+def _decidir_contribuicao(contribuicao_id, destino):
+    empresa, erro = _empresa()
+    if erro:
+        return erro
+    contribuicao = (Contribuicao.query.options(
+        selectinload(Contribuicao.item_doacao), selectinload(Contribuicao.doador),
+        selectinload(Contribuicao.estabelecimento))
+        .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+        .filter(Contribuicao.id == contribuicao_id,
+                Doacao.estabelecimento_id == empresa.id).first())
+    if not contribuicao:
+        return _erro("CONTRIBUICAO_NAO_ENCONTRADA", "Doação não encontrada.", 404)
+    if contribuicao.status != "ACEITA":
+        return _erro("CONTRIBUICAO_JA_DECIDIDA", "Esta doação já foi decidida.", 409)
+    resultado = db.session.execute(update(Contribuicao).where(
+        Contribuicao.id == contribuicao_id,
+        Contribuicao.status == "ACEITA").values(status=destino))
+    if resultado.rowcount != 1:
+        db.session.rollback()
+        return _erro("CONTRIBUICAO_JA_DECIDIDA", "Esta doação já foi decidida.", 409)
+    tipo = "doacao.entregue" if destino == "ENTREGUE" else "doacao.nao_recebida"
+    destinatario = (("doador", contribuicao.doador_id) if contribuicao.doador_id else
+                    ("empresa", contribuicao.estabelecimento_id))
+    _emitir(tipo, {"pedido_id": contribuicao.doacao_id, "item": contribuicao.item_doacao.nome},
+            publico=False, destinatarios=(destinatario,))
+    db.session.commit()
+    db.session.refresh(contribuicao)
+    registrar_auditoria("doacao_entregue" if destino == "ENTREGUE" else "doacao_nao_recebida",
+                       "ok", tipo="empresa", ator_id=empresa.id)
+    return serializar_contribuicao(contribuicao), 200
+
+
+@ns.route("/contribuicoes/<int:contribuicao_id>/receber")
+class ReceberContribuicao(Resource):
+    def post(self, contribuicao_id):
+        """Confirma a entrega da doação pelo destinatário do pedido."""
+        return _decidir_contribuicao(contribuicao_id, "ENTREGUE")
+
+
+@ns.route("/contribuicoes/<int:contribuicao_id>/nao-recebida")
+class NaoRecebida(Resource):
+    def post(self, contribuicao_id):
+        """Registra que a doação aceita não chegou ao destinatário."""
+        return _decidir_contribuicao(contribuicao_id, "CANCELADA")
