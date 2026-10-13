@@ -21,9 +21,11 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 SAIDA = RAIZ / "relatorios" / "sast"
 SEM_JANELA = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-BANDIT_ALVO = ["-r", ".", "-x", "./tests,./scripts"]
+EXCLUIDOS = "./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__"
+BANDIT_ALVO = ["-r", ".", "-x", EXCLUIDOS]
 TRIVY_ARGS = ["fs", "--scanners", "vuln,secret,misconfig",
-              "--skip-dirs", ".git,__pycache__,instance,relatorios,tests/fixtures", "."]
+              "--skip-dirs", ".git,__pycache__,instance,relatorios,tests/fixtures,"
+              ".venv,venv", "."]
 
 
 def _rodar(comando):

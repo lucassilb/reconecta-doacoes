@@ -6,8 +6,12 @@ Data: 2026-10-13 · Base: `main` em `e652512` · Frente B (rodada 10)
 
 | Ferramenta | Versão | Comando |
 |---|---|---|
-| Bandit | 1.9.4 (venv do projeto, Python 3.14) | `bandit -r . -x ./tests,./scripts -f json\|txt\|html -o relatorios/sast/bandit.*` |
-| Trivy | 0.75.0 (binário fora do repositório, GitHub Releases) | `trivy fs --scanners vuln,secret,misconfig --skip-dirs .git,__pycache__,instance,relatorios,tests/fixtures --format table\|json .` |
+| Bandit | 1.9.4 (venv do projeto, Python 3.14) | `bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f json\|txt\|html -o relatorios/sast/bandit.*` |
+| Trivy | 0.75.0 (binário fora do repositório, GitHub Releases) | `trivy fs --scanners vuln,secret,misconfig --skip-dirs .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv --format table\|json .` |
+
+As exclusões cobrem testes, o próprio diretório de relatórios e ambientes virtuais
+(`.venv`/`venv`), para que o scan local não varra dependências instaladas e produza o
+mesmo resultado do job `sast-bandit`/`sast-trivy` do CI em qualquer máquina.
 
 Para refazer tudo: `python scripts/sast.py` (defina `TRIVY=<caminho-do-exe>` se o Trivy
 não estiver no PATH). Artefatos versionados em `relatorios/sast/`:
