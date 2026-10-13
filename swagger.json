@@ -526,6 +526,9 @@
             "schema": {
               "$ref": "#/definitions/PedidoSugeridoIA"
             }
+          },
+          "429": {
+            "description": "Limite de 10 interpretações por minuto por empresa"
           }
         },
         "operationId": "post_interpretar_pedido",
@@ -798,8 +801,11 @@
       ],
       "post": {
         "responses": {
-          "200": {
-            "description": "Success"
+          "429": {
+            "description": "Cota de 20 envios por hora por usuário; MUITAS_TENTATIVAS"
+          },
+          "201": {
+            "description": "Doação aceita"
           }
         },
         "operationId": "post_contribuir",
@@ -839,6 +845,23 @@
           "publico"
         ]
       }
+    },
+    "/reconecta/saude": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Aplicação e banco disponíveis"
+          },
+          "503": {
+            "description": "Banco indisponível"
+          }
+        },
+        "summary": "Verifica a conexão com o banco para healthchecks",
+        "operationId": "get_saude",
+        "tags": [
+          "default"
+        ]
+      }
     }
   },
   "info": {
@@ -860,6 +883,10 @@
     }
   },
   "tags": [
+    {
+      "name": "default",
+      "description": "Default namespace"
+    },
     {
       "name": "estabelecimentos",
       "description": "Operações relacionadas aos estabelecimentos doadores"

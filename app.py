@@ -1,7 +1,11 @@
 import os
 from flask import Flask, request, send_from_directory
-from flask_restx import Api
+from flask_restx import Api, Resource
+from sqlalchemy import text
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, MethodNotAllowed, NotFound, RequestEntityTooLarge
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 from models import db
 from Auth import configurar_chave_secreta
@@ -11,13 +15,54 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL") or "sqlite:///reconecta.db"
+def _database_url(valor):
+    if not valor:
+        return "sqlite:///reconecta.db"
+    if valor.startswith("postgres://"):
+        valor = "postgresql://" + valor[len("postgres://"):]
+    url = make_url(valor)
+    if url.drivername in ("postgresql", "postgresql+psycopg"):
+        parametros = dict(url.query)
+        if url.host not in ("localhost", "127.0.0.1", "::1", "db"):
+            parametros["sslmode"] = "require"
+        return url.set(drivername="postgresql+psycopg", query=parametros).render_as_string(hide_password=False)
+    return valor
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = _database_url(os.getenv("DATABASE_URL"))
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # foto até 5 MB + campos do questionário
 app.config["ERROR_INCLUDE_MESSAGE"] = False  # erros RESTX usam codigo/mensagem da API
 configurar_chave_secreta(app)
+if os.getenv("COOKIE_SEGURO") == "1":
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 db.init_app(app)
+
+_CSP = (
+    "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+    "form-action 'self'; script-src 'self' https://cdn.jsdelivr.net; "
+    "style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data: blob:; connect-src 'self'; "
+    "media-src 'self'; worker-src 'none'"
+)
+
+
+@app.after_request
+def cabecalhos_seguranca(resposta):
+    resposta.headers["X-Content-Type-Options"] = "nosniff"
+    resposta.headers["X-Frame-Options"] = "DENY"
+    resposta.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resposta.headers["Permissions-Policy"] = (
+        "camera=(self), microphone=(), geolocation=(), payment=(), usb=()")
+    resposta.headers["Content-Security-Policy"] = _CSP
+    if app.config["SESSION_COOKIE_SECURE"]:
+        resposta.headers["Strict-Transport-Security"] = "max-age=31536000"
+    return resposta
+
 
 @app.get("/")
 def home_page():
@@ -60,6 +105,22 @@ api = Api(
     authorizations={"AdminToken": {"type": "apiKey", "in": "header", "name": "X-Admin-Token"}},
     doc="/swagger"
 )
+
+
+class Saude(Resource):
+    @api.doc(responses={200: "Aplicação e banco disponíveis",
+                        503: "Banco indisponível"})
+    def get(self):
+        """Verifica a conexão com o banco para healthchecks."""
+        try:
+            db.session.execute(text("SELECT 1"))
+        except SQLAlchemyError:
+            db.session.rollback()
+            return {"status": "indisponivel", "banco": "indisponivel"}, 503
+        return {"status": "ok", "banco": "ok"}, 200
+
+
+api.add_resource(Saude, "/reconecta/saude")
 
 @api.errorhandler(RequestEntityTooLarge)
 def requisicao_grande(_erro):
@@ -130,4 +191,6 @@ with app.app_context():
     aplicar_migracoes()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=os.getenv("FLASK_DEBUG") == "1")
+    app.run(host=os.getenv("FLASK_RUN_HOST", "127.0.0.1"),
+            port=int(os.getenv("PORT", "5000")),
+            debug=os.getenv("FLASK_DEBUG") == "1")

@@ -8,7 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
-from Auth import iniciar_sessao
+from Auth import iniciar_sessao, registrar_auditoria
 from cnpj_service import ConsultaCNPJError, consultar_cnpj, formatar_cnpj, validar_cnpj
 from models import Doador, Estabelecimento, db
 
@@ -213,6 +213,7 @@ class CadastroEmpresa(Resource):
                 return _erro("CNPJ_JA_CADASTRADO", "Este CNPJ já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
         iniciar_sessao("empresa", empresa.id)
+        registrar_auditoria("cadastro_empresa", "ok", tipo="empresa", ator_id=empresa.id)
         return {"id": empresa.id, "tipo": "empresa", "nome": empresa.nome,
                 "cnpj": empresa.cnpj, "cnpj_formatado": formatar_cnpj(empresa.cnpj),
                 "email": empresa.email, "telefone": empresa.telefone,
@@ -262,6 +263,7 @@ class CadastroDoador(Resource):
                 return _erro("CPF_JA_CADASTRADO", "Este CPF já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
         iniciar_sessao("doador", doador.id)
+        registrar_auditoria("cadastro_doador", "ok", tipo="doador", ator_id=doador.id)
         return {"id": doador.id, "tipo": "doador", "nome": doador.nome,
                 "cpf_formatado": f"***.{cpf[3:6]}.{cpf[6:9]}-**",
                 "email": doador.email, "telefone": doador.telefone}, 201

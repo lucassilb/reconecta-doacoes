@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS contribuicoes (
     validade DATE NOT NULL,
     respostas TEXT NOT NULL,
     foto_arquivo VARCHAR(80) NOT NULL,
+    foto_dados BYTEA,
     status VARCHAR(20) NOT NULL DEFAULT 'ACEITA',
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT ck_contribuicoes_uma_origem CHECK ((doador_id IS NOT NULL) <> (estabelecimento_id IS NOT NULL)),

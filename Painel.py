@@ -5,7 +5,7 @@ from flask import current_app, request
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
-from Auth import usuario_atual
+from Auth import registrar_auditoria, usuario_atual
 from Contribuicoes import serializar_contribuicao
 from fuso import agora_brasilia_sem_fuso
 from Publico import CATEGORIAS, UNIDADES, doacao_model, serializar_doacao
@@ -139,6 +139,7 @@ class DoacoesPainel(Resource):
             db.session.rollback()
             current_app.logger.exception("Falha ao criar pedido")
             return _erro("ERRO_INTERNO", "Não foi possível criar o pedido.", 500)
+        registrar_auditoria("pedido_publicado", "ok", tipo="empresa", ator_id=empresa.id)
         dados = serializar_doacao(pedido, incluir_status=True)
         dados["contribuicoes"] = []
         return dados, 201
@@ -156,6 +157,7 @@ class DoacaoPainel(Resource):
             return _erro("PEDIDO_NAO_REMOVIVEL", "Este pedido não pode ser removido.", 409)
         db.session.delete(pedido)
         db.session.commit()
+        registrar_auditoria("pedido_removido", "ok", tipo="empresa", ator_id=empresa.id)
         return "", 204
 
 @ns.route("/minhas-doacoes")

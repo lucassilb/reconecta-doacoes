@@ -128,6 +128,7 @@ class Contribuicao(db.Model):
     validade = db.Column(db.Date, nullable=False)
     respostas = db.Column(db.Text, nullable=False)
     foto_arquivo = db.Column(db.String(80), nullable=False)
+    foto_dados = db.Column(db.LargeBinary, nullable=True)
     status = db.Column(db.String(20), nullable=False, default='ACEITA', server_default='ACEITA')
     criado_em = db.Column(db.DateTime, nullable=False, default=_utc_naive)
     doador = db.relationship('Doador', backref='contribuicoes')
