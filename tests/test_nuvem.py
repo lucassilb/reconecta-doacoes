@@ -51,6 +51,14 @@ def test_url_postgres_local_e_supabase():
     assert remota.drivername == "postgresql+psycopg"
     assert remota.query["sslmode"] == "require"
     assert remota.query["application_name"] == "reconecta"
+    colada = make_url(_database_url(
+        "  postgresql://u:p%2Fx%40y@aws-1-sa-east-1.pooler.supabase.com:5432/postgres
+
+"))
+    assert colada.database == "postgres"  # sem a quebra de linha colada no fim
+    assert colada.password == "p/x@y"     # senha com símbolos convertidos na URL
+    assert _database_url("  
+") == "sqlite:///reconecta.db"
     assert app.config["SQLALCHEMY_ENGINE_OPTIONS"]["pool_pre_ping"] is True
 
 

@@ -16,6 +16,8 @@ load_dotenv()
 app = Flask(__name__)
 
 def _database_url(valor):
+    # painéis de nuvem costumam colar a URL com espaço ou quebra de linha no fim
+    valor = (valor or "").strip()
     if not valor:
         return "sqlite:///reconecta.db"
     if valor.startswith("postgres://"):
