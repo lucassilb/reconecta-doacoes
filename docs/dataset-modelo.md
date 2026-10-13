@@ -159,3 +159,13 @@ python -m pytest tests/test_classificador.py tests/test_ia.py -q
 ```
 
 O teste `test_treino_e_reprodutivel_e_o_modelo_do_repositorio_esta_em_dia` falha se o dataset ou o treino mudarem sem o modelo ser treinado de novo.
+
+## Sugerir destino (IA de conexão)
+
+O classificador treinado também alimenta `POST /reconecta/ia/sugerir-destino`: o texto do
+que sobrou vira itens pelo pipeline de sempre (LLM → classificador → regras) e a função
+pura `conexao.casar` pontua os pedidos abertos que combinam — categoria (do classificador
+quando a LLM não acerta), nome parecido, quanto falta, prazo e UF. Os dados usados são só
+os campos públicos do pedido; o resultado é recomendação explicável (`motivos`), e quem
+decide é a pessoa. Detalhes em [llm.md](llm.md#sugestão-de-destino-post-reconecta-ia-sugerir-destino)
+e no código `conexao.py`.
