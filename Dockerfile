@@ -18,4 +18,4 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT', '5000') + '/reconecta/saude', timeout=4)" || exit 1
 
-CMD ["sh", "-c", "exec gunicorn app:app --preload --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 90 --access-logfile - --error-logfile -"]
+CMD ["sh", "-c", "exec gunicorn app:app --preload --worker-class gthread --threads 8 --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 90 --access-logfile - --error-logfile -"]

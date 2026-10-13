@@ -62,3 +62,26 @@ O serviço funciona sem Ollama, com sugestões por regras. O primeiro uso do mod
 - **Saída tratada como dado não confiável**: validada contra listas e tamanhos, exibida com `textContent` (nunca como HTML) e nunca grava no banco nem decide publicação sozinha.
 - **Transparência**: toda resposta informa se veio do modelo (`fonte: "llm"`, com o nome do modelo) ou das regras.
 - **Sem segredos**: não há chave de API; nada sensível em variáveis da IA.
+
+## Sugestão de destino (`POST /reconecta/ia/sugerir-destino`)
+
+É a IA que **conecta** quem tem excedente a quem precisa. A pessoa logada (doador ou
+organização) escreve o que sobrou — "sobraram 30 pães e 5 kg de tomate, vence amanhã" — e
+o mesmo pipeline de `interpretar-pedido` (LLM local quando há, senão classificador +
+regras) extrai os itens. A função `conexao.casar` (pura, sem rede) então cruza esses itens
+com os pedidos abertos e devolve até 5 sugestões:
+
+```json
+{"itens":[{"nome":"pães","categoria":"Padaria","quantidade":30.0,"unidade_medida":"unidade"}],
+ "sugestoes":[{"pedido_id":1,"organizacao":"ONG Esperança","municipio_uf":"BARUERI/SP",
+   "pontuacao":86,"motivos":["pede Padaria","faltam 70 de 100 pães","mesma UF","prazo em 2 dias"],
+   "item_id":10,"quantidade_sugerida":30}],
+ "pode_publicar_excedente":true,"fonte":"regras","modelo":null}
+```
+
+A pontuação (0–100) é explicável e aparece em `motivos`: mesma categoria, semelhança do
+nome do item, quanto falta para a meta, urgência do prazo e mesma UF (quando o usuário tem
+endereço). O limite é de 10 chamadas por minuto por usuário. **É recomendação, não
+decisão**: a pessoa escolhe o destino e a doação segue o questionário normal; sem sugestão
+que combine, uma empresa de alimentos pode publicar o excedente (`pode_publicar_excedente`).
+A mesma função `casar` escolhe as ONGs notificadas quando um excedente é publicado.
