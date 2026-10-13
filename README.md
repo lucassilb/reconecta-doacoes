@@ -2,7 +2,7 @@
 
 Plataforma de doação de alimentos que conecta empresas do setor alimentício a pessoas e outras empresas dispostas a doar.
 
-Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM local e gratuita.
+Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM local e gratuita. Esta entrega acrescenta dataset estruturado, modelo treinado local, matriz de riscos STRIDE, relatórios SAST, Docker e Docker Compose, pipeline de CI/CD e publicação em nuvem com banco gerenciado, tudo com ferramentas e planos gratuitos.
 
 ## Sobre o projeto
 
@@ -11,6 +11,22 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 1. Uma **empresa com CNPJ ativo e atividade ligada a alimentação** publica um **pedido de doação** (ex.: "precisamos de 100 caixas de leite e 100 pães até sexta").
 2. O pedido aparece em **Doações disponíveis**. Qualquer **pessoa com CPF válido** ou **outra empresa** escolhe um item e doa.
 3. Antes de confirmar, quem doa responde um **questionário curto** (4 perguntas de segurança alimentar) e envia uma **foto** do alimento. Se tudo estiver de acordo, a doação é aceita, o progresso do pedido é atualizado e a pessoa recebe o endereço e o prazo de entrega.
+
+## Critérios desta entrega
+
+Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga e sem cartão.
+
+| Critério | Situação | Onde está |
+|---|---|---|
+| Dataset estruturado | Pronto | [`data/alimentos.csv`](data/alimentos.csv) (925 linhas), [`data/pedidos_avaliacao.jsonl`](data/pedidos_avaliacao.jsonl) (66 pedidos com gabarito) e [`data/README.md`](data/README.md). Seção [Dataset estruturado](#dataset-estruturado). |
+| Modelo funcional local | Pronto | Classificador treinado em [`classificador.py`](classificador.py) + [`modelo/classificador_categorias.json`](modelo/classificador_categorias.json), usado em `POST /reconecta/ia/interpretar-pedido`; LLM local `qwen2.5:3b` no Ollama. Seção [Modelo funcional local](#modelo-funcional-local). |
+| Matriz de riscos (STRIDE) | Pronto | `docs/stride.md`. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
+| Dockerfile + Docker Compose | Pronto | [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) e [`.dockerignore`](.dockerignore). Seção [Docker e Docker Compose](#docker-e-docker-compose). |
+| Pipeline CI/CD (GitHub Actions) | Pronto | [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Seção [Pipeline CI/CD](#pipeline-cicd-github-actions). |
+| Relatórios SAST (Bandit e Trivy) | Pronto | `relatorios/sast/`, triagem em `docs/sast.md`, comando `python scripts/sast.py`. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
+| URL pública | <!-- URL_PUBLICA --> | Render, plano gratuito, pelo [`render.yaml`](render.yaml). Seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase). |
+| Banco em nuvem | <!-- BANCO_NUVEM --> | Supabase (PostgreSQL), plano gratuito, pela variável `DATABASE_URL`. Passo a passo em [docs/implantacao.md](docs/implantacao.md). |
+| README completo | Pronto | Este arquivo. |
 
 ## Público-alvo
 
@@ -26,12 +42,15 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | Cadastro de doador | Valida o CPF pelos dígitos verificadores; CPF sempre devolvido mascarado. |
 | Login | E-mail, CNPJ ou CPF + senha (hash scrypt). Sessão em cookie HttpOnly/SameSite=Lax; 5 falhas em 15 min bloqueiam novas tentativas. |
 | Pedidos de doação | Só empresa publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
-| Doar para um pedido | Pessoa (CPF) ou outra empresa; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A empresa não doa no próprio pedido. |
+| Doar para um pedido | Pessoa (CPF) ou outra empresa; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A foto é guardada no banco de dados, para não se perder quando o servidor da nuvem reinicia. A empresa não doa no próprio pedido. Limite de 20 envios por hora por usuário. |
 | Progresso | Cada item mostra recebido × meta e quanto falta. |
 | Painéis | Empresa: publicar pedido (com "Preencher com IA"), meus pedidos com progresso e doações recebidas com foto, minhas doações. Doador: minhas doações. |
 | Meus dados | No painel, "Editar" altera os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha informando a atual. CNPJ e CPF não mudam. |
 | Dashboard | Indicadores, gráfico pedido × recebido por categoria, doações por dia (30 dias), empresas com mais doações, alertas e últimas doações, com dados reais do banco. Botão "Gerar resumo com IA". |
 | LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
+| Classificador treinado | Modelo próprio, treinado no dataset do projeto, que escolhe a categoria de cada item em "Preencher com IA". Roda dentro da aplicação, inclusive na nuvem, onde o Ollama não está disponível. Detalhes em [docs/dataset-modelo.md](docs/dataset-modelo.md). |
+| Segurança | Cabeçalhos de segurança e Content-Security-Policy em todas as respostas; trilha de auditoria em JSON (login, cadastro, edição de dados, pedidos, doações e uso do token de administrador) sem senha, documento, e-mail ou foto; limites de uso nas rotas de IA e de doação. |
+| Saúde | `GET /reconecta/saude` confere a conexão com o banco; é usado pelos healthchecks do Docker, do Compose e do Render. |
 | CRUDs do CP1 | Estabelecimentos, Instituições e Doações (`/reconecta/...`): leitura pública sem contatos; escrita só com token de administrador, CNPJ verificado e erros em JSON. |
 
 ## Regras de negócio
@@ -48,29 +67,41 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | RN08 | CPF, e-mail, telefone e endereços privados não aparecem em telas ou respostas públicas; o endereço cadastrado de estabelecimentos e instituições permanece público nos CRUDs do CP1. |
 | RN09 | E-mail, CNPJ e CPF são únicos. |
 | RN10 | POST/PUT/DELETE dos CRUDs do CP1 exigem `X-Admin-Token` válido; sem `ADMIN_TOKEN` configurado, a escrita fica desativada. |
+| RN11 | Limites de uso: 5 falhas de login em 15 min bloqueiam novas tentativas; cada empresa interpreta até 10 pedidos por minuto com a IA; cada IP gera até 10 resumos do dashboard por minuto; cada usuário envia até 20 doações por hora. Acima disso a API responde 429. |
 
 ## Arquitetura
 
 ```text
 ReConecta/
-├── app.py                 # Flask + flask-restx: configuração, rotas das páginas, erros JSON, registro dos namespaces
+├── app.py                 # Flask + flask-restx: configuração, rotas das páginas, /reconecta/saude, cabeçalhos de segurança, erros JSON
 ├── models.py              # Modelos SQLAlchemy (entidades, CHECKs, índices)
 ├── migracoes.py           # Migrações idempotentes aplicadas no boot (SQLite e PostgreSQL)
 ├── schema.sql             # Esquema para instalação manual no PostgreSQL
+├── fuso.py                # Datas e horas no fuso de Brasília
 ├── Cadastro.py            # /reconecta/cadastro  (CNPJ, empresa, doador)
 ├── cnpj_service.py        # Consulta e cache de CNPJ nas fontes públicas
 ├── cnae_alimentos.py      # Critério "atividade ligada a alimentos" por CNAE
-├── Auth.py                # /reconecta/auth      (login, logout, me)
+├── Auth.py                # /reconecta/auth      (login, logout, me) e trilha de auditoria
 ├── Publico.py             # /reconecta/publico   (resumo, opções, pedidos, detalhe)
-├── Contribuicoes.py       # doação para um pedido (questionário + foto)
+├── Contribuicoes.py       # doação para um pedido (questionário + foto guardada no banco)
 ├── Painel.py              # /reconecta/painel    (pedidos da empresa, minhas doações)
 ├── Dashboard.py           # /reconecta/dashboard (agregados)
-├── IA.py, llm_service.py  # /reconecta/ia        (LLM local via Ollama + regras automáticas se ele estiver fora)
+├── IA.py, llm_service.py  # /reconecta/ia        (LLM local via Ollama; classificador e regras quando ela está fora)
+├── classificador.py       # Classificador de categorias (Naive Bayes em Python puro)
+├── modelo/                # Modelo treinado em JSON, métricas do treino e da avaliação
+├── data/                  # Dataset de alimentos, pedidos de avaliação e gerador
+├── scripts/               # treinar_modelo.py, classificar.py, avaliar_modelos.py, sast.py
 ├── Estabelecimentos.py, Instituicoes.py, Doacoes.py  # CRUDs do CP1
 ├── crud_validacao.py, crud_admin.py  # validação dos CRUDs do CP1 e token de administrador (X-Admin-Token)
 ├── static/                # Front-end: HTML, CSS e JS (sem build)
 ├── tests/                 # pytest
-└── docs/                  # modelagem, otimizações, LLM, critério CNAE
+├── docs/                  # modelagem, otimizações, LLM, dataset e modelo, implantação, STRIDE, SAST, critério CNAE
+├── relatorios/sast/       # Relatórios do Bandit e do Trivy
+├── Dockerfile, .dockerignore, docker-compose.yml  # Imagem da aplicação e ambiente local com PostgreSQL
+├── render.yaml            # Blueprint do Render (plano gratuito)
+├── .github/workflows/ci.yml  # Pipeline de CI/CD
+├── requirements.txt       # Dependências de produção
+└── requirements-dev.txt   # Dependências de desenvolvimento (pytest, bandit, playwright)
 ```
 
 Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`.
@@ -122,17 +153,25 @@ Detalhes, medições e como repetir em [docs/otimizacoes.md](docs/otimizacoes.md
 
 ## Tecnologias
 
-Python 3.10+ (testado em 3.14), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, PostgreSQL (ou SQLite para desenvolvimento), psycopg 3, python-dotenv, requests, pytest, Ollama + `qwen2.5:3b` (opcional, gratuito e local), Chart.js.
+Todas gratuitas.
+
+- **Aplicação**: Python 3.10+ (testado em 3.14 local e 3.12 na imagem Docker), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, psycopg 3, python-dotenv, requests, gunicorn (servidor de produção), Chart.js.
+- **Banco**: PostgreSQL (local, no Compose ou no Supabase) ou SQLite para desenvolvimento.
+- **IA**: Ollama + `qwen2.5:3b` (opcional, local) e o classificador próprio em Python puro, sem dependência extra.
+- **Testes e segurança**: pytest, Bandit, Trivy e Playwright (só para a prova opcional de CSP no navegador).
+- **Entrega**: Docker, Docker Compose, GitHub Actions, Render (plano gratuito) e Supabase (plano gratuito).
 
 ## Instalação
 
-### Pré-requisitos
+Há dois caminhos: Python direto na máquina ou Docker Compose.
+
+### Caminho 1: Python local
+
+Pré-requisitos:
 
 - Python 3.10 ou superior e Git;
 - PostgreSQL (opcional: sem `DATABASE_URL` a aplicação usa SQLite em `instance/reconecta.db`);
-- Ollama (opcional, gratuito) para a LLM local — sem ele as funções de IA usam regras automáticas.
-
-### Passos
+- Ollama (opcional, gratuito) para a LLM local. Sem ele as funções de IA usam o classificador treinado e regras automáticas.
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
@@ -142,7 +181,8 @@ python -m venv .venv
 .venv\Scripts\activate
 # Linux ou macOS
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt        # produção
+pip install -r requirements-dev.txt    # testes e Bandit (desenvolvimento)
 ```
 
 LLM local (opcional, gratuito): instale o Ollama (https://ollama.com/download) e baixe o modelo:
@@ -152,26 +192,53 @@ ollama pull qwen2.5:3b
 ollama serve
 ```
 
+### Caminho 2: Docker Compose
+
+Pré-requisito: Docker com Compose (`docker version` e `docker compose version`). Não precisa de Python nem de PostgreSQL instalados. Os comandos estão em [Docker e Docker Compose](#docker-e-docker-compose).
+
 ## Variáveis de ambiente
 
-Crie um `.env` a partir do `.env.example` (não publique o `.env`):
+Crie um `.env` a partir do `.env.example` (não publique o `.env`). Nenhuma é obrigatória para rodar localmente.
 
-| Variável | Obrigatória | Padrão | Uso |
-|---|---|---|---|
-| `DATABASE_URL` | não | SQLite `instance/reconecta.db` | Ex.: `postgresql://USUARIO:SENHA@localhost:5432/reconecta` |
-| `SECRET_KEY` | não | gerada e guardada em `instance/secret_key` | Assina o cookie de sessão; defina em produção. |
-| `FLASK_DEBUG` | não | `0` | `1` liga o modo debug. |
-| `ADMIN_TOKEN` | para escrita dos CRUDs do CP1 | desativado | Token longo e aleatório enviado em `X-Admin-Token`. Sem configuração: escrita 403; token ausente/incorreto: 401. Não use no navegador nem publique no repositório. |
-| `OLLAMA_URL` | não | `http://localhost:11434` | Endereço do Ollama local. |
-| `OLLAMA_MODELO` | não | `qwen2.5:3b` | Modelo gratuito usado pela IA. |
+| Variável | Padrão | Uso |
+|---|---|---|
+| `DATABASE_URL` | SQLite `instance/reconecta.db` | Ex.: `postgresql://USUARIO:SENHA@localhost:5432/reconecta_dev`. Aceita `postgres://` e `postgresql://` (Supabase, Render) e usa o driver psycopg 3. Em host que não é local, a conexão exige SSL (`sslmode=require`). |
+| `SECRET_KEY` | gerada e guardada em `instance/secret_key` | Assina o cookie de sessão; defina em produção. No Render é gerada pelo Blueprint. |
+| `COOKIE_SEGURO` | desligado | `1` atrás de HTTPS (Render): cookie de sessão só por HTTPS, leitura dos cabeçalhos do proxy e `Strict-Transport-Security`. Deixe ausente em HTTP local. |
+| `PORT` | `5000` | Porta do servidor (o Render define a dele). |
+| `FLASK_RUN_HOST` | `127.0.0.1` | Endereço do servidor de desenvolvimento (`python app.py`). No Docker quem escuta em `0.0.0.0` é o gunicorn. |
+| `FLASK_DEBUG` | `0` | `1` liga o modo debug. |
+| `FLASK_APP` | `app.py` | Usada só pelo comando `flask`. |
+| `ADMIN_TOKEN` | desativado | Token longo e aleatório enviado em `X-Admin-Token` para a escrita dos CRUDs do CP1. Sem configuração: escrita 403; token ausente ou incorreto: 401. Não use no navegador nem publique no repositório. |
+| `OLLAMA_URL` | `http://localhost:11434` | Endereço do Ollama. Só HTTP, com porta, em `localhost`, `127.0.0.1` ou `::1`. |
+| `OLLAMA_MODELO` | `qwen2.5:3b` | Modelo gratuito usado pela IA; outro valor desliga a chamada à LLM. |
+| `OLLAMA_PERMITIR_DOCKER` | desligado | `1` aceita também, e somente, o host `ollama` do Docker Compose em `OLLAMA_URL` (`http://ollama:11434`). O Compose já define. |
+
+Só no Docker Compose (lidas pelo `docker-compose.yml`):
+
+| Variável | Padrão | Uso |
+|---|---|---|
+| `POSTGRES_PASSWORD` | `dev-only-change-me` | Senha do PostgreSQL de desenvolvimento do Compose. O padrão serve só para máquina de teste. |
+| `COMPOSE_OLLAMA_URL` | `http://ollama:11434` | Endereço do Ollama visto pelo contêiner da aplicação. |
+
+Só nos testes opcionais: `CP2_PG_SUPERUSER_PASSWORD_FILE` (provas em PostgreSQL) e `RECON_CSP_URL` (prova de CSP no navegador). Para refazer os relatórios SAST, `TRIVY` pode apontar para o binário do Trivy.
 
 ## Execução
+
+Local:
 
 ```bash
 python app.py
 ```
 
-A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que faltarem e aplica as migrações (colunas, índices) de forma idempotente. Swagger em `http://localhost:5000/swagger`.
+Com Docker Compose:
+
+```bash
+docker compose build app
+docker compose up -d --wait
+```
+
+Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `http://localhost:5000/swagger` e a verificação de saúde em `http://localhost:5000/reconecta/saude`. Ao iniciar, cria as tabelas que faltarem e aplica as migrações (colunas, índices) de forma idempotente.
 
 ## Testes
 
@@ -179,7 +246,7 @@ A aplicação sobe em `http://localhost:5000`. Ao iniciar, cria as tabelas que f
 python -m pytest -q
 ```
 
-188 testes (unitários, de endpoints, de regras de negócio, de migração, de integridade do banco e da LLM com respostas simuladas). Usam SQLite em memória e não acessam a internet nem o Ollama; 3 provas opcionais em PostgreSQL só rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` definido (sem ela aparecem como "skipped").
+Resultado atual: **221 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -187,6 +254,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 
 | Método | Endpoint | Descrição |
 |---|---|---|
+| GET | `/reconecta/saude` | Saúde da aplicação: 200 `{"status":"ok","banco":"ok"}`; 503 se o banco não responder. |
 | GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ: situação, atividades alimentares, `apto` e `motivos`. |
 | POST | `/reconecta/cadastro/empresa` | Cadastra empresa (refaz a verificação do CNPJ) e inicia a sessão. |
 | POST | `/reconecta/cadastro/doador` | Cadastra pessoa física e inicia a sessão. |
@@ -198,14 +266,14 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
 | GET | `/reconecta/publico/doacoes` | Pedidos abertos. Paginação `pagina`/`por_pagina` (máx. 50), filtros `categoria`, `uf`, `busca`; cabeçalhos `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`. |
 | GET | `/reconecta/publico/doacoes/{id}` | Detalhe do pedido com progresso por item. |
-| POST | `/reconecta/publico/doacoes/{id}/contribuicoes` | Doar (multipart: item, quantidade, validade, 4 respostas, foto). |
+| POST | `/reconecta/publico/doacoes/{id}/contribuicoes` | Doar (multipart: item, quantidade, validade, 4 respostas, foto). Limite de 20 por hora por usuário (429 `MUITAS_TENTATIVAS`). |
 | GET | `/reconecta/contribuicoes/{id}/foto` | Foto da doação (só quem doou ou a empresa dona). |
 | GET/POST | `/reconecta/painel/doacoes` | Pedidos da empresa logada / publicar pedido. |
 | DELETE | `/reconecta/painel/doacoes/{id}` | Remover pedido próprio. |
 | GET | `/reconecta/painel/minhas-doacoes` | Doações feitas pela pessoa ou empresa logada. |
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
-| POST | `/reconecta/ia/interpretar-pedido` | Empresa logada: texto livre → itens sugeridos para revisão. |
-| POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados (10/min por IP). |
+| POST | `/reconecta/ia/interpretar-pedido` | Empresa logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por empresa (429 `MUITAS_TENTATIVAS`). |
+| POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados. Limite de 10 por minuto por IP (429 `LIMITE_IA`). |
 | GET público / POST admin | `/reconecta/estabelecimentos/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo e CNAE alimentar. |
 | GET público / PUT/DELETE admin | `/reconecta/estabelecimentos/{id}` | GET sem contato; admin recebe registro completo. DELETE com dependentes: 409. |
 | GET público / POST admin | `/reconecta/instituicoes/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo. |
@@ -213,7 +281,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-O arquivo [swagger.json](swagger.json) é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **36 operações em 25 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 
@@ -237,15 +305,15 @@ Onde cada item exigido está atualizado:
 
 | Item do critério | Onde está |
 |---|---|
-| README | Este arquivo, reescrito para o CP2 (fluxo de pedidos e doações, dashboard, LLM, segurança) |
+| README | Este arquivo, reescrito para o CP2 (fluxo de pedidos e doações, dashboard, LLM, segurança) e ampliado com dataset, modelo, STRIDE, SAST, Docker, CI/CD e nuvem |
 | Swagger | `/swagger` (gerado do código pelo Flask-RESTX) e [swagger.json](swagger.json) exportado da API atual, com todos os endpoints, modelos de entrada/saída, códigos de resposta e o cabeçalho `X-Admin-Token` |
-| Instruções de instalação | Seções **Instalação** (Python, venv, `pip install -r requirements.txt`, PostgreSQL ou SQLite, Ollama gratuito), **Execução** e **Testes** |
-| Endpoints | Seção **Endpoints**: todas as 35 operações da API (24 caminhos) com método, caminho e descrição, mais as rotas de página em **Arquitetura** |
+| Instruções de instalação | Seções **Instalação** (Python local com venv, `requirements.txt` e `requirements-dev.txt`, PostgreSQL ou SQLite, Ollama gratuito; ou Docker Compose), **Execução** e **Testes**; nuvem em [docs/implantacao.md](docs/implantacao.md) |
+| Endpoints | Seção **Endpoints**: todas as 36 operações da API (25 caminhos) com método, caminho e descrição, mais as rotas de página em **Arquitetura** |
 | Arquitetura | Seção **Arquitetura**: um arquivo por responsabilidade, front-end em `static/`, testes em `tests/`, docs em `docs/` |
-| Funcionalidades | Seções **Funcionalidades** e **Regras de negócio** (RN01–RN10), mais as tabelas dos critérios 2, 3 e 4 |
-| Variáveis de ambiente | Seção **Variáveis de ambiente** (`DATABASE_URL`, `SECRET_KEY`, `FLASK_DEBUG`, `OLLAMA_URL`, `OLLAMA_MODELO`, `ADMIN_TOKEN`) e o arquivo `.env.example` |
+| Funcionalidades | Seções **Funcionalidades** e **Regras de negócio** (RN01–RN11), mais as tabelas dos critérios 2, 3 e 4 |
+| Variáveis de ambiente | Seção **Variáveis de ambiente** (as 11 da aplicação, as 2 do Docker Compose e as dos testes opcionais) e o arquivo `.env.example` |
 
-Documentos complementares: [docs/modelagem.md](docs/modelagem.md) (banco), [docs/otimizacoes.md](docs/otimizacoes.md) (otimizações com medições), [docs/llm.md](docs/llm.md) (LLM) e [docs/cnae-alimentos.md](docs/cnae-alimentos.md) (critério de atividade alimentar).
+Os documentos de apoio estão listados em [Documentação complementar](#documentação-complementar).
 
 ## Testes (critério 7 do CP2)
 
@@ -255,14 +323,17 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **185 passed, 3 skipped** (os 3 "skipped" são as provas opcionais em PostgreSQL; com `CP2_PG_SUPERUSER_PASSWORD_FILE` definido, os 188 passam). Os testes usam SQLite em memória e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real.
+Resultado atual: **221 passed, 4 skipped**. Os testes usam SQLite em memória e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
+
+- 3 provas em PostgreSQL (`tests/test_integridade_banco.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
+- 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
 
 | Tipo de teste | Arquivos | O que cobrem |
 |---|---|---|
-| Unitários | `test_cnae_alimentos.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, normalização e validação da saída da LLM, fallback por regras |
-| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_crud_seguro.py`, `test_cp2_api.py` | Códigos HTTP, formato das respostas e erros JSON de cada rota (cadastro, login, edição de dados, pedidos, doação com foto, painel, dashboard, IA, CRUDs do CP1, paginação e filtros) |
-| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_crud_seguro.py`, `test_auth.py` | RN01–RN10: CNPJ ativo e alimentar, só empresa publica, questionário e validade, empresa não doa no próprio pedido, foto privada, dados pessoais fora do público, limite de tentativas de login, escrita do CP1 só com token |
-| De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_fuso.py`, `test_cp2_api.py` | Aplicação + banco: migrações idempotentes preservando dados, CHECKs e FK composta, fuso de Brasília no dashboard, número de consultas SQL das listas |
+| Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, normalização e validação da saída da LLM, fallback por regras, formato do dataset, treino reprodutível e acurácia mínima do classificador |
+| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cada rota (cadastro, login, edição de dados, pedidos, doação com foto, painel, dashboard, IA, CRUDs do CP1, paginação e filtros, saúde) |
+| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | RN01–RN11: CNPJ ativo e alimentar, só empresa publica, questionário e validade, empresa não doa no próprio pedido, foto privada, dados pessoais fora do público, escrita do CP1 só com token, limites de login, de IA e de doações |
+| De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + banco: migrações idempotentes preservando dados, CHECKs e FK composta, fuso de Brasília no dashboard, número de consultas SQL das listas, foto no banco com leitura do arquivo antigo, URL do Supabase, auditoria sem credenciais, classificador dentro da interpretação de pedidos |
 
 ## LLM (critério 8 do CP2)
 
@@ -271,13 +342,130 @@ O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API pag
 1. **"Preencher com IA"** (painel da empresa → "Publicar pedido de doação"): a empresa escreve, por exemplo, "Precisamos de 100 caixas de leite e 100 pães até sexta-feira"; a LLM classifica e estrutura os itens nas **categorias e unidades fixas da plataforma** e sugere o prazo. O formulário é preenchido para a empresa revisar; a publicação continua passando pelas validações do pedido.
 2. **"Gerar resumo com IA"** (dashboard): a LLM interpreta os indicadores agregados dos pedidos e doações e devolve um resumo e recomendações para apoiar decisões.
 
+Quando a LLM não está disponível, ou devolve uma categoria fora da lista, a categoria de cada item vem do classificador treinado do projeto (seção [Modelo funcional local](#modelo-funcional-local)).
+
 Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados enviados, resposta obtida, uso da resposta, limitações e segurança/dados sensíveis — está na tabela do início de [docs/llm.md](docs/llm.md), com exemplos reais de entrada e saída. Endpoints: `POST /reconecta/ia/interpretar-pedido` e `POST /reconecta/ia/resumo-dashboard`; código em `llm_service.py` e `IA.py`; testes em `tests/test_ia.py`.
+
+## Dataset estruturado
+
+O projeto tem dois conjuntos de dados próprios em `data/`, **sintéticos e curados à mão** (nenhum dado coletado de usuários, nenhum dado pessoal):
+
+| Arquivo | Conteúdo |
+|---|---|
+| [`data/alimentos.csv`](data/alimentos.csv) | 925 nomes de alimentos como uma empresa escreve num pedido ("leite integral 1L", "pao frances", "arroz tipo 1 5kg"), com `id`, `texto`, `categoria` (as 8 da aplicação), `unidade_sugerida` e `origem`. Sem duplicata, nem ignorando acento e caixa. |
+| [`data/pedidos_avaliacao.jsonl`](data/pedidos_avaliacao.jsonl) | 66 pedidos em texto livre (20 fáceis, 22 médios, 24 difíceis) com o gabarito de itens e prazo: 130 itens. |
+| [`data/README.md`](data/README.md) | Dicionário de dados, como foi construído, critérios de categoria, distribuição, divisão treino/teste e licença. |
+
+Divisão treino/teste estratificada por categoria (740/185), com semente fixa. Para refazer o CSV: `python data/gerar_dataset.py`.
+
+## Modelo funcional local
+
+Além da LLM local (Ollama + `qwen2.5:3b`), o ReConecta tem um **modelo treinado no próprio dataset**: um classificador Naive Bayes multinomial que escolhe a categoria de cada item do pedido. É Python puro (só biblioteca padrão), roda dentro da aplicação em menos de 1 ms, não precisa de GPU nem de serviço externo e é salvo em JSON, sem `pickle`.
+
+| Medida (execução de 2026-10-13) | Classificador treinado | Regra de palavras-chave anterior |
+|---|---|---|
+| Acurácia no teste (185 linhas) | **77,8%** | 40,0% |
+| F1 macro no teste | **0,78** | 0,45 |
+| Validação cruzada de 5 dobras (925 linhas) | **81,2% ± 1,7** | — |
+| Categoria certa nos 130 itens dos pedidos de avaliação | **84,6%** | 56,2% |
+| Pedidos inteiros certos, sem a LLM (66 pedidos) | **48** | 25 |
+
+Com a LLM local ligada, o conjunto completo acerta 50 dos 66 pedidos inteiros, com 3,6 s de latência média por pedido. A comparação entre regras, classificador e LLM, com exemplos de erro, está em [docs/avaliacao-modelos.md](docs/avaliacao-modelos.md).
+
+Uso na aplicação: em `POST /reconecta/ia/interpretar-pedido`, a categoria de um item vem do classificador quando a confiança passa do limiar (0,15, escolhido pelos dados); senão das palavras-chave; senão "Outros". Na nuvem, onde o Ollama não roda, é o classificador que responde. O contrato da API e as telas não mudaram, e a empresa continua revisando antes de publicar.
+
+```bash
+python scripts/treinar_modelo.py                 # treina, avalia e grava modelo/classificador_categorias.json
+python scripts/classificar.py "pao de queijo"    # demonstração no terminal
+python scripts/avaliar_modelos.py                # regras x classificador x LLM (use --sem-llm sem o Ollama)
+```
+
+Detalhes (atributos, treino, métricas por categoria, matriz de confusão, limiar e limitações) em [docs/dataset-modelo.md](docs/dataset-modelo.md).
+
+## Segurança (STRIDE e SAST)
+
+- **Matriz de riscos STRIDE**: `docs/stride.md`. Traz o diagrama de fluxo de dados com as fronteiras de confiança, os ativos e atores, a matriz com probabilidade × impacto, os controles existentes com referência `arquivo:linha`, as lacunas e os riscos residuais.
+- **Relatórios SAST**: pasta `relatorios/sast/`, versionada. Bandit no código Python (`bandit.json`, `bandit.txt`, `bandit.html`) e Trivy em três varreduras: arquivos e dependências (`trivy-fs.*`, scanners `vuln,secret,misconfig`), configuração do Dockerfile e do Compose (`trivy-config.*`) e imagem Docker (`trivy-image.*`). A triagem achado a achado está em `docs/sast.md`.
+- **Resumo dos achados**: <!-- SAST_RESUMO -->
+- **Refazer os relatórios**: `python scripts/sast.py` na raiz do projeto. Precisa do Bandit (`pip install -r requirements-dev.txt`) e do binário gratuito do Trivy no PATH ou em `TRIVY=<caminho>`.
+- **No pipeline**: o GitHub Actions repete Bandit e Trivy a cada push ou pull request na `main` e guarda os relatórios como artefatos.
+
+Controles que estão no código:
+
+| Controle | Onde |
+|---|---|
+| Senhas com hash scrypt; sessão em cookie HttpOnly e SameSite=Lax; cookie só por HTTPS com `COOKIE_SEGURO=1` | `Auth.py`, `app.py` |
+| Cabeçalhos em todas as respostas: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` e `Content-Security-Policy` (sem script inline e sem `unsafe-eval`); `Strict-Transport-Security` com `COOKIE_SEGURO=1` | `app.py` |
+| Trilha de auditoria: logger `reconecta.auditoria`, uma linha JSON por evento (login, logout, cadastro, edição de dados, troca de senha, pedido publicado ou removido, doação aceita ou recusada, uso do token de administrador), com data, ator, IP e resultado, sem senha, documento, e-mail ou foto | `Auth.py`, `Cadastro.py`, `Painel.py`, `Contribuicoes.py`, `crud_admin.py` |
+| Limites de uso (RN11) | `Auth.py`, `IA.py`, `Contribuicoes.py` |
+| Foto conferida pelos bytes, até 5 MB, visível só para quem doou e para a empresa dona do pedido | `Contribuicoes.py` |
+| LLM só em endereço local (ou no serviço `ollama` do Compose), sem redirecionamento e sem proxy; saída validada e nunca gravada direto no banco | `llm_service.py` |
+| Imagem Docker com usuário sem privilégio e sem segredos; `.dockerignore` deixa `.env`, `instance/` e testes de fora | `Dockerfile`, `.dockerignore` |
+
+## Docker e Docker Compose
+
+O [`Dockerfile`](Dockerfile) parte de `python:3.12-slim`, instala só o `requirements.txt` de produção, roda com o usuário sem privilégio `reconecta` e serve a aplicação com gunicorn (2 workers, timeout de 90 s). Tem `HEALTHCHECK` em `/reconecta/saude` e não leva segredo nenhum: tudo chega por variável de ambiente.
+
+O [`docker-compose.yml`](docker-compose.yml) sobe dois serviços, mais um opcional:
+
+| Serviço | Imagem | Papel |
+|---|---|---|
+| `app` | construída do `Dockerfile` | Aplicação na porta 5000; só inicia depois que o banco está saudável. |
+| `db` | `postgres:17-alpine` | PostgreSQL de desenvolvimento (`reconecta_dev`), com volume nomeado e healthcheck `pg_isready`. |
+| `ollama` | `ollama/ollama` | Opcional, perfil `ia`: a LLM local dentro do Compose. |
+
+```bash
+docker compose build app
+docker compose up -d --wait
+curl --fail http://localhost:5000/reconecta/saude     # {"status":"ok","banco":"ok"}
+
+# opcional: LLM local dentro do Compose
+docker compose --profile ia up -d --wait
+docker compose exec ollama ollama pull qwen2.5:3b
+
+docker compose down        # desliga e mantém o banco de desenvolvimento
+docker compose down -v     # desliga e apaga o volume deste Compose
+```
+
+As senhas padrão do Compose (`dev-only-...`) servem só para máquina de teste; defina `POSTGRES_PASSWORD` e `SECRET_KEY` no `.env` antes de compartilhar o ambiente.
+
+## Pipeline CI/CD (GitHub Actions)
+
+O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda a cada push e pull request na `main`, e também por acionamento manual. As permissões são mínimas (`contents: read`).
+
+| Job | O que faz | Quando falha |
+|---|---|---|
+| `testes` | Python 3.12, instala `requirements.txt` e `requirements-dev.txt`, roda `python -m pytest` e guarda o relatório JUnit como artefato | Algum teste falha |
+| `sast-bandit` | Bandit no código da aplicação; relatórios JSON e texto como artefato `bandit-report` | Achado de severidade alta |
+| `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Vulnerabilidade crítica com correção disponível |
+| `docker` | `docker compose build app`, `docker compose up -d --wait` e chamada a `/reconecta/saude` | A imagem não constrói ou a aplicação não fica saudável |
+| `deploy` | Opcional e manual: dispara o Deploy Hook do Render guardado no segredo `RENDER_DEPLOY_HOOK_URL` | Sem o segredo, termina com aviso e sem erro |
+
+A entrega contínua normal não depende do job `deploy`: o `render.yaml` usa `autoDeployTrigger: checksPass`, então o Render publica a `main` sozinho depois que os checks do GitHub passam.
+
+## Nuvem: Render e Supabase
+
+- **Aplicação**: Web Service no plano gratuito do Render, criado pelo Blueprint [`render.yaml`](render.yaml) (`runtime: docker`, `healthCheckPath: /reconecta/saude`). URL pública: <!-- URL_PUBLICA -->
+- **Banco**: PostgreSQL no plano gratuito do Supabase, ligado pela `DATABASE_URL` com a URL do Session pooler. Situação: <!-- BANCO_NUVEM -->
+- **Variáveis no Render**: `DATABASE_URL` (informada na criação), `SECRET_KEY` (gerada pelo Render), `COOKIE_SEGURO=1` e `ADMIN_TOKEN` (opcional).
+- **O que muda na nuvem**:
+  - As tabelas são criadas e migradas no primeiro início.
+  - As fotos das doações ficam no banco, porque o disco do plano gratuito é apagado a cada reinício.
+  - O Ollama não roda no plano gratuito. As funções de IA respondem com o classificador treinado e as regras, e avisam `fonte: "regras"`.
+
+O passo a passo completo (criar o projeto no Supabase, criar o serviço no Render, ativar o CI/CD e conferir) está em [docs/implantacao.md](docs/implantacao.md).
 
 ## Documentação complementar
 
 - [docs/modelagem.md](docs/modelagem.md) — modelagem, normalização e índices;
 - [docs/otimizacoes.md](docs/otimizacoes.md) — otimizações da API com medições;
 - [docs/llm.md](docs/llm.md) — LLM: modelo, finalidade, dados enviados, uso, limitações e segurança;
+- [docs/dataset-modelo.md](docs/dataset-modelo.md) — dataset, classificador treinado, métricas e uso na aplicação;
+- [docs/avaliacao-modelos.md](docs/avaliacao-modelos.md) — comparação entre regras, classificador e LLM local;
+- [data/README.md](data/README.md) — dicionário de dados dos dois conjuntos;
+- [docs/implantacao.md](docs/implantacao.md) — Docker Compose, Supabase, Render e CI/CD, passo a passo;
+- `docs/stride.md` — matriz de riscos STRIDE;
+- `docs/sast.md` — triagem dos relatórios do Bandit e do Trivy;
 - [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar.
 
 ## Limitações conhecidas
@@ -285,11 +473,15 @@ Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados
 - O CP1 tinha apenas o modelo `reservas`, sem endpoints de reserva. O fluxo atual é pedido → contribuição; reserva e retirada por instituições ainda não têm fluxo na aplicação.
 - Recuperação de senha não implementada.
 - A consulta de CNPJ depende de serviços públicos externos (com cache de 10 minutos e fontes alternativas).
-- A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam regras automáticas e indicam `fonte: "regras"`.
+- A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam o classificador e regras automáticas e indicam `fonte: "regras"`.
+- O classificador conhece o vocabulário de 254 alimentos do dataset, que é sintético; alimento muito diferente pode cair na categoria errada, e a empresa sempre revisa antes de publicar.
+- O plano gratuito do Render suspende o serviço depois de um tempo sem acesso, então o primeiro acesso seguinte demora; ele também não roda o Ollama.
+- Os limites de uso (login, IA, doações) ficam na memória de cada processo: com 2 workers do gunicorn, cada um conta separado, e a contagem zera quando o serviço reinicia.
+- Riscos residuais registrados em `docs/stride.md`: não há prova de posse do e-mail nem do CNPJ no cadastro (exigiria serviço de e-mail) e não há limite global de requisições por IP.
 
 ## Documentação Swagger
 
-Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir do código (sempre igual à API em execução). A especificação exportada está em [swagger.json](swagger.json) e é regenerada a cada mudança de endpoint. O endereço publicado no CP1 (https://reconecta.onrender.com/swagger) mostra a versão do CP1 até ser atualizado.
+Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir do código (sempre igual à API em execução). A especificação exportada está em [swagger.json](swagger.json) e é regenerada a cada mudança de endpoint. Na nuvem, fica em `/swagger` da URL pública desta entrega (seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase)). O endereço publicado no CP1 (https://reconecta.onrender.com/swagger) é de outra conta e mostra a versão do CP1.
 
 ## Organização no Trello
 
