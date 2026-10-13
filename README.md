@@ -24,8 +24,8 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 | Dockerfile + Docker Compose | Pronto | [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) e [`.dockerignore`](.dockerignore). Seção [Docker e Docker Compose](#docker-e-docker-compose). |
 | Pipeline CI/CD (GitHub Actions) | Pronto | [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Seção [Pipeline CI/CD](#pipeline-cicd-github-actions). |
 | Relatórios SAST (Bandit e Trivy) | Pronto | [`relatorios/sast/`](relatorios/sast/), triagem em [`docs/sast.md`](docs/sast.md), comando `python scripts/sast.py`; os mesmos relatórios saem como artefatos do GitHub Actions. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
-| URL pública | <!-- URL_PUBLICA --> | Render, plano gratuito, pelo [`render.yaml`](render.yaml). Seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase). |
-| Banco em nuvem | <!-- BANCO_NUVEM --> | Supabase (PostgreSQL), plano gratuito, pela variável `DATABASE_URL`. Passo a passo em [docs/implantacao.md](docs/implantacao.md). |
+| URL pública | Pronto | **https://reconecta-iota.onrender.com** — Render, plano gratuito, pelo [`render.yaml`](render.yaml). Seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase). |
+| Banco em nuvem | Pronto | Supabase (PostgreSQL, região São Paulo), plano gratuito, pela variável `DATABASE_URL`. Passo a passo em [docs/implantacao.md](docs/implantacao.md). |
 | README completo | Pronto | Este arquivo. |
 
 ## Público-alvo
@@ -445,8 +445,8 @@ A entrega contínua normal não depende do job `deploy`: o `render.yaml` usa `au
 
 ## Nuvem: Render e Supabase
 
-- **Aplicação**: Web Service no plano gratuito do Render, criado pelo Blueprint [`render.yaml`](render.yaml) (`runtime: docker`, `healthCheckPath: /reconecta/saude`). URL pública: <!-- URL_PUBLICA -->
-- **Banco**: PostgreSQL no plano gratuito do Supabase, ligado pela `DATABASE_URL` com a URL do Session pooler. Situação: <!-- BANCO_NUVEM -->
+- **Aplicação**: Web Service no plano gratuito do Render, criado pelo Blueprint [`render.yaml`](render.yaml) (`runtime: docker`, `healthCheckPath: /reconecta/saude`). URL pública: **https://reconecta-iota.onrender.com** (saúde em [`/reconecta/saude`](https://reconecta-iota.onrender.com/reconecta/saude), Swagger em [`/swagger`](https://reconecta-iota.onrender.com/swagger)). No plano gratuito o serviço hiberna sem uso; o primeiro acesso depois disso pode levar cerca de um minuto.
+- **Banco**: PostgreSQL no plano gratuito do Supabase, ligado pela `DATABASE_URL` com a URL do Session pooler. Situação: no ar desde 2026-10-13, com as 7 tabelas criadas pela própria aplicação ao iniciar; conferido com um cadastro feito pelo site público e lido direto no banco (registro de teste apagado em seguida). A publicação é automática: o Render só publica um commit da `main` depois que o GitHub Actions passa (`autoDeployTrigger: checksPass`).
 - **Variáveis no Render**: `DATABASE_URL` (informada na criação), `SECRET_KEY` (gerada pelo Render), `COOKIE_SEGURO=1` e `ADMIN_TOKEN` (opcional).
 - **O que muda na nuvem**:
   - As tabelas são criadas e migradas no primeiro início.

@@ -61,3 +61,9 @@ O logger `reconecta.auditoria` emite uma linha JSON por evento de autenticação
 - [Render Deploy Hooks](https://render.com/docs/deploy-hooks)
 - [Supabase: conexão PostgreSQL e Session pooler](https://supabase.com/docs/guides/database/connecting-to-postgres)
 - [Trivy Action](https://github.com/aquasecurity/trivy-action#readme)
+
+## Estado publicado e dois cuidados com a `DATABASE_URL`
+
+- Site no ar: `https://reconecta-iota.onrender.com` (Render, plano gratuito), ligado ao PostgreSQL do Supabase em São Paulo, desde 2026-10-13.
+- **Senha com símbolos**: se a senha do banco tiver `@`, `/`, `:`, `#`, `?`, `%`, `,` ou parênteses, ela precisa ir na URL em formato codificado (`@` vira `%40`, `/` vira `%2F`), senão o endereço é cortado no lugar errado (foi a causa da primeira falha de publicação: `failed to resolve host`). O mais simples é usar senha só com letras e números.
+- **Quebra de linha no fim**: colar a URL com linha em branco depois de `/postgres` fazia a aplicação procurar um banco chamado `postgres` seguido de quebras de linha (`database "postgres\n\n" does not exist`). A aplicação agora remove espaços e quebras de linha no início e no fim da `DATABASE_URL` (`app.py`, função `_database_url`; teste em `tests/test_nuvem.py`).
