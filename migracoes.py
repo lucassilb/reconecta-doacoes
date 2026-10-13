@@ -14,6 +14,18 @@ def _migrar_indices(engine):
                 indice.create(bind=engine, checkfirst=True)
 
 
+def _migrar_foto_contribuicao(engine):
+    """Mantem fotos antigas no disco; fotos novas ficam no banco."""
+    inspector = inspect(engine)
+    if not inspector.has_table("contribuicoes"):
+        return
+    colunas = {coluna["name"] for coluna in inspector.get_columns("contribuicoes")}
+    if "foto_dados" not in colunas:
+        tipo = "BYTEA" if engine.dialect.name == "postgresql" else "BLOB"
+        with engine.begin() as conexao:
+            conexao.execute(text(f"ALTER TABLE contribuicoes ADD COLUMN foto_dados {tipo}"))
+
+
 def _restricao_postgresql(conexao, tabela, nome):
     """None se ausente; caso contrário informa se já foi validada."""
     linha = conexao.execute(text("""
@@ -224,6 +236,7 @@ def aplicar_migracoes(engine=None):
     if engine.dialect.name == "postgresql":
         _migrar_chave_item_postgresql(engine)
     _migrar_pedidos(engine)
+    _migrar_foto_contribuicao(engine)
     _migrar_indices(engine)
     if engine.dialect.name == "postgresql":
         _migrar_integridade_postgresql(engine)

@@ -1,0 +1,158 @@
+name: CI
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: pytest -q --junitxml=pytest.xml
+        env:
+          DATABASE_URL: sqlite://
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pytest-junit
+          path: pytest.xml
+          if-no-files-found: warn
+
+  sast-bandit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Relatorios JSON e texto
+        run: |
+          mkdir -p reports
+          bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f json -o reports/bandit.json || true
+          bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f txt -o reports/bandit.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: reports/bandit.*
+          if-no-files-found: warn
+      - name: Bloquear achados de severidade alta
+        run: bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -lll
+
+  sast-trivy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: mkdir -p reports
+      - name: Construir imagem para varredura
+        run: docker build -t reconecta:ci .
+      - name: Arquivos, dependencias, segredos e configuracao (tabela)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          format: table
+          output: reports/trivy-fs.txt
+          exit-code: "0"
+      - name: Arquivos (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          format: sarif
+          output: reports/trivy-fs.sarif
+          exit-code: "0"
+      - name: Imagem (tabela)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: reconecta:ci
+          scanners: vuln,secret,misconfig
+          format: table
+          output: reports/trivy-image.txt
+          exit-code: "0"
+      - name: Imagem (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: reconecta:ci
+          scanners: vuln,secret,misconfig
+          format: sarif
+          output: reports/trivy-image.sarif
+          exit-code: "0"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: reports/trivy-*
+          if-no-files-found: warn
+      - name: Bloquear critica corrigivel nos arquivos
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Bloquear critica corrigivel na imagem
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: reconecta:ci
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir e subir Compose
+        run: |
+          docker compose build app
+          docker compose up -d --wait
+      - name: Verificar saude
+        run: curl --fail --silent --show-error http://localhost:5000/reconecta/saude
+      - name: Logs em caso de falha
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Encerrar Compose
+        if: always()
+        run: docker compose down -v
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: [testes, sast-bandit, sast-trivy, docker]
+    runs-on: ubuntu-24.04
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+    steps:
+      - name: Disparar Render quando configurado
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::warning::RENDER_DEPLOY_HOOK_URL ausente; deploy ignorado."
+            exit 0
+          fi
+          curl --fail --silent --show-error --output /dev/null --request POST "$RENDER_DEPLOY_HOOK_URL"

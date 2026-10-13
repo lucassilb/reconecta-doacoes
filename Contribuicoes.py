@@ -5,9 +5,10 @@ import re
 import secrets
 from datetime import date
 from decimal import Decimal, InvalidOperation
+from io import BytesIO
 from pathlib import Path
 
-from flask import current_app, request, send_from_directory
+from flask import current_app, request, send_file, send_from_directory
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -153,12 +154,7 @@ def criar_contribuicao(doacao):
                      motivos=motivos)
 
     nome = f"{secrets.token_hex(16)}.{extensao}"
-    pasta = Path(current_app.instance_path) / "uploads" / "contribuicoes"
-    pasta.mkdir(parents=True, exist_ok=True)
-    caminho = pasta / nome
     try:
-        with caminho.open("xb") as arquivo:
-            arquivo.write(dados_foto)
         contribuicao = Contribuicao(
             doacao_id=doacao.id, item_doacao_id=item.id,
             doador_id=usuario.id if tipo == "doador" else None,
@@ -166,14 +162,22 @@ def criar_contribuicao(doacao):
             alimento=item.nome, categoria=item.categoria, quantidade=quantidade,
             unidade_medida=item.unidade_medida, validade=validade,
             respostas=json.dumps(respostas, ensure_ascii=False), foto_arquivo=nome,
+            foto_dados=dados_foto,
             status="ACEITA")
         db.session.add(contribuicao)
         db.session.commit()
-    except (OSError, SQLAlchemyError):
+    except SQLAlchemyError:
         db.session.rollback()
-        caminho.unlink(missing_ok=True)
         current_app.logger.exception("Falha ao salvar contribuição")
         return _erro("ERRO_INTERNO", "Não foi possível salvar a doação.", 500)
+    # Copia local para instalações antigas; o banco e a fonte persistente.
+    try:
+        pasta = Path(current_app.instance_path) / "uploads" / "contribuicoes"
+        pasta.mkdir(parents=True, exist_ok=True)
+        with (pasta / nome).open("xb") as arquivo:
+            arquivo.write(dados_foto)
+    except OSError:
+        current_app.logger.warning("Copia local da foto indisponivel; foto guardada no banco")
     return {"id": contribuicao.id, "status": "ACEITA",
             "entrega": {"endereco": doacao.estabelecimento.endereco,
                         "receber_ate": iso_prazo(doacao.data_limite_retirada)}}, 201
@@ -192,11 +196,14 @@ class FotoContribuicao(Resource):
                                               contribuicao.doacao.estabelecimento_id == usuario.id)))
         if not autorizado or not re.fullmatch(r"[0-9a-f]{32}\.(jpg|png|webp)", contribuicao.foto_arquivo):
             return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
-        pasta = Path(current_app.instance_path) / "uploads" / "contribuicoes"
-        if not (pasta / contribuicao.foto_arquivo).is_file():
-            return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
-        resposta = send_from_directory(pasta, contribuicao.foto_arquivo,
-                                        mimetype=MIMES[contribuicao.foto_arquivo.rsplit(".", 1)[1]])
+        mime = MIMES[contribuicao.foto_arquivo.rsplit(".", 1)[1]]
+        if contribuicao.foto_dados is not None:
+            resposta = send_file(BytesIO(contribuicao.foto_dados), mimetype=mime)
+        else:
+            pasta = Path(current_app.instance_path) / "uploads" / "contribuicoes"
+            if not (pasta / contribuicao.foto_arquivo).is_file():
+                return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
+            resposta = send_from_directory(pasta, contribuicao.foto_arquivo, mimetype=mime)
         resposta.headers["X-Content-Type-Options"] = "nosniff"
         resposta.headers["Cache-Control"] = "private, no-store"
         return resposta
