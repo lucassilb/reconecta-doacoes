@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, send_from_directory
-from flask_restx import Api
+from flask_restx import Api, Resource
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import SQLAlchemyError
@@ -64,15 +64,6 @@ def cabecalhos_seguranca(resposta):
     return resposta
 
 
-@app.get("/reconecta/saude")
-def saude():
-    try:
-        db.session.execute(text("SELECT 1"))
-    except SQLAlchemyError:
-        db.session.rollback()
-        return {"status": "indisponivel", "banco": "indisponivel"}, 503
-    return {"status": "ok", "banco": "ok"}, 200
-
 @app.get("/")
 def home_page():
     return send_from_directory(app.static_folder, "index.html")
@@ -114,6 +105,22 @@ api = Api(
     authorizations={"AdminToken": {"type": "apiKey", "in": "header", "name": "X-Admin-Token"}},
     doc="/swagger"
 )
+
+
+class Saude(Resource):
+    @api.doc(responses={200: "Aplicação e banco disponíveis",
+                        503: "Banco indisponível"})
+    def get(self):
+        """Verifica a conexão com o banco para healthchecks."""
+        try:
+            db.session.execute(text("SELECT 1"))
+        except SQLAlchemyError:
+            db.session.rollback()
+            return {"status": "indisponivel", "banco": "indisponivel"}, 503
+        return {"status": "ok", "banco": "ok"}, 200
+
+
+api.add_resource(Saude, "/reconecta/saude")
 
 @api.errorhandler(RequestEntityTooLarge)
 def requisicao_grande(_erro):
