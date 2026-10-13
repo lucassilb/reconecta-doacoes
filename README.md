@@ -20,10 +20,10 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 |---|---|---|
 | Dataset estruturado | Pronto | [`data/alimentos.csv`](data/alimentos.csv) (925 linhas), [`data/pedidos_avaliacao.jsonl`](data/pedidos_avaliacao.jsonl) (66 pedidos com gabarito) e [`data/README.md`](data/README.md). Seção [Dataset estruturado](#dataset-estruturado). |
 | Modelo funcional local | Pronto | Classificador treinado em [`classificador.py`](classificador.py) + [`modelo/classificador_categorias.json`](modelo/classificador_categorias.json), usado em `POST /reconecta/ia/interpretar-pedido`; LLM local `qwen2.5:3b` no Ollama. Seção [Modelo funcional local](#modelo-funcional-local). |
-| Matriz de riscos (STRIDE) | Pronto | `docs/stride.md`. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
+| Matriz de riscos (STRIDE) | Pronto | [`docs/stride.md`](docs/stride.md), com 40 ameaças nas seis categorias (35 do sistema e 5 próprias da nuvem). Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
 | Dockerfile + Docker Compose | Pronto | [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) e [`.dockerignore`](.dockerignore). Seção [Docker e Docker Compose](#docker-e-docker-compose). |
 | Pipeline CI/CD (GitHub Actions) | Pronto | [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Seção [Pipeline CI/CD](#pipeline-cicd-github-actions). |
-| Relatórios SAST (Bandit e Trivy) | Pronto | `relatorios/sast/`, triagem em `docs/sast.md`, comando `python scripts/sast.py`. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
+| Relatórios SAST (Bandit e Trivy) | Pronto | [`relatorios/sast/`](relatorios/sast/), triagem em [`docs/sast.md`](docs/sast.md), comando `python scripts/sast.py`; os mesmos relatórios saem como artefatos do GitHub Actions. Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
 | URL pública | <!-- URL_PUBLICA --> | Render, plano gratuito, pelo [`render.yaml`](render.yaml). Seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase). |
 | Banco em nuvem | <!-- BANCO_NUVEM --> | Supabase (PostgreSQL), plano gratuito, pela variável `DATABASE_URL`. Passo a passo em [docs/implantacao.md](docs/implantacao.md). |
 | README completo | Pronto | Este arquivo. |
@@ -384,9 +384,9 @@ Detalhes (atributos, treino, métricas por categoria, matriz de confusão, limia
 
 ## Segurança (STRIDE e SAST)
 
-- **Matriz de riscos STRIDE**: `docs/stride.md`. Traz o diagrama de fluxo de dados com as fronteiras de confiança, os ativos e atores, a matriz com probabilidade × impacto, os controles existentes com referência `arquivo:linha`, as lacunas e os riscos residuais.
-- **Relatórios SAST**: pasta `relatorios/sast/`, versionada. Bandit no código Python (`bandit.json`, `bandit.txt`, `bandit.html`) e Trivy em três varreduras: arquivos e dependências (`trivy-fs.*`, scanners `vuln,secret,misconfig`), configuração do Dockerfile e do Compose (`trivy-config.*`) e imagem Docker (`trivy-image.*`). A triagem achado a achado está em `docs/sast.md`.
-- **Resumo dos achados**: <!-- SAST_RESUMO -->
+- **Matriz de riscos STRIDE**: [docs/stride.md](docs/stride.md). Traz o diagrama de fluxo de dados com as fronteiras de confiança, os ativos e atores, a matriz com probabilidade × impacto, os controles existentes com referência `arquivo:linha`, as lacunas e os riscos residuais.
+- **Relatórios SAST**: pasta [`relatorios/sast/`](relatorios/sast/), versionada. Bandit no código Python (`bandit.json`, `bandit.txt`, `bandit.html`) e Trivy em três varreduras: arquivos e dependências (`trivy-fs.*`, scanners `vuln,secret,misconfig`), configuração do Dockerfile (`trivy-config.*`) e imagem Docker (`trivy-image.*`). A triagem achado a achado está em `docs/sast.md`.
+- **Resumo dos achados**: varredura de 2026-10-13 (Bandit 1.9.4, Trivy 0.75.0). **Bandit: 0 achados** em 3.415 linhas (na primeira varredura eram 5 médios: 1 corrigido e 4 falsos positivos justificados no código). **Trivy em arquivos e dependências: 0 vulnerabilidades, 0 segredos, 0 falhas de configuração** (eram 4 dependências com CVE média, todas atualizadas). **Trivy no Dockerfile: 0 falhas** (a versão usada não tem verificador para Compose, `render.yaml` e workflow; esses foram revisados à mão na matriz STRIDE). **Trivy na imagem Docker: 0 críticas, 44 altas, 58 médias, 61 baixas e 3 sem classificação**, todas em pacotes do sistema Debian da imagem base `python:3.12-slim`; nenhuma está em pacote Python e só 2 (sem classificação) têm correção publicada. O antes e depois e a triagem de cada achado estão em [docs/sast.md](docs/sast.md)
 - **Refazer os relatórios**: `python scripts/sast.py` na raiz do projeto. Precisa do Bandit (`pip install -r requirements-dev.txt`) e do binário gratuito do Trivy no PATH ou em `TRIVY=<caminho>`.
 - **No pipeline**: o GitHub Actions repete Bandit e Trivy a cada push ou pull request na `main` e guarda os relatórios como artefatos.
 
@@ -464,8 +464,8 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - [docs/avaliacao-modelos.md](docs/avaliacao-modelos.md) — comparação entre regras, classificador e LLM local;
 - [data/README.md](data/README.md) — dicionário de dados dos dois conjuntos;
 - [docs/implantacao.md](docs/implantacao.md) — Docker Compose, Supabase, Render e CI/CD, passo a passo;
-- `docs/stride.md` — matriz de riscos STRIDE;
-- `docs/sast.md` — triagem dos relatórios do Bandit e do Trivy;
+- [docs/stride.md](docs/stride.md) — matriz de riscos STRIDE;
+- [docs/sast.md](docs/sast.md) — triagem dos relatórios do Bandit e do Trivy;
 - [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar.
 
 ## Limitações conhecidas
@@ -477,7 +477,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - O classificador conhece o vocabulário de 254 alimentos do dataset, que é sintético; alimento muito diferente pode cair na categoria errada, e a empresa sempre revisa antes de publicar.
 - O plano gratuito do Render suspende o serviço depois de um tempo sem acesso, então o primeiro acesso seguinte demora; ele também não roda o Ollama.
 - Os limites de uso (login, IA, doações) ficam na memória de cada processo: com 2 workers do gunicorn, cada um conta separado, e a contagem zera quando o serviço reinicia.
-- Riscos residuais registrados em `docs/stride.md`: não há prova de posse do e-mail nem do CNPJ no cadastro (exigiria serviço de e-mail) e não há limite global de requisições por IP.
+- Riscos residuais registrados em [docs/stride.md](docs/stride.md), seção 5: não há prova de posse do e-mail nem do CNPJ no cadastro (exigiria serviço de e-mail); não há limite global de requisições por IP e os limites de uso ficam na memória de cada processo; o token de administrador é único e estático; a trilha de auditoria vai só para o log, sem persistência; as ações do pipeline são fixadas por versão, não por hash, e a imagem base tem vulnerabilidades do Debian ainda sem correção.
 
 ## Documentação Swagger
 
