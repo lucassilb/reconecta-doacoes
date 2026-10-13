@@ -1,0 +1,926 @@
+id,texto,categoria,unidade_sugerida,origem
+1,banana prata,Hortifrúti,kg,nome_base
+2,bananas,Hortifrúti,kg,variacao_escrita
+3,banana nanica kg,Hortifrúti,kg,variacao_escrita
+4,banana da terra,Hortifrúti,kg,variacao_escrita
+5,maçã,Hortifrúti,kg,nome_base
+6,maca fuji,Hortifrúti,kg,variacao_escrita
+7,maçãs gala,Hortifrúti,kg,variacao_escrita
+8,maca nacional cx 18kg,Hortifrúti,kg,embalagem
+9,laranja pera,Hortifrúti,kg,nome_base
+10,laranjas,Hortifrúti,kg,variacao_escrita
+11,laranja lima,Hortifrúti,kg,variacao_escrita
+12,laranja p/ suco saco 20kg,Hortifrúti,kg,embalagem
+13,tomate,Hortifrúti,kg,nome_base
+14,tomates maduros,Hortifrúti,kg,variacao_escrita
+15,tomate italiano,Hortifrúti,kg,variacao_escrita
+16,tomate cereja bandeja,Hortifrúti,kg,variacao_escrita
+17,batata inglesa,Hortifrúti,kg,nome_base
+18,batatas,Hortifrúti,kg,variacao_escrita
+19,batata lavada saco 25kg,Hortifrúti,kg,embalagem
+20,batata doce,Hortifrúti,kg,variacao_escrita
+21,cebola,Hortifrúti,kg,nome_base
+22,cebolas,Hortifrúti,kg,variacao_escrita
+23,cebola roxa,Hortifrúti,kg,variacao_escrita
+24,cebola branca saco 20kg,Hortifrúti,kg,embalagem
+25,alface crespa,Hortifrúti,unidade,nome_base
+26,alface americana,Hortifrúti,unidade,variacao_escrita
+27,pé de alface,Hortifrúti,unidade,variacao_escrita
+28,alface lisa un,Hortifrúti,unidade,variacao_escrita
+29,cenoura,Hortifrúti,kg,nome_base
+30,cenouras,Hortifrúti,kg,variacao_escrita
+31,cenoura kg,Hortifrúti,kg,variacao_escrita
+32,cenoura ralada bandeja,Hortifrúti,kg,variacao_escrita
+33,abobrinha,Hortifrúti,kg,nome_base
+34,abobrinha italiana,Hortifrúti,kg,variacao_escrita
+35,abobrinhas verdes,Hortifrúti,kg,variacao_escrita
+36,abóbora cabotiá,Hortifrúti,kg,nome_base
+37,abobora moranga,Hortifrúti,kg,variacao_escrita
+38,abóbora japonesa kg,Hortifrúti,kg,variacao_escrita
+39,chuchu,Hortifrúti,kg,nome_base
+40,chuchus,Hortifrúti,kg,variacao_escrita
+41,chuchu verde kg,Hortifrúti,kg,variacao_escrita
+42,repolho verde,Hortifrúti,unidade,nome_base
+43,repolho roxo,Hortifrúti,unidade,variacao_escrita
+44,repolho un,Hortifrúti,unidade,variacao_escrita
+45,repolhos,Hortifrúti,unidade,variacao_escrita
+46,couve manteiga,Hortifrúti,unidade,nome_base
+47,maço de couve,Hortifrúti,unidade,variacao_escrita
+48,couve picada bandeja,Hortifrúti,unidade,variacao_escrita
+49,couve flor,Hortifrúti,unidade,variacao_escrita
+50,brócolis,Hortifrúti,unidade,nome_base
+51,brocolis ninja,Hortifrúti,unidade,variacao_escrita
+52,brocolis maço,Hortifrúti,unidade,variacao_escrita
+53,mamão formosa,Hortifrúti,kg,nome_base
+54,mamao papaia,Hortifrúti,kg,variacao_escrita
+55,mamões,Hortifrúti,kg,variacao_escrita
+56,melancia,Hortifrúti,kg,nome_base
+57,melancias,Hortifrúti,kg,variacao_escrita
+58,melancia fatiada,Hortifrúti,kg,variacao_escrita
+59,melancia inteira kg,Hortifrúti,kg,variacao_escrita
+60,abacaxi pérola,Hortifrúti,kg,nome_base
+61,abacaxis,Hortifrúti,kg,variacao_escrita
+62,abacaxi un,Hortifrúti,kg,variacao_escrita
+63,uva itália,Hortifrúti,kg,nome_base
+64,uvas sem semente,Hortifrúti,kg,variacao_escrita
+65,uva rubi cx 500g,Hortifrúti,kg,embalagem
+66,manga palmer,Hortifrúti,kg,nome_base
+67,mangas,Hortifrúti,kg,variacao_escrita
+68,manga tommy kg,Hortifrúti,kg,variacao_escrita
+69,limão taiti,Hortifrúti,kg,nome_base
+70,limoes,Hortifrúti,kg,variacao_escrita
+71,limão siciliano,Hortifrúti,kg,variacao_escrita
+72,limao saco 5kg,Hortifrúti,kg,embalagem
+73,pepino,Hortifrúti,kg,nome_base
+74,pepinos japoneses,Hortifrúti,kg,variacao_escrita
+75,pepino caipira,Hortifrúti,kg,variacao_escrita
+76,pimentão verde,Hortifrúti,kg,nome_base
+77,pimentao vermelho,Hortifrúti,kg,variacao_escrita
+78,pimentões coloridos,Hortifrúti,kg,variacao_escrita
+79,beterraba,Hortifrúti,kg,nome_base
+80,beterrabas,Hortifrúti,kg,variacao_escrita
+81,beterraba kg,Hortifrúti,kg,variacao_escrita
+82,mandioca,Hortifrúti,kg,nome_base
+83,aipim descascado,Hortifrúti,kg,variacao_escrita
+84,macaxeira kg,Hortifrúti,kg,variacao_escrita
+85,mandioca congelada 1kg,Hortifrúti,kg,embalagem
+86,alho,Hortifrúti,kg,nome_base
+87,alho nacional,Hortifrúti,kg,variacao_escrita
+88,cabeça de alho,Hortifrúti,kg,variacao_escrita
+89,alho descascado 500g,Hortifrúti,kg,embalagem
+90,cheiro verde,Hortifrúti,unidade,nome_base
+91,salsinha maço,Hortifrúti,unidade,variacao_escrita
+92,cebolinha,Hortifrúti,unidade,variacao_escrita
+93,coentro maco,Hortifrúti,unidade,variacao_escrita
+94,berinjela,Hortifrúti,kg,nome_base
+95,berinjelas,Hortifrúti,kg,variacao_escrita
+96,beringela kg,Hortifrúti,kg,variacao_escrita
+97,quiabo,Hortifrúti,kg,nome_base
+98,quiabo bandeja 300g,Hortifrúti,kg,embalagem
+99,quiabos frescos,Hortifrúti,kg,variacao_escrita
+100,vagem,Hortifrúti,kg,nome_base
+101,vagem manteiga,Hortifrúti,kg,variacao_escrita
+102,vagem kg,Hortifrúti,kg,variacao_escrita
+103,milho verde espiga,Hortifrúti,unidade,nome_base
+104,espigas de milho,Hortifrúti,unidade,variacao_escrita
+105,milho verde in natura,Hortifrúti,unidade,variacao_escrita
+106,pera,Hortifrúti,kg,nome_base
+107,peras williams,Hortifrúti,kg,variacao_escrita
+108,pera portuguesa,Hortifrúti,kg,variacao_escrita
+109,goiaba vermelha,Hortifrúti,kg,nome_base
+110,goiabas,Hortifrúti,kg,variacao_escrita
+111,goiaba kg,Hortifrúti,kg,variacao_escrita
+112,abacate,Hortifrúti,kg,nome_base
+113,abacates,Hortifrúti,kg,variacao_escrita
+114,avocado,Hortifrúti,kg,variacao_escrita
+115,morango,Hortifrúti,kg,nome_base
+116,morangos bandeja,Hortifrúti,kg,variacao_escrita
+117,morango cx 250g,Hortifrúti,kg,embalagem
+118,tangerina ponkan,Hortifrúti,kg,nome_base
+119,mexerica,Hortifrúti,kg,variacao_escrita
+120,bergamota kg,Hortifrúti,kg,variacao_escrita
+121,inhame,Hortifrúti,kg,nome_base
+122,cará,Hortifrúti,kg,variacao_escrita
+123,inhame kg,Hortifrúti,kg,variacao_escrita
+124,rúcula,Hortifrúti,unidade,nome_base
+125,rucula maço,Hortifrúti,unidade,variacao_escrita
+126,agrião,Hortifrúti,unidade,variacao_escrita
+127,espinafre maco,Hortifrúti,unidade,variacao_escrita
+128,frutas variadas,Hortifrúti,kg,nome_base
+129,legumes sortidos,Hortifrúti,kg,variacao_escrita
+130,verduras frescas,Hortifrúti,kg,variacao_escrita
+131,caixa de hortaliças,Hortifrúti,kg,variacao_escrita
+132,melão amarelo,Hortifrúti,kg,nome_base
+133,melao,Hortifrúti,kg,variacao_escrita
+134,melões,Hortifrúti,kg,variacao_escrita
+135,kiwi,Hortifrúti,kg,nome_base
+136,maracujá azedo,Hortifrúti,kg,variacao_escrita
+137,maracuja kg,Hortifrúti,kg,variacao_escrita
+138,coco verde,Hortifrúti,kg,variacao_escrita
+139,pão francês,Padaria,unidade,nome_base
+140,pães franceses,Padaria,unidade,variacao_escrita
+141,paozinho,Padaria,unidade,variacao_escrita
+142,pão de sal,Padaria,unidade,variacao_escrita
+143,pão de forma,Padaria,pacote,nome_base
+144,pao de forma integral 500g,Padaria,pacote,embalagem
+145,pão de forma tradicional,Padaria,pacote,variacao_escrita
+146,pao forma fatiado,Padaria,pacote,variacao_escrita
+147,pão de hambúrguer,Padaria,unidade,nome_base
+148,pao de hamburguer pct 6 un,Padaria,unidade,embalagem
+149,pães de hambúrguer,Padaria,unidade,variacao_escrita
+150,pão de hot dog,Padaria,unidade,nome_base
+151,pao de cachorro quente,Padaria,unidade,variacao_escrita
+152,pão para hot dog pct,Padaria,unidade,variacao_escrita
+153,pão doce,Padaria,unidade,nome_base
+154,pao doce com creme,Padaria,unidade,variacao_escrita
+155,pães doces,Padaria,unidade,variacao_escrita
+156,sonho de creme,Padaria,unidade,variacao_escrita
+157,pão de queijo,Padaria,unidade,nome_base
+158,pao de queijo congelado 1kg,Padaria,unidade,embalagem
+159,pães de queijo,Padaria,unidade,variacao_escrita
+160,paes de queijo coquetel,Padaria,unidade,variacao_escrita
+161,pão integral,Padaria,unidade,nome_base
+162,pão de centeio,Padaria,unidade,variacao_escrita
+163,pão multigrãos,Padaria,unidade,variacao_escrita
+164,pão sírio,Padaria,unidade,nome_base
+165,pao sirio pct,Padaria,unidade,variacao_escrita
+166,pão árabe,Padaria,unidade,variacao_escrita
+167,pao pita,Padaria,unidade,variacao_escrita
+168,pão de leite,Padaria,unidade,nome_base
+169,pao de leite pct,Padaria,unidade,variacao_escrita
+170,bisnaguinha,Padaria,unidade,variacao_escrita
+171,bisnaga,Padaria,unidade,variacao_escrita
+172,baguete,Padaria,unidade,nome_base
+173,baguetes,Padaria,unidade,variacao_escrita
+174,pão italiano,Padaria,unidade,variacao_escrita
+175,pao ciabatta,Padaria,unidade,variacao_escrita
+176,bolo de cenoura,Padaria,unidade,nome_base
+177,bolo de fubá,Padaria,unidade,variacao_escrita
+178,bolo de chocolate,Padaria,unidade,variacao_escrita
+179,bolos caseiros de padaria,Padaria,unidade,variacao_escrita
+180,bolo simples,Padaria,unidade,nome_base
+181,bolo de laranja,Padaria,unidade,variacao_escrita
+182,bolo formigueiro,Padaria,unidade,variacao_escrita
+183,bolo inteiro 1kg,Padaria,unidade,embalagem
+184,biscoito cream cracker,Padaria,pacote,nome_base
+185,biscoito agua e sal 200g,Padaria,pacote,embalagem
+186,bolacha cream cracker,Padaria,pacote,variacao_escrita
+187,biscoitos salgados,Padaria,pacote,variacao_escrita
+188,biscoito maizena,Padaria,pacote,nome_base
+189,bolacha maisena,Padaria,pacote,variacao_escrita
+190,biscoito maria pct,Padaria,pacote,variacao_escrita
+191,bolachas doces,Padaria,pacote,variacao_escrita
+192,biscoito recheado,Padaria,pacote,nome_base
+193,bolacha recheada chocolate,Padaria,pacote,variacao_escrita
+194,biscoito recheado 130g,Padaria,pacote,embalagem
+195,bolachas recheadas,Padaria,pacote,variacao_escrita
+196,biscoito de polvilho,Padaria,pacote,nome_base
+197,biscoito polvilho 100g,Padaria,pacote,embalagem
+198,rosquinha de polvilho,Padaria,pacote,variacao_escrita
+199,sequilhos,Padaria,pacote,variacao_escrita
+200,rosquinha de coco,Padaria,pacote,nome_base
+201,rosca doce,Padaria,pacote,variacao_escrita
+202,rosquinhas,Padaria,pacote,variacao_escrita
+203,rosca de leite,Padaria,pacote,variacao_escrita
+204,torrada,Padaria,pacote,nome_base
+205,torradas integrais,Padaria,pacote,variacao_escrita
+206,torrada tradicional 160g,Padaria,pacote,embalagem
+207,torradinhas,Padaria,pacote,variacao_escrita
+208,croissant,Padaria,unidade,nome_base
+209,croissants,Padaria,unidade,variacao_escrita
+210,croissant de manteiga,Padaria,unidade,variacao_escrita
+211,broa de milho,Padaria,unidade,nome_base
+212,broas,Padaria,unidade,variacao_escrita
+213,broinha de fubá,Padaria,unidade,variacao_escrita
+214,pão de batata,Padaria,unidade,nome_base
+215,pao de batata recheado,Padaria,unidade,variacao_escrita
+216,pães de batata,Padaria,unidade,variacao_escrita
+217,cuca,Padaria,unidade,nome_base
+218,cuca de banana,Padaria,unidade,variacao_escrita
+219,rocambole,Padaria,unidade,variacao_escrita
+220,pão de mel,Padaria,unidade,variacao_escrita
+221,pão bisnaguinha pct 300g,Padaria,pacote,nome_base
+222,pao bisnaguinha,Padaria,pacote,variacao_escrita
+223,bisnaguinhas integrais,Padaria,pacote,variacao_escrita
+224,pão de alho,Padaria,unidade,nome_base
+225,pao de alho pct,Padaria,unidade,variacao_escrita
+226,pão de alho tradicional,Padaria,unidade,variacao_escrita
+227,panetone,Padaria,unidade,nome_base
+228,panetones 400g,Padaria,unidade,embalagem
+229,chocotone,Padaria,unidade,variacao_escrita
+230,colomba pascal,Padaria,unidade,variacao_escrita
+231,muffin,Padaria,unidade,nome_base
+232,cupcake,Padaria,unidade,variacao_escrita
+233,bolinho individual,Padaria,unidade,variacao_escrita
+234,mini bolo,Padaria,unidade,variacao_escrita
+235,wafer,Padaria,pacote,nome_base
+236,biscoito wafer morango,Padaria,pacote,variacao_escrita
+237,bolacha wafer 140g,Padaria,pacote,embalagem
+238,pães variados,Padaria,unidade,nome_base
+239,paes do dia,Padaria,unidade,variacao_escrita
+240,sobra de pães,Padaria,unidade,variacao_escrita
+241,pão amanhecido,Padaria,unidade,variacao_escrita
+242,biscoito integral,Padaria,pacote,nome_base
+243,cookies integrais,Padaria,pacote,variacao_escrita
+244,cookie de aveia,Padaria,pacote,variacao_escrita
+245,biscoito de leite,Padaria,pacote,variacao_escrita
+246,massa de pizza,Padaria,unidade,nome_base
+247,disco de pizza pré-assado,Padaria,unidade,variacao_escrita
+248,massa pronta de pastel,Padaria,unidade,variacao_escrita
+249,massa folhada,Padaria,unidade,variacao_escrita
+250,leite integral,Laticínios,caixa,nome_base
+251,leite integral 1L,Laticínios,caixa,embalagem
+252,leite longa vida,Laticínios,caixa,variacao_escrita
+253,leite uht cx 12,Laticínios,caixa,embalagem
+254,leite desnatado,Laticínios,caixa,nome_base
+255,leite desnatado 1 litro,Laticínios,caixa,embalagem
+256,leite semidesnatado,Laticínios,caixa,variacao_escrita
+257,leite zero lactose,Laticínios,caixa,variacao_escrita
+258,leite em pó,Laticínios,pacote,nome_base
+259,leite em po integral 400g,Laticínios,pacote,embalagem
+260,leite em pó lata,Laticínios,pacote,variacao_escrita
+261,leite po instantaneo,Laticínios,pacote,variacao_escrita
+262,leite pasteurizado,Laticínios,L,nome_base
+263,leite de saquinho,Laticínios,L,variacao_escrita
+264,leite tipo A,Laticínios,L,variacao_escrita
+265,leite fresco,Laticínios,L,variacao_escrita
+266,queijo mussarela,Laticínios,kg,nome_base
+267,queijo muçarela fatiado,Laticínios,kg,variacao_escrita
+268,mussarela kg,Laticínios,kg,variacao_escrita
+269,mucarela peça,Laticínios,kg,variacao_escrita
+270,queijo prato,Laticínios,kg,nome_base
+271,queijo prato fatiado 150g,Laticínios,kg,embalagem
+272,queijo lanche,Laticínios,kg,variacao_escrita
+273,queijo minas frescal,Laticínios,kg,nome_base
+274,queijo minas,Laticínios,kg,variacao_escrita
+275,queijo branco,Laticínios,kg,variacao_escrita
+276,queijo frescal 500g,Laticínios,kg,embalagem
+277,queijo coalho,Laticínios,kg,nome_base
+278,queijo coalho espeto,Laticínios,kg,variacao_escrita
+279,queijo de coalho kg,Laticínios,kg,variacao_escrita
+280,queijo parmesão ralado,Laticínios,unidade,nome_base
+281,queijo ralado 50g,Laticínios,unidade,embalagem
+282,parmesao ralado pct,Laticínios,unidade,variacao_escrita
+283,requeijão cremoso,Laticínios,unidade,nome_base
+284,requeijao copo 200g,Laticínios,unidade,embalagem
+285,requeijão,Laticínios,unidade,variacao_escrita
+286,requeijao culinario,Laticínios,unidade,variacao_escrita
+287,iogurte natural,Laticínios,unidade,nome_base
+288,iogurte natural 170g,Laticínios,unidade,embalagem
+289,iogurtes,Laticínios,unidade,variacao_escrita
+290,yogurt integral,Laticínios,unidade,variacao_escrita
+291,iogurte de morango,Laticínios,unidade,nome_base
+292,iogurte sabor morango bandeja,Laticínios,unidade,variacao_escrita
+293,iogurte polpa,Laticínios,unidade,variacao_escrita
+294,iogurte liquido 900g,Laticínios,unidade,embalagem
+295,iogurte grego,Laticínios,unidade,nome_base
+296,iogurte grego 100g,Laticínios,unidade,embalagem
+297,danone,Laticínios,unidade,variacao_escrita
+298,danoninho,Laticínios,unidade,variacao_escrita
+299,manteiga,Laticínios,unidade,nome_base
+300,manteiga com sal 200g,Laticínios,unidade,embalagem
+301,manteiga sem sal,Laticínios,unidade,variacao_escrita
+302,tablete de manteiga,Laticínios,unidade,variacao_escrita
+303,creme de leite,Laticínios,caixa,nome_base
+304,creme de leite caixinha 200g,Laticínios,caixa,embalagem
+305,creme de leite lata,Laticínios,caixa,variacao_escrita
+306,nata,Laticínios,caixa,variacao_escrita
+307,leite condensado,Laticínios,caixa,nome_base
+308,leite condensado 395g,Laticínios,caixa,embalagem
+309,leite condensado lata,Laticínios,caixa,variacao_escrita
+310,leite condensado cx,Laticínios,caixa,variacao_escrita
+311,bebida láctea,Laticínios,unidade,nome_base
+312,bebida lactea morango,Laticínios,unidade,variacao_escrita
+313,bebida láctea 1L,Laticínios,unidade,embalagem
+314,bebida lactea fermentada,Laticínios,unidade,variacao_escrita
+315,ricota,Laticínios,unidade,nome_base
+316,ricota fresca,Laticínios,unidade,variacao_escrita
+317,queijo ricota 400g,Laticínios,unidade,embalagem
+318,cream cheese,Laticínios,unidade,nome_base
+319,cream cheese 150g,Laticínios,unidade,embalagem
+320,queijo cremoso,Laticínios,unidade,variacao_escrita
+321,coalhada,Laticínios,unidade,nome_base
+322,coalhada seca,Laticínios,unidade,variacao_escrita
+323,coalhada integral,Laticínios,unidade,variacao_escrita
+324,doce de leite,Laticínios,unidade,nome_base
+325,doce de leite pastoso 400g,Laticínios,unidade,embalagem
+326,doce de leite pote,Laticínios,unidade,variacao_escrita
+327,leite fermentado,Laticínios,unidade,nome_base
+328,leite fermentado 80g,Laticínios,unidade,embalagem
+329,yakult,Laticínios,unidade,variacao_escrita
+330,lactobacilos,Laticínios,unidade,variacao_escrita
+331,queijo provolone,Laticínios,kg,nome_base
+332,provolone,Laticínios,kg,variacao_escrita
+333,queijo gouda,Laticínios,kg,variacao_escrita
+334,queijo cheddar fatiado,Laticínios,kg,variacao_escrita
+335,petit suisse,Laticínios,unidade,nome_base
+336,queijinho petit suisse,Laticínios,unidade,variacao_escrita
+337,petit suisse morango,Laticínios,unidade,variacao_escrita
+338,chantilly,Laticínios,unidade,nome_base
+339,creme chantilly spray,Laticínios,unidade,variacao_escrita
+340,creme de leite fresco,Laticínios,unidade,variacao_escrita
+341,laticínios variados,Laticínios,kg,nome_base
+342,laticinios,Laticínios,kg,variacao_escrita
+343,derivados de leite,Laticínios,kg,variacao_escrita
+344,produtos lácteos,Laticínios,kg,variacao_escrita
+345,leite achocolatado,Laticínios,caixa,nome_base
+346,leite com chocolate cx 200ml,Laticínios,caixa,embalagem
+347,leite sabor chocolate,Laticínios,caixa,variacao_escrita
+348,queijo cottage,Laticínios,unidade,nome_base
+349,cottage 200g,Laticínios,unidade,embalagem
+350,queijo quark,Laticínios,unidade,variacao_escrita
+351,leite de cabra,Laticínios,L,nome_base
+352,leite de cabra 1L,Laticínios,L,embalagem
+353,leite cru resfriado,Laticínios,L,variacao_escrita
+354,kefir,Laticínios,unidade,nome_base
+355,kefir de leite,Laticínios,unidade,variacao_escrita
+356,iogurte kefir,Laticínios,unidade,variacao_escrita
+357,carne moída,Carnes e peixes,kg,nome_base
+358,carne moida de primeira,Carnes e peixes,kg,variacao_escrita
+359,carne moída kg,Carnes e peixes,kg,variacao_escrita
+360,patinho moido,Carnes e peixes,kg,variacao_escrita
+361,carne bovina,Carnes e peixes,kg,nome_base
+362,carne de boi,Carnes e peixes,kg,variacao_escrita
+363,carne de segunda,Carnes e peixes,kg,variacao_escrita
+364,acém em cubos,Carnes e peixes,kg,variacao_escrita
+365,alcatra,Carnes e peixes,kg,nome_base
+366,coxão mole,Carnes e peixes,kg,variacao_escrita
+367,coxao duro,Carnes e peixes,kg,variacao_escrita
+368,contra filé,Carnes e peixes,kg,variacao_escrita
+369,músculo bovino,Carnes e peixes,kg,nome_base
+370,musculo,Carnes e peixes,kg,variacao_escrita
+371,costela bovina,Carnes e peixes,kg,variacao_escrita
+372,carne para ensopado,Carnes e peixes,kg,variacao_escrita
+373,frango inteiro,Carnes e peixes,kg,nome_base
+374,frango congelado,Carnes e peixes,kg,variacao_escrita
+375,frangos,Carnes e peixes,kg,variacao_escrita
+376,frango resfriado kg,Carnes e peixes,kg,variacao_escrita
+377,peito de frango,Carnes e peixes,kg,nome_base
+378,filé de peito de frango,Carnes e peixes,kg,variacao_escrita
+379,file de frango 1kg,Carnes e peixes,kg,embalagem
+380,peito de frango sem osso,Carnes e peixes,kg,variacao_escrita
+381,coxa e sobrecoxa,Carnes e peixes,kg,nome_base
+382,coxa de frango,Carnes e peixes,kg,variacao_escrita
+383,sobrecoxa kg,Carnes e peixes,kg,variacao_escrita
+384,coxinha da asa,Carnes e peixes,kg,variacao_escrita
+385,carne suína,Carnes e peixes,kg,nome_base
+386,carne de porco,Carnes e peixes,kg,variacao_escrita
+387,lombo suíno,Carnes e peixes,kg,variacao_escrita
+388,pernil suino,Carnes e peixes,kg,variacao_escrita
+389,bisteca suína,Carnes e peixes,kg,nome_base
+390,bisteca de porco,Carnes e peixes,kg,variacao_escrita
+391,costelinha suína,Carnes e peixes,kg,variacao_escrita
+392,linguiça toscana,Carnes e peixes,kg,nome_base
+393,linguica calabresa,Carnes e peixes,kg,variacao_escrita
+394,linguiça de frango,Carnes e peixes,kg,variacao_escrita
+395,linguicas,Carnes e peixes,kg,variacao_escrita
+396,salsicha,Carnes e peixes,kg,nome_base
+397,salsicha hot dog 3kg,Carnes e peixes,kg,embalagem
+398,salsichas,Carnes e peixes,kg,variacao_escrita
+399,salsicha de frango,Carnes e peixes,kg,variacao_escrita
+400,presunto,Carnes e peixes,kg,nome_base
+401,presunto fatiado,Carnes e peixes,kg,variacao_escrita
+402,presunto cozido 200g,Carnes e peixes,kg,embalagem
+403,apresuntado,Carnes e peixes,kg,variacao_escrita
+404,mortadela,Carnes e peixes,kg,nome_base
+405,mortadela fatiada,Carnes e peixes,kg,variacao_escrita
+406,mortadela defumada kg,Carnes e peixes,kg,variacao_escrita
+407,bacon,Carnes e peixes,kg,nome_base
+408,bacon em cubos,Carnes e peixes,kg,variacao_escrita
+409,bacon fatiado 250g,Carnes e peixes,kg,embalagem
+410,toucinho,Carnes e peixes,kg,variacao_escrita
+411,peixe,Carnes e peixes,kg,nome_base
+412,peixes,Carnes e peixes,kg,variacao_escrita
+413,filé de peixe,Carnes e peixes,kg,variacao_escrita
+414,file de pescada,Carnes e peixes,kg,variacao_escrita
+415,tilápia,Carnes e peixes,kg,nome_base
+416,filé de tilapia,Carnes e peixes,kg,variacao_escrita
+417,tilapia congelada 800g,Carnes e peixes,kg,embalagem
+418,sardinha fresca,Carnes e peixes,kg,nome_base
+419,sardinhas,Carnes e peixes,kg,variacao_escrita
+420,sardinha kg,Carnes e peixes,kg,variacao_escrita
+421,sardinha em lata,Carnes e peixes,unidade,nome_base
+422,sardinha lata 125g,Carnes e peixes,unidade,embalagem
+423,sardinha em óleo,Carnes e peixes,unidade,variacao_escrita
+424,lata de sardinha,Carnes e peixes,unidade,variacao_escrita
+425,atum em lata,Carnes e peixes,unidade,nome_base
+426,atum ralado 170g,Carnes e peixes,unidade,embalagem
+427,atum sólido,Carnes e peixes,unidade,variacao_escrita
+428,lata de atum,Carnes e peixes,unidade,variacao_escrita
+429,ovos,Carnes e peixes,unidade,nome_base
+430,ovo,Carnes e peixes,unidade,variacao_escrita
+431,dúzia de ovos,Carnes e peixes,unidade,variacao_escrita
+432,ovos brancos cartela 30,Carnes e peixes,unidade,embalagem
+433,ovos caipiras,Carnes e peixes,unidade,nome_base
+434,ovos vermelhos,Carnes e peixes,unidade,variacao_escrita
+435,bandeja de ovos,Carnes e peixes,unidade,variacao_escrita
+436,ovo de codorna,Carnes e peixes,unidade,variacao_escrita
+437,fígado bovino,Carnes e peixes,kg,nome_base
+438,figado,Carnes e peixes,kg,variacao_escrita
+439,moela de frango,Carnes e peixes,kg,variacao_escrita
+440,coração de frango,Carnes e peixes,kg,variacao_escrita
+441,hambúrguer bovino,Carnes e peixes,kg,nome_base
+442,hamburguer congelado cx,Carnes e peixes,kg,variacao_escrita
+443,hambúrgueres,Carnes e peixes,kg,variacao_escrita
+444,hamburguer de frango,Carnes e peixes,kg,variacao_escrita
+445,almôndega,Carnes e peixes,kg,nome_base
+446,almondegas congeladas,Carnes e peixes,kg,variacao_escrita
+447,almôndegas de carne,Carnes e peixes,kg,variacao_escrita
+448,carne seca,Carnes e peixes,kg,nome_base
+449,charque,Carnes e peixes,kg,variacao_escrita
+450,carne de sol,Carnes e peixes,kg,variacao_escrita
+451,jabá,Carnes e peixes,kg,variacao_escrita
+452,camarão,Carnes e peixes,kg,nome_base
+453,camarao limpo,Carnes e peixes,kg,variacao_escrita
+454,camarão congelado 400g,Carnes e peixes,kg,embalagem
+455,salmão,Carnes e peixes,kg,nome_base
+456,file de salmao,Carnes e peixes,kg,variacao_escrita
+457,merluza,Carnes e peixes,kg,variacao_escrita
+458,cação em postas,Carnes e peixes,kg,variacao_escrita
+459,peito de peru,Carnes e peixes,kg,nome_base
+460,blanquet de peru,Carnes e peixes,kg,variacao_escrita
+461,peito de peru fatiado,Carnes e peixes,kg,variacao_escrita
+462,nuggets de frango,Carnes e peixes,kg,nome_base
+463,empanado de frango 300g,Carnes e peixes,kg,embalagem
+464,steak de frango,Carnes e peixes,kg,variacao_escrita
+465,frango empanado,Carnes e peixes,kg,variacao_escrita
+466,carnes variadas,Carnes e peixes,kg,nome_base
+467,cortes de frango,Carnes e peixes,kg,variacao_escrita
+468,proteína animal,Carnes e peixes,kg,variacao_escrita
+469,cortes bovinos,Carnes e peixes,kg,variacao_escrita
+470,arroz,Grãos e cereais,kg,nome_base
+471,arroz tipo 1 5kg,Grãos e cereais,kg,embalagem
+472,arroz branco,Grãos e cereais,kg,variacao_escrita
+473,arroz agulhinha,Grãos e cereais,kg,variacao_escrita
+474,pacote de arroz 5 kg,Grãos e cereais,kg,embalagem
+475,arroz integral,Grãos e cereais,kg,nome_base
+476,arroz integral 1kg,Grãos e cereais,kg,embalagem
+477,arroz parboilizado,Grãos e cereais,kg,variacao_escrita
+478,arroz parbo 5kg,Grãos e cereais,kg,embalagem
+479,feijão carioca,Grãos e cereais,kg,nome_base
+480,feijao carioca 1kg,Grãos e cereais,kg,embalagem
+481,feijão,Grãos e cereais,kg,variacao_escrita
+482,feijao tipo 1,Grãos e cereais,kg,embalagem
+483,feijão preto,Grãos e cereais,kg,nome_base
+484,feijao preto 1kg,Grãos e cereais,kg,embalagem
+485,feijões,Grãos e cereais,kg,variacao_escrita
+486,feijão fradinho,Grãos e cereais,kg,variacao_escrita
+487,feijão branco,Grãos e cereais,kg,nome_base
+488,feijao de corda,Grãos e cereais,kg,variacao_escrita
+489,feijão vermelho,Grãos e cereais,kg,variacao_escrita
+490,feijao jalo,Grãos e cereais,kg,variacao_escrita
+491,lentilha,Grãos e cereais,kg,nome_base
+492,lentilha 500g,Grãos e cereais,kg,embalagem
+493,lentilhas,Grãos e cereais,kg,variacao_escrita
+494,grão de bico,Grãos e cereais,kg,nome_base
+495,grao de bico 500g,Grãos e cereais,kg,embalagem
+496,grão-de-bico,Grãos e cereais,kg,variacao_escrita
+497,ervilha seca,Grãos e cereais,kg,nome_base
+498,ervilha partida 500g,Grãos e cereais,kg,embalagem
+499,ervilhas secas,Grãos e cereais,kg,variacao_escrita
+500,macarrão espaguete,Grãos e cereais,pacote,nome_base
+501,macarrao espaguete 500g,Grãos e cereais,pacote,embalagem
+502,macarrão,Grãos e cereais,pacote,variacao_escrita
+503,espaguete n 8,Grãos e cereais,pacote,embalagem
+504,macarrão parafuso,Grãos e cereais,pacote,nome_base
+505,macarrao parafuso 500g,Grãos e cereais,pacote,embalagem
+506,macarrão penne,Grãos e cereais,pacote,variacao_escrita
+507,massa fusilli,Grãos e cereais,pacote,variacao_escrita
+508,macarrão instantâneo,Grãos e cereais,pacote,nome_base
+509,miojo,Grãos e cereais,pacote,variacao_escrita
+510,macarrao instantaneo 80g,Grãos e cereais,pacote,embalagem
+511,lamen,Grãos e cereais,pacote,variacao_escrita
+512,farinha de trigo,Grãos e cereais,kg,nome_base
+513,farinha de trigo 1kg,Grãos e cereais,kg,embalagem
+514,farinha trigo tipo 1,Grãos e cereais,kg,embalagem
+515,trigo,Grãos e cereais,kg,variacao_escrita
+516,farinha de mandioca,Grãos e cereais,kg,nome_base
+517,farinha de mandioca torrada,Grãos e cereais,kg,variacao_escrita
+518,farinha mandioca 500g,Grãos e cereais,kg,embalagem
+519,farinha d'água,Grãos e cereais,kg,variacao_escrita
+520,fubá,Grãos e cereais,kg,nome_base
+521,fuba mimoso 1kg,Grãos e cereais,kg,embalagem
+522,fubá de milho,Grãos e cereais,kg,variacao_escrita
+523,farinha de milho,Grãos e cereais,kg,variacao_escrita
+524,flocão de milho,Grãos e cereais,kg,nome_base
+525,flocao 500g,Grãos e cereais,kg,embalagem
+526,cuscuz de milho,Grãos e cereais,kg,variacao_escrita
+527,farinha de milho flocada,Grãos e cereais,kg,variacao_escrita
+528,aveia em flocos,Grãos e cereais,kg,nome_base
+529,aveia flocos finos 200g,Grãos e cereais,kg,embalagem
+530,aveia,Grãos e cereais,kg,variacao_escrita
+531,farelo de aveia,Grãos e cereais,kg,variacao_escrita
+532,granola,Grãos e cereais,pacote,nome_base
+533,granola tradicional 1kg,Grãos e cereais,pacote,embalagem
+534,cereal matinal,Grãos e cereais,pacote,variacao_escrita
+535,sucrilhos,Grãos e cereais,pacote,variacao_escrita
+536,milho de pipoca,Grãos e cereais,kg,nome_base
+537,milho pipoca 500g,Grãos e cereais,kg,embalagem
+538,milho para pipoca,Grãos e cereais,kg,variacao_escrita
+539,canjica,Grãos e cereais,kg,nome_base
+540,canjica branca 500g,Grãos e cereais,kg,embalagem
+541,canjiquinha,Grãos e cereais,kg,variacao_escrita
+542,milho para canjica,Grãos e cereais,kg,variacao_escrita
+543,quinoa,Grãos e cereais,kg,nome_base
+544,quinoa em grãos,Grãos e cereais,kg,variacao_escrita
+545,chia,Grãos e cereais,kg,variacao_escrita
+546,linhaça,Grãos e cereais,kg,variacao_escrita
+547,trigo para quibe,Grãos e cereais,kg,nome_base
+548,trigo quibe 500g,Grãos e cereais,kg,embalagem
+549,triguilho,Grãos e cereais,kg,variacao_escrita
+550,soja em grãos,Grãos e cereais,kg,nome_base
+551,proteína de soja,Grãos e cereais,kg,variacao_escrita
+552,proteina texturizada de soja 400g,Grãos e cereais,kg,embalagem
+553,carne de soja,Grãos e cereais,kg,variacao_escrita
+554,polvilho doce,Grãos e cereais,kg,nome_base
+555,polvilho azedo 500g,Grãos e cereais,kg,embalagem
+556,goma de tapioca,Grãos e cereais,kg,variacao_escrita
+557,tapioca,Grãos e cereais,kg,variacao_escrita
+558,massa para lasanha,Grãos e cereais,pacote,nome_base
+559,massa de lasanha 500g,Grãos e cereais,pacote,embalagem
+560,macarrão talharim,Grãos e cereais,pacote,variacao_escrita
+561,massa com ovos,Grãos e cereais,pacote,variacao_escrita
+562,amendoim,Grãos e cereais,kg,nome_base
+563,amendoim cru 500g,Grãos e cereais,kg,embalagem
+564,castanha de caju,Grãos e cereais,kg,variacao_escrita
+565,castanha do pará,Grãos e cereais,kg,variacao_escrita
+566,farinha de rosca,Grãos e cereais,kg,nome_base
+567,farinha de rosca 500g,Grãos e cereais,kg,embalagem
+568,farinha panko,Grãos e cereais,kg,variacao_escrita
+569,grãos variados,Grãos e cereais,kg,nome_base
+570,graos,Grãos e cereais,kg,variacao_escrita
+571,cereais,Grãos e cereais,kg,variacao_escrita
+572,cesta de grãos,Grãos e cereais,kg,variacao_escrita
+573,arroz e feijão,Grãos e cereais,kg,nome_base
+574,arroz com feijao kit,Grãos e cereais,kg,variacao_escrita
+575,kit arroz feijão macarrão,Grãos e cereais,kg,variacao_escrita
+576,sagu,Grãos e cereais,kg,nome_base
+577,sagu de mandioca 500g,Grãos e cereais,kg,embalagem
+578,cevadinha,Grãos e cereais,kg,variacao_escrita
+579,farinha de arroz,Grãos e cereais,kg,nome_base
+580,farinha de aveia,Grãos e cereais,kg,variacao_escrita
+581,farinha integral 1kg,Grãos e cereais,kg,embalagem
+582,marmita,Refeições prontas,unidade,nome_base
+583,marmitas,Refeições prontas,unidade,variacao_escrita
+584,marmitex,Refeições prontas,unidade,variacao_escrita
+585,marmita fitness congelada,Refeições prontas,unidade,variacao_escrita
+586,quentinha,Refeições prontas,unidade,nome_base
+587,quentinhas,Refeições prontas,unidade,variacao_escrita
+588,quentinha de arroz feijão e frango,Refeições prontas,unidade,variacao_escrita
+589,quentinha média,Refeições prontas,unidade,variacao_escrita
+590,refeição pronta,Refeições prontas,unidade,nome_base
+591,refeicoes prontas,Refeições prontas,unidade,variacao_escrita
+592,refeição congelada,Refeições prontas,unidade,variacao_escrita
+593,prato pronto,Refeições prontas,unidade,variacao_escrita
+594,prato feito,Refeições prontas,unidade,nome_base
+595,PF,Refeições prontas,unidade,variacao_escrita
+596,prato executivo,Refeições prontas,unidade,variacao_escrita
+597,prato do dia,Refeições prontas,unidade,variacao_escrita
+598,sopa,Refeições prontas,L,nome_base
+599,sopa de legumes,Refeições prontas,L,variacao_escrita
+600,sopão,Refeições prontas,L,variacao_escrita
+601,sopa pronta 500ml,Refeições prontas,L,embalagem
+602,caldo verde,Refeições prontas,L,nome_base
+603,caldo de feijão,Refeições prontas,L,variacao_escrita
+604,caldo de mandioca pronto,Refeições prontas,L,variacao_escrita
+605,canja de galinha,Refeições prontas,L,variacao_escrita
+606,lasanha,Refeições prontas,unidade,nome_base
+607,lasanha congelada 600g,Refeições prontas,unidade,embalagem
+608,lasanha bolonhesa,Refeições prontas,unidade,variacao_escrita
+609,lasanhas prontas,Refeições prontas,unidade,variacao_escrita
+610,pizza,Refeições prontas,unidade,nome_base
+611,pizzas,Refeições prontas,unidade,variacao_escrita
+612,pizza congelada,Refeições prontas,unidade,variacao_escrita
+613,pizza de mussarela,Refeições prontas,unidade,variacao_escrita
+614,sanduíche,Refeições prontas,unidade,nome_base
+615,sanduiche natural,Refeições prontas,unidade,variacao_escrita
+616,sanduíches,Refeições prontas,unidade,variacao_escrita
+617,lanche natural,Refeições prontas,unidade,variacao_escrita
+618,lanche,Refeições prontas,unidade,nome_base
+619,kit lanche,Refeições prontas,unidade,variacao_escrita
+620,lanches prontos,Refeições prontas,unidade,variacao_escrita
+621,x-salada,Refeições prontas,unidade,variacao_escrita
+622,coxinha,Refeições prontas,unidade,nome_base
+623,coxinhas,Refeições prontas,unidade,variacao_escrita
+624,salgado frito,Refeições prontas,unidade,variacao_escrita
+625,salgados de festa,Refeições prontas,unidade,variacao_escrita
+626,esfiha,Refeições prontas,unidade,nome_base
+627,esfihas de carne,Refeições prontas,unidade,variacao_escrita
+628,esfirra,Refeições prontas,unidade,variacao_escrita
+629,empada de frango,Refeições prontas,unidade,variacao_escrita
+630,pastel,Refeições prontas,unidade,nome_base
+631,pasteis de carne,Refeições prontas,unidade,variacao_escrita
+632,pastel assado,Refeições prontas,unidade,variacao_escrita
+633,pastelzinho,Refeições prontas,unidade,variacao_escrita
+634,torta de frango,Refeições prontas,unidade,nome_base
+635,torta salgada,Refeições prontas,unidade,variacao_escrita
+636,empadão,Refeições prontas,unidade,variacao_escrita
+637,tortas salgadas fatia,Refeições prontas,unidade,variacao_escrita
+638,feijoada,Refeições prontas,kg,nome_base
+639,feijoada pronta,Refeições prontas,kg,variacao_escrita
+640,feijão tropeiro pronto,Refeições prontas,kg,variacao_escrita
+641,baião de dois,Refeições prontas,kg,variacao_escrita
+642,strogonoff de frango,Refeições prontas,kg,nome_base
+643,estrogonofe,Refeições prontas,kg,variacao_escrita
+644,strogonoff pronto,Refeições prontas,kg,variacao_escrita
+645,arroz cozido,Refeições prontas,kg,nome_base
+646,arroz pronto,Refeições prontas,kg,variacao_escrita
+647,arroz temperado cozido,Refeições prontas,kg,variacao_escrita
+648,risoto,Refeições prontas,kg,variacao_escrita
+649,macarronada,Refeições prontas,kg,nome_base
+650,macarrão ao molho pronto,Refeições prontas,kg,variacao_escrita
+651,yakisoba,Refeições prontas,kg,variacao_escrita
+652,espaguete à bolonhesa pronto,Refeições prontas,kg,variacao_escrita
+653,escondidinho,Refeições prontas,kg,nome_base
+654,escondidinho de carne seca,Refeições prontas,kg,variacao_escrita
+655,purê de batata pronto,Refeições prontas,kg,variacao_escrita
+656,hot dog,Refeições prontas,unidade,nome_base
+657,cachorro quente pronto,Refeições prontas,unidade,variacao_escrita
+658,cachorros quentes,Refeições prontas,unidade,variacao_escrita
+659,hambúrguer montado,Refeições prontas,unidade,nome_base
+660,x-burguer,Refeições prontas,unidade,variacao_escrita
+661,lanche de hambúrguer,Refeições prontas,unidade,variacao_escrita
+662,frango assado,Refeições prontas,kg,nome_base
+663,frango de padaria assado,Refeições prontas,kg,variacao_escrita
+664,galeto assado,Refeições prontas,kg,variacao_escrita
+665,salada pronta,Refeições prontas,kg,nome_base
+666,salada de maionese,Refeições prontas,kg,variacao_escrita
+667,salpicão,Refeições prontas,kg,variacao_escrita
+668,salada de frutas pote,Refeições prontas,kg,variacao_escrita
+669,cuscuz paulista,Refeições prontas,unidade,nome_base
+670,quiche,Refeições prontas,unidade,variacao_escrita
+671,panqueca recheada,Refeições prontas,unidade,variacao_escrita
+672,comida pronta,Refeições prontas,unidade,nome_base
+673,sobra limpa do almoço,Refeições prontas,unidade,variacao_escrita
+674,refeição do buffet,Refeições prontas,unidade,variacao_escrita
+675,comida do restaurante,Refeições prontas,unidade,variacao_escrita
+676,kit refeição,Refeições prontas,unidade,nome_base
+677,kit almoço,Refeições prontas,unidade,variacao_escrita
+678,refeição individual embalada,Refeições prontas,unidade,variacao_escrita
+679,carne cozida com legumes,Refeições prontas,kg,nome_base
+680,picadinho pronto,Refeições prontas,kg,variacao_escrita
+681,ensopado pronto,Refeições prontas,kg,variacao_escrita
+682,tapioca recheada,Refeições prontas,unidade,nome_base
+683,crepe,Refeições prontas,unidade,variacao_escrita
+684,wrap de frango,Refeições prontas,unidade,variacao_escrita
+685,marmita vegetariana,Refeições prontas,unidade,nome_base
+686,marmita vegana,Refeições prontas,unidade,variacao_escrita
+687,refeicao vegetariana,Refeições prontas,unidade,variacao_escrita
+688,polenta pronta,Refeições prontas,kg,nome_base
+689,angu,Refeições prontas,kg,variacao_escrita
+690,nhoque ao sugo pronto,Refeições prontas,kg,variacao_escrita
+691,água mineral,Bebidas não alcoólicas,L,nome_base
+692,agua mineral 500ml,Bebidas não alcoólicas,L,embalagem
+693,água sem gás,Bebidas não alcoólicas,L,variacao_escrita
+694,galão de água 20L,Bebidas não alcoólicas,L,embalagem
+695,agua,Bebidas não alcoólicas,L,variacao_escrita
+696,água com gás,Bebidas não alcoólicas,L,nome_base
+697,"agua com gas 1,5L",Bebidas não alcoólicas,L,embalagem
+698,água gaseificada,Bebidas não alcoólicas,L,variacao_escrita
+699,suco de laranja,Bebidas não alcoólicas,L,nome_base
+700,suco de laranja integral 1L,Bebidas não alcoólicas,L,embalagem
+701,suco natural,Bebidas não alcoólicas,L,variacao_escrita
+702,sucos,Bebidas não alcoólicas,L,variacao_escrita
+703,suco de uva,Bebidas não alcoólicas,L,nome_base
+704,suco de uva integral,Bebidas não alcoólicas,L,variacao_escrita
+705,"suco uva 1,5L",Bebidas não alcoólicas,L,embalagem
+706,suco de caixinha,Bebidas não alcoólicas,caixa,nome_base
+707,suco caixinha 200ml,Bebidas não alcoólicas,caixa,embalagem
+708,néctar de pêssego,Bebidas não alcoólicas,caixa,variacao_escrita
+709,nectar de manga 1L,Bebidas não alcoólicas,caixa,embalagem
+710,suco em pó,Bebidas não alcoólicas,pacote,nome_base
+711,refresco em po,Bebidas não alcoólicas,pacote,variacao_escrita
+712,suco tang,Bebidas não alcoólicas,pacote,variacao_escrita
+713,refresco sabor laranja,Bebidas não alcoólicas,pacote,variacao_escrita
+714,refrigerante,Bebidas não alcoólicas,L,nome_base
+715,refrigerantes,Bebidas não alcoólicas,L,variacao_escrita
+716,refrigerante 2L,Bebidas não alcoólicas,L,embalagem
+717,refri guaraná,Bebidas não alcoólicas,L,variacao_escrita
+718,refrigerante de cola,Bebidas não alcoólicas,L,nome_base
+719,coca,Bebidas não alcoólicas,L,variacao_escrita
+720,guaraná lata 350ml,Bebidas não alcoólicas,L,embalagem
+721,refrigerante laranja pet 2 litros,Bebidas não alcoólicas,L,embalagem
+722,água de coco,Bebidas não alcoólicas,L,nome_base
+723,agua de coco 1L,Bebidas não alcoólicas,L,embalagem
+724,água de coco caixinha,Bebidas não alcoólicas,L,variacao_escrita
+725,chá gelado,Bebidas não alcoólicas,L,nome_base
+726,cha mate pronto,Bebidas não alcoólicas,L,variacao_escrita
+727,"chá mate 1,5L",Bebidas não alcoólicas,L,embalagem
+728,chá de limão gelado,Bebidas não alcoólicas,L,variacao_escrita
+729,chá em sachê,Bebidas não alcoólicas,caixa,nome_base
+730,cha de camomila cx,Bebidas não alcoólicas,caixa,variacao_escrita
+731,chá de erva doce,Bebidas não alcoólicas,caixa,variacao_escrita
+732,sachês de chá,Bebidas não alcoólicas,caixa,variacao_escrita
+733,isotônico,Bebidas não alcoólicas,L,nome_base
+734,isotonico 500ml,Bebidas não alcoólicas,L,embalagem
+735,bebida isotônica,Bebidas não alcoólicas,L,variacao_escrita
+736,bebida de soja,Bebidas não alcoólicas,L,nome_base
+737,leite de soja,Bebidas não alcoólicas,L,variacao_escrita
+738,suco de soja 1L,Bebidas não alcoólicas,L,embalagem
+739,bebida vegetal de aveia,Bebidas não alcoólicas,L,variacao_escrita
+740,suco concentrado,Bebidas não alcoólicas,L,nome_base
+741,suco de caju concentrado 500ml,Bebidas não alcoólicas,L,embalagem
+742,suco de maracujá concentrado,Bebidas não alcoólicas,L,variacao_escrita
+743,polpa de fruta,Bebidas não alcoólicas,L,nome_base
+744,polpa de acerola 1kg,Bebidas não alcoólicas,L,embalagem
+745,polpas congeladas,Bebidas não alcoólicas,L,variacao_escrita
+746,polpa de maracuja,Bebidas não alcoólicas,L,variacao_escrita
+747,limonada,Bebidas não alcoólicas,L,nome_base
+748,limonada pronta,Bebidas não alcoólicas,L,variacao_escrita
+749,laranjada,Bebidas não alcoólicas,L,variacao_escrita
+750,energético sem álcool,Bebidas não alcoólicas,L,nome_base
+751,energetico lata,Bebidas não alcoólicas,L,variacao_escrita
+752,bebida energética,Bebidas não alcoólicas,L,variacao_escrita
+753,água saborizada,Bebidas não alcoólicas,L,nome_base
+754,agua saborizada limão,Bebidas não alcoólicas,L,variacao_escrita
+755,água aromatizada,Bebidas não alcoólicas,L,variacao_escrita
+756,chá verde,Bebidas não alcoólicas,L,nome_base
+757,cha preto,Bebidas não alcoólicas,L,variacao_escrita
+758,chá de hibisco,Bebidas não alcoólicas,L,variacao_escrita
+759,chá mate a granel,Bebidas não alcoólicas,L,variacao_escrita
+760,bebidas,Bebidas não alcoólicas,L,nome_base
+761,bebidas nao alcoolicas,Bebidas não alcoólicas,L,variacao_escrita
+762,bebidas variadas,Bebidas não alcoólicas,L,variacao_escrita
+763,fardo de bebidas,Bebidas não alcoólicas,L,variacao_escrita
+764,xarope de groselha,Bebidas não alcoólicas,L,nome_base
+765,groselha,Bebidas não alcoólicas,L,variacao_escrita
+766,xarope de guaraná,Bebidas não alcoólicas,L,variacao_escrita
+767,garrafa de água,Bebidas não alcoólicas,L,nome_base
+768,agua mineral fardo 12 un,Bebidas não alcoólicas,L,embalagem
+769,copo de água 200ml,Bebidas não alcoólicas,L,embalagem
+770,agua galao,Bebidas não alcoólicas,L,variacao_escrita
+771,suco de maçã,Bebidas não alcoólicas,L,nome_base
+772,suco de abacaxi,Bebidas não alcoólicas,L,variacao_escrita
+773,suco de goiaba 1L,Bebidas não alcoólicas,L,embalagem
+774,suco de manga,Bebidas não alcoólicas,L,variacao_escrita
+775,suco verde,Bebidas não alcoólicas,L,nome_base
+776,suco detox,Bebidas não alcoólicas,L,variacao_escrita
+777,suco de couve com limão,Bebidas não alcoólicas,L,variacao_escrita
+778,refrigerante zero,Bebidas não alcoólicas,L,nome_base
+779,refri sem açúcar,Bebidas não alcoólicas,L,variacao_escrita
+780,guaraná zero 2L,Bebidas não alcoólicas,L,embalagem
+781,bebida láctea de soja,Bebidas não alcoólicas,L,nome_base
+782,bebida de amêndoas,Bebidas não alcoólicas,L,variacao_escrita
+783,leite de aveia,Bebidas não alcoólicas,L,variacao_escrita
+784,leite vegetal,Bebidas não alcoólicas,L,variacao_escrita
+785,mate,Bebidas não alcoólicas,L,nome_base
+786,mate leão,Bebidas não alcoólicas,L,variacao_escrita
+787,erva mate para chimarrão,Bebidas não alcoólicas,L,variacao_escrita
+788,tereré,Bebidas não alcoólicas,L,variacao_escrita
+789,café pronto,Bebidas não alcoólicas,L,nome_base
+790,café coado,Bebidas não alcoólicas,L,variacao_escrita
+791,garrafa de café,Bebidas não alcoólicas,L,variacao_escrita
+792,vitamina de frutas,Bebidas não alcoólicas,L,nome_base
+793,smoothie,Bebidas não alcoólicas,L,variacao_escrita
+794,batida de frutas sem álcool,Bebidas não alcoólicas,L,variacao_escrita
+795,caldo de cana,Bebidas não alcoólicas,L,nome_base
+796,garapa,Bebidas não alcoólicas,L,variacao_escrita
+797,água tônica,Bebidas não alcoólicas,L,variacao_escrita
+798,açúcar,Outros,kg,nome_base
+799,acucar refinado 1kg,Outros,kg,embalagem
+800,açúcar cristal 5kg,Outros,kg,embalagem
+801,acucar mascavo,Outros,kg,variacao_escrita
+802,sal,Outros,kg,nome_base
+803,sal refinado 1kg,Outros,kg,embalagem
+804,sal grosso,Outros,kg,variacao_escrita
+805,sal iodado,Outros,kg,variacao_escrita
+806,óleo de soja,Outros,L,nome_base
+807,oleo de soja 900ml,Outros,L,embalagem
+808,óleo,Outros,L,variacao_escrita
+809,oleo de girassol,Outros,L,variacao_escrita
+810,azeite,Outros,L,nome_base
+811,azeite de oliva 500ml,Outros,L,embalagem
+812,azeite extra virgem,Outros,L,variacao_escrita
+813,café em pó,Outros,pacote,nome_base
+814,cafe 500g,Outros,pacote,embalagem
+815,café torrado e moído,Outros,pacote,variacao_escrita
+816,cafe soluvel,Outros,pacote,variacao_escrita
+817,molho de tomate,Outros,unidade,nome_base
+818,molho de tomate sachê 340g,Outros,unidade,embalagem
+819,extrato de tomate,Outros,unidade,variacao_escrita
+820,polpa de tomate,Outros,unidade,variacao_escrita
+821,milho verde em lata,Outros,unidade,nome_base
+822,milho em conserva 200g,Outros,unidade,embalagem
+823,lata de milho,Outros,unidade,variacao_escrita
+824,milho verde lata,Outros,unidade,variacao_escrita
+825,ervilha em lata,Outros,unidade,nome_base
+826,ervilha em conserva,Outros,unidade,variacao_escrita
+827,seleta de legumes lata,Outros,unidade,variacao_escrita
+828,maionese,Outros,unidade,nome_base
+829,maionese 500g,Outros,unidade,embalagem
+830,ketchup,Outros,unidade,variacao_escrita
+831,mostarda,Outros,unidade,variacao_escrita
+832,vinagre,Outros,L,nome_base
+833,vinagre de álcool 750ml,Outros,L,embalagem
+834,vinagre de maçã,Outros,L,variacao_escrita
+835,margarina,Outros,unidade,nome_base
+836,margarina 500g,Outros,unidade,embalagem
+837,margarina com sal,Outros,unidade,variacao_escrita
+838,creme vegetal,Outros,unidade,variacao_escrita
+839,achocolatado em pó,Outros,pacote,nome_base
+840,achocolatado 400g,Outros,pacote,embalagem
+841,chocolate em pó,Outros,pacote,variacao_escrita
+842,cacau em pó,Outros,pacote,variacao_escrita
+843,gelatina,Outros,unidade,nome_base
+844,gelatina em pó morango,Outros,unidade,variacao_escrita
+845,gelatinas,Outros,unidade,variacao_escrita
+846,pudim em pó,Outros,unidade,variacao_escrita
+847,mel,Outros,unidade,nome_base
+848,mel de abelha 300g,Outros,unidade,embalagem
+849,melado de cana,Outros,unidade,variacao_escrita
+850,geleia,Outros,unidade,nome_base
+851,geleia de morango,Outros,unidade,variacao_escrita
+852,goiabada,Outros,unidade,variacao_escrita
+853,marmelada,Outros,unidade,variacao_escrita
+854,chocolate,Outros,unidade,nome_base
+855,barra de chocolate 90g,Outros,unidade,embalagem
+856,bombom,Outros,unidade,variacao_escrita
+857,chocolates,Outros,unidade,variacao_escrita
+858,tempero pronto,Outros,pacote,nome_base
+859,tempero completo,Outros,pacote,variacao_escrita
+860,colorau,Outros,pacote,variacao_escrita
+861,orégano,Outros,pacote,variacao_escrita
+862,caldo de galinha em cubo,Outros,pacote,nome_base
+863,caldo de carne tablete,Outros,pacote,variacao_escrita
+864,caldo knorr,Outros,pacote,variacao_escrita
+865,fermento em pó,Outros,pacote,nome_base
+866,fermento biológico seco,Outros,pacote,variacao_escrita
+867,fermento quimico 100g,Outros,pacote,embalagem
+868,amido de milho,Outros,pacote,nome_base
+869,maisena 500g,Outros,pacote,embalagem
+870,amido,Outros,pacote,variacao_escrita
+871,leite de coco,Outros,unidade,nome_base
+872,leite de coco 200ml,Outros,unidade,embalagem
+873,coco ralado,Outros,unidade,variacao_escrita
+874,coco ralado 100g,Outros,unidade,embalagem
+875,azeitona,Outros,unidade,nome_base
+876,azeitonas verdes,Outros,unidade,variacao_escrita
+877,palmito,Outros,unidade,variacao_escrita
+878,champignon em conserva,Outros,unidade,variacao_escrita
+879,batata palha,Outros,pacote,nome_base
+880,batata palha 500g,Outros,pacote,embalagem
+881,salgadinho de milho,Outros,pacote,variacao_escrita
+882,pipoca de micro-ondas,Outros,pacote,variacao_escrita
+883,paçoca,Outros,pacote,nome_base
+884,pé de moleque,Outros,pacote,variacao_escrita
+885,doce de amendoim,Outros,pacote,variacao_escrita
+886,rapadura,Outros,pacote,variacao_escrita
+887,bala,Outros,pacote,nome_base
+888,balas sortidas,Outros,pacote,variacao_escrita
+889,pirulito,Outros,pacote,variacao_escrita
+890,chiclete,Outros,pacote,variacao_escrita
+891,papinha de bebê,Outros,unidade,nome_base
+892,papinha infantil,Outros,unidade,variacao_escrita
+893,fórmula infantil,Outros,unidade,variacao_escrita
+894,mingau infantil,Outros,unidade,variacao_escrita
+895,adoçante,Outros,unidade,nome_base
+896,adocante liquido,Outros,unidade,variacao_escrita
+897,stevia,Outros,unidade,variacao_escrita
+898,molho shoyu,Outros,unidade,nome_base
+899,molho de soja,Outros,unidade,variacao_escrita
+900,molho inglês,Outros,unidade,variacao_escrita
+901,molho de pimenta,Outros,unidade,variacao_escrita
+902,cesta básica,Outros,unidade,nome_base
+903,cestas basicas,Outros,unidade,variacao_escrita
+904,kit alimentação,Outros,unidade,variacao_escrita
+905,alimentos não perecíveis,Outros,unidade,variacao_escrita
+906,creme de avelã,Outros,unidade,nome_base
+907,pasta de amendoim,Outros,unidade,variacao_escrita
+908,doce de banana,Outros,unidade,variacao_escrita
+909,cocada,Outros,unidade,variacao_escrita
+910,suplemento alimentar,Outros,unidade,nome_base
+911,whey protein,Outros,unidade,variacao_escrita
+912,barra de cereal,Outros,unidade,variacao_escrita
+913,barrinha de cereais,Outros,unidade,variacao_escrita
+914,sorvete,Outros,unidade,nome_base
+915,picolé,Outros,unidade,variacao_escrita
+916,açaí congelado,Outros,unidade,variacao_escrita
+917,sobremesa gelada,Outros,unidade,variacao_escrita
+918,pimenta do reino,Outros,pacote,nome_base
+919,canela em pó,Outros,pacote,variacao_escrita
+920,cominho,Outros,pacote,variacao_escrita
+921,louro,Outros,pacote,variacao_escrita
+922,produtos diversos,Outros,unidade,nome_base
+923,itens diversos,Outros,unidade,variacao_escrita
+924,mantimentos,Outros,unidade,variacao_escrita
+925,alimentos diversos,Outros,unidade,variacao_escrita

@@ -169,6 +169,8 @@ class PedidoPublico(Resource):
 
 @ns.route("/doacoes/<int:doacao_id>/contribuicoes")
 class Contribuir(Resource):
+    @ns.response(201, "Doação aceita")
+    @ns.response(429, "Cota de 20 envios por hora por usuário; MUITAS_TENTATIVAS")
     def post(self, doacao_id):
         doacao = db.session.get(Doacao, doacao_id)
         if not doacao or doacao.estabelecimento_id is None:

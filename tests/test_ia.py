@@ -300,3 +300,83 @@ def test_resumo_invalido_retorna_fallback_deterministico(monkeypatch):
     assert resposta.status_code == 200
     assert resposta.json["fonte"] == "regras" and resposta.json["modelo"] is None
     assert "pedidos abertos" in resposta.json["resumo"]
+
+
+@pytest.mark.parametrize("url, docker, aceita", [
+    ("http://ollama:11434", "1", True),
+    ("http://ollama:11434", None, False),
+    ("http://ollama:11434", "0", False),
+    ("http://ollama:11434", "true", False),
+    ("http://localhost:11434", "1", True),
+    ("http://127.0.0.1:11434", None, True),
+    ("http://ollama.evil.com:11434", "1", False),
+    ("http://ollama@host:11434", "1", False),
+    ("http://ollama@ollama:11434", "1", False),
+    ("http://outro:11434", "1", False),
+    ("https://ollama:11434", "1", False),
+    ("http://ollama", "1", False),
+    ("http://ollama:11434/api", "1", False),
+])
+def test_host_ollama_do_compose_so_com_a_variavel(monkeypatch, url, docker, aceita):
+    monkeypatch.setenv("OLLAMA_URL", url)
+    if docker is None:
+        monkeypatch.delenv("OLLAMA_PERMITIR_DOCKER", raising=False)
+    else:
+        monkeypatch.setenv("OLLAMA_PERMITIR_DOCKER", docker)
+    assert llm_service._url_local() == (url if aceita else None)
+
+
+def test_ollama_do_compose_e_chamado_sem_redirecionar_nem_proxy(monkeypatch):
+    monkeypatch.setenv("OLLAMA_URL", "http://ollama:11434")
+    monkeypatch.setenv("OLLAMA_PERMITIR_DOCKER", "1")
+    chamadas = []
+
+    def post(sessao, url, **kwargs):
+        chamadas.append((url, sessao.trust_env, kwargs["allow_redirects"]))
+        return RespostaOllama(json.dumps({"itens": [{
+            "nome": "Leite", "categoria": "Laticínios", "quantidade": 100,
+            "unidade_medida": "caixa"}], "receber_ate": None, "observacoes": ""}))
+
+    monkeypatch.setattr(requests.Session, "post", post)
+    resposta = llm_service.interpretar_pedido("Precisamos de 100 caixas de leite")
+    assert resposta["fonte"] == "llm"
+    assert chamadas == [("http://ollama:11434/api/chat", False, False)]
+
+
+def test_interpretar_pedido_tem_limite_por_empresa():
+    cliente = _cliente_autenticado("empresa")
+    # corpo inválido não gasta a cota
+    for _ in range(12):
+        assert cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": "x"}).status_code == 400
+    for _ in range(10):
+        assert cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO}).status_code == 200
+    bloqueado = cliente.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO})
+    assert bloqueado.status_code == 429 and bloqueado.json["codigo"] == "MUITAS_TENTATIVAS"
+    assert bloqueado.headers["Retry-After"] == "60"
+    # a cota é da empresa, não do IP: outra empresa no mesmo IP continua atendida
+    with app.app_context():
+        outra = Estabelecimento(nome="Outra Empresa", cnpj="11222333000181",
+            email="outra@exemplo.com", telefone="11977776666",
+            endereco="Rua Dois, 20 - CENTRO, BARUERI/SP")
+        db.session.add(outra)
+        db.session.commit()
+        outra_id = outra.id
+    segundo = app.test_client()
+    with segundo.session_transaction() as sessao:
+        sessao["tipo"] = "empresa"
+        sessao["usuario_id"] = outra_id
+    assert segundo.post("/reconecta/ia/interpretar-pedido", json={"texto": TEXTO}).status_code == 200
+    # e não mistura com o limite por IP do resumo
+    assert app.test_client().post("/reconecta/ia/resumo-dashboard").status_code == 200
+
+
+def test_regras_aceitam_virgula_decimal_e_frase_antes_do_pedido():
+    cliente = _cliente_autenticado("empresa")
+    resposta = cliente.post("/reconecta/ia/interpretar-pedido", json={
+        "texto": "Bom dia! Nosso telefone é (11) 98765-4321. Precisamos de 2,5 kg de queijo minas, "
+                 "1,5 kg de manteiga e 70 marmitas até quarta."})
+    assert resposta.status_code == 200 and resposta.json["fonte"] == "regras"
+    assert [(i["nome"], i["categoria"], i["quantidade"], i["unidade_medida"])
+            for i in resposta.json["itens"]] == [
+        ("queijo minas", "Laticínios", 2.5, "kg"), ("manteiga", "Laticínios", 1.5, "kg"),
+        ("marmitas", "Refeições prontas", 70.0, "unidade")]

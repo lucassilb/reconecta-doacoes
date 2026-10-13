@@ -32,7 +32,8 @@ JANELA_SEGUNDOS = 60
 LIMITE_POR_IP = 10
 
 
-def _permitir_resumo(ip):
+def _permitir(chave):
+    """Janela deslizante em memória (por processo): até LIMITE_POR_IP chamadas por minuto."""
     agora = time.monotonic()
     with _acessos_lock:
         # Evita acumular IPs antigos em um processo de longa duração.
@@ -40,7 +41,7 @@ def _permitir_resumo(ip):
             for chave in list(_acessos):
                 if not _acessos[chave] or agora - _acessos[chave][-1] >= JANELA_SEGUNDOS:
                     del _acessos[chave]
-        acessos = _acessos.setdefault(ip, deque())
+        acessos = _acessos.setdefault(chave, deque())
         while acessos and agora - acessos[0] >= JANELA_SEGUNDOS:
             acessos.popleft()
         if len(acessos) >= LIMITE_POR_IP:
@@ -53,6 +54,7 @@ def _permitir_resumo(ip):
 class InterpretarPedido(Resource):
     @ns.expect(ns.model("TextoPedidoIA", {"texto": fields.String(required=True)}))
     @ns.response(200, "Sugestão para revisão", pedido_model)
+    @ns.response(429, "Limite de 10 interpretações por minuto por empresa")
     def post(self):
         atual = usuario_atual()
         if not atual:
@@ -65,6 +67,11 @@ class InterpretarPedido(Resource):
         if not isinstance(texto, str) or not 5 <= len(texto.strip()) <= 600:
             return {"codigo": "DADOS_INVALIDOS", "mensagem": "Corrija os campos indicados.",
                     "campos": {"texto": "Informe de 5 a 600 caracteres."}}, 400
+        # A chamada pode ocupar o modelo local por até 90 s: limite por empresa logada.
+        if not _permitir(f"empresa:{atual[1].id}"):
+            return {"codigo": "MUITAS_TENTATIVAS",
+                    "mensagem": "Limite de 10 interpretações por minuto atingido. "
+                                "Tente de novo em instantes."}, 429, {"Retry-After": "60"}
         return interpretar_pedido(texto.strip()), 200
 
 
@@ -72,7 +79,7 @@ class InterpretarPedido(Resource):
 class ResumoDashboard(Resource):
     @ns.response(200, "Resumo dos indicadores", resumo_model)
     def post(self):
-        if not _permitir_resumo(request.remote_addr or "desconhecido"):
+        if not _permitir(f"ip:{request.remote_addr or 'desconhecido'}"):
             return {"codigo": "LIMITE_IA", "mensagem": "Limite de 10 resumos por minuto atingido."}, 429, {
                 "Retry-After": "60"}
         # O corpo do cliente é ignorado: só os agregados calculados aqui seguem ao modelo.

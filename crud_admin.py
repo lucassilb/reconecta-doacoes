@@ -4,6 +4,7 @@ import hmac
 import os
 
 from flask import request
+from Auth import registrar_auditoria
 
 
 def token_admin_valido():
@@ -15,9 +16,12 @@ def token_admin_valido():
 
 def exigir_admin():
     if not os.getenv("ADMIN_TOKEN", "").strip():
+        registrar_auditoria("token_admin", "negado")
         return {"codigo": "ADMIN_DESATIVADO",
                 "mensagem": "Escrita administrativa desativada: configure ADMIN_TOKEN."}, 403
     if not token_admin_valido():
+        registrar_auditoria("token_admin", "negado")
         return {"codigo": "ADMIN_NAO_AUTORIZADO",
                 "mensagem": "Informe um X-Admin-Token válido."}, 401
+    registrar_auditoria("token_admin", "aceito", tipo="admin")
     return None
