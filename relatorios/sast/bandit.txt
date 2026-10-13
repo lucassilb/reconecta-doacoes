@@ -1,71 +1,22 @@
-Run started:2026-10-13 20:32:52.160942+00:00
+Run started:2026-10-13 20:57:55.450579+00:00
 
 Test results:
->> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
-   Severity: Medium   Confidence: Medium
-   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
-   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html
-   Location: .\app.py:133:17
-132	if __name__ == "__main__":
-133	    app.run(host="0.0.0.0", port=5000, debug=os.getenv("FLASK_DEBUG") == "1")
-
---------------------------------------------------
->> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
-   Severity: Medium   Confidence: Low
-   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
-   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
-   Location: .\migracoes.py:76:46
-75	                if tabela in tabelas and (tabela == "arrecadacoes" or contribuicoes_antigas):
-76	                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
-77	                        raise RuntimeError(
-
---------------------------------------------------
->> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
-   Severity: Medium   Confidence: Low
-   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
-   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
-   Location: .\migracoes.py:115:34
-114	                            conexao.exec_driver_sql(
-115	                                f"INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao")
-116	                            conexao.exec_driver_sql("DROP TABLE itens_doacao")
-
---------------------------------------------------
->> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
-   Severity: Medium   Confidence: Low
-   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
-   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
-   Location: .\migracoes.py:162:22
-161	                conexao.exec_driver_sql(
-162	                    f"INSERT INTO doacoes_nova ({', '.join(campos)}) "
-163	                    f"SELECT {', '.join(fontes)} FROM doacoes")
-164	                conexao.exec_driver_sql("DROP TABLE doacoes")
-
---------------------------------------------------
->> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
-   Severity: Medium   Confidence: Low
-   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
-   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
-   Location: .\migracoes.py:209:64
-208	            for tabela in ("arrecadacoes", "contribuicoes"):
-209	                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
-210	                    raise RuntimeError(f"Migração de pedidos interrompida: {tabela} contém dados.")
-
---------------------------------------------------
+	No issues identified.
 
 Code scanned:
-	Total lines of code: 2791
+	Total lines of code: 3415
 	Total lines skipped (#nosec): 0
-	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 4
 
 Run metrics:
 	Total issues (by severity):
 		Undefined: 0
 		Low: 0
-		Medium: 5
+		Medium: 0
 		High: 0
 	Total issues (by confidence):
 		Undefined: 0
-		Low: 4
-		Medium: 1
+		Low: 0
+		Medium: 0
 		High: 0
 Files skipped (0):

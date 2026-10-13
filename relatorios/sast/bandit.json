@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2026-10-13T20:32:51Z",
+  "generated_at": "2026-10-13T20:57:54Z",
   "metrics": {
     ".\\Auth.py": {
       "CONFIDENCE.HIGH": 0,
@@ -11,7 +11,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 229,
+      "loc": 256,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -24,7 +24,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 237,
+      "loc": 239,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -37,7 +37,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 182,
+      "loc": 218,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -89,7 +89,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 65,
+      "loc": 71,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -115,7 +115,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 165,
+      "loc": 167,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -128,20 +128,33 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 170,
+      "loc": 172,
       "nosec": 0,
       "skipped_tests": 0
     },
     ".\\app.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 103,
+      "loc": 156,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\classificador.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 130,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -180,7 +193,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 17,
+      "loc": 21,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -194,6 +207,19 @@
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
       "loc": 83,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\data\\gerar_dataset.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 323,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -219,22 +245,22 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 343,
+      "loc": 370,
       "nosec": 0,
       "skipped_tests": 0
     },
     ".\\migracoes.py": {
       "CONFIDENCE.HIGH": 0,
-      "CONFIDENCE.LOW": 4,
+      "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 4,
+      "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 208,
+      "loc": 219,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 4
     },
     ".\\models.py": {
       "CONFIDENCE.HIGH": 0,
@@ -245,125 +271,23 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 123,
+      "loc": 124,
       "nosec": 0,
       "skipped_tests": 0
     },
     "_totals": {
       "CONFIDENCE.HIGH": 0,
-      "CONFIDENCE.LOW": 4,
-      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 5,
+      "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 2791,
+      "loc": 3415,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 4
     }
   },
-  "results": [
-    {
-      "code": "132 if __name__ == \"__main__\":\n133     app.run(host=\"0.0.0.0\", port=5000, debug=os.getenv(\"FLASK_DEBUG\") == \"1\")\n",
-      "col_offset": 17,
-      "end_col_offset": 26,
-      "filename": ".\\app.py",
-      "issue_confidence": "MEDIUM",
-      "issue_cwe": {
-        "id": 605,
-        "link": "https://cwe.mitre.org/data/definitions/605.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Possible binding to all interfaces.",
-      "line_number": 133,
-      "line_range": [
-        133
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
-      "test_id": "B104",
-      "test_name": "hardcoded_bind_all_interfaces"
-    },
-    {
-      "code": "75                 if tabela in tabelas and (tabela == \"arrecadacoes\" or contribuicoes_antigas):\n76                     if conexao.execute(text(f\"SELECT COUNT(*) FROM {tabela}\")).scalar():\n77                         raise RuntimeError(\n",
-      "col_offset": 46,
-      "end_col_offset": 67,
-      "filename": ".\\migracoes.py",
-      "issue_confidence": "LOW",
-      "issue_cwe": {
-        "id": 89,
-        "link": "https://cwe.mitre.org/data/definitions/89.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Possible SQL injection vector through string-based query construction.",
-      "line_number": 76,
-      "line_range": [
-        76
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
-      "test_id": "B608",
-      "test_name": "hardcoded_sql_expressions"
-    },
-    {
-      "code": "114                             conexao.exec_driver_sql(\n115                                 f\"INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao\")\n116                             conexao.exec_driver_sql(\"DROP TABLE itens_doacao\")\n",
-      "col_offset": 34,
-      "end_col_offset": 65,
-      "filename": ".\\migracoes.py",
-      "issue_confidence": "LOW",
-      "issue_cwe": {
-        "id": 89,
-        "link": "https://cwe.mitre.org/data/definitions/89.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Possible SQL injection vector through string-based query construction.",
-      "line_number": 115,
-      "line_range": [
-        115
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
-      "test_id": "B608",
-      "test_name": "hardcoded_sql_expressions"
-    },
-    {
-      "code": "161                 conexao.exec_driver_sql(\n162                     f\"INSERT INTO doacoes_nova ({', '.join(campos)}) \"\n163                     f\"SELECT {', '.join(fontes)} FROM doacoes\")\n164                 conexao.exec_driver_sql(\"DROP TABLE doacoes\")\n",
-      "col_offset": 22,
-      "end_col_offset": 48,
-      "filename": ".\\migracoes.py",
-      "issue_confidence": "LOW",
-      "issue_cwe": {
-        "id": 89,
-        "link": "https://cwe.mitre.org/data/definitions/89.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Possible SQL injection vector through string-based query construction.",
-      "line_number": 162,
-      "line_range": [
-        162,
-        163
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
-      "test_id": "B608",
-      "test_name": "hardcoded_sql_expressions"
-    },
-    {
-      "code": "208             for tabela in (\"arrecadacoes\", \"contribuicoes\"):\n209                 if tabela in tabelas and conexao.execute(text(f\"SELECT COUNT(*) FROM {tabela}\")).scalar():\n210                     raise RuntimeError(f\"Migra\u00e7\u00e3o de pedidos interrompida: {tabela} cont\u00e9m dados.\")\n",
-      "col_offset": 64,
-      "end_col_offset": 85,
-      "filename": ".\\migracoes.py",
-      "issue_confidence": "LOW",
-      "issue_cwe": {
-        "id": 89,
-        "link": "https://cwe.mitre.org/data/definitions/89.html"
-      },
-      "issue_severity": "MEDIUM",
-      "issue_text": "Possible SQL injection vector through string-based query construction.",
-      "line_number": 209,
-      "line_range": [
-        209
-      ],
-      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
-      "test_id": "B608",
-      "test_name": "hardcoded_sql_expressions"
-    }
-  ]
+  "results": []
 }

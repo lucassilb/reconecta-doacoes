@@ -3,8 +3,8 @@
   "Trivy": {
     "Version": "0.75.0"
   },
-  "ReportID": "01a136f7-d579-720e-b956-ffb7a4f4342b",
-  "CreatedAt": "2026-10-13T17:32:54.1371348-03:00",
+  "ReportID": "01a1370e-c635-73ec-be44-ed068fda1644",
+  "CreatedAt": "2026-10-13T17:57:57.5572571-03:00",
   "ArtifactName": ".",
   "ArtifactType": "filesystem",
   "Results": [
@@ -44,12 +44,27 @@
           "AnalyzedBy": "pip"
         },
         {
+          "Name": "SQLAlchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlalchemy@2.1.2",
+            "UID": "dde866b7a9ab174b"
+          },
+          "Version": "2.1.2",
+          "Locations": [
+            {
+              "StartLine": 9,
+              "EndLine": 9
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
           "Name": "Werkzeug",
           "Identifier": {
-            "PURL": "pkg:pypi/werkzeug@3.1.8",
-            "UID": "62848adcf0854a0b"
+            "PURL": "pkg:pypi/werkzeug@3.1.9",
+            "UID": "ac2359fbbdaeb936"
           },
-          "Version": "3.1.8",
+          "Version": "3.1.9",
           "Locations": [
             {
               "StartLine": 7,
@@ -77,24 +92,9 @@
           "Name": "gunicorn",
           "Identifier": {
             "PURL": "pkg:pypi/gunicorn@23.0.0",
-            "UID": "8fd563dc69c39b07"
+            "UID": "20c7afb25dab9964"
           },
           "Version": "23.0.0",
-          "Locations": [
-            {
-              "StartLine": 9,
-              "EndLine": 9
-            }
-          ],
-          "AnalyzedBy": "pip"
-        },
-        {
-          "Name": "pytest",
-          "Identifier": {
-            "PURL": "pkg:pypi/pytest@8.4.2",
-            "UID": "f972b1bfbbf47d74"
-          },
-          "Version": "8.4.2",
           "Locations": [
             {
               "StartLine": 8,
@@ -104,12 +104,27 @@
           "AnalyzedBy": "pip"
         },
         {
+          "Name": "psycopg",
+          "Identifier": {
+            "PURL": "pkg:pypi/psycopg@3.3.6",
+            "UID": "a738db0fc4bac35a"
+          },
+          "Version": "3.3.6",
+          "Locations": [
+            {
+              "StartLine": 5,
+              "EndLine": 5
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
           "Name": "python-dotenv",
           "Identifier": {
-            "PURL": "pkg:pypi/python-dotenv@1.1.1",
-            "UID": "34049cd4a8727772"
+            "PURL": "pkg:pypi/python-dotenv@1.2.2",
+            "UID": "1d2780f9bb99a5c1"
           },
-          "Version": "1.1.1",
+          "Version": "1.2.2",
           "Locations": [
             {
               "StartLine": 4,
@@ -121,10 +136,10 @@
         {
           "Name": "requests",
           "Identifier": {
-            "PURL": "pkg:pypi/requests@2.32.5",
-            "UID": "204b5091499434e3"
+            "PURL": "pkg:pypi/requests@2.33.0",
+            "UID": "36f95218e32c40bd"
           },
-          "Version": "2.32.5",
+          "Version": "2.33.0",
           "Locations": [
             {
               "StartLine": 6,
@@ -132,240 +147,32 @@
             }
           ],
           "AnalyzedBy": "pip"
-        }
-      ],
-      "Vulnerabilities": [
-        {
-          "VulnerabilityID": "CVE-2026-102598",
-          "VendorIDs": [
-            "GHSA-g6x2-hccm-hh4m"
-          ],
-          "PkgName": "Werkzeug",
-          "PkgIdentifier": {
-            "PURL": "pkg:pypi/werkzeug@3.1.8",
-            "UID": "62848adcf0854a0b"
-          },
-          "InstalledVersion": "3.1.8",
-          "FixedVersion": "3.1.9",
-          "Status": "fixed",
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-102598",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory pip",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
-          },
-          "Fingerprint": "sha256:bbbeb5f9dfb20e0109235a0b85ece0a0f27a66970a8302659af6de01fbc014db",
-          "Title": "werkzeug: werkzeug: Denial of Service via safe_join() Windows special device paths",
-          "Description": "Werkzeug is a comprehensive WSGI web application library. Prior to 3.1.9, the safe_join function used by send_from_directory can allow a NUL: special-device path because safe_join checks the Windows device name without first removing an empty NTFS ADS marker. The trigger is that an application runs on Windows with NTFS and serves a user-specified path ending in a special device name such as NUL:. The attack mechanism is that a requested path ends in a Windows special device name with an empty ADS marker. The impact is that the special device opens successfully and the file read hangs indefinitely. This issue is fixed in version 3.1.9.",
-          "Severity": "MEDIUM",
-          "CweIDs": [
-            "CWE-67"
-          ],
-          "VendorSeverity": {
-            "ghsa": 2,
-            "redhat": 2
-          },
-          "CVSS": {
-            "ghsa": {
-              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N",
-              "V40Score": 6.3
-            },
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
-              "V3Score": 5.3
-            }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2026-102598",
-            "https://advisory.echohq.com/cve/CVE-2026-102598",
-            "https://github.com/pallets/werkzeug",
-            "https://github.com/pallets/werkzeug/commit/8d77320bcdf3a34941ec06dcf16b03c065cd21b6",
-            "https://github.com/pallets/werkzeug/pull/3309",
-            "https://github.com/pallets/werkzeug/releases/tag/3.1.9",
-            "https://github.com/pallets/werkzeug/security/advisories/GHSA-g6x2-hccm-hh4m",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-102598",
-            "https://www.cve.org/CVERecord?id=CVE-2026-102598"
-          ],
-          "PublishedDate": "2026-09-29T16:17:06.01Z",
-          "LastModifiedDate": "2026-09-30T19:38:27.293Z"
         },
         {
-          "VulnerabilityID": "CVE-2025-71176",
-          "VendorIDs": [
-            "GHSA-6w46-j5rx-g56g"
-          ],
-          "PkgName": "pytest",
-          "PkgIdentifier": {
-            "PURL": "pkg:pypi/pytest@8.4.2",
-            "UID": "f972b1bfbbf47d74"
+          "Name": "tzdata",
+          "Identifier": {
+            "PURL": "pkg:pypi/tzdata@2026.4",
+            "UID": "b0f9140ea406e25c"
           },
-          "InstalledVersion": "8.4.2",
-          "FixedVersion": "9.0.3",
-          "Status": "fixed",
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-71176",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory pip",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
-          },
-          "Fingerprint": "sha256:2d812e67052e80cf44640994c785cb3a0696d3aeb80422b3e14d34caebf114d5",
-          "Title": "pytest: pytest: Denial of Service or Privilege Escalation via insecure temporary directory handling",
-          "Description": "pytest through 9.0.2 on UNIX relies on directories with the /tmp/pytest-of-{user} name pattern, which allows local users to cause a denial of service or possibly gain privileges.",
-          "Severity": "MEDIUM",
-          "CweIDs": [
-            "CWE-379"
-          ],
-          "VendorSeverity": {
-            "amazon": 2,
-            "ghsa": 2,
-            "redhat": 2
-          },
-          "CVSS": {
-            "ghsa": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L",
-              "V3Score": 6.8
-            },
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L",
-              "V3Score": 6.8
+          "Version": "2026.4",
+          "Locations": [
+            {
+              "StartLine": 10,
+              "EndLine": 10
             }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2025-71176",
-            "https://advisory.echohq.com/cve/CVE-2025-71176",
-            "https://github.com/pytest-dev/pytes",
-            "https://github.com/pytest-dev/pytest/commit/95d8423bd24992deea5b9df32555fa1741679e2c",
-            "https://github.com/pytest-dev/pytest/issues/13669",
-            "https://github.com/pytest-dev/pytest/pull/14343",
-            "https://github.com/pytest-dev/pytest/releases/tag/9.0.3",
-            "https://nvd.nist.gov/vuln/detail/CVE-2025-71176",
-            "https://www.cve.org/CVERecord?id=CVE-2025-71176",
-            "https://www.openwall.com/lists/oss-security/2026/01/21/5"
           ],
-          "PublishedDate": "2026-01-22T05:16:17.577Z",
-          "LastModifiedDate": "2026-06-17T10:03:47.83Z"
-        },
-        {
-          "VulnerabilityID": "CVE-2026-28684",
-          "VendorIDs": [
-            "GHSA-mf9w-mj56-hr94"
-          ],
-          "PkgName": "python-dotenv",
-          "PkgIdentifier": {
-            "PURL": "pkg:pypi/python-dotenv@1.1.1",
-            "UID": "34049cd4a8727772"
-          },
-          "InstalledVersion": "1.1.1",
-          "FixedVersion": "1.2.2",
-          "Status": "fixed",
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-28684",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory pip",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
-          },
-          "Fingerprint": "sha256:d8ece7752fb2bb83bb8a4f29e635ef1742698bb5255d5ce9b31395d2c59bf351",
-          "Title": "python-dotenv: python-dotenv: Arbitrary file overwrite via symbolic link following",
-          "Description": "python-dotenv reads key-value pairs from a .env file and can set them as environment variables. Prior to version 1.2.2, `set_key()` and `unset_key()` in python-dotenv follow symbolic links when rewriting `.env` files, allowing a local attacker to overwrite arbitrary files via a crafted symlink when a cross-device rename fallback is triggered. Users should upgrade to v.1.2.2 or, as a workaround, apply the patch manually.",
-          "Severity": "MEDIUM",
-          "CweIDs": [
-            "CWE-59",
-            "CWE-61"
-          ],
-          "VendorSeverity": {
-            "ghsa": 2,
-            "redhat": 2
-          },
-          "CVSS": {
-            "ghsa": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:H",
-              "V3Score": 6.6
-            },
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H",
-              "V3Score": 7.1
-            }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2026-28684",
-            "https://advisory.echohq.com/cve/CVE-2026-28684",
-            "https://github.com/theskumar/python-dotenv",
-            "https://github.com/theskumar/python-dotenv/commit/790c5c02991100aa1bf41ee5330aca75edc51311",
-            "https://github.com/theskumar/python-dotenv/commit/790c5c02991100aa1bf41ee5330aca75edc51311.patch",
-            "https://github.com/theskumar/python-dotenv/releases/tag/v1.2.2",
-            "https://github.com/theskumar/python-dotenv/security/advisories/GHSA-mf9w-mj56-hr94",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-28684",
-            "https://www.cve.org/CVERecord?id=CVE-2026-28684"
-          ],
-          "PublishedDate": "2026-04-20T17:16:33.087Z",
-          "LastModifiedDate": "2026-06-17T10:28:54.243Z"
-        },
-        {
-          "VulnerabilityID": "CVE-2026-25645",
-          "VendorIDs": [
-            "GHSA-gc5v-m9x4-r6x2"
-          ],
-          "PkgName": "requests",
-          "PkgIdentifier": {
-            "PURL": "pkg:pypi/requests@2.32.5",
-            "UID": "204b5091499434e3"
-          },
-          "InstalledVersion": "2.32.5",
-          "FixedVersion": "2.33.0",
-          "Status": "fixed",
-          "SeveritySource": "ghsa",
-          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-25645",
-          "DataSource": {
-            "ID": "ghsa",
-            "Name": "GitHub Security Advisory pip",
-            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
-          },
-          "Fingerprint": "sha256:f9e4a954a3c3570e5175dc04c7898930449bd97d035332c05555903ee9fd6e2c",
-          "Title": "requests: Requests: Security bypass due to predictable temporary file creation",
-          "Description": "Requests is a HTTP library. Prior to version 2.33.0, the `requests.utils.extract_zipped_paths()` utility function uses a predictable filename when extracting files from zip archives into the system temporary directory. If the target file already exists, it is reused without validation. A local attacker with write access to the temp directory could pre-create a malicious file that would be loaded in place of the legitimate one. Standard usage of the Requests library is not affected by this vulnerability. Only applications that call `extract_zipped_paths()` directly are impacted. Starting in version 2.33.0, the library extracts files to a non-deterministic location. If developers are unable to upgrade, they can set `TMPDIR` in their environment to a directory with restricted write access.",
-          "Severity": "MEDIUM",
-          "CweIDs": [
-            "CWE-377"
-          ],
-          "VendorSeverity": {
-            "azure": 2,
-            "ghsa": 2,
-            "nvd": 2,
-            "photon": 2,
-            "redhat": 2,
-            "ubuntu": 1
-          },
-          "CVSS": {
-            "ghsa": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:N",
-              "V3Score": 4.4
-            },
-            "nvd": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N",
-              "V3Score": 5.5
-            },
-            "redhat": {
-              "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:N",
-              "V3Score": 4.7
-            }
-          },
-          "References": [
-            "https://access.redhat.com/security/cve/CVE-2026-25645",
-            "https://github.com/psf/requests",
-            "https://github.com/psf/requests/commit/66d21cb07bd6255b1280291c4fafb71803cdb3b7",
-            "https://github.com/psf/requests/releases/tag/v2.33.0",
-            "https://github.com/psf/requests/security/advisories/GHSA-gc5v-m9x4-r6x2",
-            "https://nvd.nist.gov/vuln/detail/CVE-2026-25645",
-            "https://ubuntu.com/security/notices/USN-8825-1",
-            "https://www.cve.org/CVERecord?id=CVE-2026-25645"
-          ],
-          "PublishedDate": "2026-03-25T17:16:52.97Z",
-          "LastModifiedDate": "2026-06-17T10:25:00.443Z"
+          "AnalyzedBy": "pip"
         }
       ]
+    },
+    {
+      "Target": "Dockerfile",
+      "Class": "config",
+      "Type": "dockerfile",
+      "MisconfSummary": {
+        "Successes": 27,
+        "Failures": 0
+      }
     }
   ]
 }

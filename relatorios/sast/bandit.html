@@ -80,7 +80,7 @@ pre {
         <div class="metrics-title">
             Metrics:<br>
         </div>
-        Total lines of code: <span id="loc">2791</span><br>
+        Total lines of code: <span id="loc">3415</span><br>
         Total lines skipped (#nosec): <span id="nosec">0</span>
     </div>
 </div>
@@ -91,121 +91,6 @@ pre {
 <br>
 <div id="results">
     
-<div id="issue-0">
-<div class="issue-block issue-sev-medium">
-    <b>hardcoded_bind_all_interfaces: </b> Possible binding to all interfaces.<br>
-    <b>Test ID:</b> B104<br>
-    <b>Severity: </b>MEDIUM<br>
-    <b>Confidence: </b>MEDIUM<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/605.html" target="_blank">CWE-605</a><br>
-    <b>File: </b><a href=".\app.py" target="_blank">.\app.py</a><br>
-    <b>Line number: </b>133<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html</a><br>
-
-<div class="code">
-<pre>
-132	if __name__ == &quot;__main__&quot;:
-133	    app.run(host=&quot;0.0.0.0&quot;, port=5000, debug=os.getenv(&quot;FLASK_DEBUG&quot;) == &quot;1&quot;)
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-1">
-<div class="issue-block issue-sev-medium">
-    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
-    <b>Test ID:</b> B608<br>
-    <b>Severity: </b>MEDIUM<br>
-    <b>Confidence: </b>LOW<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
-    <b>File: </b><a href=".\migracoes.py" target="_blank">.\migracoes.py</a><br>
-    <b>Line number: </b>76<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html</a><br>
-
-<div class="code">
-<pre>
-75	                if tabela in tabelas and (tabela == &quot;arrecadacoes&quot; or contribuicoes_antigas):
-76	                    if conexao.execute(text(f&quot;SELECT COUNT(*) FROM {tabela}&quot;)).scalar():
-77	                        raise RuntimeError(
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-2">
-<div class="issue-block issue-sev-medium">
-    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
-    <b>Test ID:</b> B608<br>
-    <b>Severity: </b>MEDIUM<br>
-    <b>Confidence: </b>LOW<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
-    <b>File: </b><a href=".\migracoes.py" target="_blank">.\migracoes.py</a><br>
-    <b>Line number: </b>115<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html</a><br>
-
-<div class="code">
-<pre>
-114	                            conexao.exec_driver_sql(
-115	                                f&quot;INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao&quot;)
-116	                            conexao.exec_driver_sql(&quot;DROP TABLE itens_doacao&quot;)
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-3">
-<div class="issue-block issue-sev-medium">
-    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
-    <b>Test ID:</b> B608<br>
-    <b>Severity: </b>MEDIUM<br>
-    <b>Confidence: </b>LOW<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
-    <b>File: </b><a href=".\migracoes.py" target="_blank">.\migracoes.py</a><br>
-    <b>Line number: </b>162<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html</a><br>
-
-<div class="code">
-<pre>
-161	                conexao.exec_driver_sql(
-162	                    f&quot;INSERT INTO doacoes_nova ({&#x27;, &#x27;.join(campos)}) &quot;
-163	                    f&quot;SELECT {&#x27;, &#x27;.join(fontes)} FROM doacoes&quot;)
-164	                conexao.exec_driver_sql(&quot;DROP TABLE doacoes&quot;)
-</pre>
-</div>
-
-
-</div>
-</div>
-
-<div id="issue-4">
-<div class="issue-block issue-sev-medium">
-    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
-    <b>Test ID:</b> B608<br>
-    <b>Severity: </b>MEDIUM<br>
-    <b>Confidence: </b>LOW<br>
-    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
-    <b>File: </b><a href=".\migracoes.py" target="_blank">.\migracoes.py</a><br>
-    <b>Line number: </b>209<br>
-    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html</a><br>
-
-<div class="code">
-<pre>
-208	            for tabela in (&quot;arrecadacoes&quot;, &quot;contribuicoes&quot;):
-209	                if tabela in tabelas and conexao.execute(text(f&quot;SELECT COUNT(*) FROM {tabela}&quot;)).scalar():
-210	                    raise RuntimeError(f&quot;Migração de pedidos interrompida: {tabela} contém dados.&quot;)
-</pre>
-</div>
-
-
-</div>
-</div>
-
 </div>
 
 </body>
