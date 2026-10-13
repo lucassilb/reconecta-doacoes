@@ -1,0 +1,1183 @@
+{
+ "dataset": {
+  "arquivo": "data/alimentos.csv",
+  "linhas": 925,
+  "treino": 740,
+  "teste": 185,
+  "por_categoria": {
+   "Hortifrúti": 138,
+   "Padaria": 111,
+   "Laticínios": 107,
+   "Carnes e peixes": 113,
+   "Grãos e cereais": 112,
+   "Refeições prontas": 109,
+   "Bebidas não alcoólicas": 107,
+   "Outros": 128
+  }
+ },
+ "semente": 42,
+ "config_escolhida": {
+  "ngramas": [
+   2,
+   4
+  ],
+  "palavras": true,
+  "primeira": 4,
+  "alfa": 0.3
+ },
+ "grade_validacao_cruzada_no_treino": [
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7462
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7475
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7503
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7233
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.03,
+   "acuracia_cv": 0.757
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7556
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7556
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 1.0,
+   "acuracia_cv": 0.726
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7597
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7664
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7651
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7516
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7773
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7732
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7828
+  },
+  {
+   "ngramas": [
+    2,
+    4
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7663
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7555
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7569
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 0.3,
+   "acuracia_cv": 0.757
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 0,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7462
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7623
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7718
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 0.3,
+   "acuracia_cv": 0.761
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 1,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7502
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.03,
+   "acuracia_cv": 0.765
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7718
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7664
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 2,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7556
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.03,
+   "acuracia_cv": 0.7732
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.1,
+   "acuracia_cv": 0.7664
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 0.3,
+   "acuracia_cv": 0.7745
+  },
+  {
+   "ngramas": [
+    3,
+    5
+   ],
+   "palavras": true,
+   "primeira": 4,
+   "alfa": 1.0,
+   "acuracia_cv": 0.7691
+  }
+ ],
+ "limiar": 0.15,
+ "curva_limiar": [
+  {
+   "limiar": 0.0,
+   "acuracia_combinada": 0.7824,
+   "cobertura": 1.0,
+   "precisao_dos_aceitos": 0.7824
+  },
+  {
+   "limiar": 0.05,
+   "acuracia_combinada": 0.7824,
+   "cobertura": 1.0,
+   "precisao_dos_aceitos": 0.7824
+  },
+  {
+   "limiar": 0.1,
+   "acuracia_combinada": 0.7824,
+   "cobertura": 1.0,
+   "precisao_dos_aceitos": 0.7824
+  },
+  {
+   "limiar": 0.15,
+   "acuracia_combinada": 0.7824,
+   "cobertura": 1.0,
+   "precisao_dos_aceitos": 0.7824
+  },
+  {
+   "limiar": 0.2,
+   "acuracia_combinada": 0.777,
+   "cobertura": 0.8716,
+   "precisao_dos_aceitos": 0.8403
+  },
+  {
+   "limiar": 0.25,
+   "acuracia_combinada": 0.7297,
+   "cobertura": 0.6676,
+   "precisao_dos_aceitos": 0.9251
+  },
+  {
+   "limiar": 0.3,
+   "acuracia_combinada": 0.6392,
+   "cobertura": 0.4486,
+   "precisao_dos_aceitos": 0.9699
+  },
+  {
+   "limiar": 0.35,
+   "acuracia_combinada": 0.5622,
+   "cobertura": 0.2865,
+   "precisao_dos_aceitos": 0.9858
+  },
+  {
+   "limiar": 0.4,
+   "acuracia_combinada": 0.4986,
+   "cobertura": 0.1689,
+   "precisao_dos_aceitos": 0.984
+  },
+  {
+   "limiar": 0.45,
+   "acuracia_combinada": 0.4757,
+   "cobertura": 0.0919,
+   "precisao_dos_aceitos": 0.9853
+  },
+  {
+   "limiar": 0.5,
+   "acuracia_combinada": 0.4635,
+   "cobertura": 0.0419,
+   "precisao_dos_aceitos": 1.0
+  },
+  {
+   "limiar": 0.6,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0068,
+   "precisao_dos_aceitos": 1.0
+  },
+  {
+   "limiar": 0.65,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0027,
+   "precisao_dos_aceitos": 1.0
+  },
+  {
+   "limiar": 0.7,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0014,
+   "precisao_dos_aceitos": 1.0
+  },
+  {
+   "limiar": 0.75,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0014,
+   "precisao_dos_aceitos": 1.0
+  },
+  {
+   "limiar": 0.8,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0,
+   "precisao_dos_aceitos": null
+  },
+  {
+   "limiar": 0.85,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0,
+   "precisao_dos_aceitos": null
+  },
+  {
+   "limiar": 0.9,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0,
+   "precisao_dos_aceitos": null
+  },
+  {
+   "limiar": 0.95,
+   "acuracia_combinada": 0.4608,
+   "cobertura": 0.0,
+   "precisao_dos_aceitos": null
+  }
+ ],
+ "teste": {
+  "classificador": {
+   "acuracia": 0.7784,
+   "f1_macro": 0.7807,
+   "por_categoria": {
+    "Hortifrúti": {
+     "precisao": 0.88,
+     "recall": 0.7857,
+     "f1": 0.8302,
+     "suporte": 28
+    },
+    "Padaria": {
+     "precisao": 0.9333,
+     "recall": 0.6364,
+     "f1": 0.7568,
+     "suporte": 22
+    },
+    "Laticínios": {
+     "precisao": 0.9048,
+     "recall": 0.9048,
+     "f1": 0.9048,
+     "suporte": 21
+    },
+    "Carnes e peixes": {
+     "precisao": 0.8333,
+     "recall": 0.8696,
+     "f1": 0.8511,
+     "suporte": 23
+    },
+    "Grãos e cereais": {
+     "precisao": 0.6667,
+     "recall": 0.7273,
+     "f1": 0.6957,
+     "suporte": 22
+    },
+    "Refeições prontas": {
+     "precisao": 0.5625,
+     "recall": 0.8182,
+     "f1": 0.6667,
+     "suporte": 22
+    },
+    "Bebidas não alcoólicas": {
+     "precisao": 0.7917,
+     "recall": 0.9048,
+     "f1": 0.8444,
+     "suporte": 21
+    },
+    "Outros": {
+     "precisao": 0.8,
+     "recall": 0.6154,
+     "f1": 0.6957,
+     "suporte": 26
+    }
+   },
+   "matriz_confusao": {
+    "ordem": [
+     "Hortifrúti",
+     "Padaria",
+     "Laticínios",
+     "Carnes e peixes",
+     "Grãos e cereais",
+     "Refeições prontas",
+     "Bebidas não alcoólicas",
+     "Outros"
+    ],
+    "linhas_real_colunas_previsto": [
+     [
+      22,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      14,
+      0,
+      0,
+      4,
+      3,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      19,
+      1,
+      0,
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      20,
+      0,
+      1,
+      0,
+      1
+     ],
+     [
+      1,
+      1,
+      0,
+      1,
+      16,
+      3,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      2,
+      0,
+      18,
+      2,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      19,
+      0
+     ],
+     [
+      1,
+      0,
+      2,
+      0,
+      3,
+      4,
+      0,
+      16
+     ]
+    ]
+   }
+  },
+  "regras_palavras_chave": {
+   "acuracia": 0.4,
+   "f1_macro": 0.4531,
+   "por_categoria": {
+    "Hortifrúti": {
+     "precisao": 0.375,
+     "recall": 0.1071,
+     "f1": 0.1667,
+     "suporte": 28
+    },
+    "Padaria": {
+     "precisao": 0.8462,
+     "recall": 0.5,
+     "f1": 0.6286,
+     "suporte": 22
+    },
+    "Laticínios": {
+     "precisao": 0.7857,
+     "recall": 0.5238,
+     "f1": 0.6286,
+     "suporte": 21
+    },
+    "Carnes e peixes": {
+     "precisao": 0.75,
+     "recall": 0.2609,
+     "f1": 0.3871,
+     "suporte": 23
+    },
+    "Grãos e cereais": {
+     "precisao": 0.8,
+     "recall": 0.3636,
+     "f1": 0.5,
+     "suporte": 22
+    },
+    "Refeições prontas": {
+     "precisao": 1.0,
+     "recall": 0.3182,
+     "f1": 0.4828,
+     "suporte": 22
+    },
+    "Bebidas não alcoólicas": {
+     "precisao": 1.0,
+     "recall": 0.381,
+     "f1": 0.5517,
+     "suporte": 21
+    },
+    "Outros": {
+     "precisao": 0.1709,
+     "recall": 0.7692,
+     "f1": 0.2797,
+     "suporte": 26
+    }
+   },
+   "matriz_confusao": {
+    "ordem": [
+     "Hortifrúti",
+     "Padaria",
+     "Laticínios",
+     "Carnes e peixes",
+     "Grãos e cereais",
+     "Refeições prontas",
+     "Bebidas não alcoólicas",
+     "Outros"
+    ],
+    "linhas_real_colunas_previsto": [
+     [
+      3,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      24
+     ],
+     [
+      0,
+      11,
+      1,
+      0,
+      1,
+      0,
+      0,
+      9
+     ],
+     [
+      0,
+      0,
+      11,
+      0,
+      0,
+      0,
+      0,
+      10
+     ],
+     [
+      0,
+      0,
+      0,
+      6,
+      0,
+      0,
+      0,
+      17
+     ],
+     [
+      0,
+      2,
+      0,
+      1,
+      8,
+      0,
+      0,
+      11
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      7,
+      0,
+      15
+     ],
+     [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      11
+     ],
+     [
+      3,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      20
+     ]
+    ]
+   }
+  },
+  "classificador_mais_regras": {
+   "acuracia": 0.7784,
+   "f1_macro": 0.7807,
+   "por_categoria": {
+    "Hortifrúti": {
+     "precisao": 0.88,
+     "recall": 0.7857,
+     "f1": 0.8302,
+     "suporte": 28
+    },
+    "Padaria": {
+     "precisao": 0.9333,
+     "recall": 0.6364,
+     "f1": 0.7568,
+     "suporte": 22
+    },
+    "Laticínios": {
+     "precisao": 0.9048,
+     "recall": 0.9048,
+     "f1": 0.9048,
+     "suporte": 21
+    },
+    "Carnes e peixes": {
+     "precisao": 0.8333,
+     "recall": 0.8696,
+     "f1": 0.8511,
+     "suporte": 23
+    },
+    "Grãos e cereais": {
+     "precisao": 0.6667,
+     "recall": 0.7273,
+     "f1": 0.6957,
+     "suporte": 22
+    },
+    "Refeições prontas": {
+     "precisao": 0.5625,
+     "recall": 0.8182,
+     "f1": 0.6667,
+     "suporte": 22
+    },
+    "Bebidas não alcoólicas": {
+     "precisao": 0.7917,
+     "recall": 0.9048,
+     "f1": 0.8444,
+     "suporte": 21
+    },
+    "Outros": {
+     "precisao": 0.8,
+     "recall": 0.6154,
+     "f1": 0.6957,
+     "suporte": 26
+    }
+   },
+   "matriz_confusao": {
+    "ordem": [
+     "Hortifrúti",
+     "Padaria",
+     "Laticínios",
+     "Carnes e peixes",
+     "Grãos e cereais",
+     "Refeições prontas",
+     "Bebidas não alcoólicas",
+     "Outros"
+    ],
+    "linhas_real_colunas_previsto": [
+     [
+      22,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      3
+     ],
+     [
+      0,
+      14,
+      0,
+      0,
+      4,
+      3,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      19,
+      1,
+      0,
+      1,
+      0,
+      0
+     ],
+     [
+      1,
+      0,
+      0,
+      20,
+      0,
+      1,
+      0,
+      1
+     ],
+     [
+      1,
+      1,
+      0,
+      1,
+      16,
+      3,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      2,
+      0,
+      18,
+      2,
+      0
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      19,
+      0
+     ],
+     [
+      1,
+      0,
+      2,
+      0,
+      3,
+      4,
+      0,
+      16
+     ]
+    ]
+   }
+  },
+  "erros_do_classificador": [
+   {
+    "texto": "uvas sem semente",
+    "real": "Hortifrúti",
+    "previsto": "Bebidas não alcoólicas",
+    "confianca": 0.229
+   },
+   {
+    "texto": "laranjas",
+    "real": "Hortifrúti",
+    "previsto": "Bebidas não alcoólicas",
+    "confianca": 0.295
+   },
+   {
+    "texto": "batata inglesa",
+    "real": "Hortifrúti",
+    "previsto": "Outros",
+    "confianca": 0.235
+   },
+   {
+    "texto": "kiwi",
+    "real": "Hortifrúti",
+    "previsto": "Outros",
+    "confianca": 0.187
+   },
+   {
+    "texto": "avocado",
+    "real": "Hortifrúti",
+    "previsto": "Outros",
+    "confianca": 0.214
+   },
+   {
+    "texto": "frutas variadas",
+    "real": "Hortifrúti",
+    "previsto": "Refeições prontas",
+    "confianca": 0.192
+   },
+   {
+    "texto": "massa pronta de pastel",
+    "real": "Padaria",
+    "previsto": "Refeições prontas",
+    "confianca": 0.251
+   },
+   {
+    "texto": "broa de milho",
+    "real": "Padaria",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.222
+   },
+   {
+    "texto": "massa de pizza",
+    "real": "Padaria",
+    "previsto": "Refeições prontas",
+    "confianca": 0.227
+   },
+   {
+    "texto": "sequilhos",
+    "real": "Padaria",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.229
+   },
+   {
+    "texto": "broinha de fubá",
+    "real": "Padaria",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.235
+   },
+   {
+    "texto": "bolos caseiros de padaria",
+    "real": "Padaria",
+    "previsto": "Refeições prontas",
+    "confianca": 0.173
+   },
+   {
+    "texto": "cookie de aveia",
+    "real": "Padaria",
+    "previsto": "Bebidas não alcoólicas",
+    "confianca": 0.209
+   },
+   {
+    "texto": "massa folhada",
+    "real": "Padaria",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.266
+   },
+   {
+    "texto": "yakult",
+    "real": "Laticínios",
+    "previsto": "Refeições prontas",
+    "confianca": 0.324
+   },
+   {
+    "texto": "mucarela peça",
+    "real": "Laticínios",
+    "previsto": "Carnes e peixes",
+    "confianca": 0.169
+   },
+   {
+    "texto": "carne para ensopado",
+    "real": "Carnes e peixes",
+    "previsto": "Refeições prontas",
+    "confianca": 0.251
+   },
+   {
+    "texto": "cação em postas",
+    "real": "Carnes e peixes",
+    "previsto": "Outros",
+    "confianca": 0.222
+   },
+   {
+    "texto": "merluza",
+    "real": "Carnes e peixes",
+    "previsto": "Hortifrúti",
+    "confianca": 0.212
+   },
+   {
+    "texto": "cuscuz de milho",
+    "real": "Grãos e cereais",
+    "previsto": "Refeições prontas",
+    "confianca": 0.171
+   },
+   {
+    "texto": "cevadinha",
+    "real": "Grãos e cereais",
+    "previsto": "Padaria",
+    "confianca": 0.167
+   },
+   {
+    "texto": "carne de soja",
+    "real": "Grãos e cereais",
+    "previsto": "Carnes e peixes",
+    "confianca": 0.298
+   },
+   {
+    "texto": "lamen",
+    "real": "Grãos e cereais",
+    "previsto": "Hortifrúti",
+    "confianca": 0.216
+   },
+   {
+    "texto": "feijões",
+    "real": "Grãos e cereais",
+    "previsto": "Refeições prontas",
+    "confianca": 0.31
+   },
+   {
+    "texto": "feijão fradinho",
+    "real": "Grãos e cereais",
+    "previsto": "Refeições prontas",
+    "confianca": 0.284
+   },
+   {
+    "texto": "canja de galinha",
+    "real": "Refeições prontas",
+    "previsto": "Bebidas não alcoólicas",
+    "confianca": 0.183
+   },
+   {
+    "texto": "sopa pronta 500ml",
+    "real": "Refeições prontas",
+    "previsto": "Bebidas não alcoólicas",
+    "confianca": 0.214
+   },
+   {
+    "texto": "lasanha congelada 600g",
+    "real": "Refeições prontas",
+    "previsto": "Carnes e peixes",
+    "confianca": 0.164
+   },
+   {
+    "texto": "coxinhas",
+    "real": "Refeições prontas",
+    "previsto": "Carnes e peixes",
+    "confianca": 0.222
+   },
+   {
+    "texto": "vitamina de frutas",
+    "real": "Bebidas não alcoólicas",
+    "previsto": "Refeições prontas",
+    "confianca": 0.168
+   },
+   {
+    "texto": "groselha",
+    "real": "Bebidas não alcoólicas",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.215
+   },
+   {
+    "texto": "pasta de amendoim",
+    "real": "Outros",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.222
+   },
+   {
+    "texto": "barra de cereal",
+    "real": "Outros",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.183
+   },
+   {
+    "texto": "mel",
+    "real": "Outros",
+    "previsto": "Hortifrúti",
+    "confianca": 0.229
+   },
+   {
+    "texto": "leite de coco",
+    "real": "Outros",
+    "previsto": "Laticínios",
+    "confianca": 0.303
+   },
+   {
+    "texto": "palmito",
+    "real": "Outros",
+    "previsto": "Refeições prontas",
+    "confianca": 0.203
+   },
+   {
+    "texto": "cominho",
+    "real": "Outros",
+    "previsto": "Refeições prontas",
+    "confianca": 0.203
+   },
+   {
+    "texto": "caldo de carne tablete",
+    "real": "Outros",
+    "previsto": "Refeições prontas",
+    "confianca": 0.221
+   },
+   {
+    "texto": "pirulito",
+    "real": "Outros",
+    "previsto": "Refeições prontas",
+    "confianca": 0.196
+   },
+   {
+    "texto": "creme vegetal",
+    "real": "Outros",
+    "previsto": "Laticínios",
+    "confianca": 0.204
+   },
+   {
+    "texto": "barrinha de cereais",
+    "real": "Outros",
+    "previsto": "Grãos e cereais",
+    "confianca": 0.224
+   }
+  ]
+ },
+ "validacao_cruzada_dataset_inteiro": {
+  "dobras": 5,
+  "acuracias": [
+   0.7831,
+   0.8138,
+   0.8162,
+   0.8132,
+   0.8343
+  ],
+  "media": 0.8121,
+  "desvio_padrao": 0.0165
+ },
+ "validacao_cruzada_treino": {
+  "acuracias": [
+   0.7086,
+   0.8188,
+   0.7755,
+   0.8163,
+   0.7945
+  ],
+  "media": 0.7828
+ }
+}
