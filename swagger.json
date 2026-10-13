@@ -1076,6 +1076,100 @@
           "default"
         ]
       }
+    },
+    "/reconecta/ia/sugerir-destino": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Sugestões de destino para o excedente",
+            "schema": {
+              "$ref": "#/definitions/PedidoSugeridoIA"
+            }
+          }
+        },
+        "summary": "Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam",
+        "operationId": "post_sugerir_destino",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/TextoDestinoIA"
+            }
+          }
+        ],
+        "tags": [
+          "ia"
+        ]
+      }
+    },
+    "/reconecta/notificacoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "As 30 notificações mais recentes destinadas ao usuário, com `lida`",
+        "operationId": "get_notificacoes",
+        "tags": [
+          "tempo_real"
+        ]
+      }
+    },
+    "/reconecta/notificacoes/lidas": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Marca como lidas as notificações até `ate_id`",
+        "operationId": "post_notificacoes_lidas",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/NotificacoesLidas"
+            }
+          }
+        ],
+        "tags": [
+          "tempo_real"
+        ]
+      }
+    },
+    "/reconecta/novidades": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Eventos visíveis desde um id (máx",
+        "description": "50) e o último id global.",
+        "operationId": "get_novidades",
+        "tags": [
+          "tempo_real"
+        ]
+      }
+    },
+    "/reconecta/tempo-real": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Fluxo SSE de eventos públicos e do usuário; encerra aos 5 min",
+        "operationId": "get_tempo_real",
+        "tags": [
+          "tempo_real"
+        ]
+      }
     }
   },
   "info": {
@@ -1144,6 +1238,10 @@
     {
       "name": "ia",
       "description": "Sugestões com modelo local e regras de fallback"
+    },
+    {
+      "name": "tempo_real",
+      "description": "Eventos ao vivo, novidades e notificações"
     }
   ],
   "definitions": {
@@ -1942,6 +2040,29 @@
         },
         "gerado_em": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TextoDestinoIA": {
+      "required": [
+        "texto"
+      ],
+      "properties": {
+        "texto": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "NotificacoesLidas": {
+      "required": [
+        "ate_id"
+      ],
+      "properties": {
+        "ate_id": {
+          "type": "integer",
+          "description": "Último id de evento lido"
         }
       },
       "type": "object"

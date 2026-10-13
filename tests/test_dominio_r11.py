@@ -227,8 +227,11 @@ def test_destinatarios_do_excedente_exigem_pedido_categoria_e_uf():
             db.session.add(ItemDoacao(doacao_id=pedido.id, nome="Pão", categoria="Padaria",
                                        quantidade=3, unidade_medida="kg"))
         db.session.commit()
-        assert _ongs_compativeis(["Padaria"], "SP", mercado.id) == (("empresa", ong.id),)
-        assert _ongs_compativeis(["Laticínios"], "SP", mercado.id) == ()
+        oferta = [{"nome": "Pão", "categoria": "Padaria", "quantidade": 3,
+                   "unidade_medida": "kg"}]
+        assert _ongs_compativeis(oferta, "SP", mercado.id) == (("empresa", ong.id),)
+        assert _ongs_compativeis([{**oferta[0], "categoria": "Laticínios", "nome": "Leite"}],
+                                 "SP", mercado.id) == ()
         mercado_id, ong_id, fora_id = mercado.id, ong.id, fora.id
     cliente = app.test_client()
     sessao(cliente, mercado_id)

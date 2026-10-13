@@ -13,10 +13,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 from Auth import registrar_auditoria, usuario_atual
+from conexao import casar
 from eventos import emitir as _emitir
 from Publico import CATEGORIAS, UNIDADES, _inteiro_positivo, _municipio_uf
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
-from models import Doacao, Estabelecimento, Excedente, ItemDoacao, ItemExcedente, _utc_naive, db
+from models import Estabelecimento, Excedente, ItemExcedente, _utc_naive, db
 
 ns = Namespace("excedentes", description="Excedentes para reserva e retirada por ONGs")
 item_entrada = ns.model("ItemExcedenteEntrada", {
@@ -52,21 +53,28 @@ def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
 
-def _ongs_compativeis(categorias, uf, publicador_id):
-    """Seleciona ONGs com pedido aberto na mesma UF e categoria."""
-    if not uf or not categorias:
+def _ongs_compativeis(itens, uf, publicador_id):
+    """Usa o mesmo casamento da IA para avisar ONGs com pedido compatível."""
+    if not uf or not itens:
         return ()
-    ids = (db.session.query(Estabelecimento.id)
-           .join(Doacao, Doacao.estabelecimento_id == Estabelecimento.id)
-           .filter(Estabelecimento.sem_fins_lucrativos.is_(True),
-                   Estabelecimento.id != publicador_id,
-                   Doacao.status == "DISPONIVEL",
-                   Doacao.data_limite_retirada > agora_brasilia_sem_fuso(),
-                   Doacao.itens.any(ItemDoacao.categoria.in_(categorias)),
-                   or_(Estabelecimento.endereco.ilike(f"%/{uf} - %"),
-                       Estabelecimento.endereco.ilike(f"%/{uf}")))
-           .distinct().all())
-    return tuple(("empresa", id_) for (id_,) in ids)
+    from IA import _pedidos_abertos
+    ongs = {id_ for (id_,) in db.session.query(Estabelecimento.id).filter(
+        Estabelecimento.sem_fins_lucrativos.is_(True)).all()}
+    categorias = {item["categoria"] for item in itens}
+    ofertas = [{"nome": item["nome"], "categoria": item["categoria"],
+               "quantidade": float(item["quantidade"]),
+               "unidade_medida": item["unidade_medida"]} for item in itens]
+    destinatarios = set()
+    for pedido in _pedidos_abertos():
+        id_ = pedido["estabelecimento_id"]
+        local = (pedido.get("empresa") or {}).get("municipio_uf") or ""
+        if (id_ not in ongs or id_ == publicador_id or
+                not local.upper().endswith(f"/{uf}") or
+                not any(item["categoria"] in categorias for item in pedido["itens"])):
+            continue
+        if casar(ofertas, [pedido], uf):
+            destinatarios.add(id_)
+    return tuple(("empresa", id_) for id_ in sorted(destinatarios))
 
 
 def _empresa():
@@ -272,7 +280,7 @@ class Excedentes(Resource):
                 "municipio_uf": _municipio_uf(empresa.endereco),
                 "categorias": categorias,
                 "retirar_ate": iso_prazo(prazo)},
-                destinatarios=_ongs_compativeis(categorias,
+                destinatarios=_ongs_compativeis(itens,
                                                 (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
                                                 empresa.id))
             db.session.commit()
