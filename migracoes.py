@@ -57,6 +57,14 @@ def _migrar_integridade_postgresql(engine):
         ("contribuicoes", "fk_contribuicoes_item_pedido",
          "FOREIGN KEY (item_doacao_id, doacao_id) "
          "REFERENCES itens_doacao (id, doacao_id) ON DELETE RESTRICT"),
+        ("excedentes", "ck_excedentes_status",
+         "CHECK (status IN ('DISPONIVEL', 'RESERVADO', 'RETIRADO', 'CANCELADO', 'EXPIRADO'))"),
+        ("excedentes", "ck_excedentes_observacao",
+         "CHECK (length(observacao) <= 200)"),
+        ("excedentes", "ck_excedentes_reservante",
+         "CHECK ((status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR "
+         "(status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL))"),
+        ("itens_excedente", "ck_itens_excedente_quantidade", "CHECK (quantidade > 0)"),
     )
     with engine.begin() as conexao:
         for tabela, nome, definicao in restricoes:

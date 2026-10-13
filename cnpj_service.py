@@ -181,6 +181,7 @@ def consultar_cnpj(valor):
             dados = fonte = None
 
     if dados is None:
+        sem_codigo = None
         for nome, url, normalizar in FONTES:
             try:
                 resposta = requests.get(url.format(digitos), timeout=TIMEOUT)
@@ -194,12 +195,17 @@ def consultar_cnpj(valor):
                 raise
             except (requests.RequestException, ValueError, TypeError, AttributeError, KeyError):
                 continue
+            if not candidato["natureza_juridica"]["codigo"]:
+                sem_codigo = sem_codigo or (candidato, nome)
+                continue
             dados, fonte = candidato, nome
-            with _cache_lock:
-                _cache[digitos] = (time.monotonic() + CACHE_TTL, dados, fonte)
             break
+        if dados is None and sem_codigo:
+            dados, fonte = sem_codigo
         if dados is None:
             raise ConsultaCNPJError("CONSULTA_INDISPONIVEL", "Consulta de CNPJ indisponível no momento. Tente novamente.", 503)
+        with _cache_lock:
+            _cache[digitos] = (time.monotonic() + CACHE_TTL, dados, fonte)
 
     try:
         from cnae_alimentos import classificar_atividades

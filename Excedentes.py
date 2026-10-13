@@ -15,7 +15,7 @@ from sqlalchemy.orm import selectinload
 from Auth import registrar_auditoria, usuario_atual
 from Publico import CATEGORIAS, UNIDADES, _inteiro_positivo, _municipio_uf
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
-from models import Estabelecimento, Excedente, ItemExcedente, _utc_naive, db
+from models import Doacao, Estabelecimento, Excedente, ItemDoacao, ItemExcedente, _utc_naive, db
 
 ns = Namespace("excedentes", description="Excedentes para reserva e retirada por ONGs")
 item_entrada = ns.model("ItemExcedenteEntrada", {
@@ -62,9 +62,21 @@ def _emitir(tipo, dados, *, publico=True, destinatarios=()):
     emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
 
 
-def _ongs_compativeis(_excedente):
-    """Preenchido após a integração da função de conexão da Frente B."""
-    return ()
+def _ongs_compativeis(categorias, uf, publicador_id):
+    """Seleciona ONGs com pedido aberto na mesma UF e categoria."""
+    if not uf or not categorias:
+        return ()
+    ids = (db.session.query(Estabelecimento.id)
+           .join(Doacao, Doacao.estabelecimento_id == Estabelecimento.id)
+           .filter(Estabelecimento.sem_fins_lucrativos.is_(True),
+                   Estabelecimento.id != publicador_id,
+                   Doacao.status == "DISPONIVEL",
+                   Doacao.data_limite_retirada > agora_brasilia_sem_fuso(),
+                   Doacao.itens.any(ItemDoacao.categoria.in_(categorias)),
+                   or_(Estabelecimento.endereco.ilike(f"%/{uf} - %"),
+                       Estabelecimento.endereco.ilike(f"%/{uf}")))
+           .distinct().all())
+    return tuple(("empresa", id_) for (id_,) in ids)
 
 
 def _empresa():
@@ -264,11 +276,15 @@ class Excedentes(Resource):
             db.session.add(excedente)
             db.session.flush()
             db.session.add_all(ItemExcedente(excedente_id=excedente.id, **item) for item in itens)
+            categorias = sorted({item["categoria"] for item in itens})
             _emitir("excedente.publicado", {
                 "excedente_id": excedente.id, "organizacao": empresa.nome,
                 "municipio_uf": _municipio_uf(empresa.endereco),
-                "categorias": sorted({item["categoria"] for item in itens}),
-                "retirar_ate": iso_prazo(prazo)}, destinatarios=_ongs_compativeis(excedente))
+                "categorias": categorias,
+                "retirar_ate": iso_prazo(prazo)},
+                destinatarios=_ongs_compativeis(categorias,
+                                                (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
+                                                empresa.id))
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
