@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 import requests
 
+import classificador
 from fuso import hoje_brasilia
 from Publico import CATEGORIAS, UNIDADES
 
@@ -59,6 +60,17 @@ def _sem_identificadores(texto):
     return texto
 
 
+def _hosts_permitidos():
+    """Localhost e, só com OLLAMA_PERMITIR_DOCKER=1, o serviço "ollama" do Docker Compose.
+
+    Nenhum outro nome é aceito: o texto do pedido não sai da máquina nem da rede interna.
+    """
+    hosts = {"localhost", "127.0.0.1", "::1"}
+    if os.getenv("OLLAMA_PERMITIR_DOCKER", "").strip() == "1":
+        hosts.add("ollama")
+    return hosts
+
+
 def _url_local():
     valor = os.getenv("OLLAMA_URL", URL_PADRAO).rstrip("/")
     try:
@@ -66,8 +78,8 @@ def _url_local():
         porta = partes.port
     except ValueError:
         return None
-    if (partes.scheme != "http" or partes.hostname not in
-            {"localhost", "127.0.0.1", "::1"} or partes.username or partes.password or
+    if (partes.scheme != "http" or partes.hostname not in _hosts_permitidos()
+            or partes.username or partes.password or
             partes.path or partes.query or partes.fragment or not porta):
         return None
     return valor
@@ -125,6 +137,23 @@ def _categoria(nome):
     return "Outros"
 
 
+def _classificador_confiante(nome):
+    """Categoria do modelo treinado quando a confiança passa do limiar; senão None."""
+    categoria, confianca = classificador.classificar(nome)
+    if categoria in CATEGORIAS and confianca >= classificador.limiar():
+        return categoria
+    return None
+
+
+def _categoria_item(nome, usar_classificador=True):
+    """Modelo treinado se confiante; senão palavras-chave; senão "Outros"."""
+    if usar_classificador:
+        categoria = _classificador_confiante(nome)
+        if categoria:
+            return categoria
+    return _categoria(nome)
+
+
 def _unidade(valor):
     if valor in UNIDADES:
         return valor
@@ -178,7 +207,7 @@ def _validar_pedido(objeto):
             continue
         categoria = bruto.get("categoria")
         if categoria not in CATEGORIAS:
-            categoria = _categoria(nome)
+            categoria = _categoria_item(nome)
         itens.append({"nome": nome, "categoria": categoria,
                       "quantidade": quantidade, "unidade_medida": unidade})
     if not itens:
@@ -219,25 +248,28 @@ def _prazo_regras(texto):
     return None
 
 
-def _pedido_regras(texto):
-    trechos = re.split(r"\s+e\s+(?=\d)|[,;]\s*(?=\d)", texto, flags=re.IGNORECASE)
+def _pedido_regras(texto, usar_classificador=True):
+    # vírgula só separa itens quando há espaço depois: "2,5 kg" continua um número
+    trechos = re.split(r"\s+e\s+(?=\d)|;\s*(?=\d)|,\s+(?=\d)", texto, flags=re.IGNORECASE)
     itens = []
     padrao = re.compile(
         r"(?P<quantidade>\d+(?:[.,]\d{1,2})?)\s*"
         r"(?:(?P<unidade>caixas?|pacotes?|unidades?|kg|g|litros?|l|quilos?|gramas?)\b\s*)?"
-        r"(?:de\s+|d[oa]s?\s+)?(?P<nome>.+)", re.IGNORECASE)
+        r"(?:de\s+|d[oa]s?\s+)?(?P<nome>[^\W\d_].*)", re.IGNORECASE)
     for trecho in trechos[:10]:
         trecho = re.split(r"\s+(?:at[eé]\s+|para\s+o\s+dia\s+)", trecho,
                           maxsplit=1, flags=re.IGNORECASE)[0]
-        trecho = re.split(r"[.!?]\s+", trecho, maxsplit=1)[0]
-        achado = padrao.search(trecho.strip())
+        # a primeira frase com quantidade e alimento: saudação ou telefone antes não atrapalham
+        achado = next((a for a in (padrao.search(frase) for frase in
+                                   re.split(r"(?<=[.!?])\s+", trecho.strip())) if a), None)
         if not achado:
             continue
-        nome = _texto_plano(achado.group("nome"), 100).strip(" ,.;")
+        nome = _texto_plano(achado.group("nome"), 100).strip(" ,.;!?")
         quantidade = _quantidade(achado.group("quantidade"))
         unidade = _unidade(achado.group("unidade")) if achado.group("unidade") else "unidade"
         if nome and quantidade is not None and unidade:
-            itens.append({"nome": nome, "categoria": _categoria(nome),
+            itens.append({"nome": nome,
+                          "categoria": _categoria_item(nome, usar_classificador),
                           "quantidade": quantidade, "unidade_medida": unidade})
     return {"itens": itens, "receber_ate": _prazo_regras(texto),
             "observacoes": "Revise os itens e o prazo antes de publicar."}
@@ -258,7 +290,9 @@ def _conferir_com_texto(validado, texto):
             nome = (modelo["nome"] if modelo and
                     _sem_acentos(modelo["nome"]) == _sem_acentos(item["nome"])
                     else item["nome"])
+            # "Outros" só cede à LLM quando veio da falta de regra, não do classificador.
             categoria = (modelo["categoria"] if modelo and item["categoria"] == "Outros"
+                         and not _classificador_confiante(item["nome"])
                          else item["categoria"])
             conferidos.append({**item, "nome": nome, "categoria": categoria})
         validado["itens"] = conferidos
@@ -270,7 +304,7 @@ def _conferir_com_texto(validado, texto):
     return validado
 
 
-def interpretar_pedido(texto):
+def _sistema_pedido():
     hoje = hoje_brasilia()
     dias = ("segunda-feira", "terça-feira", "quarta-feira", "quinta-feira",
             "sexta-feira", "sábado", "domingo")
@@ -295,7 +329,12 @@ def interpretar_pedido(texto):
         "Não invente quantidades, itens, validade ou prazo. "
         f"Formato obrigatório: {json.dumps(ESQUEMA_PEDIDO, ensure_ascii=False)}"
     )
-    bruto = _chamar_ollama(sistema, _sem_identificadores(texto), formato=ESQUEMA_PEDIDO)
+    return sistema
+
+
+def interpretar_pedido(texto):
+    bruto = _chamar_ollama(_sistema_pedido(), _sem_identificadores(texto),
+                           formato=ESQUEMA_PEDIDO)
     validado = _validar_pedido(bruto)
     if validado:
         conferido = _conferir_com_texto(validado, texto)
