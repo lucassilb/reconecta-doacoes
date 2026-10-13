@@ -3,7 +3,7 @@ services:
     name: reconecta
     runtime: docker
     plan: free
-    autoDeployTrigger: "off"
+    autoDeployTrigger: checksPass
     healthCheckPath: /reconecta/saude
     envVars:
       - key: DATABASE_URL

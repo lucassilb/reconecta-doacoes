@@ -37,17 +37,23 @@ O esquema é criado no primeiro boot. A migração idempotente adiciona `contrib
 
 ## 3. Criar o serviço Render
 
-1. Depois de integrar e publicar a branch principal do projeto, conecte o repositório no Render e crie um **Blueprint** com o `render.yaml` da raiz. Confira que o serviço `reconecta` é **Web Service**, `runtime: docker` e `plan: free` antes de confirmar. Se a tela exigir pagamento ou cartão, interrompa a criação.
+1. Depois de integrar e publicar a branch `main` do repositório novo [`lucassilb/reconecta-doacoes`](https://github.com/lucassilb/reconecta-doacoes), faça login no Render com o GitHub e abra [o Blueprint deste repositório](https://render.com/deploy?repo=https://github.com/lucassilb/reconecta-doacoes). Autorize o acesso ao repositório privado pelo login do GitHub. Confira que o serviço `reconecta` é **Web Service**, `runtime: docker` e `plan: free` antes de confirmar. Não é necessária chave de API. Se a tela exigir pagamento ou cartão, interrompa a criação.
 2. No primeiro Blueprint, informe `DATABASE_URL` com a URL do Session pooler. `SECRET_KEY` é gerada pelo Render. `COOKIE_SEGURO=1` ativa cookie HTTPS e `ProxyFix`. `ADMIN_TOKEN` é opcional; configure somente se precisar da escrita dos CRUDs administrativos legados. Em Blueprint já existente, edite valores `sync: false` diretamente no serviço do Render.
 3. Após o deploy, abra `https://<servico>.onrender.com/reconecta/saude`; deve responder `200` com banco `ok`. Confira login e upload de foto em uma instalação de teste, pois o disco do Render gratuito é efêmero. O aplicativo mantém fotos novas no banco para sobreviver a reinícios.
 
-O plano gratuito pode suspender o serviço após inatividade e tem cotas de uso. A URL pública só existe após o Regente criar o serviço; este repositório não fornece credenciais nem faz publicação automática sem o hook configurado.
+O plano gratuito pode suspender o serviço após inatividade e tem cotas de uso. A URL pública só existe após o Regente criar o serviço. O `autoDeployTrigger: checksPass` publica novos commits da branch conectada depois que os checks do GitHub Actions passam.
 
 ## 4. Ativar CI/CD no GitHub
 
 O workflow `.github/workflows/ci.yml` roda em push/PR para `main` e por acionamento manual. Executa Python 3.12 e pytest com JUnit; Bandit; Trivy em arquivos e imagem com tabelas/SARIF; e build + healthcheck do Compose. Artefatos ficam em cada execução do Actions. Achados Bandit altos e Trivy críticos com correção disponível bloqueiam o deploy.
 
-O Blueprint usa `autoDeployTrigger: off` para que um commit sozinho não contorne os checks. Para disparar o Render somente após todos os jobs passarem, copie o **Deploy Hook URL** do serviço Render e crie no GitHub o segredo de Actions `RENDER_DEPLOY_HOOK_URL`. O workflow envia POST ao hook apenas em `main`. Sem esse segredo, o job termina com aviso e não faz deploy. Trate o hook como segredo: não cole a URL em arquivos ou logs.
+O Blueprint usa `autoDeployTrigger: checksPass`; essa é a rota normal de CD e não pede chave de API nem segredo de GitHub ao usuário. Há também um job **opcional** de Deploy Hook para acionamento manual (`workflow_dispatch`) em `main`, após todos os jobs passarem. Para usá-lo, copie o **Deploy Hook URL** do serviço Render e crie no GitHub o segredo de Actions `RENDER_DEPLOY_HOOK_URL`. Sem esse segredo, o job termina com aviso. Trate o hook como segredo: não cole a URL em arquivos ou logs.
+
+## 5. Segurança operacional
+
+O servidor de desenvolvimento escuta só em `127.0.0.1` por padrão; `FLASK_RUN_HOST` pode alterar esse valor. No Docker, gunicorn escuta em `0.0.0.0`. Em HTTPS, `COOKIE_SEGURO=1` ativa o cookie seguro, `ProxyFix` e HSTS. Todas as respostas recebem proteção contra MIME sniffing e frames, política de referenciador, política de permissões e CSP compatível com as páginas e com Chart.js/Google Fonts. A CSP permite atributos de estilo inline para as barras e prévias de foto criadas pelo JavaScript existente; scripts inline e `unsafe-eval` permanecem bloqueados.
+
+O logger `reconecta.auditoria` emite uma linha JSON por evento de autenticação, cadastro, alteração de conta, pedido, doação e uso do token administrativo. Inclui data UTC, tipo e ID do ator, IP e resultado; não inclui credenciais, documentos, e-mail nem foto. Os logs devem ser guardados conforme a política do ambiente. POSTs de contribuição têm cota de 20 por hora por usuário **em cada processo**; reinício ou outro worker tem cota independente. Prova de posse de e-mail/CNPJ e limite global por IP continuam riscos residuais documentados em `docs/stride.md`.
 
 ## Referências dos provedores
 

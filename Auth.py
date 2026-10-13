@@ -1,10 +1,14 @@
 """Sessão por cookie e autenticação dos dois tipos de doador."""
 
 import os
+import json
+import logging
 import re
 import secrets
+import sys
 import threading
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import request, session
@@ -18,6 +22,23 @@ from models import Doador, Estabelecimento, db
 
 
 ns = Namespace("auth", description="Entrada, saída e sessão do usuário")
+_auditoria = logging.getLogger("reconecta.auditoria")
+_auditoria.setLevel(logging.INFO)
+_auditoria.propagate = False
+if not _auditoria.handlers:
+    _saida_auditoria = logging.StreamHandler(sys.stdout)
+    _saida_auditoria.setFormatter(logging.Formatter("%(message)s"))
+    _auditoria.addHandler(_saida_auditoria)
+
+
+def registrar_auditoria(evento, resultado, *, tipo=None, ator_id=None):
+    """Emite somente metadados de segurança, sem dados pessoais nem payloads."""
+    _auditoria.info(json.dumps({
+        "data": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "evento": evento, "ator_tipo": tipo, "ator_id": ator_id,
+        "ip": request.remote_addr, "resultado": resultado,
+    }, ensure_ascii=False, separators=(",", ":")))
+
 _falhas = {}
 _falhas_lock = threading.Lock()
 JANELA_FALHAS = 15 * 60
@@ -165,18 +186,22 @@ class Login(Resource):
         if not isinstance(senha, str) or not senha:
             campos["senha"] = "Informe sua senha."
         if campos:
+            registrar_auditoria("login", "falha")
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
         chave = _chave_identificador(identificador)
         if _bloqueado(chave):
+            registrar_auditoria("login", "bloqueado")
             return _erro("MUITAS_TENTATIVAS", "Aguarde 15 minutos antes de tentar novamente.", 429)
         encontrado = _buscar_identificador(chave)
         if not encontrado or not encontrado[1].senha_hash or not check_password_hash(encontrado[1].senha_hash, senha):
             _registrar_falha(chave)
+            registrar_auditoria("login", "falha")
             return _erro("CREDENCIAIS_INVALIDAS", "Identificador ou senha inválidos.", 401)
         with _falhas_lock:
             _falhas.pop(chave, None)
         tipo, usuario = encontrado
         iniciar_sessao(tipo, usuario.id)
+        registrar_auditoria("login", "ok", tipo=tipo, ator_id=usuario.id)
         return {"usuario": dados_usuario(tipo, usuario)}, 200
 
 
@@ -185,6 +210,8 @@ class Logout(Resource):
     @ns.response(204, "Sessão encerrada")
     def post(self):
         """Encerra a sessão atual."""
+        registrar_auditoria("logout", "ok", tipo=session.get("tipo"),
+                            ator_id=session.get("usuario_id"))
         session.clear()
         return "", 204
 
@@ -262,4 +289,7 @@ class Me(Resource):
         except IntegrityError:
             db.session.rollback()
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+        registrar_auditoria("dados_editados", "ok", tipo=tipo, ator_id=usuario.id)
+        if trocando_senha:
+            registrar_auditoria("senha_trocada", "ok", tipo=tipo, ator_id=usuario.id)
         return dados_usuario(tipo, usuario), 200

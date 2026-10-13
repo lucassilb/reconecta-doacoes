@@ -37,9 +37,31 @@ app.config["ERROR_INCLUDE_MESSAGE"] = False  # erros RESTX usam codigo/mensagem 
 configurar_chave_secreta(app)
 if os.getenv("COOKIE_SEGURO") == "1":
     app.config["SESSION_COOKIE_SECURE"] = True
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 db.init_app(app)
+
+_CSP = (
+    "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+    "form-action 'self'; script-src 'self' https://cdn.jsdelivr.net; "
+    "style-src 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "img-src 'self' data: blob:; connect-src 'self'; "
+    "media-src 'self'; worker-src 'none'"
+)
+
+
+@app.after_request
+def cabecalhos_seguranca(resposta):
+    resposta.headers["X-Content-Type-Options"] = "nosniff"
+    resposta.headers["X-Frame-Options"] = "DENY"
+    resposta.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resposta.headers["Permissions-Policy"] = (
+        "camera=(self), microphone=(), geolocation=(), payment=(), usb=()")
+    resposta.headers["Content-Security-Policy"] = _CSP
+    if app.config["SESSION_COOKIE_SECURE"]:
+        resposta.headers["Strict-Transport-Security"] = "max-age=31536000"
+    return resposta
 
 
 @app.get("/reconecta/saude")
@@ -162,5 +184,6 @@ with app.app_context():
     aplicar_migracoes()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")),
+    app.run(host=os.getenv("FLASK_RUN_HOST", "127.0.0.1"),
+            port=int(os.getenv("PORT", "5000")),
             debug=os.getenv("FLASK_DEBUG") == "1")

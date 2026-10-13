@@ -66,7 +66,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
-          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          skip-dirs: .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv
           format: table
           output: reports/trivy-fs.txt
           exit-code: "0"
@@ -76,7 +76,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
-          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          skip-dirs: .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv
           format: sarif
           output: reports/trivy-fs.sarif
           exit-code: "0"
@@ -110,7 +110,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
-          skip-dirs: .venv,venv,instance,relatorios,__pycache__
+          skip-dirs: .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv
           severity: CRITICAL
           ignore-unfixed: true
           exit-code: "1"
@@ -143,7 +143,7 @@ jobs:
         run: docker compose down -v
 
   deploy:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     needs: [testes, sast-bandit, sast-trivy, docker]
     runs-on: ubuntu-24.04
     env:

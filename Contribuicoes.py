@@ -3,6 +3,8 @@
 import json
 import re
 import secrets
+import threading
+import time
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
@@ -12,12 +14,16 @@ from flask import current_app, request, send_file, send_from_directory
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
-from Auth import usuario_atual
+from Auth import registrar_auditoria, usuario_atual
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
 from models import Contribuicao, Doacao, ItemDoacao, db
 
 ns = Namespace("contribuicoes", description="Fotos privadas das doações recebidas")
 MAX_FOTO = 5 * 1024 * 1024
+LIMITE_DOACOES = 20
+JANELA_DOACOES = 60 * 60
+_tentativas_doacoes = {}
+_tentativas_lock = threading.Lock()
 PERGUNTAS = ("dentro_validade", "embalagem_ok", "armazenado_ok", "nao_caseiro")
 MOTIVOS_NAO = {
     "dentro_validade": ("ALIMENTO_VENCIDO", "Alimento vencido não pode ser doado."),
@@ -62,6 +68,21 @@ def foto_url(contribuicao):
     return f"/reconecta/contribuicoes/{contribuicao.id}/foto"
 
 
+def _cota_esgotada(tipo, usuario_id):
+    """Conta POSTs autenticados por usuário neste processo durante uma hora."""
+    agora = time.monotonic()
+    chave = (tipo, usuario_id)
+    with _tentativas_lock:
+        recentes = [t for t in _tentativas_doacoes.get(chave, ())
+                    if agora - t < JANELA_DOACOES]
+        if len(recentes) >= LIMITE_DOACOES:
+            _tentativas_doacoes[chave] = recentes
+            return True
+        recentes.append(agora)
+        _tentativas_doacoes[chave] = recentes
+        return False
+
+
 def serializar_contribuicao(contribuicao, *, entrega=False):
     dados = {
         "id": contribuicao.id,
@@ -91,12 +112,18 @@ def serializar_contribuicao(contribuicao, *, entrega=False):
 def criar_contribuicao(doacao):
     atual = usuario_atual()
     if not atual:
+        registrar_auditoria("doacao_recusada", "nao_autenticado")
         return _erro("NAO_AUTENTICADO", "Entre para doar.", 401)
     tipo, usuario = atual
+    if _cota_esgotada(tipo, usuario.id):
+        registrar_auditoria("doacao_recusada", "cota", tipo=tipo, ator_id=usuario.id)
+        return _erro("MUITAS_TENTATIVAS", "Aguarde antes de enviar outra doação.", 429)
     if tipo == "empresa" and usuario.id == doacao.estabelecimento_id:
+        registrar_auditoria("doacao_recusada", "pedido_proprio", tipo=tipo, ator_id=usuario.id)
         return _erro("PEDIDO_PROPRIO", "Sua empresa não pode doar para o próprio pedido.", 409)
     if (doacao.estabelecimento_id is None or doacao.status != "DISPONIVEL" or
             doacao.data_limite_retirada <= agora_brasilia_sem_fuso()):
+        registrar_auditoria("doacao_recusada", "pedido_indisponivel", tipo=tipo, ator_id=usuario.id)
         return _erro("CONTRIBUICAO_RECUSADA", "Este pedido não recebe mais doações.", 422,
                      motivos=[{"codigo": "PEDIDO_INDISPONIVEL", "mensagem": "Pedido encerrado."}])
 
@@ -131,6 +158,7 @@ def criar_contribuicao(doacao):
     if foto is None:
         campos["foto"] = "Envie uma foto JPEG, PNG ou WebP."
     if campos:
+        registrar_auditoria("doacao_recusada", "dados_invalidos", tipo=tipo, ator_id=usuario.id)
         return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
     dados_foto = foto.read(MAX_FOTO + 1)
     extensao = _extensao_foto(dados_foto)
@@ -139,6 +167,7 @@ def criar_contribuicao(doacao):
     elif not extensao:
         campos["foto"] = "Envie uma foto JPEG, PNG ou WebP válida."
     if campos:
+        registrar_auditoria("doacao_recusada", "foto_invalida", tipo=tipo, ator_id=usuario.id)
         return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
     if item and formulario.get("categoria") and formulario["categoria"] != item.categoria:
         motivos.append({"codigo": "CATEGORIA_NAO_ACEITA", "mensagem": "Categoria diferente do item pedido."})
@@ -150,6 +179,7 @@ def criar_contribuicao(doacao):
             if not any(motivo["codigo"] == codigo for motivo in motivos):
                 motivos.append({"codigo": codigo, "mensagem": mensagem})
     if motivos:
+        registrar_auditoria("doacao_recusada", "alimento_inelegivel", tipo=tipo, ator_id=usuario.id)
         return _erro("CONTRIBUICAO_RECUSADA", "Este alimento não pôde ser aceito.", 422,
                      motivos=motivos)
 
@@ -169,6 +199,7 @@ def criar_contribuicao(doacao):
     except SQLAlchemyError:
         db.session.rollback()
         current_app.logger.exception("Falha ao salvar contribuição")
+        registrar_auditoria("doacao_recusada", "erro_interno", tipo=tipo, ator_id=usuario.id)
         return _erro("ERRO_INTERNO", "Não foi possível salvar a doação.", 500)
     # Copia local para instalações antigas; o banco e a fonte persistente.
     try:
@@ -178,6 +209,7 @@ def criar_contribuicao(doacao):
             arquivo.write(dados_foto)
     except OSError:
         current_app.logger.warning("Copia local da foto indisponivel; foto guardada no banco")
+    registrar_auditoria("doacao_aceita", "ok", tipo=tipo, ator_id=usuario.id)
     return {"id": contribuicao.id, "status": "ACEITA",
             "entrega": {"endereco": doacao.estabelecimento.endereco,
                         "receber_ate": iso_prazo(doacao.data_limite_retirada)}}, 201

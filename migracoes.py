@@ -85,7 +85,7 @@ def _migrar_pedidos(engine):
         with engine.connect() as conexao:
             for tabela in ("arrecadacoes", "contribuicoes"):
                 if tabela in tabelas and (tabela == "arrecadacoes" or contribuicoes_antigas):
-                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
+                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608
                         raise RuntimeError(
                             f"Migração de pedidos interrompida: {tabela} contém dados; "
                             "não é seguro descartá-los automaticamente.")
@@ -124,7 +124,7 @@ def _migrar_pedidos(engine):
                             )""")
                             campos = "id, doacao_id, nome, categoria, quantidade, unidade_medida, validade"
                             conexao.exec_driver_sql(
-                                f"INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao")
+                                f"INSERT INTO itens_doacao_nova ({campos}) SELECT {campos} FROM itens_doacao")  # campos literais internos; # nosec B608
                             conexao.exec_driver_sql("DROP TABLE itens_doacao")
                             conexao.exec_driver_sql("ALTER TABLE itens_doacao_nova RENAME TO itens_doacao")
                     finally:
@@ -171,8 +171,8 @@ def _migrar_doacoes_sqlite(engine, colunas):
                           "data_limite_retirada", "status"]
                 fontes = [campo if campo in nomes else "NULL" for campo in campos]
                 conexao.exec_driver_sql(
-                    f"INSERT INTO doacoes_nova ({', '.join(campos)}) "
-                    f"SELECT {', '.join(fontes)} FROM doacoes")
+                        f"INSERT INTO doacoes_nova ({', '.join(campos)}) "  # nomes de listas internas; # nosec B608
+                        f"SELECT {', '.join(fontes)} FROM doacoes")
                 conexao.exec_driver_sql("DROP TABLE doacoes")
                 conexao.exec_driver_sql("ALTER TABLE doacoes_nova RENAME TO doacoes")
         finally:
@@ -218,7 +218,7 @@ def aplicar_migracoes(engine=None):
         "arrecadacao_id" in {c["name"] for c in inspector.get_columns("contribuicoes")}):
         with engine.connect() as conexao:
             for tabela in ("arrecadacoes", "contribuicoes"):
-                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():
+                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608
                     raise RuntimeError(f"Migração de pedidos interrompida: {tabela} contém dados.")
     inspector = inspect(engine)
     for tabela in ("estabelecimentos", "doadores"):
