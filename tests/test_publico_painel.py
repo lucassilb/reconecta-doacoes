@@ -9,7 +9,7 @@ os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
 from Auth import _falhas  # noqa: E402
-from fuso import iso_prazo  # noqa: E402
+from fuso import agora_brasilia_sem_fuso, iso_prazo  # noqa: E402
 from models import Doacao, Doador, Estabelecimento, Instituicao, ItemDoacao, Reserva, db  # noqa: E402
 
 
@@ -73,7 +73,8 @@ def test_publico_filtra_status_prazo_privacidade_e_soma_kg(cliente):
         ativa = Doacao(estabelecimento_id=empresa_id, status="DISPONIVEL",
                        data_limite_retirada=datetime.now() + timedelta(days=2))
         vencida = Doacao(estabelecimento_id=empresa_id, status="DISPONIVEL",
-                         data_limite_retirada=datetime.now() - timedelta(hours=1))
+                         # prazo em hora de Brasília, como a aplicação compara (o runner do CI roda em UTC)
+                         data_limite_retirada=agora_brasilia_sem_fuso() - timedelta(hours=1))
         reservada = Doacao(estabelecimento_id=empresa_id, status="RESERVADA",
                            data_limite_retirada=datetime.now() + timedelta(days=2))
         db.session.add_all((ativa, vencida, reservada))
