@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 from Auth import registrar_auditoria, usuario_atual
 from Contribuicoes import serializar_contribuicao
+from eventos import emitir as _emitir
 from fuso import agora_brasilia_sem_fuso
 from Publico import CATEGORIAS, UNIDADES, _municipio_uf, doacao_model, serializar_doacao
 from models import Contribuicao, Doacao, ItemDoacao, db
@@ -32,15 +33,6 @@ erro_model = ns.model("PainelErro", {
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
-
-def _emitir(tipo, dados, *, publico=True, destinatarios=()):
-    try:
-        from eventos import emitir
-    except ModuleNotFoundError as erro:
-        if erro.name != "eventos":
-            raise
-        return
-    emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
 
 def _usuario():
     atual = usuario_atual()

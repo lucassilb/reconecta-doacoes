@@ -13,6 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 from Auth import registrar_auditoria, usuario_atual
+from eventos import emitir as _emitir
 from Publico import CATEGORIAS, UNIDADES, _inteiro_positivo, _municipio_uf
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
 from models import Doacao, Estabelecimento, Excedente, ItemDoacao, ItemExcedente, _utc_naive, db
@@ -49,17 +50,6 @@ LIMITES = {"publicar": 20, "reservar": 30}
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
-
-
-def _emitir(tipo, dados, *, publico=True, destinatarios=()):
-    """A Frente B fornece o gravador transacional depois do merge da main."""
-    try:
-        from eventos import emitir
-    except ModuleNotFoundError as erro:
-        if erro.name != "eventos":
-            raise
-        return
-    emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
 
 
 def _ongs_compativeis(categorias, uf, publicador_id):
@@ -392,17 +382,18 @@ class CancelarReserva(Resource):
             return _erro("EXCEDENTE_NAO_ENCONTRADO", "Excedente não encontrado.", 404)
         if status_efetivo(excedente) != "RESERVADO":
             return _erro("RESERVA_INDISPONIVEL", "Esta reserva não pode ser cancelada.", 409)
+        reservante_id = excedente.reservado_por_id
         resultado = db.session.execute(update(Excedente).where(
             Excedente.id == excedente_id, Excedente.status == "RESERVADO",
             Excedente.retirar_ate > agora_brasilia_sem_fuso(),
-            Excedente.reservado_por_id == excedente.reservado_por_id).values(
+            Excedente.reservado_por_id == reservante_id).values(
                 status="DISPONIVEL", reservado_por_id=None, reservado_em=None))
         if resultado.rowcount != 1:
             db.session.rollback()
             return _erro("RESERVA_INDISPONIVEL", "Esta reserva não pode ser cancelada.", 409)
         _emitir("excedente.reserva_cancelada", {"excedente_id": excedente_id},
                 destinatarios=(("empresa", excedente.estabelecimento_id),
-                               ("empresa", excedente.reservado_por_id)))
+                               ("empresa", reservante_id)))
         db.session.commit()
         db.session.refresh(excedente)
         registrar_auditoria("excedente_reserva_cancelada", "ok", tipo="empresa", ator_id=empresa.id)

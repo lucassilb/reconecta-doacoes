@@ -15,6 +15,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
 from Auth import registrar_auditoria, usuario_atual
+from eventos import emitir as _emitir
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
 from models import Contribuicao, Doacao, ItemDoacao, db
 
@@ -36,16 +37,6 @@ MIMES = {"jpg": "image/jpeg", "png": "image/png", "webp": "image/webp"}
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
-
-
-def _emitir(tipo, dados, *, publico=True, destinatarios=()):
-    try:
-        from eventos import emitir
-    except ModuleNotFoundError as erro:
-        if erro.name != "eventos":
-            raise
-        return
-    emitir(tipo, dados, publico=publico, destinatarios=destinatarios)
 
 
 def _extensao_foto(dados):

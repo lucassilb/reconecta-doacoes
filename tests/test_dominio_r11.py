@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import date, timedelta
 
 import pytest
@@ -10,6 +11,7 @@ from app import app  # noqa: E402
 from cnpj_service import _normalizar_brasilapi, _normalizar_cnpjws, _normalizar_opencnpj  # noqa: E402
 from fuso import agora_brasilia_sem_fuso  # noqa: E402
 from Excedentes import _ongs_compativeis  # noqa: E402
+from eventos import Evento  # noqa: E402
 from models import Contribuicao, Doacao, Estabelecimento, ItemDoacao, db  # noqa: E402
 from migracoes import aplicar_migracoes  # noqa: E402
 
@@ -171,6 +173,16 @@ def test_excedente_reserva_unica_endereco_privado_e_retirada():
     assert indicadores["excedentes_resgatados"] == 1
     assert indicadores["ongs"] == 2
     assert indicadores["empresas_alimentos"] == 1
+    with app.app_context():
+        eventos = Evento.query.order_by(Evento.id).all()
+        publicados = [evento for evento in eventos if evento.tipo == "excedente.reservado" and evento.publico]
+        privados = [evento for evento in eventos if evento.tipo == "excedente.reservado" and not evento.publico]
+        assert len(publicados) == len(privados) == 2
+        assert "ong" not in json.loads(publicados[0].dados)
+        assert json.loads(privados[0].dados)["ong"] == "ONG"
+        assert privados[0].dest_id == ids[0]
+        assert any(evento.tipo == "excedente.retirado" and evento.dest_id == ids[2]
+                   for evento in eventos)
 
 
 def test_excedente_validacoes_e_expiracao_sem_job():
@@ -217,6 +229,14 @@ def test_destinatarios_do_excedente_exigem_pedido_categoria_e_uf():
         db.session.commit()
         assert _ongs_compativeis(["Padaria"], "SP", mercado.id) == (("empresa", ong.id),)
         assert _ongs_compativeis(["Laticínios"], "SP", mercado.id) == ()
+        mercado_id, ong_id, fora_id = mercado.id, ong.id, fora.id
+    cliente = app.test_client()
+    sessao(cliente, mercado_id)
+    assert cliente.post("/reconecta/excedentes", json=anuncio()).status_code == 201
+    with app.app_context():
+        privados = Evento.query.filter_by(tipo="excedente.publicado", publico=False).all()
+        assert [(evento.dest_tipo, evento.dest_id) for evento in privados] == [("empresa", ong_id)]
+        assert all(evento.dest_id != fora_id for evento in privados)
 
 
 def test_dono_confirma_doacao_e_progresso_preserva_compromisso():
@@ -251,6 +271,11 @@ def test_dono_confirma_doacao_e_progresso_preserva_compromisso():
     detalhe = cliente.get(f"/reconecta/publico/doacoes/{ids[2]}").json
     assert detalhe["itens"][0]["recebido"] == 4
     assert detalhe["itens"][0]["entregue"] == 4
+    with app.app_context():
+        aviso = Evento.query.filter_by(tipo="doacao.entregue").one()
+        assert aviso.publico is False
+        assert (aviso.dest_tipo, aviso.dest_id) == ("empresa", ids[5])
+        assert json.loads(aviso.dados) == {"pedido_id": ids[2], "item": "Pão"}
     assert cliente.get("/reconecta/dashboard").json["indicadores"]["doacoes_entregues"] == 1
     with app.app_context():
         outra_doacao = Contribuicao(doacao_id=ids[2], item_doacao_id=ids[4],
