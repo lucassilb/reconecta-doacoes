@@ -33,6 +33,13 @@ PAPEIS = {
 PUBLICAS = {"/reconecta/saude", "/reconecta/publico/ongs",
             "/reconecta/publico/resumo", "/reconecta/publico/doacoes",
             "/reconecta/dashboard/impacto"}
+POSTS = {
+    "publico": {"/reconecta/auth/login", "/reconecta/ia/risco-descarte",
+                "/reconecta/ia/sugerir-destino"},
+    "doador": {"/reconecta/excedentes"},
+    "empresa": {"/reconecta/painel/doacoes", "/reconecta/ia/interpretar-pedido"},
+    "ong": {"/reconecta/notificacoes/lidas"},
+}
 RISCO = {"0": "INFORMATIVA", "1": "BAIXA", "2": "MEDIA", "3": "ALTA", "4": "CRITICA"}
 
 
@@ -85,15 +92,22 @@ def cookie_papel(email, esperado):
     return cookie
 
 
-def spec_parcial(spec, rotas, destino):
+def spec_parcial(spec, rotas, destino, posts=()):
     parcial = dict(spec)
     parcial["host"] = "app:5000"
     parcial["schemes"] = ["http"]
-    parcial["paths"] = {rota: {metodo: valor for metodo, valor in spec["paths"][rota].items()
-                                if metodo == "get"}
-                        for rota in sorted(rotas)}
-    if not all(parcial["paths"].values()):
-        raise RuntimeError("swagger.json não contém todos os GETs esperados")
+    parcial["paths"] = {}
+    for rota in sorted(set(rotas) | set(posts)):
+        metodos = ({"get"} if rota in rotas else set()) | ({"post"} if rota in posts else set())
+        parcial["paths"][rota] = {
+            chave: valor for chave, valor in spec["paths"][rota].items()
+            if chave in metodos or chave == "parameters"}
+    for rota in rotas:
+        if "get" not in parcial["paths"][rota]:
+            raise RuntimeError(f"swagger.json sem GET esperado: {rota}")
+    for rota in posts:
+        if "post" not in parcial["paths"][rota]:
+            raise RuntimeError(f"swagger.json sem POST esperado: {rota}")
     destino.write_text(json.dumps(parcial, ensure_ascii=False), encoding="utf-8")
 
 
@@ -137,7 +151,7 @@ def resumir_zap(arquivos):
     return {"ferramenta": "OWASP ZAP stable", "versao": ", ".join(sorted(versoes)),
             "data": datetime.now(timezone.utc).isoformat(),
             "alvo": "Compose SQLite efêmero local",
-            "escopo": "baseline público + GETs do swagger.json por papel fictício",
+            "escopo": "baseline público + GETs e POSTs selecionados do swagger.json por papel fictício",
             "varreduras": varreduras, "por_severidade": total}
 
 
@@ -147,9 +161,9 @@ def main():
         trabalho = Path(temporario)
         ambiente = {**os.environ, "DAST_WORK_DIR": str(trabalho)}
         spec = json.loads((RAIZ / "swagger.json").read_text(encoding="utf-8"))
-        spec_parcial(spec, PUBLICAS, trabalho / "swagger-publico.json")
+        spec_parcial(spec, PUBLICAS, trabalho / "swagger-publico.json", POSTS["publico"])
         for papel, (_, _, rotas) in PAPEIS.items():
-            spec_parcial(spec, rotas, trabalho / f"swagger-{papel}.json")
+            spec_parcial(spec, rotas, trabalho / f"swagger-{papel}.json", POSTS[papel])
         iniciado = True  # o projeto é exclusivo; limpar mesmo se o up falhar no meio
         try:
             compose(projecto, ambiente, "up", "--build", "-d", "--wait", "app")
@@ -184,6 +198,10 @@ def main():
             SAIDA.mkdir(parents=True, exist_ok=True)
             resumo = resumir_zap(arquivos)
             resumo["sessoes_ficticias_verificadas"] = sorted(PAPEIS)
+            resumo["operacoes_no_swagger"] = {
+                nome: {"GET": sorted(rotas), "POST": sorted(POSTS[nome])}
+                for nome, rotas in [("publico", PUBLICAS),
+                                    *[(p, dados[2]) for p, dados in PAPEIS.items()]]}
             (SAIDA / "zap.json").write_text(json.dumps(resumo, ensure_ascii=False, indent=2) + "\n",
                                             encoding="utf-8")
             print(f"ZAP por severidade: {resumo['por_severidade']}", flush=True)

@@ -6,7 +6,7 @@ import subprocess
 import sys
 import pytest
 
-from scripts.dast import PUBLICAS, PAPEIS, RAIZ, resumir_zap, spec_parcial
+from scripts.dast import PUBLICAS, PAPEIS, POSTS, RAIZ, resumir_zap, spec_parcial
 
 
 def test_semente_recusa_execucao_fora_do_compose_efemero():
@@ -18,16 +18,18 @@ def test_semente_recusa_execucao_fora_do_compose_efemero():
     assert "SQLite efêmero" in resultado.stderr
 
 
-def test_spec_zap_usa_apenas_gets_locais_do_swagger(tmp_path):
+def test_spec_zap_usa_gets_e_posts_locais_do_swagger(tmp_path):
     swagger = json.loads((RAIZ / "swagger.json").read_text(encoding="utf-8"))
     for nome, rotas in [("publico", PUBLICAS), *[(p, dados[2]) for p, dados in PAPEIS.items()]]:
         saida = tmp_path / f"{nome}.json"
-        spec_parcial(swagger, rotas, saida)
+        spec_parcial(swagger, rotas, saida, POSTS[nome])
         preparado = json.loads(saida.read_text(encoding="utf-8"))
         assert preparado["host"] == "app:5000"
         assert preparado["schemes"] == ["http"]
-        assert set(preparado["paths"]) == rotas
-        assert all(set(operacoes) == {"get"} for operacoes in preparado["paths"].values())
+        assert set(preparado["paths"]) == rotas | POSTS[nome]
+        for rota, operacoes in preparado["paths"].items():
+            assert ("get" in operacoes) == (rota in rotas)
+            assert ("post" in operacoes) == (rota in POSTS[nome])
 
 
 def test_resumo_zap_preserva_alta_sem_evidencia_ou_cookie(tmp_path):

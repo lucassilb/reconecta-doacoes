@@ -1,9 +1,9 @@
 {
   "ferramenta": "OWASP ZAP stable",
   "versao": "2.17.0",
-  "data": "2026-10-14T22:15:45.248904+00:00",
+  "data": "2026-10-14T22:22:47.312167+00:00",
   "alvo": "Compose SQLite efêmero local",
-  "escopo": "baseline público + GETs do swagger.json por papel fictício",
+  "escopo": "baseline público + GETs e POSTs selecionados do swagger.json por papel fictício",
   "varreduras": {
     "baseline": {
       "alertas": [
@@ -48,7 +48,7 @@
           "id": "10049",
           "nome": "Storable and Cacheable Content",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 3,
+          "ocorrencias": 2,
           "rotas": [
             "fora_do_swagger"
           ]
@@ -59,6 +59,7 @@
           "severidade": "INFORMATIVA",
           "ocorrencias": 5,
           "rotas": [
+            "/",
             "fora_do_swagger"
           ]
         }
@@ -71,7 +72,7 @@
           "id": "100001",
           "nome": "Unexpected Content-Type was returned",
           "severidade": "BAIXA",
-          "ocorrencias": 12,
+          "ocorrencias": 11,
           "rotas": [
             "/",
             "fora_do_swagger"
@@ -81,8 +82,11 @@
           "id": "100000",
           "nome": "A Client Error response code was returned by the server",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 22,
+          "ocorrencias": 37,
           "rotas": [
+            "/reconecta/auth/login",
+            "/reconecta/ia/risco-descarte",
+            "/reconecta/ia/sugerir-destino",
             "fora_do_swagger"
           ]
         },
@@ -92,9 +96,9 @@
           "severidade": "INFORMATIVA",
           "ocorrencias": 5,
           "rotas": [
-            "/reconecta/dashboard/impacto",
+            "/reconecta/ia/risco-descarte",
+            "/reconecta/ia/sugerir-destino",
             "/reconecta/publico/doacoes",
-            "/reconecta/publico/ongs",
             "/reconecta/publico/resumo",
             "/reconecta/saude"
           ]
@@ -108,7 +112,7 @@
           "id": "100001",
           "nome": "Unexpected Content-Type was returned",
           "severidade": "BAIXA",
-          "ocorrencias": 12,
+          "ocorrencias": 11,
           "rotas": [
             "/",
             "fora_do_swagger"
@@ -118,8 +122,9 @@
           "id": "100000",
           "nome": "A Client Error response code was returned by the server",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 22,
+          "ocorrencias": 25,
           "rotas": [
+            "/reconecta/excedentes",
             "fora_do_swagger"
           ]
         },
@@ -127,7 +132,7 @@
           "id": "10049",
           "nome": "Non-Storable Content",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 4,
+          "ocorrencias": 5,
           "rotas": [
             "/reconecta/auth/me",
             "/reconecta/excedentes",
@@ -144,7 +149,7 @@
           "id": "100001",
           "nome": "Unexpected Content-Type was returned",
           "severidade": "BAIXA",
-          "ocorrencias": 12,
+          "ocorrencias": 11,
           "rotas": [
             "/",
             "fora_do_swagger"
@@ -154,8 +159,10 @@
           "id": "100000",
           "nome": "A Client Error response code was returned by the server",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 24,
+          "ocorrencias": 32,
           "rotas": [
+            "/reconecta/ia/interpretar-pedido",
+            "/reconecta/painel/doacoes",
             "fora_do_swagger"
           ]
         },
@@ -163,11 +170,11 @@
           "id": "10049",
           "nome": "Non-Storable Content",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 4,
+          "ocorrencias": 5,
           "rotas": [
             "/reconecta/auth/me",
             "/reconecta/excedentes/meus",
-            "/reconecta/notificacoes",
+            "/reconecta/ia/interpretar-pedido",
             "/reconecta/painel/doacoes"
           ]
         }
@@ -180,7 +187,7 @@
           "id": "100001",
           "nome": "Unexpected Content-Type was returned",
           "severidade": "BAIXA",
-          "ocorrencias": 12,
+          "ocorrencias": 11,
           "rotas": [
             "/",
             "fora_do_swagger"
@@ -190,8 +197,9 @@
           "id": "100000",
           "nome": "A Client Error response code was returned by the server",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 24,
+          "ocorrencias": 27,
           "rotas": [
+            "/reconecta/notificacoes/lidas",
             "fora_do_swagger"
           ]
         },
@@ -199,11 +207,12 @@
           "id": "10049",
           "nome": "Non-Storable Content",
           "severidade": "INFORMATIVA",
-          "ocorrencias": 4,
+          "ocorrencias": 5,
           "rotas": [
             "/reconecta/auth/me",
             "/reconecta/excedentes/reservas",
             "/reconecta/notificacoes",
+            "/reconecta/notificacoes/lidas",
             "/reconecta/painel/doacoes"
           ]
         }
@@ -222,5 +231,55 @@
     "doador",
     "empresa",
     "ong"
-  ]
+  ],
+  "operacoes_no_swagger": {
+    "publico": {
+      "GET": [
+        "/reconecta/dashboard/impacto",
+        "/reconecta/publico/doacoes",
+        "/reconecta/publico/ongs",
+        "/reconecta/publico/resumo",
+        "/reconecta/saude"
+      ],
+      "POST": [
+        "/reconecta/auth/login",
+        "/reconecta/ia/risco-descarte",
+        "/reconecta/ia/sugerir-destino"
+      ]
+    },
+    "doador": {
+      "GET": [
+        "/reconecta/auth/me",
+        "/reconecta/excedentes",
+        "/reconecta/notificacoes",
+        "/reconecta/painel/minhas-doacoes"
+      ],
+      "POST": [
+        "/reconecta/excedentes"
+      ]
+    },
+    "empresa": {
+      "GET": [
+        "/reconecta/auth/me",
+        "/reconecta/excedentes/meus",
+        "/reconecta/notificacoes",
+        "/reconecta/painel/doacoes"
+      ],
+      "POST": [
+        "/reconecta/ia/interpretar-pedido",
+        "/reconecta/painel/doacoes"
+      ]
+    },
+    "ong": {
+      "GET": [
+        "/reconecta/auth/me",
+        "/reconecta/excedentes/reservas",
+        "/reconecta/notificacoes",
+        "/reconecta/painel/doacoes"
+      ],
+      "POST": [
+        "/reconecta/notificacoes/lidas"
+      ]
+    }
+  }
 }
