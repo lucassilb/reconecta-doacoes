@@ -264,6 +264,18 @@
 .ex-categoria:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
 #bloco-rede > section:first-child { display: none; }
 #bloco-excedentes, #bloco-doacoes, #bloco-minhas-doacoes { max-width: 920px; }
+/* Pedido da ONG: uma linha por alimento no desktop, duas colunas no celular. */
+#publicar .form-doacao { gap: 12px; }
+#publicar .painel-etapa { gap: 10px; }
+#publicar .item { padding: 10px 42px 10px 12px; }
+#publicar .item__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#publicar .item__nome, #publicar .item__categoria { grid-column: 1 / -1; }
+#publicar .item__remover { top: 10px; right: 7px; }
+#publicar .item .campo__entrada { min-height: 40px; padding: 8px 10px; }
+@media (min-width: 900px) {
+  #publicar .item__grade { grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(0, .6fr) minmax(0, .9fr); }
+  #publicar .item__nome, #publicar .item__categoria { grid-column: auto; }
+}
 @media (max-width: 600px) {
   .painel-abas__link { padding: 9px 11px; font-size: .84rem; }
   .painel-etapas li { font-size: .75rem; padding: 8px 5px; }

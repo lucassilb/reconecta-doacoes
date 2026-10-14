@@ -459,7 +459,7 @@
     iniciarAbas(ong ? "ong" : "empresa");
   }
 
-  /* Publicar pedido e "Meus pedidos": só empresa (rodada 9). */
+  /* Publicar pedido e "Meus pedidos": ONG. */
   function iniciarDoacoes() {
     $("bloco-doacoes").hidden = false;
     listaItens = $("lista-itens");
@@ -526,6 +526,45 @@
   var limiteInput = $("limite");
   var avisoDoacao = $("aviso-doacao");
 
+  function mostrarPedidoEtapa(numero) {
+    document.querySelectorAll("[data-pedido-etapa]").forEach(function (etapa) {
+      etapa.hidden = etapa.dataset.pedidoEtapa !== String(numero);
+    });
+    document.querySelectorAll("[data-pedido-indicador]").forEach(function (indicador) {
+      if (indicador.dataset.pedidoIndicador === String(numero)) indicador.setAttribute("aria-current", "step");
+      else indicador.removeAttribute("aria-current");
+    });
+  }
+
+  function resumoPedido() {
+    var resumo = $("pedido-resumo");
+    var lista = el("ul");
+    linhasItens.forEach(function (linha) {
+      var f = linha.campos;
+      lista.appendChild(el("li", { texto: f.nome.value.trim() + " · " + f.quantidade.value.trim() + " " + f.unidade_medida.value + " · " + f.categoria.value }));
+    });
+    resumo.replaceChildren(el("strong", { texto: "Alimentos pedidos" }), lista,
+      el("p", { texto: "Receber até " + limiteInput.value.replace("T", " às ") }));
+  }
+
+  document.querySelectorAll("[data-pedido-avancar]").forEach(function (botao) {
+    botao.addEventListener("click", function () {
+      var proxima = Number(botao.dataset.pedidoAvancar);
+      limparErrosForm();
+      var todos = validarFormulario();
+      var campos = {};
+      Object.keys(todos).forEach(function (chave) {
+        if ((proxima === 2 && chave !== "data_limite_retirada") || proxima === 3) campos[chave] = todos[chave];
+      });
+      if (Object.keys(campos).length) { aplicarErros(campos); return; }
+      if (proxima === 3) resumoPedido();
+      mostrarPedidoEtapa(proxima);
+    });
+  });
+  document.querySelectorAll("[data-pedido-voltar]").forEach(function (botao) {
+    botao.addEventListener("click", function () { mostrarPedidoEtapa(botao.dataset.pedidoVoltar); });
+  });
+
   function validarFormulario() {
     var campos = {};
     var limiteV = limiteInput.value;
@@ -547,6 +586,9 @@
   }
 
   function aplicarErros(campos) {
+    var chaves = Object.keys(campos);
+    if (chaves.some(function (chave) { return chave === "itens" || chave.indexOf("itens[") === 0; })) mostrarPedidoEtapa(1);
+    else if (chaves.indexOf("data_limite_retirada") !== -1) mostrarPedidoEtapa(2);
     var primeiro = null;
     Object.keys(campos).forEach(function (chave) {
       var input = null;
@@ -606,6 +648,7 @@
       if (!c.receber_ate) partes.push("O texto não trazia uma data: escolha o \"Receber até\".");
       if (c.observacoes) partes.push("Observação: " + c.observacoes);
       mostrarAviso(aviso, "Preenchemos " + itens.length + (itens.length === 1 ? " item" : " itens") + " a partir do texto", partes.join(" "), { ok: true });
+      mostrarPedidoEtapa(1);
       $("publicar-t").scrollIntoView({ block: "nearest" });
     }).catch(function () {
       mostrarAviso(aviso, "Não conseguimos falar com o servidor", "Verifique sua conexão ou preencha os itens manualmente.", { erro: true });
@@ -640,7 +683,7 @@
         carregarDoacoes();
         mostrarAviso(avisoDoacao, "Pedido publicado",
           "Ele já aparece em Pedidos das ONGs, na Home, para quem quiser doar.", { ok: true });
-        $("minhas-t").scrollIntoView({ behavior: "smooth", block: "nearest" });
+        $("publicar-t").scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
       }
       if (r.status === 400 && c.campos) { aplicarErros(c.campos); return; }
@@ -667,6 +710,7 @@
     listaItens.replaceChildren();
     adicionarItem();
     limparErrosForm();
+    mostrarPedidoEtapa(1);
   }
 
   /* ---------- minhas doações ---------- */
@@ -1002,6 +1046,7 @@
       Object.keys(regioes).forEach(function (id) {
         var no = $(id);
         var ocultar = regioes[id] !== chave;
+        if (perfil === "ong" && id === "publicar-excedente") ocultar = true;
         if (perfil === "pessoa" && chave === "doar") {
           if (id === "publicar-excedente") ocultar = submodo !== "oferta";
           if (id === "bloco-rede") ocultar = submodo !== "pedidos";

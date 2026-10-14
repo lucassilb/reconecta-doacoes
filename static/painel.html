@@ -144,12 +144,12 @@
 
       </div>
 
-      <!-- ===== publicar pedido e meus pedidos: só empresa ===== -->
+      <!-- ===== pedidos da ONG ===== -->
       <div id="bloco-doacoes" class="painel__grade" hidden>
 
         <section class="cartao" id="publicar" aria-labelledby="publicar-t">
-          <h2 id="publicar-t" class="cartao__titulo">Publicar pedido de doação</h2>
-          <p class="cartao__sub">Diga do que você precisa: cada item, a quantidade e até quando pode receber. O pedido aparece em Pedidos das ONGs, na Home, e pessoas com CPF ou outras empresas doam, com questionário e foto.</p>
+          <h2 id="publicar-t" class="cartao__titulo">Criar pedido</h2>
+          <p class="cartao__sub">Informe os alimentos, a quantidade e até quando pode receber.</p>
 
           <details class="ia-pedido" id="ia-pedido">
             <summary>Preencher com IA (opcional)</summary>
@@ -163,17 +163,13 @@
             <div id="ia-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
           </details>
 
+          <div id="aviso-doacao" class="aviso" role="alert" hidden></div>
           <form id="form-doacao" class="form-doacao" novalidate>
-            <div class="campo campo--limite">
-              <label for="limite" class="campo__rotulo">Receber até</label>
-              <input id="limite" name="limite" type="datetime-local" class="campo__entrada campo__entrada--mono"
-                     aria-describedby="limite-ajuda limite-erro" required>
-              <p id="limite-ajuda" class="campo__ajuda">Até quando as doações podem ser entregues no endereço da empresa.</p>
-              <p id="limite-erro" class="campo__erro" data-erro></p>
-            </div>
-
+            <ol class="painel-etapas" aria-label="Etapas do pedido"><li data-pedido-indicador="1" aria-current="step">1 · Alimentos</li><li data-pedido-indicador="2">2 · Prazo</li><li data-pedido-indicador="3">3 · Conferir</li></ol>
+            <div class="painel-etapa" data-pedido-etapa="1">
+            <h3>O que sua ONG precisa?</h3>
             <fieldset class="itens">
-              <legend class="itens__legenda">Itens que você precisa</legend>
+              <legend class="itens__legenda">Alimentos</legend>
               <p id="itens-erro" class="campo__erro" data-erro></p>
               <div id="lista-itens" class="itens__lista"></div>
               <button type="button" id="btn-add-item" class="btn btn--secundario btn--pequeno btn--add">
@@ -181,12 +177,24 @@
                 Adicionar item
               </button>
             </fieldset>
-
-            <div id="aviso-doacao" class="aviso" role="alert" hidden></div>
-
-            <button type="submit" id="btn-publicar" class="btn btn--primario">
-              Publicar pedido
-            </button>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--primario" data-pedido-avancar="2">Continuar</button></div>
+            </div>
+            <div class="painel-etapa" data-pedido-etapa="2" hidden>
+            <h3>Até quando pode receber?</h3>
+            <div class="campo campo--limite">
+              <label for="limite" class="campo__rotulo">Receber até</label>
+              <input id="limite" name="limite" type="datetime-local" class="campo__entrada campo__entrada--mono"
+                     aria-describedby="limite-ajuda limite-erro" required>
+              <p id="limite-ajuda" class="campo__ajuda">Prazo para entregar no endereço da ONG.</p>
+              <p id="limite-erro" class="campo__erro" data-erro></p>
+            </div>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--secundario" data-pedido-voltar="1">Voltar</button><button type="button" class="btn btn--primario" data-pedido-avancar="3">Continuar</button></div>
+            </div>
+            <div class="painel-etapa" data-pedido-etapa="3" hidden>
+            <h3>Confira seu pedido</h3>
+            <div id="pedido-resumo" class="painel-resumo" aria-live="polite"></div>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--secundario" data-pedido-voltar="2">Voltar</button><button type="submit" id="btn-publicar" class="btn btn--primario">Publicar pedido</button></div>
+            </div>
           </form>
         </section>
 
