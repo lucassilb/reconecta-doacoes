@@ -2,7 +2,12 @@
 
 - **1ª passada:** 2026-10-13, base `e652512` — Bandit 5 MEDIUM; Trivy fs 4 MEDIUM.
 - **2ª passada:** 2026-10-13, base `main` `3a7939e` (Frentes A e C integradas) — resultado
-  na seção "Estado atual".
+  na seção "Estado anterior".
+- **3ª passada:** 2026-10-13, base `main` local `520d5b1` (rodada 11 integrada) — resultado
+  na seção "Estado atual". Trivy `image` **não foi refeito localmente** (daemon Docker
+  indisponível na máquina); ele roda no job `sast-trivy` do GitHub Actions
+  (`ci.yml:84-99`) e os artefatos `trivy-image.*` em `relatorios/sast/` seguem referindo-se
+  à 2ª passada (`3a7939e`).
 
 ## Ferramentas e comandos
 
@@ -29,7 +34,29 @@ Kubernetes, Helm, Terraform, CloudFormation e Ansible — `docker-compose.yml`,
 deles está na matriz `docs/stride.md`, linhas T6/T7/D7/I9). O `trivy config` detecta só o
 `Dockerfile` neste repositório: 0 misconfigurações.
 
-## Estado atual (`3a7939e`)
+## Estado atual (`520d5b1`, rodada 11)
+
+Rodado localmente com `python scripts/sast.py --sem-imagem` (Bandit 1.9.4 no venv,
+Python 3.14; Trivy 0.75.0 com DB de 2026-10-13, binário fora do repositório).
+
+| Origem | CRITICAL | HIGH | MEDIUM | LOW | UNKNOWN |
+|---|---|---|---|---|---|
+| Bandit (código, excl. tests/scripts/venv/instance) | 0 | 0 | **0** | 0 | 0 |
+| Trivy `fs` — vulns (`requirements.txt`, Dockerfile) | 0 | 0 | **0** | 0 | 0 |
+| Trivy `fs` — segredos | — | — | **0** | — | — |
+| Trivy `config` — IaC (Dockerfile) | — | — | **0** | — | — |
+| Trivy `image` — não refeito nesta passada | — | — | — | — | — |
+
+Bandit: **0 achados** em 4372 linhas varridas (4 testes pulados por `# nosec`, os mesmos
+B608 justificados de `migracoes.py`). Os módulos novos da rodada (`Excedentes.py`,
+`eventos.py`, `TempoReal.py`, `conexao.py`, mudanças em `Cadastro.py`, `Painel.py`,
+`IA.py`, `models.py`, `migracoes.py`) saíram limpos: as transições de estado usam
+`update().where(...)` parametrizado pelo ORM e não há SQL novo fora de `migracoes.py`.
+
+Trivy `fs`/`config`: **0 vulnerabilidades, 0 segredos, 0 misconfigurações** — incluída a
+linha nova do `CMD` do gunicorn (`--worker-class gthread --threads 8`, `Dockerfile:21`).
+
+## Estado anterior (`3a7939e`)
 
 | Origem | CRITICAL | HIGH | MEDIUM | LOW | UNKNOWN |
 |---|---|---|---|---|---|
@@ -78,6 +105,10 @@ matriz, T6): actions por tag e não por SHA; sem lockfile com hash.
    reavaliar quando a base publicar updates.
 2. **Sem segredos, sem misconfig detectada, sem CVE em dependência Python.**
 3. Itens que o SAST não cobre (fora do escopo da ferramenta) estão no STRIDE: prova de
-   posse no cadastro, limite global por IP, token admin estático, auditoria só em stdout.
+   posse no cadastro, limite global por IP, token admin estático, auditoria só em stdout —
+   e, novos na rodada 11 (`docs/stride.md`, seção 8): cada conexão SSE segura um gthread
+   por até 5 min (D8), a regra "evento sem dado pessoal" é convenção e não enforcement
+   (I11), contas legadas ficam `atividade_alimentar=True` até `atualizar_perfis.py` rodar
+   (E8) e a `observacao` do excedente é texto livre público (I12).
 
 **Nenhum achado CRITICAL nem HIGH acionável. Nenhuma correção pendente nesta frente.**
