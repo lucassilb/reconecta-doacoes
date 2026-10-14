@@ -22,6 +22,8 @@
 }
 
 .painel__grade { display: grid; gap: 18px; }
+.painel__grade + .painel__grade { margin-top: 18px; }
+.painel__selos { display: flex; flex-wrap: wrap; gap: 6px; }
 .painel .cartao { display: grid; gap: 12px; align-content: start; animation: rc-surgir .3s ease both; }
 .cartao__titulo { font-size: 1.35rem; font-weight: 700; }
 .cartao__sub { color: var(--tinta-suave); font-size: .92rem; margin-top: -6px; }
@@ -172,6 +174,9 @@
 .recebida__foto img { width: 56px; height: 56px; object-fit: cover; display: block; }
 .recebida__texto { display: grid; gap: 2px; min-width: 0; }
 .recebida__meta { font-size: .86rem; color: var(--tinta-suave); }
+.recebida__texto .selo { justify-self: start; margin-top: 4px; }
+.recebida__acoes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.recebida__acoes .btn { min-height: 36px; }
 .minha-doacao { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; }
 .minha-doacao:not(:has(.minha-doacao__foto)) { grid-template-columns: minmax(0, 1fr); }
 .minha-doacao__foto { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; }
@@ -208,3 +213,18 @@
 .senha-forca[data-nivel="1"] i:nth-child(1) { background: var(--erro); }
 .senha-forca[data-nivel="2"] i:nth-child(-n+2) { background: var(--alerta); }
 .senha-forca[data-nivel="3"] i { background: var(--ok); }
+
+/* formulário e histórico de excedentes */
+.ex-item__grade { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) {
+  .ex-item__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ex-item__grade .campo:first-child { grid-column: 1 / -1; }
+}
+.ex-item > .btn { justify-self: start; }
+.ex-declaracoes { margin: 0; padding: 0; border: 0; display: grid; gap: 10px; }
+.ex-declaracoes legend { margin-bottom: 10px; }
+.ex-declaracoes label { display: flex; align-items: flex-start; gap: 10px; font-size: .93rem; }
+.ex-declaracoes input { width: 18px; height: 18px; flex: none; margin: 2px 0 0; accent-color: var(--verde); }
+.ex-cartao .pedido-itens-painel { gap: 4px; }
+.ex-cartao .pedido-linha { color: var(--tinta-suave); font-size: .88rem; }
+.ex-cartao .doacao__onde { color: var(--tinta); }
