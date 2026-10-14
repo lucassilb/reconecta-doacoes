@@ -513,6 +513,10 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 
 button.hero__cta { border: 0; cursor: pointer; font-family: inherit; }
 
+/* a coluna de texto do hero não cresce além da grade: as métricas quebram linha em vez de entrar sob a foto */
+.hero__texto { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 520px) { .hero__metricas { grid-template-columns: repeat(3, minmax(0, auto)); } }
+
 .ao-vivo {
   display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; vertical-align: 1px;
   padding: 2px 10px; border-radius: var(--pilula);

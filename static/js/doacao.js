@@ -320,6 +320,8 @@
     fd.append("foto", $("c-foto").files[0]);
 
     var btn = $("btn-doar");
+    var vivo = window.ReConecta && window.ReConecta.tempoReal;
+    if (vivo && vivo.silenciar) vivo.silenciar();   // sem aviso ao vivo da própria doação
     btn.disabled = true; btn.classList.add("is-carregando");
     requisitar("/reconecta/publico/doacoes/" + ID + "/contribuicoes", { method: "POST", form: fd }).then(function (r) {
       var c = r.corpo;

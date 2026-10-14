@@ -174,6 +174,7 @@
 
   function agir(caminho, metodo, b, mensagens) {
     aviso("");
+    if (R.tempoReal && R.tempoReal.silenciar) R.tempoReal.silenciar();
     b.disabled = true; b.classList.add("is-carregando");
     requisitar("/reconecta/excedentes/" + ID + caminho, metodo || "POST").then(function (r) {
       var c = r.corpo;

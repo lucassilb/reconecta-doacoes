@@ -22,7 +22,10 @@
      Para cada evento dispara, no document:
        new CustomEvent("reconecta:evento", { detail: { id, tipo, criado_em, dados, privado } })
      privado = true quando o evento foi destinado ao usuário logado (também aparece no sino).
-     window.ReConecta.tempoReal = { estado: "sse" | "consulta" | "parado", ultimoId }
+     window.ReConecta.tempoReal = { estado: "sse" | "consulta" | "parado", ultimoId, silenciar(ms) }
+       silenciar(ms): a página chama antes de uma ação do próprio usuário (reservar, doar…) para não
+       mostrar o aviso público do que ele mesmo acabou de fazer; o evento continua sendo disparado
+       e os avisos destinados a ele continuam aparecendo.
      window.ReConecta.descreverEvento(evento, privado) → { texto, href } ou null
      As páginas só escutam "reconecta:evento" e recarregam o trecho afetado. */
 (function () {
@@ -449,6 +452,8 @@
   var INTERVALO_CONSULTA = 10000;
   var RETORNO_SSE = 60000;
   var tr = api.tempoReal = { estado: "parado", ultimoId: 0 };
+  var semAvisosAte = 0;
+  tr.silenciar = function (ms) { semAvisosAte = Date.now() + (Number(ms) > 0 ? Number(ms) : 6000); };
   api.descreverEvento = descreverEvento;
 
   var fonte = null, relogioConsulta = null, relogioRetorno = null, relogioFila = null;
@@ -479,7 +484,9 @@
         detail: { id: ev.id, tipo: ev.tipo, criado_em: ev.criado_em, dados: ev.dados, privado: ev.privado }
       }));
     });
+    var calado = Date.now() < semAvisosAte;   // a própria pessoa acabou de agir: a tela dela já mostra o resultado
     lote.slice(-3).forEach(function (ev) {
+      if (calado && !ev.privado) return;
       var repetido = !ev.privado && chaves[ev.tipo + "|" + (ev.dados.pedido_id || "") + "|" + (ev.dados.excedente_id || "")];
       // o que a própria organização acabou de publicar não precisa de aviso para ela mesma
       var meu = !ev.privado && meuNome && ev.dados.organizacao === meuNome;
