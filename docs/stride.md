@@ -3,12 +3,16 @@
 - **1ª passada:** 2026-10-13, base `e652512` (pré-nuvem). Achados originais preservados na
   coluna "Estado" e na seção 7.
 - **2ª passada:** 2026-10-13, base `main` `3a7939e` (Frentes A e C integradas: nuvem,
-  Docker, CI/CD, dataset+classificador). Todas as referências `arquivo:linha` apontam para
-  o código atual.
+  Docker, CI/CD, dataset+classificador). As referências `arquivo:linha` das seções 1–7
+  apontam para essa base e podem ter deslocado algumas linhas na rodada 11.
+- **3ª passada:** 2026-10-13, base `main` local `520d5b1` (rodada 11: perfis ONG/empresa
+  por natureza jurídica, excedentes, confirmação de entrega, eventos + SSE, notificações,
+  IA de conexão). Superfícies novas na seção 8, com referências a `520d5b1`.
 
 Método: leitura do código (`app.py`, `Auth.py`, `Cadastro.py`, `cnpj_service.py`,
-`Publico.py`, `Contribuicoes.py`, `Painel.py`, `Dashboard.py`, `IA.py`, `llm_service.py`,
-`classificador.py`, `crud_admin.py`, `crud_validacao.py`, `models.py`, `migracoes.py`,
+`cnae_alimentos.py`, `Publico.py`, `Contribuicoes.py`, `Painel.py`, `Dashboard.py`,
+`IA.py`, `conexao.py`, `llm_service.py`, `classificador.py`, `eventos.py`, `TempoReal.py`,
+`Excedentes.py`, `crud_admin.py`, `crud_validacao.py`, `models.py`, `migracoes.py`,
 `static/js/*`, `Dockerfile`, `docker-compose.yml`, `render.yaml`, `.github/workflows/ci.yml`,
 `schema.sql`, `docs/*`) e dos relatórios SAST em `relatorios/sast/`. Controle só é citado
 quando existe no código; o que não existe aparece como lacuna.
@@ -213,3 +217,66 @@ Probabilidade (P) e Impacto (I) de 1 a 3. Risco = P×I (1–9). Residual = após
 | B104 `app.py` bind 0.0.0.0 | ✔ `FLASK_RUN_HOST` padrão `127.0.0.1` (`app.py:194`) |
 | B608 ×4 em `migracoes.py` | ✔ `# nosec` com justificativa (`:88,127,174,221`) |
 | Foto só em disco (risco com disco efêmero) | ✔ `foto_dados` no banco |
+
+## 8. Rodada 11 — superfícies novas (base `520d5b1`)
+
+O que entrou: papéis de organização por natureza jurídica (`sem_fins_lucrativos`,
+`atividade_alimentar`), excedentes com reserva/retirada, confirmação "Recebi/Não recebi",
+tabela `eventos` + SSE `/reconecta/tempo-real` + `/novidades` + `/notificacoes`, e a rota
+`/reconecta/ia/sugerir-destino`. No diagrama da seção 1 somam-se: uma seta APP→USR de SSE
+(fluxo de saída contínuo, autenticado por cookie quando logado), a tabela `eventos` dentro
+da Fronteira 2 (gravada na mesma transação da operação) e o ator "ONG" distinguível de
+"empresa de alimentos" dentro de "organização com CNPJ".
+
+**Atores novos/ajustados**
+
+| Ator | Acesso |
+|---|---|
+| ONG autenticada (CNPJ sem fins lucrativos) | + publicar pedidos, **reservar excedentes** (30/h), cancelar sua reserva, confirmar Recebi/Não recebi nas doações aceitas |
+| Empresa de alimentos autenticada | + publicar pedidos, **publicar excedentes** (20/h), cancelar excedente próprio, confirmar retirada de quem reservou, `interpretar-pedido`/`sugerir-destino` |
+| Qualquer usuário logado | `sugerir-destino` (10/min), `/notificacoes`, SSE com seus eventos privados |
+| Visitante anônimo | `GET /excedentes` e `/<id>` (sem endereço de retirada), SSE/`novidades` só com eventos públicos |
+
+### S — Falsificação (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| S6 | `POST /reconecta/cadastro/empresa` | Cadastro como **ONG de terceiro** (natureza jurídica é dado público da Receita) | 2 | 3 | 6 | Aceite por natureza sem fins lucrativos (`cnpj_service.py:17,228`) **ou** CNAE alimentar; `SEM_PERFIL_ACEITO` recusa quem não é nenhum (`Cadastro.py:143-144`); lista CONCLA conservadora, documentada em `docs/natureza-juridica.md`; cadastro auditado (`Cadastro.py:229`) | 4 | ○ Mesma lacuna de S2 — o segundo caminho amplia os CNPJs elegíveis, não a confiança |
+
+### T — Adulteração (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| T8 | Reservar/cancelar/confirmar excedente | Corrida: duas ONGs reservam o mesmo excedente; retirada/cancelamento duplo | 2 | 3 | 6 | Transição de estado atômica `UPDATE ... WHERE status=... AND retirar_ate>agora` com `rowcount` conferido (`Excedentes.py:333-338,364-372,394-401,422-428`); CHECKs de status e de reservante (`models.py:144-148`, `schema.sql:113-116`); expiração derivada na leitura, sem job (`status_efetivo`, `Excedentes.py:171-174`) | 1 | ✔ |
+| T9 | `POST .../contribuicoes/<id>/receber` e `/nao-recebida` | Dupla decisão ou forja de estado da doação | 2 | 2 | 4 | Só o dono do pedido (join + filtro, `Painel.py:195-199`); só `ACEITA`, `UPDATE` atômico com `rowcount` (`:200-207`); auditoria `doacao_entregue`/`doacao_nao_recebida` (`:216-217`) | 1 | ✔ |
+| T10 | `POST /reconecta/excedentes` | Item/validade/declarações forjados | 2 | 2 | 4 | 3 declarações obrigatórias, ≥1 item, validade ≥ hoje, `retirar_ate` futuro e ≤ menor validade, categoria/unidade por allowlist, quantidade `Decimal` ≤ 2 casas com teto (`Excedentes.py:102-168`); `observacao` ≤ 200 também por CHECK (`models.py:146`) | 1 | ✔ |
+| T11 | Tabela `eventos` | Evento anunciado de operação que falhou depois | 1 | 2 | 2 | `emitir` grava na mesma transação do chamador, sem commit próprio (`eventos.py:38-50`) — rollback apaga o evento | 1 | ✔ |
+| T12 | `/reconecta/ia/sugerir-destino` | Texto com injeção adultera a saída do modelo | 2 | 2 | 4 | Mesmo pipeline validado de `interpretar-pedido` (schema + conferência por regras, `llm_service.py`); sugestões são `casar` **puro** sobre pedidos lidos do banco (`conexao.py:112-139`, `IA.py:131-140`) — o texto influencia só os itens extraídos, nunca executa nem altera dados | 1 | ✔ |
+
+### R — Repúdio (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| R5 | Reserva/retirada/cancelamento de excedente; decisão de entrega | Negar ação sobre excedente ou doação | 2 | 2 | 4 | `registrar_auditoria` em cada transição (`Excedentes.py:291,342,378,407,434`; `Painel.py:216-217`) **e** a tabela `eventos` é trilha persistida no banco (`eventos.py:19-35`) | 2 | ◐ `eventos` cobre o fato de negócio, não o ator; auditoria continua só em stdout (R3) |
+
+### I — Divulgação de informação (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| I11 | SSE `/tempo-real`, `/novidades`, `/notificacoes` | Evento privado vaza para outro usuário ou anônimo | 2 | 3 | 6 | Filtro `público OU (dest_tipo,dest_id) do logado` na consulta (`TempoReal.py:54-58,70-73,142`); `/notificacoes` só lê o destinatário logado e `lidas` só mexe na linha própria com id monotônico (`:151-163,166-191`); `dados` sem PII por contrato (`eventos.py:8-9`), verificado nos emissores — ex.: nome da ONG vai só na linha privada do publicador (`Excedentes.py:373-375`), `doacao.entregue` público só tem id+item (`Painel.py:211-213`) | 2 | ◐ "Sem PII" é **convenção, não enforcement**: um `emitir` futuro com dado pessoal vazaria pelo canal público. Revisão de novas chamadas cobre isso; um assert/lint sobre chaves permitidas reduziria o risco |
+| I12 | `GET /reconecta/excedentes/<id>` | Endereço de retirada e nome do reservante expostos | 2 | 3 | 6 | `retirada.endereco` só para quem reservou (`Excedentes.py:205-209`); `reservado_por` só para o publicador (`:210-212`); sem login, só dados públicos | 2 | ◐ `observacao` é texto livre **público** (`:203`) — o publicador pode digitar dado sensível ali; mitigar na UI (aviso) ou documentação |
+| I13 | SSE/`novidades` para anônimo | Eventos públicos escrapeáveis em tempo real | 2 | 1 | 2 | Payload público por contrato só com ids/rótulos (organização, município/UF, categorias — dados já expostos nas listagens) | 2 | ◐ Aceito: equivale ao scraping de `/publico/*` (I7) |
+
+### D — Negação de serviço (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| D8 | SSE `/reconecta/tempo-real` | Muitas conexões esgotam os threads do gunicorn | 3 | 2 | 6 | Teto de 20 conexões por processo → 503 `TEMPO_REAL_LOTADO` e o front cai para `/novidades` a cada 10 s (`TempoReal.py:28,112-117`); fluxo encerra sozinho aos 5 min e o navegador reconecta (`:27,96`); sessão do banco devolvida ao pool entre consultas (`:70-82`); batimento a cada 15 s (`:101-104`) | 4 | ○ O contador é **por processo** (2 workers → até 40) **e** cada SSE segura um gthread por até 5 min: `--threads 8 --workers 2` (`Dockerfile:21`) somam 16 threads, então ~16 clientes SSE podem enfileirar requisições normais **antes** do 503 disparar. Mitigações possíveis: subir `threads`, dedicar um processo/worker ao SSE ou mover o limite para a borda |
+| D9 | `POST /excedentes`, `POST .../reservar` | Spam de excedentes e reservas | 2 | 2 | 4 | Cota 20 publicações/h e 30 reservas/h por organização (`Excedentes.py:46-49,89-99,264-265,355-356`) | 2 | ◐ Em memória por processo (mesma limitação de D6: divide entre workers e zera no restart) |
+| D10 | `/novidades`, `/notificacoes`, `/sugerir-destino` | Flood de consultas / saturar o modelo | 2 | 2 | 4 | Respostas limitadas (50/30 itens), `desde` só dígitos (`TempoReal.py:85-89`), índices `ix_eventos_*` (`eventos.py:26-27`); `sugerir-destino` exige login, texto 5–600 e 10/min por usuário (`IA.py:118-130`) | 2 | ◐ Sem limite global por IP (D5) |
+
+### E — Elevação de privilégio (r11)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| E8 | Papéis ONG × empresa de alimentos | Empresa comum reserva excedente; não-alimentar publica | 2 | 3 | 6 | Papel **derivado da Receita**, não declarado pelo usuário: reservar exige `sem_fins_lucrativos` (`Excedentes.py:353-354`), publicar exige `atividade_alimentar` (`:262-263`), proibido reservar o próprio (`:360-361`); gravação no cadastro
