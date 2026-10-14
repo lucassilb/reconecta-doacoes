@@ -57,15 +57,15 @@ def _uf(endereco):
     return uf if uf in REGIAO_UF else "Não informada"
 
 
-def _minutos(fim, inicio):
-    if fim is None or inicio is None:
-        return None
-    minutos = (fim - inicio).total_seconds() / 60
-    return minutos if minutos >= 0 else None
+def _minutos_sql(fim, inicio):
+    """Diferença em minutos nos dois bancos suportados pelo projeto."""
+    if db.session.get_bind().dialect.name == "sqlite":
+        return (func.julianday(fim) - func.julianday(inicio)) * 1440
+    return extract("epoch", fim - inicio) / 60
 
 
-def _media(valores):
-    return round(sum(valores) / len(valores), 2) if valores else None
+def _media_sql(media, amostras):
+    return round(float(media), 2) if amostras else None
 
 
 def _ler_json(caminho):
@@ -86,51 +86,64 @@ def montar_impacto():
     total = defaultdict(Decimal)
     por_uf = defaultdict(lambda: defaultdict(Decimal))
     sem_conversao = 0
-    tempos_pedido, tempos_excedente = [], []
     calor = [[0] * 24 for _ in range(7)]
 
-    contribuicoes = (db.session.query(Contribuicao.status, Contribuicao.quantidade,
-                     Contribuicao.categoria, Contribuicao.unidade_medida,
-                     Contribuicao.criado_em, Doacao.data_cadastro,
-                     Estabelecimento.endereco)
-                     .join(Doacao, Doacao.id == Contribuicao.doacao_id)
-                     .join(Estabelecimento, Estabelecimento.id == Doacao.estabelecimento_id)
-                     .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE"))).all())
+    tempos_pedido = (db.session.query(
+        func.avg(_minutos_sql(Contribuicao.criado_em, Doacao.data_cadastro)),
+        func.count(Contribuicao.id))
+        .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+        .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")),
+                Contribuicao.criado_em >= Doacao.data_cadastro).one())
+    tempos_excedente = (db.session.query(
+        func.avg(_minutos_sql(Excedente.reservado_em, Excedente.criado_em)),
+        func.count(Excedente.id))
+        .filter(Excedente.status.in_(("RESERVADO", "RETIRADO")),
+                Excedente.reservado_em >= Excedente.criado_em).one())
+
+    ano = extract("year", Contribuicao.criado_em)
+    mes = extract("month", Contribuicao.criado_em)
+    dia = extract("day", Contribuicao.criado_em)
+    hora = extract("hour", Contribuicao.criado_em)
+    horarios = (db.session.query(ano, mes, dia, hora, func.count(Contribuicao.id))
+                .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")),
+                        Contribuicao.criado_em.isnot(None))
+                .group_by(ano, mes, dia, hora).all())
+    for ano_utc, mes_utc, dia_utc, hora_utc, contagem in horarios:
+        local = utc_para_brasilia(datetime(ano_utc, mes_utc, dia_utc, hora_utc))
+        calor[local.weekday()][local.hour] += contagem
+
+    contribuicoes = (db.session.query(
+        Contribuicao.categoria, Contribuicao.unidade_medida,
+        Estabelecimento.endereco,
+        func.sum(Contribuicao.quantidade).label("quantidade"),
+        func.count(Contribuicao.id).label("itens"))
+        .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+        .join(Estabelecimento, Estabelecimento.id == Doacao.estabelecimento_id)
+        .filter(Contribuicao.status == "ENTREGUE")
+        .group_by(Contribuicao.categoria, Contribuicao.unidade_medida,
+                  Estabelecimento.id, Estabelecimento.endereco).all())
     for c in contribuicoes:
-        minutos = _minutos(c.criado_em, c.data_cadastro)
-        if minutos is not None:
-            tempos_pedido.append(minutos)
-        if c.criado_em:
-            local = utc_para_brasilia(c.criado_em)
-            calor[local.weekday()][local.hour] += 1
-        if c.status != "ENTREGUE":
-            continue
         peso = converter_kg(c.quantidade, c.categoria, c.unidade_medida, tabela)
         if peso is None:
-            sem_conversao += 1
+            sem_conversao += c.itens
             continue
         kg, tipo = peso
         total[tipo] += kg
         por_uf[_uf(c.endereco)][tipo] += kg
 
-    excedentes = (db.session.query(Excedente.status, Excedente.criado_em,
-                  Excedente.reservado_em, Estabelecimento.endereco)
-                  .join(Estabelecimento, Estabelecimento.id == Excedente.reservado_por_id)
-                  .filter(Excedente.status.in_(("RESERVADO", "RETIRADO"))).all())
-    for e in excedentes:
-        minutos = _minutos(e.reservado_em, e.criado_em)
-        if minutos is not None:
-            tempos_excedente.append(minutos)
-
-    retirados = (db.session.query(ItemExcedente.quantidade, ItemExcedente.categoria,
-                 ItemExcedente.unidade_medida, Estabelecimento.endereco)
+    retirados = (db.session.query(ItemExcedente.categoria,
+                 ItemExcedente.unidade_medida, Estabelecimento.endereco,
+                 func.sum(ItemExcedente.quantidade).label("quantidade"),
+                 func.count(ItemExcedente.id).label("itens"))
                  .join(Excedente, Excedente.id == ItemExcedente.excedente_id)
                  .join(Estabelecimento, Estabelecimento.id == Excedente.reservado_por_id)
-                 .filter(Excedente.status == "RETIRADO").all())
+                 .filter(Excedente.status == "RETIRADO")
+                 .group_by(ItemExcedente.categoria, ItemExcedente.unidade_medida,
+                           Estabelecimento.id, Estabelecimento.endereco).all())
     for item in retirados:
         peso = converter_kg(item.quantidade, item.categoria, item.unidade_medida, tabela)
         if peso is None:
-            sem_conversao += 1
+            sem_conversao += item.itens
             continue
         kg, tipo = peso
         total[tipo] += kg
@@ -147,7 +160,12 @@ def montar_impacto():
     for uf, valores in por_uf.items():
         for tipo, kg in valores.items():
             regioes[REGIAO_UF.get(uf, "Não informada")][tipo] += kg
-    todos_tempos = tempos_pedido + tempos_excedente
+    pedido_media, pedido_amostras = tempos_pedido
+    excedente_media, excedente_amostras = tempos_excedente
+    combinado_amostras = pedido_amostras + excedente_amostras
+    combinado_media = ((pedido_media or 0) * pedido_amostras +
+                       (excedente_media or 0) * excedente_amostras)
+    combinado_media = combinado_media / combinado_amostras if combinado_amostras else None
     return {
         "peso": resumo_peso(total) | {"itens_sem_conversao": sem_conversao},
         "refeicoes": {"kg_por_refeicao": float(KG_POR_REFEICAO),
@@ -155,10 +173,12 @@ def montar_impacto():
                        "por_uf": [{"uf": uf} | resumo_peso(v) for uf, v in sorted(por_uf.items())],
                        "por_regiao": [{"regiao": regiao} | resumo_peso(v)
                                       for regiao, v in sorted(regioes.items())]},
-        "match": {"pedido_min": _media(tempos_pedido), "pedido_amostras": len(tempos_pedido),
-                  "excedente_min": _media(tempos_excedente),
-                  "excedente_amostras": len(tempos_excedente),
-                  "combinado_min": _media(todos_tempos), "combinado_amostras": len(todos_tempos)},
+        "match": {"pedido_min": _media_sql(pedido_media, pedido_amostras),
+                  "pedido_amostras": pedido_amostras,
+                  "excedente_min": _media_sql(excedente_media, excedente_amostras),
+                  "excedente_amostras": excedente_amostras,
+                  "combinado_min": _media_sql(combinado_media, combinado_amostras),
+                  "combinado_amostras": combinado_amostras},
         "calor_doacoes": {"periodo": "todo o histórico", "fuso": "America/Sao_Paulo",
                            "dias": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
                            "horas": list(range(24)), "valores": calor},

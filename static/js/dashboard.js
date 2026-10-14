@@ -180,7 +180,7 @@
     var peso = d.peso || {}, refeicoes = d.refeicoes || {}, match = d.match || {};
     $("kg-medido").textContent = decimal.format(peso.kg_medido || 0) + " kg";
     $("kg-estimado").textContent = decimal.format(peso.kg_estimado || 0) + " kg";
-    $("refeicoes-total").textContent = inteiro.format((Number(peso.kg_medido || 0) + Number(peso.kg_estimado || 0)) / (refeicoes.kg_por_refeicao || .5));
+    $("refeicoes-total").textContent = inteiro.format(peso.refeicoes_estimadas || 0);
     $("refeicoes-premissa").textContent = refeicoes.premissa || "Premissa não informada";
     $("match-total").textContent = duracao(match.combinado_min);
     $("match-detalhe").textContent = "Pedido → doação: " + duracao(match.pedido_min) + " (" + (match.pedido_amostras || 0) + "); oferta → reserva: " + duracao(match.excedente_min) + " (" + (match.excedente_amostras || 0) + ").";
@@ -381,6 +381,8 @@
   }
   function selecionarModo(novo) {
     if (modo === novo) return;
+    clearTimeout(atualizacaoPendente);
+    atualizacaoPendente = null;
     modo = novo;
     window.history.replaceState(null, "", window.location.pathname + (modo === "demonstracao" ? "?modo=demonstracao" : "") + window.location.hash);
     aplicarModo();
@@ -392,12 +394,17 @@
   $("modo-demonstracao").addEventListener("click", function () { selecionarModo("demonstracao"); });
   $("btn-atualizar").addEventListener("click", carregar);
   $("btn-resumo").addEventListener("click", gerarResumo);
-  var atualizacaoPendente;
+  var atualizacaoPendente, ultimaAtualizacaoPorEvento = 0;
   document.addEventListener("reconecta:evento", function (evento) {
     if (modo === "demonstracao") return;
     if (!evento.detail || !/^(pedido\.|doacao\.|excedente\.)/.test(evento.detail.tipo)) return;
-    clearTimeout(atualizacaoPendente);
-    atualizacaoPendente = setTimeout(carregar, 250);
+    if (atualizacaoPendente) return;
+    var espera = Math.max(250, 2000 - (Date.now() - ultimaAtualizacaoPorEvento));
+    atualizacaoPendente = setTimeout(function () {
+      atualizacaoPendente = null;
+      ultimaAtualizacaoPorEvento = Date.now();
+      carregar();
+    }, espera);
   });
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden && modo === "real") carregar();

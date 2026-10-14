@@ -122,3 +122,17 @@ def test_seguranca_publica_nao_inventa_contadores():
     assert resposta.status_code == 200
     assert resposta.json["controles"]["falhas_login"].startswith("Não medidas")
     assert resposta.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] > 0
+
+
+@pytest.mark.parametrize("cookie_seguro", [False, True])
+def test_seguranca_declara_cabecalhos_da_resposta(monkeypatch, cookie_seguro):
+    monkeypatch.setitem(app.config, "SESSION_COOKIE_SECURE", cookie_seguro)
+    resposta = app.test_client().get("/reconecta/dashboard/seguranca")
+    assert resposta.status_code == 200
+    nomes = {"Content-Security-Policy", "X-Content-Type-Options",
+             "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"}
+    declarados = set(resposta.json["controles"]["cabecalhos"])
+    assert declarados == nomes
+    assert declarados == {nome for nome in nomes if resposta.headers.get(nome)}
+    assert bool(resposta.headers.get("Strict-Transport-Security")) == cookie_seguro
+    assert resposta.json["controles"]["hsts_condicional"] == cookie_seguro
