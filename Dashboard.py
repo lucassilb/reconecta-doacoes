@@ -1,18 +1,174 @@
 """Indicadores agregados e públicos dos pedidos de doação."""
 
+import csv
+import json
+from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
+from flask import current_app
 from flask_restx import Namespace, Resource
 from sqlalchemy import extract, func, select
 
 from fuso import agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
-                    Excedente, Instituicao, ItemDoacao, db)
+                    Excedente, Instituicao, ItemDoacao, ItemExcedente, db)
 from Publico import _municipio_uf
 
 ns = Namespace("dashboard", description="Indicadores públicos agregados")
+
+
+RAIZ = Path(__file__).resolve().parent
+KG_POR_REFEICAO = Decimal("0.5")  # premissa declarada; não mede refeições servidas
+MACROREGIOES = {
+    "Norte": "AC AP AM PA RO RR TO".split(),
+    "Nordeste": "AL BA CE MA PB PE PI RN SE".split(),
+    "Centro-Oeste": "DF GO MT MS".split(),
+    "Sudeste": "ES MG RJ SP".split(),
+    "Sul": "PR RS SC".split(),
+}
+REGIAO_UF = {uf: regiao for regiao, ufs in MACROREGIOES.items() for uf in ufs}
+
+
+def conversoes_kg(caminho=None):
+    caminho = caminho or RAIZ / "data" / "conversao_kg.csv"
+    with open(caminho, encoding="utf-8", newline="") as arquivo:
+        return {(r["categoria"], r["unidade_medida"]):
+                (Decimal(r["kg_por_unidade"]), r["tipo"])
+                for r in csv.DictReader(arquivo)}
+
+
+def converter_kg(quantidade, categoria, unidade, tabela):
+    regra = tabela.get((categoria, unidade)) or tabela.get(("*", unidade))
+    if regra is None:
+        return None
+    return Decimal(str(quantidade)) * regra[0], regra[1]
+
+
+def _uf(endereco):
+    municipio = _municipio_uf(endereco)
+    uf = municipio.rsplit("/", 1)[-1].upper() if municipio else None
+    return uf if uf in REGIAO_UF else "Não informada"
+
+
+def _minutos(fim, inicio):
+    if fim is None or inicio is None:
+        return None
+    minutos = (fim - inicio).total_seconds() / 60
+    return minutos if minutos >= 0 else None
+
+
+def _media(valores):
+    return round(sum(valores) / len(valores), 2) if valores else None
+
+
+def _ler_json(caminho):
+    try:
+        return json.loads(caminho.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def montar_impacto():
+    """Conta somente entregas e retiradas; ofertas abertas não são impacto."""
+    tabela = conversoes_kg()
+    total = defaultdict(Decimal)
+    por_uf = defaultdict(lambda: defaultdict(Decimal))
+    sem_conversao = 0
+    tempos_pedido, tempos_excedente = [], []
+    calor = [[0] * 24 for _ in range(7)]
+
+    contribuicoes = (db.session.query(Contribuicao.status, Contribuicao.quantidade,
+                     Contribuicao.categoria, Contribuicao.unidade_medida,
+                     Contribuicao.criado_em, Doacao.data_cadastro,
+                     Estabelecimento.endereco)
+                     .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+                     .join(Estabelecimento, Estabelecimento.id == Doacao.estabelecimento_id)
+                     .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE"))).all())
+    for c in contribuicoes:
+        minutos = _minutos(c.criado_em, c.data_cadastro)
+        if minutos is not None:
+            tempos_pedido.append(minutos)
+        if c.criado_em:
+            local = utc_para_brasilia(c.criado_em)
+            calor[local.weekday()][local.hour] += 1
+        if c.status != "ENTREGUE":
+            continue
+        peso = converter_kg(c.quantidade, c.categoria, c.unidade_medida, tabela)
+        if peso is None:
+            sem_conversao += 1
+            continue
+        kg, tipo = peso
+        total[tipo] += kg
+        por_uf[_uf(c.endereco)][tipo] += kg
+
+    excedentes = (db.session.query(Excedente.status, Excedente.criado_em,
+                  Excedente.reservado_em, Estabelecimento.endereco)
+                  .join(Estabelecimento, Estabelecimento.id == Excedente.reservado_por_id)
+                  .filter(Excedente.status.in_(("RESERVADO", "RETIRADO"))).all())
+    for e in excedentes:
+        minutos = _minutos(e.reservado_em, e.criado_em)
+        if minutos is not None:
+            tempos_excedente.append(minutos)
+
+    retirados = (db.session.query(ItemExcedente.quantidade, ItemExcedente.categoria,
+                 ItemExcedente.unidade_medida, Estabelecimento.endereco)
+                 .join(Excedente, Excedente.id == ItemExcedente.excedente_id)
+                 .join(Estabelecimento, Estabelecimento.id == Excedente.reservado_por_id)
+                 .filter(Excedente.status == "RETIRADO").all())
+    for item in retirados:
+        peso = converter_kg(item.quantidade, item.categoria, item.unidade_medida, tabela)
+        if peso is None:
+            sem_conversao += 1
+            continue
+        kg, tipo = peso
+        total[tipo] += kg
+        por_uf[_uf(item.endereco)][tipo] += kg
+
+    def resumo_peso(valores):
+        medido = valores.get("medido", Decimal(0))
+        estimado = valores.get("estimado", Decimal(0))
+        return {"kg_medido": round(float(medido), 3),
+                "kg_estimado": round(float(estimado), 3),
+                "refeicoes_estimadas": round(float((medido + estimado) / KG_POR_REFEICAO))}
+
+    regioes = defaultdict(lambda: defaultdict(Decimal))
+    for uf, valores in por_uf.items():
+        for tipo, kg in valores.items():
+            regioes[REGIAO_UF.get(uf, "Não informada")][tipo] += kg
+    todos_tempos = tempos_pedido + tempos_excedente
+    return {
+        "peso": resumo_peso(total) | {"itens_sem_conversao": sem_conversao},
+        "refeicoes": {"kg_por_refeicao": float(KG_POR_REFEICAO),
+                       "premissa": "0,5 kg de alimento por refeição; projeção, não refeições servidas",
+                       "por_uf": [{"uf": uf} | resumo_peso(v) for uf, v in sorted(por_uf.items())],
+                       "por_regiao": [{"regiao": regiao} | resumo_peso(v)
+                                      for regiao, v in sorted(regioes.items())]},
+        "match": {"pedido_min": _media(tempos_pedido), "pedido_amostras": len(tempos_pedido),
+                  "excedente_min": _media(tempos_excedente),
+                  "excedente_amostras": len(tempos_excedente),
+                  "combinado_min": _media(todos_tempos), "combinado_amostras": len(todos_tempos)},
+        "calor_doacoes": {"periodo": "todo o histórico", "fuso": "America/Sao_Paulo",
+                           "dias": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+                           "horas": list(range(24)), "valores": calor},
+        "ia": {"metricas": _ler_json(RAIZ / "modelo" / "metricas.json"),
+               "limiares": _ler_json(RAIZ / "modelo" / "limiares.json")},
+    }
+
+
+def montar_seguranca():
+    """Configuração comprovável e relatórios estáticos, nunca telemetria simulada."""
+    return {
+        "sast": _ler_json(RAIZ / "relatorios" / "sast" / "resumo.json"),
+        "controles": {
+            "cabecalhos": ["Content-Security-Policy", "X-Content-Type-Options",
+                           "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"],
+            "hsts_condicional": bool(current_app.config["SESSION_COOKIE_SECURE"]),
+            "cotas": "Login, IA, doações, excedentes e reservas: limites em memória por processo.",
+            "falhas_login": "Não medidas em contador persistente; eventos apenas no log de auditoria.",
+            "bloqueios_login": "Não medidos em contador persistente."},
+    }
 
 
 def montar_dashboard() -> dict:
@@ -198,3 +354,17 @@ def montar_dashboard() -> dict:
 class Dashboard(Resource):
     def get(self):
         return montar_dashboard(), 200
+
+
+@ns.route("/impacto")
+class Impacto(Resource):
+    @ns.response(200, "Kg medidos/estimados, refeições projetadas por região, match, IA e calor")
+    def get(self):
+        return montar_impacto(), 200
+
+
+@ns.route("/seguranca")
+class Seguranca(Resource):
+    @ns.response(200, "Relatórios SAST/STRIDE e controles verificáveis, sem dados pessoais")
+    def get(self):
+        return montar_seguranca(), 200

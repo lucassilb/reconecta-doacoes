@@ -102,6 +102,24 @@ jobs:
           format: sarif
           output: reports/trivy-fs.sarif
           exit-code: "0"
+      - name: Arquivos (JSON para resumo)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          skip-dirs: .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv
+          format: json
+          output: reports/trivy-fs.json
+          exit-code: "0"
+      - name: Configuração (JSON para resumo)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          format: json
+          output: reports/trivy-config.json
+          exit-code: "0"
       - name: Imagem (tabela)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -119,6 +137,15 @@ jobs:
           scanners: vuln,secret,misconfig
           format: sarif
           output: reports/trivy-image.sarif
+          exit-code: "0"
+      - name: Imagem (JSON para resumo)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: reconecta:ci
+          scanners: vuln,secret,misconfig
+          format: json
+          output: reports/trivy-image.json
           exit-code: "0"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -164,9 +191,29 @@ jobs:
         if: always()
         run: docker compose down -v
 
+  sast-resumo:
+    needs: [sast-bandit, sast-trivy]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: bandit-report
+          path: relatorios/sast
+      - uses: actions/download-artifact@v4
+        with:
+          name: trivy-report
+          path: relatorios/sast
+      - name: Resumir varreduras e STRIDE
+        run: python scripts/resumo_sast.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sast-resumo
+          path: relatorios/sast/resumo.json
+
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: [testes, ia, sast-bandit, sast-trivy, docker]
+    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker]
     runs-on: ubuntu-24.04
     env:
       RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

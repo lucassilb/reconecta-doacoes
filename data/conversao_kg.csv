@@ -1,0 +1,28 @@
+categoria,unidade_medida,kg_por_unidade,tipo
+*,kg,1,medido
+*,g,0.001,medido
+*,L,1,medido
+Hortifrúti,unidade,0.15,estimado
+Hortifrúti,pacote,0.5,estimado
+Hortifrúti,caixa,10,estimado
+Padaria,unidade,0.08,estimado
+Padaria,pacote,0.5,estimado
+Padaria,caixa,5,estimado
+Laticínios,unidade,0.25,estimado
+Laticínios,pacote,1,estimado
+Laticínios,caixa,10,estimado
+Carnes e peixes,unidade,0.3,estimado
+Carnes e peixes,pacote,1,estimado
+Carnes e peixes,caixa,10,estimado
+Grãos e cereais,unidade,1,estimado
+Grãos e cereais,pacote,1,estimado
+Grãos e cereais,caixa,10,estimado
+Refeições prontas,unidade,0.5,estimado
+Refeições prontas,pacote,0.5,estimado
+Refeições prontas,caixa,5,estimado
+Bebidas não alcoólicas,unidade,0.5,estimado
+Bebidas não alcoólicas,pacote,3,estimado
+Bebidas não alcoólicas,caixa,6,estimado
+Outros,unidade,0.5,estimado
+Outros,pacote,1,estimado
+Outros,caixa,5,estimado

@@ -300,6 +300,32 @@
         ]
       }
     },
+    "/reconecta/dashboard/impacto": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Kg medidos/estimados, refeições projetadas por região, match, IA e calor"
+          }
+        },
+        "operationId": "get_impacto",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/reconecta/dashboard/seguranca": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Relatórios SAST/STRIDE e controles verificáveis, sem dados pessoais"
+          }
+        },
+        "operationId": "get_seguranca",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
     "/reconecta/doacoes/": {
       "get": {
         "responses": {

@@ -141,7 +141,7 @@ Cada item do critério e onde ele está no código. As páginas ficam em `static
 
 ## Dashboard (critério 3 do CP2)
 
-Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligada no cabeçalho e no rodapé de todas as páginas. Os dados vêm de **uma única requisição** `GET /reconecta/dashboard`, montada por `montar_dashboard()` em `Dashboard.py` com consultas agregadas (`COUNT`/`SUM` com `GROUP BY`) direto do banco da aplicação — nada é fixo no HTML. O botão "Atualizar dados" refaz a consulta; "Dados de …" mostra quando os números foram gerados, em horário de Brasília.
+Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligada no cabeçalho e no rodapé de todas as páginas. Os indicadores anteriores vêm de `GET /reconecta/dashboard`, montado por `montar_dashboard()` em `Dashboard.py` com consultas agregadas (`COUNT`/`SUM` com `GROUP BY`) direto do banco da aplicação. O impacto e a segurança vêm de `/reconecta/dashboard/impacto` e `/reconecta/dashboard/seguranca`. O botão "Atualizar dados" refaz as consultas de negócio; "Dados de …" mostra o horário de Brasília.
 
 | Item do critério | Onde aparece na página | Campo do `GET /reconecta/dashboard` |
 |---|---|---|
@@ -155,13 +155,19 @@ Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligad
 
 Privacidade: o dashboard é público e só traz dados agregados. "Últimas doações" mostra o item, a quantidade, a empresa que recebeu e se quem doou foi pessoa ou empresa, sem nome, CPF ou contato de pessoas. Testes em `tests/test_dashboard.py`, `tests/test_fuso.py` e `tests/test_cp2_api.py` (agregação, limite da meta, ausência de dados pessoais, fuso e número de consultas).
 
+### Impacto e DevSecOps
+
+O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a premissa 1 L = 1 kg) separados de **kg estimados** por médias de categoria para unidade, pacote e caixa. Conta somente doações `ENTREGUE` e excedentes `RETIRADO`. As **refeições potenciais por UF e região** usam 0,5 kg por refeição como premissa, não refeições servidas. Exibe ainda o tempo médio pedido → doação aceita e oferta → reserva; a avaliação offline da IA com data, acurácias e limiares; gráficos Chart.js; cartograma de calor por UF; e calor dia × hora das doações aceitas. O impacto atualiza com eventos em tempo real.
+
+O bloco de segurança lê `relatorios/sast/resumo.json` com achados e data de Bandit, Trivy de arquivos/configuração/imagem e estado STRIDE. A imagem versionada ainda tem 44 achados HIGH do Debian base; o painel não os chama de mitigados. Cabeçalhos/CSP e cotas são controles existentes; falhas e bloqueios de login aparecem como **não medidos**, pois só constam no log. Regras, premissas, atualização do relatório e prova estão em [docs/dashboard.md](docs/dashboard.md); testes em `tests/test_dashboard_impacto.py`.
+
 ## Otimização da API (critério 4 do CP2)
 
 Detalhes, medições e como repetir em [docs/otimizacoes.md](docs/otimizacoes.md).
 
 | Item do critério | O que foi feito | Onde |
 |---|---|---|
-| Redução de requisições desnecessárias | Dashboard inteiro em **1** requisição; sessão consultada **1** vez por página (antes `/painel` e `/entrar` faziam 2 `GET /auth/me`); cache de 10 min das consultas de CNPJ (a verificação ao digitar e a do envio usam o mesmo resultado); "Seus dados" não envia nada se nada mudou; Home busca só a 1ª página de pedidos | `Dashboard.py`, `static/js/layout.js`, `painel.js`, `entrar.js`, `cnpj_service.py` |
+| Redução de requisições desnecessárias | Indicadores originais do dashboard em **1** requisição; impacto e segurança em 2 endpoints adicionais; sessão consultada **1** vez por página (antes `/painel` e `/entrar` faziam 2 `GET /auth/me`); cache de 10 min das consultas de CNPJ (a verificação ao digitar e a do envio usam o mesmo resultado); "Seus dados" não envia nada se nada mudou; Home busca só a 1ª página de pedidos | `Dashboard.py`, `static/js/layout.js`, `painel.js`, `entrar.js`, `cnpj_service.py` |
 | Paginação | `GET /reconecta/publico/doacoes?pagina=&por_pagina=` (máx. 50) com `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`; `limite` antigo continua aceito | `Publico.py` |
 | Filtros | `categoria`, `uf` e `busca` (nome do item ou da empresa) na mesma lista, com `EXISTS` para não duplicar pedidos | `Publico.py` |
 | Consultas otimizadas | `selectinload` (carregamento em lote) nas listas e no painel; agregações `COUNT`/`SUM` + `GROUP BY` no dashboard; índices nas chaves estrangeiras, em `doacoes(status, data_limite_retirada)` e `contribuicoes(doacao_id, status)` | `Publico.py`, `Painel.py`, `Dashboard.py`, `models.py`, `migracoes.py`, `schema.sql` |
@@ -300,6 +306,8 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | POST | `/reconecta/excedentes/{id}/cancelar-reserva` | Reservante ou publicador libera a reserva. |
 | POST | `/reconecta/excedentes/{id}/confirmar-retirada` | Publicador confirma a retirada. |
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
+| GET | `/reconecta/dashboard/impacto` | Kg físicos e estimados, refeições potenciais por UF/região, match, avaliação da IA e calor por dia/hora. |
+| GET | `/reconecta/dashboard/seguranca` | Resumo versionado SAST/STRIDE e controles de segurança declarados. |
 | POST | `/reconecta/ia/interpretar-pedido` | Organização logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por organização (429 `MUITAS_TENTATIVAS`). |
 | POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados. Limite de 10 por minuto por IP (429 `LIMITE_IA`). |
 | POST | `/reconecta/ia/sugerir-destino` | Interpreta alimentos oferecidos e sugere pedidos compatíveis com pontuação e motivos. |
@@ -314,7 +322,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-A tabela cobre as **52 operações em 39 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **54 operações em 41 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 

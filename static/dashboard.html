@@ -34,6 +34,26 @@
 
     <div id="dash-erro" class="aviso aviso--erro" role="alert" hidden></div>
 
+    <section class="dash-impacto" aria-labelledby="impacto-titulo">
+      <div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento">Impacto comprovado</p><h2 id="impacto-titulo">Da oferta à entrega</h2></div><p>Somente doações confirmadas como entregues e excedentes retirados entram no peso.</p></div>
+      <div class="impacto-cards">
+        <article class="cartao impacto-card impacto-card--principal"><h3>Kg em unidades físicas</h3><strong id="kg-medido">—</strong><p>kg e g convertidos; 1 L = 1 kg como premissa operacional.</p></article>
+        <article class="cartao impacto-card"><h3>Kg por média de categoria</h3><strong id="kg-estimado">—</strong><p>Unidade, pacote e caixa são estimativas. Não são peso aferido.</p></article>
+        <article class="cartao impacto-card"><h3>Refeições potenciais</h3><strong id="refeicoes-total">—</strong><p id="refeicoes-premissa">Premissa: 0,5 kg por refeição; não mede pratos servidos.</p></article>
+        <article class="cartao impacto-card"><h3>Match doador × ONG</h3><strong id="match-total">—</strong><p id="match-detalhe">Do pedido à doação aceita e da oferta à reserva.</p></article>
+      </div>
+      <p class="dash-fonte">Conversões declaradas em <code>data/conversao_kg.csv</code>. <span id="sem-conversao"></span></p>
+    </section>
+
+    <section class="dash-grade dash-analise" aria-label="Análise regional e da inteligência">
+      <article class="cartao dash-graf"><h2>Refeições potenciais por região</h2><p class="dash-graf__sub">UF da organização que recebeu; peso físico e estimado somados apenas para esta projeção.</p><figure class="dash-graf__area"><canvas id="g-regiao" role="img" aria-label="Gráfico de refeições potenciais por região"></canvas></figure><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-regiao"></div></details></article>
+      <article class="cartao dash-graf"><h2>Qualidade da IA</h2><p class="dash-graf__sub" id="ia-medicao">Carregando avaliação…</p><figure class="dash-graf__area"><canvas id="g-acuracia" role="img" aria-label="Acurácia medida e limiares do classificador e da recomendação"></canvas></figure><div id="ia-metricas" class="dash-metricas"></div></article>
+      <article class="cartao dash-graf"><h2>Mapa de calor por UF</h2><p class="dash-graf__sub">Cartograma por UF de destino; cor representa refeições potenciais, não população.</p><div class="mapa-uf" id="mapa-uf" role="img" aria-label="Cartograma de refeições potenciais por UF"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-uf"></div></details></article>
+      <article class="cartao dash-graf"><h2>Quando as doações são aceitas</h2><p class="dash-graf__sub">Dia da semana × hora em Brasília, em todo o histórico. Inclui aceitas e depois entregues.</p><div class="mapa-horas" id="mapa-horas"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-horas"></div></details></article>
+    </section>
+
+    <section class="cartao dash-seguranca" aria-labelledby="seg-titulo"><div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento">DevSecOps</p><h2 id="seg-titulo">Segurança observável</h2></div><p>Achados atuais e controles reais; relatórios com datas próprias.</p></div><div id="sast-cards" class="sast-cards"></div><p id="stride-resumo"></p><div id="seg-controles" class="seg-controles"></div></section>
+
     <!-- indicadores -->
     <section aria-labelledby="ind-titulo">
       <h2 id="ind-titulo" class="sr-only">Indicadores</h2>

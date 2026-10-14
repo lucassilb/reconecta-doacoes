@@ -167,6 +167,136 @@
       }), [2]));
   }
 
+  /* ---------- impacto e segurança ---------- */
+
+  function duracao(min) {
+    if (min == null) return "Sem amostras";
+    return min >= 60 ? decimal.format(min / 60) + " h" : decimal.format(min) + " min";
+  }
+  function pintarImpacto(d) {
+    var peso = d.peso || {}, refeicoes = d.refeicoes || {}, match = d.match || {};
+    $("kg-medido").textContent = decimal.format(peso.kg_medido || 0) + " kg";
+    $("kg-estimado").textContent = decimal.format(peso.kg_estimado || 0) + " kg";
+    $("refeicoes-total").textContent = inteiro.format((Number(peso.kg_medido || 0) + Number(peso.kg_estimado || 0)) / (refeicoes.kg_por_refeicao || .5));
+    $("refeicoes-premissa").textContent = refeicoes.premissa || "Premissa não informada";
+    $("match-total").textContent = duracao(match.combinado_min);
+    $("match-detalhe").textContent = "Pedido → doação: " + duracao(match.pedido_min) + " (" + (match.pedido_amostras || 0) + "); oferta → reserva: " + duracao(match.excedente_min) + " (" + (match.excedente_amostras || 0) + ").";
+    $("sem-conversao").textContent = peso.itens_sem_conversao ? peso.itens_sem_conversao + " item(ns) sem conversão ficaram fora do cálculo." : "Todos os itens confirmados tinham conversão.";
+    graficoRegiao(refeicoes.por_regiao || []);
+    mapaUF(refeicoes.por_uf || []);
+    mapaHoras(d.calor_doacoes || {});
+    graficoAcuracia(d.ia || {});
+  }
+
+  function graficoRegiao(lista) {
+    $("t-regiao").replaceChildren(tabela("Refeições potenciais por região", ["Região", "Refeições potenciais", "Kg físicos", "Kg estimados"],
+      lista.map(function (r) { return [r.regiao, inteiro.format(r.refeicoes_estimadas), decimal.format(r.kg_medido), decimal.format(r.kg_estimado)]; }), [1, 2, 3]));
+    if (!lista.length) return;
+    var op = opcoesBase();
+    op.indexAxis = "y";
+    grafico("g-regiao", { type: "bar", data: { labels: lista.map(function (r) { return r.regiao; }),
+      datasets: [{ label: "Refeições potenciais", data: lista.map(function (r) { return r.refeicoes_estimadas; }), backgroundColor: COR.verde, borderRadius: 5 }] }, options: op });
+  }
+
+  function graficoAcuracia(ia) {
+    var m = ia.metricas, l = ia.limiares;
+    if (!m || !l) { $("ia-medicao").textContent = "Avaliação indisponível."; return; }
+    $("ia-medicao").textContent = "Avaliação de " + (m.data || "data não informada") + "; versão " + (m.versao || "—") + ". Valores do conjunto de teste, não taxa de acerto em produção.";
+    var chaves = ["acuracia_classificador", "acuracia_top1", "acuracia_top3", "taxa_sem_sugestao_correta"];
+    var rotulos = ["Classificador", "Destino top-1", "Destino top-3", "Sem sugestão correta"];
+    $("ia-metricas").replaceChildren.apply($("ia-metricas"), chaves.map(function (k, i) {
+      return el("p", { texto: rotulos[i] + ": " + decimal.format(100 * Number(m[k] || 0)) + "% · limiar " + decimal.format(100 * Number(l[k] || 0)) + "%" });
+    }));
+    var op = opcoesBase(); op.indexAxis = "y"; op.scales.x.max = 100;
+    grafico("g-acuracia", { type: "bar", data: { labels: rotulos, datasets: [
+      { label: "Medido (%)", data: chaves.map(function (k) { return 100 * Number(m[k] || 0); }), backgroundColor: COR.verde, borderRadius: 5 },
+      { label: "Limiar (%)", data: chaves.map(function (k) { return 100 * Number(l[k] || 0); }), backgroundColor: COR.trilho, borderRadius: 5 }
+    ] }, options: op });
+  }
+
+  var POSICOES_UF = { RR:[2,0], AP:[5,0], AM:[2,1], PA:[4,1], AC:[1,2], RO:[2,2], TO:[5,2], MA:[6,1], PI:[7,2], CE:[8,1], RN:[10,1], PB:[10,2], PE:[9,3], AL:[10,4], SE:[9,4], BA:[7,4], MT:[4,3], GO:[5,4], DF:[6,4], MS:[4,5], MG:[7,5], ES:[9,5], SP:[6,6], RJ:[8,6], PR:[5,7], SC:[6,8], RS:[5,9] };
+  function mapaUF(lista) {
+    var porUf = {};
+    lista.forEach(function (r) { porUf[r.uf] = r; });
+    var maximo = Math.max.apply(null, lista.map(function (r) { return r.refeicoes_estimadas; }).concat([1]));
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 660 510");
+    svg.setAttribute("aria-hidden", "true");
+    Object.keys(POSICOES_UF).forEach(function (uf) {
+      var pos = POSICOES_UF[uf], valor = (porUf[uf] || {}).refeicoes_estimadas || 0;
+      var grupo = document.createElementNS(svg.namespaceURI, "g");
+      var ret = document.createElementNS(svg.namespaceURI, "rect");
+      ret.setAttribute("x", 12 + pos[0] * 58); ret.setAttribute("y", 12 + pos[1] * 48);
+      ret.setAttribute("width", 53); ret.setAttribute("height", 43); ret.setAttribute("rx", 7);
+      ret.setAttribute("fill", valor ? "hsl(98 47% " + (85 - 56 * valor / maximo) + "%)" : "#e8e9e3");
+      var rotulo = document.createElementNS(svg.namespaceURI, "text");
+      rotulo.setAttribute("x", 38 + pos[0] * 58); rotulo.setAttribute("y", 39 + pos[1] * 48);
+      rotulo.setAttribute("text-anchor", "middle"); rotulo.setAttribute("font-size", "14");
+      rotulo.setAttribute("font-weight", "700"); rotulo.setAttribute("fill", "#19351c");
+      rotulo.textContent = uf;
+      var titulo = document.createElementNS(svg.namespaceURI, "title");
+      titulo.textContent = uf + ": " + inteiro.format(valor) + " refeições potenciais";
+      grupo.append(ret, rotulo, titulo); svg.appendChild(grupo);
+    });
+    $("mapa-uf").replaceChildren(svg);
+    $("t-uf").replaceChildren(tabela("Impacto por UF de destino", ["UF", "Refeições potenciais", "Kg físicos", "Kg estimados"],
+      lista.map(function (r) { return [r.uf, inteiro.format(r.refeicoes_estimadas), decimal.format(r.kg_medido), decimal.format(r.kg_estimado)]; }), [1, 2, 3]));
+  }
+
+  function mapaHoras(calor) {
+    var matriz = calor.valores || [], dias = calor.dias || [], alvo = $("mapa-horas");
+    var maximo = Math.max.apply(null, matriz.flat().concat([1]));
+    var nos = [el("span", { texto: "" })];
+    for (var h = 0; h < 24; h++) nos.push(el("span", { texto: h % 3 === 0 ? String(h) : "" }));
+    dias.forEach(function (dia, i) {
+      nos.push(el("span", { texto: dia }));
+      for (var hora = 0; hora < 24; hora++) {
+        var n = (matriz[i] || [])[hora] || 0;
+        nos.push(el("span", { classe: "celula", title: dia + " " + hora + "h: " + n + " doações", style: "background:hsl(98 47% " + (n ? 85 - 56 * n / maximo : 94) + "%)" }));
+      }
+    });
+    alvo.replaceChildren.apply(alvo, nos);
+    $("t-horas").replaceChildren(tabela("Doações aceitas por dia e hora de Brasília", ["Dia", "Total", "Hora de pico"],
+      dias.map(function (dia, i) { var valores = matriz[i] || [], pico = Math.max.apply(null, valores.concat([0])); return [dia, inteiro.format(valores.reduce(function (a, b) { return a + b; }, 0)), pico ? valores.indexOf(pico) + "h (" + pico + ")" : "—"]; }), [1]));
+  }
+
+  function pintarSeguranca(d) {
+    var sast = d.sast, alvo = $("sast-cards");
+    if (!sast) { alvo.textContent = "Resumo SAST indisponível."; return; }
+    var rotulos = { bandit: "Bandit · código", "trivy-fs": "Trivy · arquivos", "trivy-config": "Trivy · configuração", "trivy-image": "Trivy · imagem" };
+    alvo.replaceChildren.apply(alvo, Object.keys(rotulos).map(function (nome) {
+      var r = (sast.ferramentas || {})[nome] || {}, sev = r.severidades || {};
+      var achados = Object.keys(sev).reduce(function (n, k) { return n + Number(sev[k] || 0); }, 0) + Number(r.segredos || 0) + Number(r.configuracoes || 0);
+      return el("div", { classe: "sast-card" + (Number(sev.HIGH || 0) || Number(sev.CRITICAL || 0) ? " sast-card--alerta" : "") }, [
+        el("b", { texto: rotulos[nome] }), el("strong", { texto: r.disponivel ? inteiro.format(achados) + " achados" : "Indisponível" }),
+        el("small", { texto: "Alta " + (sev.HIGH || 0) + " · crítica " + (sev.CRITICAL || 0) + " · varredura " + (r.varredura_em ? String(r.varredura_em).slice(0, 10) : "sem data") })
+      ]);
+    }));
+    var stride = sast.stride || {};
+    var correcoes = sast.correcoes_documentadas || {};
+    $("stride-resumo").textContent = "Correções documentadas: " + (correcoes.cves_corrigidas || 0) + " CVEs de dependências e " + (correcoes.bandit_b104_corrigido ? "1 achado Bandit B104" : "nenhum B104 confirmado") + ". " + (correcoes.bandit_b608_justificado ? "Os 4 B608 foram justificados; não contam como CVEs corrigidas. " : "") + "STRIDE: " + (stride.mitigados || 0) + " riscos marcados mitigados; " + (stride.residuais || 0) + " com risco residual. Os achados HIGH da imagem Debian, na data indicada acima, não foram contados como mitigados.";
+    var c = d.controles || {};
+    $("seg-controles").replaceChildren(
+      el("p", { texto: "Cabeçalhos ativos: " + (c.cabecalhos || []).join(", ") + ". HSTS " + (c.hsts_condicional ? "ativo em HTTPS" : "condicionado a COOKIE_SEGURO=1") + "." }),
+      el("p", { texto: "Cotas: " + (c.cotas || "não informadas") }),
+      el("p", { texto: "Falhas de login: " + (c.falhas_login || "não medidas") }),
+      el("p", { texto: "Bloqueios de login: " + (c.bloqueios_login || "não medidos") })
+    );
+  }
+
+  function carregarAnalise() {
+    return requisitar("/reconecta/dashboard/impacto").then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      pintarImpacto(r.corpo);
+    }).catch(function () { $("kg-medido").textContent = "Indisponível"; });
+  }
+  function carregarSeguranca() {
+    return requisitar("/reconecta/dashboard/seguranca").then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      pintarSeguranca(r.corpo);
+    }).catch(function () { $("sast-cards").textContent = "Indicadores de segurança indisponíveis."; });
+  }
+
   /* ---------- carga ---------- */
 
   function carregar() {
@@ -182,6 +312,7 @@
       preencherAlertas(d.alertas || []);
       preencherTabelas(d);
       $("dash-gerado").textContent = "Dados de " + dataHora(d.gerado_em);
+      carregarAnalise();
     }).catch(function () {
       var e = $("dash-erro");
       e.replaceChildren(el("p", { classe: "aviso__titulo", texto: "Não conseguimos carregar os indicadores" }), el("p", { texto: "Verifique sua conexão e tente atualizar." }));
@@ -234,4 +365,5 @@
     if (!document.hidden) carregar();
   });
   carregar();
+  carregarSeguranca();
 })();
