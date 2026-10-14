@@ -330,9 +330,14 @@
       if (no) no.textContent = n[k] == null ? "" : String(n[k]);
     });
     var resumo = $("resumo");
-    resumo.querySelector('[data-resumo="pedidos"]').textContent = n.pedidos == null ? "—" : inteiro.format(n.pedidos);
-    resumo.querySelector('[data-resumo="doados"]').textContent = estado.doados ? inteiro.format(estado.doados.length) : "—";
-    resumo.querySelector('[data-resumo="ongs"]').textContent = n.ongs == null ? "—" : inteiro.format(n.ongs);
+    // número e rótulo concordam: "1 pedido aberto", "2 pedidos abertos"
+    [["pedidos", n.pedidos, "pedido aberto", "pedidos abertos"],
+     ["doados", estado.doados ? estado.doados.length : null, "alimento doado aguardando", "alimentos doados aguardando"],
+     ["ongs", n.ongs, "ONG na rede", "ONGs na rede"]].forEach(function (c) {
+      var valor = resumo.querySelector('[data-resumo="' + c[0] + '"]');
+      valor.textContent = c[1] == null ? "—" : inteiro.format(c[1]);
+      valor.nextElementSibling.textContent = c[1] === 1 ? c[2] : c[3];
+    });
     resumo.setAttribute("aria-busy", "false");
   }
   function listaDaAbaDoados() {

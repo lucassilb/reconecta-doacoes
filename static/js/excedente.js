@@ -82,7 +82,8 @@
   /* estado em palavras */
   function estado(x) {
     if (x.status === "DISPONIVEL") return ["Aguardando uma ONG retirar", "exc-estado--espera"];
-    if (x.status === "RESERVADO") return [x.reservado_por && x.reservado_por.nome ? "Reservado por " + nome(x.reservado_por.nome) : "Reservado por uma ONG", "exc-estado--reservado"];
+    if (x.status === "RESERVADO") return [x.reservado_por && x.reservado_por.nome ? "Reservado por " + nome(x.reservado_por.nome)
+      : x.retirada ? "Reservado pela sua ONG" : "Reservado por uma ONG", "exc-estado--reservado"];
     if (x.status === "RETIRADO") return ["Retirado", "exc-estado--ok"];
     if (x.status === "CANCELADO") return ["Cancelado", ""];
     if (x.status === "EXPIRADO") return ["Prazo de retirada encerrado", ""];
