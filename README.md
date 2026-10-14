@@ -123,7 +123,7 @@ ReConecta/
 └── requirements-dev.txt   # Dependências de desenvolvimento (pytest, bandit, playwright)
 ```
 
-Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`. A rota `/excedentes/<id>` está registrada em `app.py`; a página de detalhe ainda está em integração.
+Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`, `/excedentes/<id>` (excedente: reserva, cancelamento e confirmação de retirada, com a situação ao vivo). Todas as páginas carregam `static/js/layout.js`, que abre uma única conexão com `/reconecta/tempo-real`, cai para `/reconecta/novidades` a cada 10 s se o fluxo falhar e repassa cada evento às páginas pelo evento `reconecta:evento`; o sino de notificações e os avisos ao vivo saem daí. Na Home, o botão "Tenho alimento para doar" abre o assistente que chama `POST /reconecta/ia/sugerir-destino` e leva ao pedido sugerido com o questionário preenchido; a faixa "Excedentes de hoje" e o progresso dos pedidos se atualizam sem recarregar.
 
 ## Frontend (critério 2 do CP2)
 
@@ -265,7 +265,7 @@ Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `
 python -m pytest -q
 ```
 
-Resultado atual: **243 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
+Resultado atual: **244 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -356,7 +356,7 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **243 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
+Resultado atual: **244 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
 
 - 3 provas em PostgreSQL (`tests/test_integridade_banco.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
 - 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
