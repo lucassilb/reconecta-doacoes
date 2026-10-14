@@ -1,22 +1,27 @@
-/* ReConecta — Home: resumo, pedido mais recente, carrossel de pedidos, faixa de excedentes
-   e o assistente "Tenho alimento para doar". Os trechos se atualizam sozinhos com os eventos
-   de tempo real que o layout.js dispara em "reconecta:evento". */
+/* ReConecta — Home (rodada 16): topo curto e o bloco "Agora na rede" com três abas:
+   Pedidos das ONGs (a ONG diz o que precisa), Alimentos doados (alguém oferece e uma ONG
+   retira) e ONGs na rede. A faixa de categorias filtra as abas. Tudo se atualiza sozinho
+   com os eventos que o layout.js dispara em "reconecta:evento". O assistente
+   "Tenho alimento para doar" continua o mesmo. */
 (function () {
   "use strict";
 
   var API = "/reconecta/publico";
 
-  var IMG_CATEGORIA = {
-    "Hortifrúti": "hortifruti",
-    "Padaria": "padaria",
-    "Laticínios": "laticinios",
-    "Carnes e peixes": "carnes",
-    "Grãos e cereais": "graos",
-    "Refeições prontas": "refeicoes",
-    "Bebidas não alcoólicas": "bebidas",
-    "Outros": "outros"
-  };
-  var CATEGORIAS_PADRAO = Object.keys(IMG_CATEGORIA);
+  /* categoria → slug da foto real (static/img/categorias/<slug>.webp); enquanto a foto
+     não existe, cai na imagem antiga da categoria */
+  var CATEGORIAS = [
+    ["Hortifrúti", "hortifruti", "hortifruti"],
+    ["Padaria", "padaria", "padaria"],
+    ["Laticínios", "laticinios", "laticinios"],
+    ["Carnes e peixes", "carnes-peixes", "carnes"],
+    ["Grãos e cereais", "graos-cereais", "graos"],
+    ["Refeições prontas", "refeicoes-prontas", "refeicoes"],
+    ["Bebidas não alcoólicas", "bebidas", "bebidas"],
+    ["Outros", "outros", "outros"]
+  ];
+  var FOTO = {}, RESERVA = {};
+  CATEGORIAS.forEach(function (c) { FOTO[c[0]] = c[1]; RESERVA[c[0]] = c[2]; });
 
   function $(id) { return document.getElementById(id); }
 
@@ -34,9 +39,13 @@
     return no;
   }
 
-  function obter(caminho) {
-    return fetch(API + caminho, { headers: { "Accept": "application/json" }, credentials: "same-origin" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  function obterJSON(url) {
+    return fetch(url, { headers: { "Accept": "application/json" }, credentials: "same-origin" })
+      .then(function (r) {
+        if (!r.ok) { var e = new Error("HTTP " + r.status); e.status = r.status; throw e; }
+        var total = Number(r.headers.get("X-Total-Count"));
+        return r.json().then(function (corpo) { return { corpo: corpo, total: isFinite(total) ? total : null }; });
+      });
   }
 
   /* ---------- formatação ---------- */
@@ -53,7 +62,6 @@
   }
 
   function titulo(nome) {
-    // formato de título com siglas preservadas (layout.js)
     var R = window.ReConecta;
     return R && R.nomeTitulo ? R.nomeTitulo(nome) : String(nome || "").trim();
   }
@@ -61,19 +69,22 @@
   function local(municipioUf) {
     if (!municipioUf) return "";
     var partes = String(municipioUf).split("/");
-    return titulo(partes[0]) + (partes[1] ? " / " + partes[1].toUpperCase() : "");
+    return titulo(partes[0]) + (partes[1] ? "/" + partes[1].toUpperCase() : "");
   }
 
-  function data(valor) {
-    return window.ReConecta.dataBrasilia(valor);
+  function data(valor) { return window.ReConecta.dataBrasilia(valor); }
+
+  function diasAte(valor) {
+    var d = data(valor);
+    if (!d) return null;
+    var hoje = window.ReConecta.diaISO(new Date());
+    return Math.round((Date.parse(window.ReConecta.diaISO(d) + "T00:00:00Z") - Date.parse(hoje + "T00:00:00Z")) / 86400000);
   }
 
   function prazo(valor) {
     var d = data(valor);
     if (!d) return "";
-    var hoje = window.ReConecta.diaISO(new Date());
-    var dia = window.ReConecta.diaISO(d);
-    var dif = Math.round((Date.parse(dia + "T00:00:00Z") - Date.parse(hoje + "T00:00:00Z")) / 86400000);
+    var dif = diasAte(valor);
     var hora = d.toLocaleTimeString("pt-BR", { timeZone: window.ReConecta.fuso, hour: "2-digit", minute: "2-digit" });
     var quando;
     if (dif === 0) quando = "hoje";
@@ -83,405 +94,374 @@
     return quando + ", " + hora;
   }
 
-  function haQuanto(valor) {
-    var d = data(valor);
-    if (!d) return "";
-    var min = Math.round((Date.now() - d.getTime()) / 60000);
-    if (min < 1) return "agora";
-    if (min < 60) return "há " + min + " min";
-    var h = Math.round(min / 60);
-    if (h < 24) return "há " + h + " h";
-    var dias = Math.round(h / 24);
-    return dias === 1 ? "ontem" : "há " + dias + " dias";
+  function vence(iso) {
+    var dif = diasAte(iso + "T12:00:00");
+    if (dif === null) return "";
+    if (dif <= 0) return "vence hoje";
+    if (dif === 1) return "vence amanhã";
+    if (dif < 30) return "vence em " + dif + " dias";
+    return "vence " + iso.split("-").reverse().slice(0, 2).join("/");
   }
 
-  /* estilo "redondo": miniaturas SVG do carrossel; "foto": ilustrações recortadas da grade de categorias */
-  function imgCategoria(categoria, tamanho, alt, estilo) {
-    var slug = IMG_CATEGORIA[categoria] || "outros";
-    return el("img", {
-      src: estilo === "foto" ? "/static/img/doacoes/cat-" + slug + ".webp" : "/static/img/categorias/" + slug + ".svg",
-      width: String(tamanho), height: String(tamanho),
-      alt: alt == null ? "" : alt, loading: "lazy", decoding: "async"
+  /* Fotos reais por categoria (static/img/categorias/<slug>.webp, frente de fotos da
+     rodada 16). Enquanto elas não estão no repositório, usa a imagem antiga da categoria;
+     se uma foto faltar depois de ligada, cai na antiga sem quebrar o cartão. */
+  var FOTOS_REAIS = true;
+  function fotoCategoria(categoria, classe) {
+    var nome = FOTO[categoria] ? categoria : "Outros";
+    var antiga = "/static/img/doacoes/cat-" + RESERVA[nome] + ".webp";
+    var img = el("img", { classe: classe, src: FOTOS_REAIS ? "/static/img/categorias/" + FOTO[nome] + ".webp" : antiga, alt: "",
+                          width: "640", height: "480", loading: "lazy", decoding: "async" });
+    if (FOTOS_REAIS) img.addEventListener("error", function trocar() { img.removeEventListener("error", trocar); img.src = antiga; });
+    return img;
+  }
+
+  /* ---------- perfil de quem vê ---------- */
+
+  var usuarioAtual = null;
+  function perfis() { return (usuarioAtual && usuarioAtual.perfis) || []; }
+  function ehOng() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && perfis().indexOf("ong") !== -1); }
+  function ehEmpresaAlimentos() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && perfis().indexOf("empresa_alimentos") !== -1); }
+  function podePublicar() { return !!(usuarioAtual && (usuarioAtual.tipo === "doador" || ehEmpresaAlimentos())); }
+
+  /* ---------- estado do bloco "Agora na rede" ---------- */
+
+  var estado = {
+    aba: "pedidos", categoria: "", organizacao: "",
+    pedidos: null, doados: null, meus: [], ongs: null,
+    erro: {}
+  };
+  var MAX_CARTOES = 8;
+  var mostrarTodos = false;
+
+  var EXPLICA = {
+    pedidos: "O que as ONGs pediram e ainda falta. Escolha um pedido e doe.",
+    doados: "Alimentos oferecidos por empresas e pessoas. Uma ONG reserva e retira.",
+    ongs: "As organizações da rede e quantos pedidos cada uma tem abertos."
+  };
+
+  /* ---------- cartões ---------- */
+
+  function botao(texto, href, classe) {
+    return el("a", { classe: "btn btn--pequeno " + (classe || "btn--primario"), href: href }, [texto]);
+  }
+
+  function cartaoPedido(d) {
+    var e = d.empresa || {};
+    var itens = d.itens || [];
+    var abertos = itens.filter(function (i) { return Number(i.faltam) > 0; });
+    var mostrar = (abertos.length ? abertos : itens).slice(0, 3);
+    var principal = (mostrar[0] || itens[0] || {}).categoria;
+    return el("li", { classe: "cartao-rede cartao-rede--pedido" }, [
+      fotoCategoria(principal, "cartao-rede__foto"),
+      el("div", { classe: "cartao-rede__corpo" }, [
+        el("p", { classe: "cartao-rede__tipo", texto: "Pedido" }),
+        el("h3", { classe: "cartao-rede__titulo", texto: titulo(e.nome) }),
+        el("p", { classe: "cartao-rede__local", texto: local(e.municipio_uf) }),
+        el("ul", { classe: "cartao-rede__itens", "aria-label": "Itens que faltam" }, mostrar.map(function (i) {
+          var falta = Number(i.faltam);
+          return el("li", null, [el("span", { texto: i.nome }), el("strong", { texto: falta > 0 ? "faltam " + quantidade({ quantidade: falta, unidade_medida: i.unidade_medida }) : "completo" })]);
+        })),
+        itens.length > mostrar.length ? el("p", { classe: "cartao-rede__mais", texto: "+ " + (itens.length - mostrar.length) + " itens" }) : null,
+        el("p", { classe: "cartao-rede__prazo" }, ["Receber até ", el("strong", { texto: prazo(d.receber_ate || d.data_limite_retirada) })])
+      ]),
+      el("div", { classe: "cartao-rede__acao" }, [
+        botao("Doar", "/doacoes/" + d.id)
+      ])
+    ]);
+  }
+
+  var ESTADO_DOADO = {
+    DISPONIVEL: ["Aguardando uma ONG retirar", "estado--espera"],
+    RESERVADO: ["Reservado", "estado--reservado"],
+    RETIRADO: ["Retirado", "estado--ok"],
+    CANCELADO: ["Cancelado", "estado--fim"],
+    EXPIRADO: ["Prazo encerrado", "estado--fim"]
+  };
+
+  function cartaoDoado(x) {
+    var e = x.empresa || {};
+    var itens = x.itens || [];
+    var i0 = itens[0] || {};
+    var meu = x.meu === true;
+    var st = ESTADO_DOADO[x.status] || [x.status, ""];
+    var textoEstado = x.status === "RESERVADO" && x.reservado_por && x.reservado_por.nome
+      ? "Reservado por " + titulo(x.reservado_por.nome) : st[0];
+    var quem = e.pessoa_fisica ? "Pessoa física" : titulo(e.nome);
+    var acao;
+    if (meu) acao = botao("Ver sua doação", "/excedentes/" + x.id, "btn--secundario");
+    else if (ehOng() && x.status === "DISPONIVEL") acao = botao("Reservar", "/excedentes/" + x.id);
+    else acao = botao("Ver detalhes", "/excedentes/" + x.id, "btn--secundario");
+    return el("li", { classe: "cartao-rede cartao-rede--doado" + (meu ? " cartao-rede--meu" : "") }, [
+      fotoCategoria(i0.categoria, "cartao-rede__foto"),
+      meu ? el("p", { classe: "cartao-rede__selo", texto: "Sua doação" }) : null,
+      el("div", { classe: "cartao-rede__corpo" }, [
+        el("p", { classe: "cartao-rede__tipo", texto: "Alimento doado" }),
+        el("h3", { classe: "cartao-rede__titulo cartao-rede__titulo--grande" }, [
+          quantidade(i0) + " de " + (i0.nome || "alimento"),
+          itens.length > 1 ? el("span", { classe: "cartao-rede__mais", texto: " + " + (itens.length - 1) }) : null]),
+        el("p", { classe: "cartao-rede__local", texto: "Doado por " + quem + (e.municipio_uf ? " · " + local(e.municipio_uf) : "") }),
+        el("p", { classe: "cartao-rede__prazo" }, [
+          i0.validade ? el("span", { texto: vence(i0.validade) }) : null,
+          i0.validade ? " · " : null,
+          "retirar até ", el("strong", { texto: prazo(x.retirar_ate) })]),
+        el("p", { classe: "estado " + st[1], texto: textoEstado })
+      ]),
+      el("div", { classe: "cartao-rede__acao" }, [acao])
+    ]);
+  }
+
+  function iniciais(nome) {
+    var partes = titulo(nome).split(/\s+/).filter(function (p) { return p.length > 2; });
+    return ((partes[0] || nome || "?").charAt(0) + (partes[1] ? partes[1].charAt(0) : "")).toUpperCase();
+  }
+
+  function cartaoOng(o) {
+    var n = Number(o.pedidos_abertos) || 0;
+    return el("li", { classe: "cartao-rede cartao-rede--ong" }, [
+      el("span", { classe: "cartao-rede__avatar", "aria-hidden": "true", texto: iniciais(o.nome) }),
+      el("div", { classe: "cartao-rede__corpo" }, [
+        el("p", { classe: "cartao-rede__tipo", texto: "ONG" }),
+        el("h3", { classe: "cartao-rede__titulo", texto: titulo(o.nome) }),
+        el("p", { classe: "cartao-rede__local", texto: local(o.municipio_uf) }),
+        el("p", { classe: "estado " + (n ? "estado--ok" : "estado--fim"),
+                  texto: n ? (n === 1 ? "1 pedido aberto" : n + " pedidos abertos") : "Ainda não publicou pedido" })
+      ]),
+      n ? el("div", { classe: "cartao-rede__acao" }, [(function () {
+        var b = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Ver pedidos" });
+        b.addEventListener("click", function () { estado.organizacao = o.nome; estado.categoria = ""; trocarAba("pedidos", true); });
+        return b;
+      })()]) : null
+    ]);
+  }
+
+  /* ---------- estado vazio: duas linhas e uma ação certa por perfil ---------- */
+
+  function acaoVazio(aba) {
+    if (aba === "ongs") return usuarioAtual ? null : botao("Cadastrar ONG", "/cadastro", "btn--secundario");
+    if (ehOng()) return aba === "pedidos" ? botao("Publicar o primeiro pedido", "/painel#publicar")
+                                          : botao("Ver pedidos das ONGs", "#doacoes", "btn--secundario");
+    if (podePublicar()) return botao("Doar o que sobrou", "/painel#publicar-excedente");
+    var b = el("button", { type: "button", classe: "btn btn--primario btn--pequeno", texto: "Tenho alimento para doar" });
+    b.addEventListener("click", function () { abrirAssistente(); });
+    return b;
+  }
+
+  function vazio(aba) {
+    var cat = estado.categoria;
+    var linhas = {
+      pedidos: estado.organizacao ? ["Esta ONG não tem pedido aberto agora.", "Veja os pedidos das outras ONGs."]
+        : cat ? ["Nenhum pedido de " + cat.toLowerCase() + " agora.", "Veja todas as categorias ou doe o que sobrou."]
+        : ehOng() ? ["Sua ONG ainda não tem pedido aberto.", "Publique o que falta e quem tem alimento é avisado na hora."]
+        : ["Nenhuma ONG pediu alimentos agora.", "Cadastrar uma ONG não cria pedido: ele aparece aqui quando a ONG publica o que falta."],
+      doados: cat ? ["Nenhum alimento de " + cat.toLowerCase() + " doado agora.", "Veja todas as categorias."]
+        : ["Nenhum alimento doado aguardando retirada.", "Quando alguém doar o que sobrou, aparece aqui na hora."],
+      ongs: ["Nenhuma ONG na rede ainda.", "As ONGs aparecem aqui assim que se cadastram."]
+    }[aba];
+    var acoes = [];
+    if (cat || estado.organizacao) {
+      var limpar = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Ver todas" });
+      limpar.addEventListener("click", function () { estado.categoria = ""; estado.organizacao = ""; desenhar(); });
+      acoes.push(limpar);
+    }
+    var a = acaoVazio(aba);
+    if (a) acoes.push(a);
+    return el("div", { classe: "rede__vazio" }, [
+      el("p", { classe: "rede__vazio-titulo", texto: linhas[0] }),
+      el("p", { texto: linhas[1] }),
+      acoes.length ? el("div", { classe: "rede__vazio-acoes" }, acoes) : null
+    ]);
+  }
+
+  /* ---------- filtro por categoria (fotos) ---------- */
+
+  function montarFiltro() {
+    var alvo = $("filtro");
+    var opcoes = [["", "Todas"]].concat(CATEGORIAS.map(function (c) { return [c[0], c[0]]; }));
+    alvo.replaceChildren.apply(alvo, opcoes.map(function (o) {
+      var b = el("button", { type: "button", classe: "filtro__chip", "data-categoria": o[0], "aria-pressed": String(estado.categoria === o[0]) }, [
+        o[0] ? fotoCategoria(o[0], "filtro__foto") : el("span", { classe: "filtro__todas", "aria-hidden": "true", texto: "✓" }),
+        el("span", { texto: o[1] === "Bebidas não alcoólicas" ? "Bebidas" : o[1] })
+      ]);
+      b.addEventListener("click", function () {
+        estado.categoria = estado.categoria === o[0] ? "" : o[0];
+        estado.organizacao = "";
+        mostrarTodos = false;
+        desenhar();
+      });
+      return b;
+    }));
+  }
+
+  function temCategoria(itens) {
+    return !estado.categoria || (itens || []).some(function (i) { return i.categoria === estado.categoria; });
+  }
+
+  /* ---------- desenho ---------- */
+
+  function listaDaAba() {
+    if (estado.aba === "pedidos") {
+      return (estado.pedidos || []).filter(function (d) {
+        return temCategoria(d.itens) && (!estado.organizacao || (d.empresa || {}).nome === estado.organizacao);
+      });
+    }
+    if (estado.aba === "doados") {
+      // as doações de quem está vendo vêm primeiro, com o estado delas (reservada, retirada)
+      var vistos = {};
+      var meus = estado.meus.filter(function (x) { return x.status === "DISPONIVEL" || x.status === "RESERVADO" || x.status === "RETIRADO"; });
+      var todos = meus.concat(estado.doados || []).filter(function (x) {
+        if (vistos[x.id]) return false;
+        vistos[x.id] = true;
+        return true;
+      });
+      return todos.filter(function (x) { return temCategoria(x.itens); });
+    }
+    return estado.ongs || [];
+  }
+
+  function contar() {
+    var n = {
+      pedidos: estado.pedidos ? estado.pedidos.length : null,
+      doados: estado.doados ? listaDaAbaDoados().length : null,
+      ongs: estado.ongs ? estado.ongs.length : null
+    };
+    Object.keys(n).forEach(function (k) {
+      var no = document.querySelector('[data-conta="' + k + '"]');
+      if (no) no.textContent = n[k] == null ? "" : String(n[k]);
     });
+    var resumo = $("resumo");
+    resumo.querySelector('[data-resumo="pedidos"]').textContent = n.pedidos == null ? "—" : inteiro.format(n.pedidos);
+    resumo.querySelector('[data-resumo="doados"]').textContent = estado.doados ? inteiro.format(estado.doados.length) : "—";
+    resumo.querySelector('[data-resumo="ongs"]').textContent = n.ongs == null ? "—" : inteiro.format(n.ongs);
+    resumo.setAttribute("aria-busy", "false");
+  }
+  function listaDaAbaDoados() {
+    var aba = estado.aba, cat = estado.categoria;
+    estado.aba = "doados"; estado.categoria = "";
+    var l = listaDaAba();
+    estado.aba = aba; estado.categoria = cat;
+    return l;
   }
 
-  /* Quem doa: empresa (estabelecimento, nome da Receita) ou pessoa física (doador:
-     só o primeiro nome e a cidade, sem dados pessoais). */
-  function origem(d) {
-    if (d.origem === "doador" || (!d.estabelecimento && d.doador)) {
-      var p = d.doador || {};
-      return { nome: p.nome || "Doador", municipio_uf: p.municipio_uf, pf: true };
-    }
-    var e = d.empresa || d.estabelecimento || {}; // pedidos (rodada 9) vêm com "empresa"
-    return { nome: e.nome, municipio_uf: e.municipio_uf, pf: false };
-  }
-  function tituloOrigem(o) { return o.pf ? String(o.nome || "") : titulo(o.nome); }
-  function seloPF() { return el("span", { classe: "selo selo--pf", texto: "Pessoa física" }); }
-
-  /* ---------- resumo (métricas do hero) ---------- */
-
-  function preencherResumo(r) {
-    var alvo = $("resumo");
-    var valores = r ? {
-      doacoes: inteiro.format(Number(r.doacoes_disponiveis) || 0),      // pedidos abertos
-      recebidas: typeof r.doacoes_recebidas === "number" ? inteiro.format(r.doacoes_recebidas) : "—"
-    } : { doacoes: "—", recebidas: "—" };
-    Object.keys(valores).forEach(function (k) {
-      alvo.querySelector('[data-resumo="' + k + '"]').textContent = valores[k];
+  function desenhar() {
+    contar();
+    var aba = estado.aba;
+    $("filtro").hidden = aba === "ongs";
+    $("filtro").querySelectorAll(".filtro__chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-categoria") === estado.categoria));
     });
-    alvo.setAttribute("aria-busy", "false");
-  }
-
-  /* ---------- doação mais recente (cartão flutuante) ---------- */
-
-  function resumoItens(itens, max) {
-    var nomes = itens.slice(0, max).map(function (i) { return i.nome; });
-    var resto = itens.length - nomes.length;
-    return nomes.join(", ") + (resto > 0 ? " e mais " + resto : "");
-  }
-
-  /* Frase do cartão "Pedidos abertos" sem pedido: o convite muda com quem está vendo. */
-  function conviteSemPedido() {
-    if (usuarioAtual && !ehOng() && podePublicar()) {
-      return ["Nenhum pedido aberto neste momento. Tem alimento sobrando? ",
-              el("a", { href: "/painel#publicar-excedente", texto: "Doe o que sobrou", "data-convite": "" }), " para uma ONG retirar."];
-    }
-    if (usuarioAtual) {
-      return ["Nenhum pedido aberto neste momento. ",
-              el("a", { href: "/painel#publicar", texto: "Publique o pedido da sua ONG", "data-convite": "" }), "."];
-    }
-    return ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua ONG", "data-convite": "" }), " e publique o primeiro."];
-  }
-
-  function preencherUltima(doacoes, falhou) {
-    var cartao = $("ultima-doacao");
-    var c = $("ultima-doacao-corpo");   // o ícone da caixa fica fixo no HTML
-    c.replaceChildren();
-    cartao.setAttribute("aria-busy", "false");
-    if (falhou) { cartao.hidden = true; return; }
-    var d = doacoes[0];
-    if (!d) {
-      c.append(
-        el("p", { classe: "sobretitulo", texto: "Pedidos abertos" }),
-        el("p", { classe: "ultima__vazia" }, conviteSemPedido())
-      );
-      ajustarConvites();
+    $("rede-explica").textContent = estado.organizacao && aba === "pedidos"
+      ? "Pedidos de " + titulo(estado.organizacao) + "." : EXPLICA[aba];
+    var alvo = $("rede-conteudo");
+    var dados = { pedidos: estado.pedidos, doados: estado.doados, ongs: estado.ongs }[aba];
+    if (dados === null && !estado.erro[aba]) return;   // ainda carregando: fica o esqueleto
+    if (estado.erro[aba]) {
+      var tentar = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Tentar de novo" });
+      tentar.addEventListener("click", function () { carregarTudo(false); });
+      alvo.replaceChildren(el("div", { classe: "rede__vazio", role: "alert" }, [
+        el("p", { classe: "rede__vazio-titulo", texto: "Não conseguimos carregar agora." }), tentar]));
+      alvo.setAttribute("aria-busy", "false");
       return;
     }
-    var est = origem(d);
-    c.append(
-      el("p", { classe: "sobretitulo", texto: d.data_cadastro ? "Pedido mais recente · " + haQuanto(d.data_cadastro) : "Pedido mais recente" }),
-      el("p", { classe: "ultima__nome" }, [tituloOrigem(est)]),
-      est.municipio_uf ? el("p", { classe: "ultima__local", texto: local(est.municipio_uf) }) : null,
-      el("p", { classe: "ultima__itens", texto: "Precisa de " + resumoItens(d.itens || [], 3).toLowerCase() }),
-      el("div", { classe: "ultima__rodape" }, [
-        el("span", null, ["Receber até ", el("strong", { texto: prazo(receberAte(d)) })]),
-        el("a", { href: "/doacoes/" + d.id, texto: "Doar" })
-      ])
-    );
-  }
-
-  /* ---------- carrossel ---------- */
-
-  function receberAte(d) { return d.receber_ate || d.data_limite_retirada; }
-
-  /* "Leite · 12 de 100 unidades" com uma barra fina de progresso */
-  function itemPedido(i) {
-    var meta = Number(i.quantidade) || 0, recebido = Number(i.recebido) || 0;
-    var pct = meta > 0 ? Math.min(100, Math.round(recebido / meta * 100)) : 0;
-    var texto = numero.format(recebido) + " de " + quantidade(i);
-    return el("li", { classe: "pedido-linha" }, [
-      el("span", { classe: "pedido-linha__topo" }, [el("span", { classe: "pedido-linha__nome", texto: i.nome, title: i.nome }), el("span", { classe: "pedido-linha__qtd", texto: texto })]),
-      el("span", { classe: "pedido-linha__barra", role: "progressbar", "aria-label": "Recebido de " + i.nome, "aria-valuemin": "0", "aria-valuemax": String(meta), "aria-valuenow": String(Math.min(recebido, meta)), "aria-valuetext": texto }, [
-        el("span", { style: "width:" + pct + "%" })
-      ])
-    ]);
-  }
-
-  function cartaoDoacao(d) {
-    var est = origem(d);
-    var itens = d.itens || [];
-    var categorias = d.categorias && d.categorias.length ? d.categorias : [itens[0] && itens[0].categoria];
-    var MAX = 3;
-    var corpo = el("div", { classe: "doacao__corpo" }, [
-      el("h3", { classe: "doacao__nome" }, [tituloOrigem(est)]),
-      el("p", { classe: "doacao__local", texto: local(est.municipio_uf) }),
-      el("p", { classe: "doacao__precisa", texto: "Precisa de" }),
-      el("ul", { classe: "doacao__itens doacao__itens--pedido" }, itens.slice(0, MAX).map(itemPedido)),
-      itens.length > MAX ? el("p", { classe: "doacao__mais", texto: "+ " + (itens.length - MAX) + (itens.length - MAX === 1 ? " item" : " itens") }) : null
-    ]);
-    return el("li", { classe: "doacao doacao--pedido" }, [
-      imgCategoria(categorias[0], 76, ""),
-      corpo,
-      el("div", { classe: "doacao__rodape" }, [
-        el("span", { classe: "doacao__prazo" }, ["Receber até ", el("strong", { texto: prazo(receberAte(d)) })]),
-        el("a", { classe: "btn btn--primario btn--pequeno doacao__doar", href: "/doacoes/" + d.id, "aria-label": "Doar para o pedido de " + tituloOrigem(est) }, ["Doar"])
-      ])
-    ]);
-  }
-
-  var atualizarControles = null;
-  window.addEventListener("resize", function () { if (atualizarControles) atualizarControles(); });
-
-  function montarCarrossel(doacoes) {
-    var alvo = $("doacoes-conteudo");
-    var anteriorLista = $("lista-doacoes");
-    var posicao = anteriorLista ? anteriorLista.scrollLeft : 0;
-    var lista = el("ul", {
-      classe: "carrossel", id: "lista-doacoes", tabindex: "0",
-      "aria-label": doacoes.length + (doacoes.length === 1 ? " doação disponível" : " doações disponíveis")
-    }, doacoes.map(cartaoDoacao));
-    alvo.replaceChildren(lista);
-    alvo.setAttribute("aria-busy", "false");
-
-    var controles = $("carrossel-controles");
-    var anterior = $("carrossel-anterior");
-    var proximo = $("carrossel-proximo");
-
-    function atualizar() {
-      var max = lista.scrollWidth - lista.clientWidth;
-      controles.hidden = max <= 4;
-      anterior.disabled = lista.scrollLeft <= 4;
-      proximo.disabled = lista.scrollLeft >= max - 4;
-    }
-    function passo(direcao) {
-      var item = lista.querySelector(".doacao");
-      var largura = item ? item.getBoundingClientRect().width + 16 : lista.clientWidth;
-      var porVez = Math.max(1, Math.floor((lista.clientWidth + 16) / largura));
-      lista.scrollBy({ left: direcao * largura * porVez, behavior: "smooth" });
-    }
-    anterior.onclick = function () { passo(-1); };
-    proximo.onclick = function () { passo(1); };
-    lista.addEventListener("scroll", function () { window.requestAnimationFrame(atualizar); }, { passive: true });
-    atualizarControles = atualizar;
-    if (posicao) lista.scrollLeft = posicao;
-    atualizar();
-  }
-
-  var SVG = {
-    chevron: '<path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    predio: '<path d="M4 20.5V5.5l8-2.5v17.5M12 8.5l8 2.5v9.5M2.5 20.5h19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M7 8.5h1.5M7 12h1.5M7 15.5h1.5M15 13.5h1.5M15 17h1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-    seta: '<path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-    duvida: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/>'
-  };
-  function svg(nome, classe) {
-    var span = el("span", { classe: classe, "aria-hidden": "true" });
-    span.innerHTML = '<svg viewBox="0 0 24 24" focusable="false">' + SVG[nome] + "</svg>";
-    return span;
-  }
-
-  /* Sem pedido aberto: diz isso com clareza e oferece o caminho que existe agora,
-     "Doar o que sobrou" (publicar para as ONGs retirarem). As categorias são só
-     informativas: nenhum cartão leva a cadastro ou login de quem já entrou. */
-  var categoriasVazio = null;
-  function podePublicar() { return !!(usuarioAtual && (usuarioAtual.tipo === "doador" || ehEmpresaAlimentos())); }
-  function acoesVazio() {
-    var principal, secundaria;
-    if (!usuarioAtual) {
-      principal = el("button", { type: "button", classe: "vazio__cta" }, [
-        svg("predio", "vazio__cta-icone"), el("span", { texto: "Doar o que sobrou" }), svg("seta", "vazio__cta-seta")]);
-      principal.addEventListener("click", abrirAssistente);
-      secundaria = el("a", { classe: "vazio__quem", href: "/cadastro" }, [svg("duvida", "vazio__quem-icone"), "Criar conta (CPF ou CNPJ)"]);
-    } else if (!ehOng() && podePublicar()) {
-      principal = el("a", { classe: "vazio__cta", href: "/painel#publicar-excedente" }, [
-        svg("predio", "vazio__cta-icone"), el("span", { texto: "Doar o que sobrou" }), svg("seta", "vazio__cta-seta")]);
-      secundaria = el("a", { classe: "vazio__quem", href: "#excedentes" }, [svg("duvida", "vazio__quem-icone"), "O que já foi oferecido"]);
+    var lista = listaDaAba();
+    if (!lista.length) {
+      alvo.replaceChildren(vazio(aba));
     } else {
-      // ONG: o caminho dela é pedir ou reservar o que foi oferecido
-      principal = el("a", { classe: "vazio__cta", href: "/painel#publicar" }, [
-        svg("predio", "vazio__cta-icone"), el("span", { texto: "Publicar um pedido" }), svg("seta", "vazio__cta-seta")]);
-      secundaria = el("a", { classe: "vazio__quem", href: "#excedentes" }, [svg("duvida", "vazio__quem-icone"), "Ver excedentes de hoje"]);
+      var cartao = aba === "pedidos" ? cartaoPedido : aba === "doados" ? cartaoDoado : cartaoOng;
+      var visiveis = mostrarTodos ? lista : lista.slice(0, MAX_CARTOES);
+      var filhos = [el("ul", { classe: "grade", "aria-label": EXPLICA[aba] }, visiveis.map(cartao))];
+      if (lista.length > visiveis.length) {
+        var mais = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno rede__mais", texto: "Ver mais " + (lista.length - visiveis.length) });
+        mais.addEventListener("click", function () { mostrarTodos = true; desenhar(); });
+        filhos.push(mais);
+      }
+      if (aba === "pedidos" && ehOng() && !estado.organizacao) {
+        filhos.unshift(el("p", { classe: "rede__dica" }, ["Sua ONG precisa de algo? ", el("a", { href: "/painel#publicar", texto: "Publicar pedido" })]));
+      }
+      alvo.replaceChildren.apply(alvo, filhos);
     }
-    return el("div", { classe: "vazio__acoes" }, [principal, secundaria]);
-  }
-  function montarVazio(categorias) {
-    categoriasVazio = categorias;
-    var alvo = $("doacoes-conteudo");
-    $("carrossel-controles").hidden = true;
-    atualizarControles = null;
-    var ong = !!usuarioAtual && ehOng();
-    alvo.replaceChildren(el("div", { classe: "vazio" }, [
-      el("div", { classe: "vazio__texto" }, [
-        el("h3", { texto: "Nenhum pedido aberto agora" }),
-        el("p", { texto: ong
-          ? "Quando uma ONG publicar o que está faltando, o pedido aparece aqui na hora. Publique o pedido da sua organização para receber doações."
-          : "Quando uma ONG publicar o que está faltando, o pedido aparece aqui na hora. Tem alimento sobrando? Dá para doar agora: publique o que sobrou e uma ONG reserva e retira." })
-      ]),
-      acoesVazio(),
-      el("p", { classe: "vazio__legenda", texto: "Categorias que a plataforma recebe:" }),
-      el("ul", { classe: "categorias categorias--info", "aria-label": "Categorias que a plataforma recebe" }, categorias.map(function (c) {
-        var slug = IMG_CATEGORIA[c] || "outros";
-        return el("li", null, [
-          el("span", { classe: "categoria categoria--" + slug }, [
-            el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "", "foto")]),
-            el("span", { classe: "categoria__nome", texto: c })
-          ])
-        ]);
-      }))
-    ]));
     alvo.setAttribute("aria-busy", "false");
-    ajustarConvites();
   }
 
-  function montarFalha() {
-    var alvo = $("doacoes-conteudo");
-    $("carrossel-controles").hidden = true;
-    var tentar = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Tentar novamente" });
-    tentar.addEventListener("click", carregar);
-    alvo.replaceChildren(el("div", { classe: "aviso falha", role: "alert" }, [
-      el("p", { texto: "Não conseguimos carregar as doações agora." }), tentar
-    ]));
-    alvo.setAttribute("aria-busy", "false");
+  /* ---------- abas ---------- */
+
+  function trocarAba(aba, focar) {
+    estado.aba = aba;
+    mostrarTodos = false;
+    if (aba !== "pedidos") estado.organizacao = "";
+    document.querySelectorAll(".aba").forEach(function (b) {
+      var sel = b.getAttribute("data-aba") === aba;
+      b.setAttribute("aria-selected", String(sel));
+      b.tabIndex = sel ? 0 : -1;
+      if (sel) { $("rede-painel").setAttribute("aria-labelledby", b.id); if (focar) b.focus(); }
+    });
+    desenhar();
   }
+
+  document.querySelectorAll(".aba").forEach(function (b, i, todas) {
+    b.addEventListener("click", function () { estado.escolheu = true; trocarAba(b.getAttribute("data-aba")); });
+    b.addEventListener("keydown", function (e) {
+      var passo = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!passo) return;
+      e.preventDefault();
+      trocarAba(todas[(i + passo + todas.length) % todas.length].getAttribute("data-aba"), true);
+    });
+  });
+
+  // links antigos e do menu: /#doacoes, /#excedentes, /#ongs abrem a aba certa
+  function abaDoEndereco() {
+    var h = location.hash;
+    if (h === "#excedentes") trocarAba("doados");
+    else if (h === "#ongs") trocarAba("ongs");
+    else if (h === "#doacoes") trocarAba("pedidos");
+  }
+  window.addEventListener("hashchange", abaDoEndereco);
 
   /* ---------- carga ---------- */
 
-  function carregar(aoVivo) {
-    aoVivo = aoVivo === true;
-    if (!aoVivo) $("doacoes-conteudo").setAttribute("aria-busy", "true");
-    obter("/resumo").then(preencherResumo, function () { if (!aoVivo) preencherResumo(null); });
-
-    obter("/doacoes?limite=8").then(function (doacoes) {
-      doacoes = Array.isArray(doacoes) ? doacoes : [];
-      preencherUltima(doacoes, false);
-      if (doacoes.length) { montarCarrossel(doacoes); return; }
-      return obter("/opcoes")
-        .then(function (o) { return o && o.categorias && o.categorias.length ? o.categorias : CATEGORIAS_PADRAO; },
-              function () { return CATEGORIAS_PADRAO; })
-        .then(montarVazio);
-    }).catch(function () {
-      if (aoVivo) return;            // falha numa atualização ao vivo: fica o que já estava na tela
-      preencherUltima([], true);
-      montarFalha();
-    });
+  function carregarPedidos() {
+    return obterJSON(API + "/doacoes?limite=100").then(function (r) {
+      estado.pedidos = Array.isArray(r.corpo) ? r.corpo : []; estado.erro.pedidos = false;
+    }, function () { if (estado.pedidos === null) estado.erro.pedidos = true; });
   }
-
-  /* ---------- excedentes de hoje ---------- */
-
-  function faltaTexto(ate) {
-    var d = data(ate);
-    if (!d) return "";
-    var min = Math.floor((d.getTime() - Date.now()) / 60000);
-    if (min < 1) return "encerra agora";
-    if (min < 60) return "faltam " + min + " min";
-    var h = Math.floor(min / 60), resto = min % 60;
-    if (h < 24) return "faltam " + h + " h" + (resto ? " " + resto + " min" : "");
-    var dias = Math.floor(h / 24);
-    return "faltam " + dias + (dias === 1 ? " dia" : " dias");
+  function carregarDoados() {
+    var publicos = obterJSON("/reconecta/excedentes?limite=100").then(function (r) {
+      estado.doados = Array.isArray(r.corpo) ? r.corpo : []; estado.erro.doados = false;
+    }, function () { if (estado.doados === null) estado.erro.doados = true; });
+    // as doações de quem está logado, com o estado delas (o público só lista as disponíveis)
+    var meus = usuarioAtual && podePublicar()
+      ? obterJSON("/reconecta/excedentes/meus").then(function (r) { estado.meus = Array.isArray(r.corpo) ? r.corpo : []; }, function () {})
+      : Promise.resolve(estado.meus = []);
+    return Promise.all([publicos, meus]);
   }
-
-  function validadeCurta(iso) {
-    var d = data(iso);
-    if (!d) return "";
-    var hoje = window.ReConecta.diaISO(new Date());
-    if (iso === hoje) return "vence hoje";
-    return "vence " + d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit" });
-  }
-
-  function ehOng() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && (usuarioAtual.perfis || []).indexOf("ong") !== -1); }
-  function ehEmpresaAlimentos() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && (usuarioAtual.perfis || []).indexOf("empresa_alimentos") !== -1); }
-
-  function cartaoExcedente(x) {
-    var emp = x.empresa || {};
-    var itens = x.itens || [];
-    var MAX = 3;
-    return el("li", { classe: "excedente", "data-excedente": String(x.id) }, [
-      el("div", { classe: "excedente__topo" }, [
-        imgCategoria(itens[0] && itens[0].categoria, 52, ""),
-        el("div", null, [
-          el("h3", { classe: "excedente__nome", texto: titulo(emp.nome) }),
-          el("p", { classe: "excedente__local", texto: local(emp.municipio_uf) })
-        ])
-      ]),
-      el("ul", { classe: "excedente__itens" }, itens.slice(0, MAX).map(function (i) {
-        return el("li", null, [
-          el("span", { classe: "excedente__item", texto: quantidade(i) + " de " + i.nome }),
-          el("span", { classe: "excedente__validade", texto: validadeCurta(i.validade) })
-        ]);
-      })),
-      itens.length > MAX ? el("p", { classe: "doacao__mais", texto: "+ " + (itens.length - MAX) + (itens.length - MAX === 1 ? " item" : " itens") }) : null,
-      el("div", { classe: "excedente__rodape" }, [
-        el("p", { classe: "excedente__prazo" }, [
-          "Retirar até ", el("strong", { texto: prazo(x.retirar_ate) }),
-          el("span", { classe: "excedente__falta", "data-ate": x.retirar_ate, texto: faltaTexto(x.retirar_ate) })
-        ]),
-        el("a", { classe: "btn btn--primario btn--pequeno", href: "/excedentes/" + x.id,
-                  "aria-label": (ehOng() ? "Ver e reservar" : "Ver") + " o excedente de " + titulo(emp.nome) },
-           [ehOng() ? "Ver e reservar" : "Ver detalhes"])
-      ])
-    ]);
-  }
-
-  var excedentesAtuais = null, excedentesTotal = 0;
-  function desenharExcedentes(lista, total) {
-    excedentesAtuais = lista; excedentesTotal = total;
-    var alvo = $("excedentes-conteudo");
-    var metrica = document.querySelector('[data-resumo="excedentes"]');
-    if (metrica) metrica.textContent = inteiro.format(total);
-    // uma linha de explicação e uma ação útil para cada perfil, nunca um beco sem saída
-    var publicar = $("excedentes-publicar"), lead = $("excedentes-lead");
-    if (ehOng()) {
-      publicar.hidden = !ehEmpresaAlimentos();
-      publicar.textContent = "Publicar excedente"; publicar.href = "/painel#publicar-excedente";
-      lead.textContent = "Alimentos oferecidos por empresas e pessoas para a sua ONG reservar e retirar antes de vencer. Quando alguém reserva, o cartão some daqui na hora.";
-    } else if (podePublicar()) {
-      publicar.hidden = false;
-      publicar.textContent = "Doar o que sobrou"; publicar.href = "/painel#publicar-excedente";
-      lead.textContent = "Alimentos oferecidos para ONGs retirarem; só ONGs reservam. Quer doar também? Publique o que sobrou e uma ONG retira.";
-    } else if (!usuarioAtual) {
-      publicar.hidden = false;
-      publicar.textContent = "Entrar como ONG"; publicar.href = "/entrar?proximo=" + encodeURIComponent("/#excedentes");
-      lead.textContent = "Alimentos oferecidos por empresas e pessoas para ONGs retirarem antes de vencer. A ONG entra, reserva pelo site e retira no prazo.";
-    } else {
-      publicar.hidden = true;
-      lead.textContent = "Alimentos oferecidos para ONGs retirarem; só ONGs reservam. Para doar, escolha um pedido das ONGs acima.";
-    }
-    if (!lista.length) {
-      alvo.replaceChildren(el("div", { classe: "excedentes__vazio" }, [
-        el("h3", { texto: "Nenhum excedente disponível agora" }),
-        el("p", { texto: podePublicar()
-          ? "Sobrou alimento bom hoje? Publique e as ONGs com pedido parecido são avisadas na hora."
-          : "Quando alguém publicar o que sobrou, o cartão aparece aqui na hora, sem recarregar a página." })
-      ]));
-    } else {
-      alvo.replaceChildren(el("ul", { classe: "excedentes__lista",
-        "aria-label": lista.length + (lista.length === 1 ? " excedente disponível" : " excedentes disponíveis") },
-        lista.map(cartaoExcedente)));
-    }
-    alvo.setAttribute("aria-busy", "false");
-  }
-
-  function carregarExcedentes(aoVivo) {
-    return fetch("/reconecta/excedentes?limite=8", { headers: { "Accept": "application/json" }, credentials: "same-origin" })
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        var total = Number(r.headers.get("X-Total-Count"));
-        return r.json().then(function (lista) {
-          lista = Array.isArray(lista) ? lista : [];
-          desenharExcedentes(lista, isFinite(total) && total >= lista.length ? total : lista.length);
-        });
-      })
-      .catch(function () {
-        if (aoVivo === true) return;
-        var alvo = $("excedentes-conteudo");
-        var tentar = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Tentar novamente" });
-        tentar.addEventListener("click", carregarExcedentes);
-        alvo.replaceChildren(el("div", { classe: "aviso falha", role: "alert" }, [
-          el("p", { texto: "Não conseguimos carregar os excedentes agora." }), tentar]));
-        alvo.setAttribute("aria-busy", "false");
+  function carregarOngs() {
+    return obterJSON(API + "/ongs").then(function (r) {
+      var lista = Array.isArray(r.corpo) ? r.corpo : (r.corpo && r.corpo.ongs) || [];
+      estado.ongs = lista; estado.erro.ongs = false;
+    }, function () {
+      // sem a rota (versão anterior do servidor): monta pelas ONGs que têm pedido aberto
+      var mapa = {};
+      (estado.pedidos || []).forEach(function (d) {
+        var e = d.empresa || {};
+        if (!e.nome) return;
+        mapa[e.nome] = mapa[e.nome] || { nome: e.nome, municipio_uf: e.municipio_uf, pedidos_abertos: 0 };
+        mapa[e.nome].pedidos_abertos += 1;
       });
-  }
-
-  // contagem regressiva: atualiza o texto a cada 30 s e tira da lista o que venceu
-  setInterval(function () {
-    var venceu = false;
-    document.querySelectorAll(".excedente__falta[data-ate]").forEach(function (no) {
-      var d = data(no.getAttribute("data-ate"));
-      if (d && d.getTime() <= Date.now()) venceu = true;
-      else no.textContent = faltaTexto(no.getAttribute("data-ate"));
+      estado.ongs = Object.keys(mapa).map(function (k) { return mapa[k]; });
     });
-    if (venceu) carregarExcedentes(true);
-  }, 30000);
+  }
+  function carregarTudo() {
+    return carregarPedidos().then(function () { return Promise.all([carregarDoados(), carregarOngs()]); }).then(function () {
+      // sem endereço de aba: sem pedido aberto, abre no que existe (alimentos doados ou ONGs)
+      if (!/^#(doacoes|excedentes|ongs)$/.test(location.hash) && !estado.escolheu && estado.pedidos && !estado.pedidos.length) {
+        if (listaDaAbaDoados().length) estado.aba = "doados";
+        else if ((estado.ongs || []).length) estado.aba = "ongs";
+        trocarAba(estado.aba);
+        return;
+      }
+      desenhar();
+    });
+  }
 
   /* ---------- tempo real ---------- */
 
@@ -493,17 +473,22 @@
 
   document.addEventListener("reconecta:evento", function (e) {
     var tipo = (e.detail && e.detail.tipo) || "";
-    if (tipo === "pedido.publicado" || tipo.indexOf("doacao.") === 0) agendar("pedidos", function () { carregar(true); });
-    if (tipo.indexOf("excedente.") === 0) agendar("excedentes", function () { carregarExcedentes(true); });
+    if (tipo === "pedido.publicado" || tipo.indexOf("doacao.") === 0 || tipo.indexOf("pedido.") === 0) {
+      agendar("pedidos", function () { carregarPedidos().then(carregarOngs).then(desenhar); });
+    }
+    if (tipo.indexOf("excedente.") === 0) agendar("doados", function () { carregarDoados().then(desenhar); });
   });
+
+  // a contagem regressiva dos prazos muda com o tempo
+  setInterval(function () { if (estado.aba !== "ongs") desenhar(); }, 60000);
 
   /* "Ao vivo" quando o fluxo está aberto; na consulta periódica, diz o intervalo */
   function mostrarEstado() {
-    var estado = document.documentElement.getAttribute("data-tempo-real");
+    var est = document.documentElement.getAttribute("data-tempo-real");
     document.querySelectorAll("[data-ao-vivo]").forEach(function (no) {
-      no.hidden = estado !== "sse" && estado !== "consulta";
-      no.textContent = estado === "sse" ? "Ao vivo" : "Atualiza a cada 10 s";
-      no.classList.toggle("ao-vivo--consulta", estado === "consulta");
+      no.hidden = est !== "sse" && est !== "consulta";
+      no.textContent = est === "sse" ? "Ao vivo" : "Atualiza a cada 10 s";
+      no.classList.toggle("ao-vivo--consulta", est === "consulta");
     });
   }
   if (typeof MutationObserver === "function") {
@@ -613,7 +598,7 @@
     var acoes = [];
     if (c.pode_publicar_excedente && itens.length) {
       var publicar = el("a", { classe: "btn " + (sugestoes.length ? "btn--secundario" : "btn--primario") + " btn--pequeno",
-        href: "/painel#publicar-excedente" }, [usuarioAtual && usuarioAtual.tipo === "doador" ? "Publicar para as ONGs retirarem" : "Publicar como excedente"]);
+        href: "/painel#publicar-excedente" }, ["Doar o que sobrou"]);
       // o painel pode aproveitar os itens já interpretados
       publicar.addEventListener("click", function () { guardar(CHAVE_RASCUNHO, JSON.stringify({ texto: texto, itens: itens })); });
       acoes.push(publicar);
@@ -687,49 +672,25 @@
     abrirAssistente();
   });
 
-  /* ---------- CTA conforme a sessão ---------- */
+  /* ---------- ações conforme a sessão ---------- */
 
-  var usuarioAtual = null;
-  /* Quem já entrou nunca é mandado para o cadastro: cada convite vira a ação do perfil. */
-  function ajustarConvites() {
-    var vazio = document.querySelector("#ultima-doacao-corpo .ultima__vazia");
-    if (vazio) vazio.replaceChildren.apply(vazio, conviteSemPedido());
-    var ong = !!usuarioAtual && ehOng();
-    var acoes = {
-      empresa: usuarioAtual && usuarioAtual.tipo === "empresa" ? ["/painel", "Abrir o painel"] : null,
-      doador: usuarioAtual && usuarioAtual.tipo === "doador" ? ["/?assistente=1", "Doar agora"] : null,
-      ong: ong ? ["/painel#publicar", "Publicar pedido"] : null
-    };
-    document.querySelectorAll("[data-sessao]").forEach(function (a) {
-      var tipo = a.getAttribute("data-sessao");
-      if (!a.dataset.original) a.dataset.original = a.innerHTML;
-      if (!usuarioAtual) { a.hidden = false; a.href = "/cadastro"; a.innerHTML = a.dataset.original; return; }
-      var acao = tipo === "cta" ? (ong ? ["/painel#publicar", "Publicar pedido"] : null) : acoes[tipo];
-      a.hidden = !acao;
-      if (acao) { a.href = acao[0]; a.textContent = acao[1]; }
-    });
-    // o convite final é para ONGs: quem não é ONG e já entrou não precisa dele
-    $("cta-final").hidden = !!usuarioAtual && !ong;
+  function ajustarTopo() {
+    var sec = $("hero-secundario");
+    if (ehOng()) { sec.href = "/painel#publicar"; sec.textContent = "Publicar pedido"; }
+    else if (usuarioAtual) { sec.href = "#doacoes"; sec.textContent = "Ver pedidos das ONGs"; }
+    else { sec.href = "/cadastro"; sec.textContent = "Sou ONG · pedir doações"; }
   }
 
   var abriuPeloEndereco = false;
   document.addEventListener("reconecta:sessao", function (e) {
-    var u = e.detail && e.detail.usuario;
-    var mudouPerfil = !!excedentesAtuais && JSON.stringify((u && u.perfis) || []) !== JSON.stringify((usuarioAtual && usuarioAtual.perfis) || []);
-    usuarioAtual = u;
-    ajustarConvites();
+    var antes = usuarioAtual;
+    usuarioAtual = (e.detail && e.detail.usuario) || null;
+    ajustarTopo();
     // empresa usa o endereço do cadastro; pessoa física pode informar o CEP
-    $("assistente-cep-campo").hidden = !!(u && u.tipo === "empresa");
-    var sec = $("hero-secundario");
-    if (sec) {
-      if (u && u.tipo === "empresa") { sec.href = "/painel#publicar"; sec.textContent = "Preciso de doações · publicar pedido"; }
-      else if (u) { sec.href = "#doacoes"; sec.textContent = "Ver os pedidos abertos"; }
-      else { sec.href = "/cadastro"; sec.textContent = "Preciso de doações · publicar pedido"; }
-    }
-    // os cartões de excedente dizem "Ver e reservar" só para ONG
-    if (excedentesAtuais && (mudouPerfil || u)) desenharExcedentes(excedentesAtuais, excedentesTotal);
-    // o estado vazio dos pedidos depende de quem está vendo (visitante, pessoa, empresa ou ONG)
-    if (categoriasVazio && !document.querySelector("#doacoes-conteudo .carrossel")) montarVazio(categoriasVazio);
+    $("assistente-cep-campo").hidden = !!(usuarioAtual && usuarioAtual.tipo === "empresa");
+    // "Sua doação" e as ações dependem de quem está vendo
+    if (usuarioAtual && podePublicar()) carregarDoados().then(desenhar);
+    else if (antes !== usuarioAtual) desenhar();
     // volta do login com ?assistente=1: reabre com o texto guardado
     if (!abriuPeloEndereco && /[?&]assistente=1(&|$)/.test(location.search)) {
       abriuPeloEndereco = true;
@@ -737,6 +698,7 @@
     }
   });
 
-  carregar();
-  carregarExcedentes();
+  montarFiltro();
+  abaDoEndereco();
+  carregarTudo();
 })();

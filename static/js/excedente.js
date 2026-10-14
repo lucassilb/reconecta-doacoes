@@ -1,6 +1,7 @@
-/* ReConecta — página de um excedente (/excedentes/<id>): itens, prazo e estado ao vivo.
-   ONG reserva e cancela a reserva; quem publicou vê quem reservou e confirma a retirada.
-   O servidor é a fonte da verdade: toda ação recarrega o estado que ele devolve. */
+/* ReConecta — página do alimento doado (/excedentes/<id>), rodada 16.
+   Dados à esquerda, ação à direita. Quem publicou vê "Sua doação", o estado e as ações
+   (confirmar retirada, cancelar); a ONG reserva; os outros veem uma explicação curta e
+   "Doar também". O servidor é a fonte da verdade: toda ação recarrega o estado dele. */
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
@@ -36,28 +37,22 @@
 
   var R = window.ReConecta;
   function nome(n) { return R.nomeTitulo(n); }
-  function local(mu) { if (!mu) return ""; var p = String(mu).split("/"); return nome(p[0]) + (p[1] ? " / " + p[1].toUpperCase() : ""); }
+  function local(mu) { if (!mu) return ""; var p = String(mu).split("/"); return nome(p[0]) + (p[1] ? "/" + p[1].toUpperCase() : ""); }
   var numero = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
   var PLURAL = { unidade: "unidades", pacote: "pacotes", caixa: "caixas" };
   function qtd(n, u) { return numero.format(Number(n) || 0) + " " + (PLURAL[u] && Number(n) !== 1 ? PLURAL[u] : (u || "")); }
-  function listaNomes(itens) {
-    var nomes = itens.map(function (i) { return i.nome; });
-    if (nomes.length <= 1) return nomes.join("");
-    return nomes.slice(0, -1).join(", ") + " e " + nomes[nomes.length - 1];
-  }
   function dataHora(iso) {
     var d = R.dataBrasilia(iso);
     if (!d) return "";
     var hora = d.toLocaleTimeString("pt-BR", { timeZone: R.fuso, hour: "2-digit", minute: "2-digit" });
     var dia = R.diaISO(d) === R.diaISO(new Date()) ? "hoje"
-      : d.toLocaleDateString("pt-BR", { timeZone: R.fuso, weekday: "long", day: "2-digit", month: "long" });
-    return dia + ", às " + hora;
+      : d.toLocaleDateString("pt-BR", { timeZone: R.fuso, weekday: "short", day: "2-digit", month: "2-digit" });
+    return dia + ", " + hora;
   }
   function validade(iso) {
-    var d = R.dataBrasilia(iso);
-    if (!d) return "";
-    if (iso === R.diaISO(new Date())) return "Vence hoje";
-    return "Validade: " + d.toLocaleDateString("pt-BR", { timeZone: R.fuso, day: "2-digit", month: "2-digit", year: "numeric" });
+    if (!iso) return "";
+    if (iso === R.diaISO(new Date())) return "vence hoje";
+    return iso.split("-").reverse().join("/");
   }
   function falta(iso) {
     var d = R.dataBrasilia(iso);
@@ -70,59 +65,66 @@
     var dias = Math.floor(h / 24);
     return "(faltam " + dias + (dias === 1 ? " dia" : " dias") + ")";
   }
-  var IMG = { "Hortifrúti": "hortifruti", "Padaria": "padaria", "Laticínios": "laticinios", "Carnes e peixes": "carnes",
-    "Grãos e cereais": "graos", "Refeições prontas": "refeicoes", "Bebidas não alcoólicas": "bebidas", "Outros": "outros" };
+  /* mesma foto da categoria que a Home usa (fotos reais quando a frente de fotos chegar) */
+  var FOTOS_REAIS = true;
+  var CAT = { "Hortifrúti": ["hortifruti", "hortifruti"], "Padaria": ["padaria", "padaria"], "Laticínios": ["laticinios", "laticinios"],
+    "Carnes e peixes": ["carnes-peixes", "carnes"], "Grãos e cereais": ["graos-cereais", "graos"],
+    "Refeições prontas": ["refeicoes-prontas", "refeicoes"], "Bebidas não alcoólicas": ["bebidas", "bebidas"], "Outros": ["outros", "outros"] };
+  function pintarFoto(img, categoria) {
+    var c = CAT[categoria] || CAT.Outros;
+    var antiga = "/static/img/doacoes/cat-" + c[1] + ".webp";
+    if (FOTOS_REAIS) {
+      img.onerror = function () { img.onerror = null; img.src = antiga; };
+      img.src = "/static/img/categorias/" + c[0] + ".webp";
+    } else img.src = antiga;
+  }
 
-  var SITUACAO = {
-    DISPONIVEL: ["Disponível", "selo"],
-    RESERVADO: ["Reservado", "selo selo--acento"],
-    RETIRADO: ["Retirado", "selo selo--cinza"],
-    CANCELADO: ["Cancelado", "selo selo--cinza"],
-    EXPIRADO: ["Prazo encerrado", "selo selo--cinza"]
-  };
+  /* estado em palavras */
+  function estado(x) {
+    if (x.status === "DISPONIVEL") return ["Aguardando uma ONG retirar", "exc-estado--espera"];
+    if (x.status === "RESERVADO") return [x.reservado_por && x.reservado_por.nome ? "Reservado por " + nome(x.reservado_por.nome) : "Reservado por uma ONG", "exc-estado--reservado"];
+    if (x.status === "RETIRADO") return ["Retirado", "exc-estado--ok"];
+    if (x.status === "CANCELADO") return ["Cancelado", ""];
+    if (x.status === "EXPIRADO") return ["Prazo de retirada encerrado", ""];
+    return [x.status, ""];
+  }
 
   var m = location.pathname.match(/\/excedentes\/(\d+)/);
   var ID = m ? m[1] : null;
   var excedente = null;
   var usuario;                 // undefined até a sessão responder
 
-  /* ---------- o excedente ---------- */
-
-  function itemLinha(i) {
-    return el("li", { classe: "pedido-item" }, [
-      el("img", { classe: "pedido-item__img", src: "/static/img/doacoes/cat-" + (IMG[i.categoria] || "outros") + ".webp", alt: "", width: "40", height: "40" }),
-      el("div", { classe: "pedido-item__texto" }, [
-        el("p", { classe: "pedido-item__linha" }, [el("strong", { texto: i.nome }), el("span", { texto: qtd(i.quantidade, i.unidade_medida) })]),
-        el("p", { classe: "pedido-item__falta", texto: i.categoria + " · " + validade(i.validade) })
-      ])
-    ]);
-  }
+  /* ---------- os dados ---------- */
 
   function preencher(x) {
     var mudou = excedente && excedente.status !== x.status;
     excedente = x;
     var itens = x.itens || [];
-    var titulo = itens.length ? "Excedente de " + listaNomes(itens).toLowerCase() : "Excedente de alimentos";
-    document.title = titulo + " · ReConecta";
+    var i0 = itens[0] || {};
+    var titulo = itens.length ? qtd(i0.quantidade, i0.unidade_medida) + " de " + i0.nome : "Alimento doado";
+    document.title = (x.meu ? "Sua doação: " : "") + titulo + " · ReConecta";
     $("exc-titulo").textContent = titulo;
+    $("exc-sua").hidden = x.meu !== true;
+    pintarFoto($("exc-foto"), i0.categoria);
     var emp = x.empresa || {};
-    $("exc-empresa").replaceChildren(el("span", { classe: "det__empresa-icone", "aria-hidden": "true" }), el("span", null, [
-      "Publicado por ", el("strong", { texto: nome(emp.nome) }), emp.municipio_uf ? " · " + local(emp.municipio_uf) : "",
-      x.distancia ? el("span", { classe: "det__distancia", texto: " · " + x.distancia + " de você" }) : null]));
-    $("exc-empresa").firstChild.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 9.5 5.6 5A1.6 1.6 0 0 1 7.1 4h9.8a1.6 1.6 0 0 1 1.5 1L20 9.5M4 9.5h16v1a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 10.5zM5.5 13.500V20h13v-6.500M10 20v-4h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+    $("exc-quem").replaceChildren("Doado por ", el("strong", { texto: emp.pessoa_fisica ? "Pessoa física" : nome(emp.nome) }),
+      emp.municipio_uf ? " · " + local(emp.municipio_uf) : "", x.distancia ? " · " + x.distancia + " de você" : "");
 
-    var s = SITUACAO[x.status] || [x.status, "selo selo--cinza"];
+    var s = estado(x);
     var sit = $("exc-situacao");
     if (sit.textContent !== s[0]) sit.textContent = s[0];      // só anuncia quando muda de verdade
-    sit.className = s[1];
+    sit.className = "exc-estado " + s[1];
     $("exc-prazo").textContent = dataHora(x.retirar_ate);
     $("exc-falta").textContent = x.status === "DISPONIVEL" || x.status === "RESERVADO" ? falta(x.retirar_ate) : "";
-    $("exc-local").textContent = x.retirada && x.retirada.endereco
-      ? x.retirada.endereco
-      : (emp.municipio_uf ? local(emp.municipio_uf) + ". " : "") + "O endereço completo aparece para a ONG que reservar.";
+    $("exc-validade").textContent = validade(i0.validade);
+    var endereco = (x.retirada && x.retirada.endereco) || x.retirada_informada;
+    $("exc-local").textContent = endereco || ((emp.municipio_uf ? local(emp.municipio_uf) + ". " : "") + "O endereço aparece para a ONG que reservar.");
     $("exc-obs-linha").hidden = !x.observacao;
     $("exc-obs").textContent = x.observacao || "";
-    $("exc-itens").replaceChildren.apply($("exc-itens"), itens.map(itemLinha));
+    // com mais de um item, a lista completa; com um só, o título já diz tudo
+    $("exc-itens").replaceChildren.apply($("exc-itens"), itens.length > 1 ? itens.map(function (i) {
+      return el("li", null, [el("strong", { texto: i.nome }), el("span", { texto: qtd(i.quantidade, i.unidade_medida) + " · " + validade(i.validade) })]);
+    }) : []);
 
     desenharAcao();
     $("exc-carregando").hidden = true;
@@ -134,18 +136,18 @@
     $("exc-carregando").hidden = true;
     var e = $("exc-erro");
     e.replaceChildren(el("p", { classe: "aviso__titulo", texto: titulo }), el("p", { texto: texto }),
-      el("a", { classe: "btn btn--secundario btn--pequeno", href: "/#excedentes" }, ["Ver excedentes de hoje"]));
+      el("a", { classe: "btn btn--secundario btn--pequeno", href: "/#excedentes" }, ["Ver alimentos doados"]));
     e.hidden = false;
   }
 
   function carregar(aoVivo) {
-    if (!ID) { mostrarErroCarga("Excedente não encontrado", "O endereço desta página está incompleto."); return Promise.resolve(); }
+    if (!ID) { mostrarErroCarga("Doação não encontrada", "O endereço desta página está incompleto."); return Promise.resolve(); }
     return requisitar("/reconecta/excedentes/" + ID).then(function (r) {
-      if (r.status === 404) { if (!aoVivo) mostrarErroCarga("Excedente não encontrado", "Ele pode ter sido removido."); return; }
+      if (r.status === 404) { if (!aoVivo) mostrarErroCarga("Doação não encontrada", "Ela pode ter sido removida."); return; }
       if (!r.ok) throw new Error("HTTP " + r.status);
       preencher(r.corpo);
     }).catch(function () {
-      if (!aoVivo) mostrarErroCarga("Não conseguimos carregar este excedente", "Verifique sua conexão e recarregue a página.");
+      if (!aoVivo) mostrarErroCarga("Não conseguimos carregar esta doação", "Verifique sua conexão e recarregue a página.");
     });
   }
 
@@ -154,22 +156,24 @@
   function aviso(titulo, texto) {
     var a = $("exc-aviso");
     if (!titulo) { a.hidden = true; a.replaceChildren(); return; }
-    a.replaceChildren(el("p", { classe: "quest__aviso-titulo", texto: titulo }), texto ? el("p", { texto: texto }) : null);
+    a.replaceChildren(el("p", { texto: titulo }), texto ? el("p", { texto: texto }) : null);
     a.hidden = false;
   }
 
   function botao(rotulo, classe, acao) {
-    var b = el("button", { type: "button", classe: "btn " + classe + " btn--largo", texto: rotulo });
+    var b = el("button", { type: "button", classe: "btn " + classe, texto: rotulo });
     b.addEventListener("click", function () { acao(b); });
     return b;
   }
+  function link(rotulo, classe, href) { return el("a", { classe: "btn " + classe, href: href }, [rotulo]); }
+  function texto(t, forte) { return el("p", { classe: forte ? "exc-acao__forte" : null, texto: t }); }
 
   /* Pergunta "tem certeza?" no próprio cartão, sem janela. */
   function confirmarNoCartao(pergunta, rotuloSim, executar) {
     var alvo = $("exc-acao");
     var sim = botao(rotuloSim, "btn--perigo", function (b) { executar(b); });
     var nao = botao("Voltar", "btn--fantasma", function () { desenharAcao(); $("acao-titulo").focus(); });
-    alvo.replaceChildren(el("p", { classe: "exc__pergunta", texto: pergunta }), sim, nao);
+    alvo.replaceChildren(texto(pergunta, true), sim, nao);
     sim.focus();
   }
 
@@ -179,10 +183,14 @@
     b.disabled = true; b.classList.add("is-carregando");
     requisitar("/reconecta/excedentes/" + ID + caminho, metodo || "POST").then(function (r) {
       var c = r.corpo;
-      if (r.ok) { preencher(c); $("acao-titulo").focus(); return; }
+      if (r.ok) {
+        // DELETE (cancelar a doação) responde 204 sem corpo: busca o estado novo
+        if (r.status === 204 || !c.id) carregar(true).then(function () { $("acao-titulo").focus(); });
+        else { preencher(c); $("acao-titulo").focus(); }
+        return;
+      }
       if (r.status === 401) { location.href = "/entrar?proximo=" + encodeURIComponent("/excedentes/" + ID); return; }
-      var texto = mensagens[c.codigo] || c.mensagem || "Tente novamente em alguns instantes.";
-      aviso("Não foi possível concluir", texto);
+      aviso("Não foi possível concluir", mensagens[c.codigo] || c.mensagem || "Tente novamente em alguns instantes.");
       // 409: o estado mudou enquanto a pessoa decidia; mostra o estado novo
       if (r.status === 409 || r.status === 404) return carregar(true);
       b.disabled = false; b.classList.remove("is-carregando");
@@ -193,97 +201,95 @@
   }
 
   var MSG = {
-    EXCEDENTE_INDISPONIVEL: "Este excedente acabou de ser reservado por outra ONG ou saiu do prazo.",
-    APENAS_ONGS: "Só organizações sem fins lucrativos reservam excedentes.",
-    EXCEDENTE_PROPRIO: "Você publicou este excedente; quem reserva é uma ONG.",
+    EXCEDENTE_INDISPONIVEL: "Esta doação acabou de ser reservada por outra ONG ou saiu do prazo.",
+    APENAS_ONGS: "Só organizações sem fins lucrativos reservam.",
+    EXCEDENTE_PROPRIO: "A doação é sua; quem reserva é uma ONG.",
     MUITAS_TENTATIVAS: "Muitas reservas em pouco tempo. Aguarde um pouco e tente de novo.",
     RESERVA_INDISPONIVEL: "Esta reserva já não pode ser cancelada.",
     RETIRADA_INDISPONIVEL: "Não há reserva dentro do prazo para confirmar."
   };
+
+  function ehOng() { return !!(usuario && usuario.tipo === "empresa" && (usuario.perfis || []).indexOf("ong") !== -1); }
+  function podeDoar() { return !!(usuario && (usuario.tipo === "doador" || (usuario.perfis || []).indexOf("empresa_alimentos") !== -1)); }
+  function doarTambem() {
+    return podeDoar() ? link("Doar também", "btn--secundario", "/painel#publicar-excedente")
+                      : link("Doar também", "btn--secundario", "/?assistente=1");
+  }
 
   function desenharAcao() {
     var alvo = $("exc-acao");
     var x = excedente;
     if (!x || usuario === undefined) return;
     var titulo = $("acao-titulo");
-    // o servidor marca "meu": true no detalhe para quem publicou (empresa ou pessoa física)
-    var souPublicador = !!(usuario && x.meu === true);
-    var reserveiEu = !!x.retirada;
-    var blocos = [];
+    var b = [];
 
-    if (reserveiEu && x.status === "RESERVADO") {
-      titulo.textContent = "Reservado para a sua ONG";
-      blocos.push(
-        el("div", { classe: "exc__reserva" }, [
-          el("p", { classe: "exc__reserva-titulo", texto: "Retire neste endereço" }),
-          el("p", { classe: "exc__endereco", texto: x.retirada.endereco }),
-          el("p", null, ["Até ", el("strong", { texto: dataHora(x.retirada.retirar_ate) }), "."])
-        ]),
-        el("p", { classe: "doar__texto", texto: "Na retirada, a empresa confirma a entrega pelo site. Se não puder ir, cancele para outra ONG aproveitar." }),
-        botao("Cancelar reserva", "btn--secundario", function () {
-          confirmarNoCartao("Cancelar a reserva? O excedente volta a ficar disponível para outras ONGs.", "Sim, cancelar a reserva",
-            function (b) { agir("/cancelar-reserva", "POST", b, MSG); });
-        }),
-        el("a", { classe: "btn btn--fantasma btn--largo", href: "/painel" }, ["Ver minhas reservas no painel"])
-      );
-    } else if (reserveiEu && x.status === "RETIRADO") {
-      titulo.textContent = "Retirada confirmada";
-      blocos.push(el("p", { classe: "doar__texto", texto: "A empresa confirmou que a sua ONG retirou este excedente. Alimento aproveitado!" }),
-        el("a", { classe: "btn btn--secundario btn--largo", href: "/#excedentes" }, ["Ver outros excedentes"]));
-    } else if (souPublicador) {
-      titulo.textContent = "Seu excedente";
-      if (x.status === "RESERVADO" && x.reservado_por) {
-        blocos.push(
-          el("div", { classe: "exc__reserva" }, [
-            el("p", { classe: "exc__reserva-titulo", texto: "Reservado por" }),
-            el("p", { classe: "exc__endereco", texto: nome(x.reservado_por.nome) }),
-            el("p", null, ["Retirada até ", el("strong", { texto: dataHora(x.retirar_ate) }), "."])
-          ]),
-          botao("Confirmar retirada", "btn--primario", function (b) { agir("/confirmar-retirada", "POST", b, MSG); }),
+    if (x.meu === true) {
+      // quem doou: "Sua doação", o estado e as ações dela
+      titulo.textContent = "Sua doação";
+      if (x.status === "DISPONIVEL") {
+        b.push(texto("Aguardando uma ONG reservar. Você é avisado no sino quando isso acontecer."),
+          botao("Cancelar esta doação", "btn--fantasma", function () {
+            confirmarNoCartao("Cancelar a doação? Ela deixa de aparecer para as ONGs.", "Sim, cancelar a doação",
+              function (bt) { agir("", "DELETE", bt, MSG); });
+          }));
+      } else if (x.status === "RESERVADO") {
+        b.push(el("div", { classe: "exc-reserva" }, [
+            el("p", { classe: "exc-reserva__rotulo", texto: "Reservado por" }),
+            el("p", { classe: "exc-reserva__valor", texto: x.reservado_por ? nome(x.reservado_por.nome) : "uma ONG" }),
+            el("p", { texto: "Retirada até " + dataHora(x.retirar_ate) + "." })]),
+          texto("Quando a ONG buscar, confirme aqui."),
+          botao("Confirmar retirada", "btn--primario", function (bt) { agir("/confirmar-retirada", "POST", bt, MSG); }),
           botao("Cancelar a reserva", "btn--fantasma", function () {
-            confirmarNoCartao("Cancelar a reserva desta ONG? O excedente volta a ficar disponível.", "Sim, cancelar a reserva",
-              function (b) { agir("/cancelar-reserva", "POST", b, MSG); });
-          })
-        );
-      } else if (x.status === "DISPONIVEL") {
-        blocos.push(el("p", { classe: "doar__texto", texto: "Aguardando a reserva de uma ONG. Você é avisado na hora, aqui e no sino de notificações." }));
+            confirmarNoCartao("Cancelar a reserva desta ONG? A doação volta a ficar disponível.", "Sim, cancelar a reserva",
+              function (bt) { agir("/cancelar-reserva", "POST", bt, MSG); });
+          }));
       } else if (x.status === "RETIRADO") {
-        blocos.push(el("p", { classe: "doar__texto", texto: "Você confirmou a retirada. Alimento aproveitado!" }));
+        b.push(texto("A ONG retirou. Obrigado por doar!", true), link("Doar de novo", "btn--primario", "/painel#publicar-excedente"));
       } else {
-        blocos.push(el("p", { classe: "doar__bloqueio", texto: x.status === "EXPIRADO" ? "O prazo de retirada terminou sem retirada confirmada." : "Este excedente foi cancelado." }));
+        b.push(texto(x.status === "EXPIRADO" ? "O prazo terminou sem retirada." : "Você cancelou esta doação."),
+          link("Doar de novo", "btn--secundario", "/painel#publicar-excedente"));
       }
-      blocos.push(el("a", { classe: "btn btn--fantasma btn--largo", href: "/painel" }, ["Gerenciar no painel"]));
+      b.push(link("Minhas doações no painel", "btn--fantasma", "/painel"));
+    } else if (x.retirada && x.status === "RESERVADO") {
+      // a ONG que reservou
+      titulo.textContent = "Reservado para a sua ONG";
+      b.push(el("div", { classe: "exc-reserva" }, [
+          el("p", { classe: "exc-reserva__rotulo", texto: "Retire neste endereço" }),
+          el("p", { classe: "exc-reserva__valor", texto: x.retirada.endereco }),
+          el("p", { texto: "Até " + dataHora(x.retirada.retirar_ate) + "." })]),
+        botao("Cancelar reserva", "btn--secundario", function () {
+          confirmarNoCartao("Cancelar a reserva? A doação volta a ficar disponível para outras ONGs.", "Sim, cancelar a reserva",
+            function (bt) { agir("/cancelar-reserva", "POST", bt, MSG); });
+        }),
+        link("Minhas reservas no painel", "btn--fantasma", "/painel"));
+    } else if (x.retirada && x.status === "RETIRADO") {
+      titulo.textContent = "Retirada confirmada";
+      b.push(texto("A sua ONG retirou esta doação. Alimento aproveitado!"), link("Ver outros alimentos doados", "btn--secundario", "/#excedentes"));
     } else if (x.status !== "DISPONIVEL") {
-      titulo.textContent = "Excedente indisponível";
-      var motivo = { RESERVADO: "Uma ONG já reservou este excedente. Se a reserva for cancelada, ele volta a aparecer aqui na hora.",
-        RETIRADO: "Este excedente já foi retirado por uma ONG.", CANCELADO: "A empresa cancelou este excedente.",
-        EXPIRADO: "O prazo de retirada deste excedente terminou." }[x.status] || "Este excedente não está disponível.";
-      blocos.push(el("p", { classe: "doar__bloqueio", texto: motivo }),
-        el("a", { classe: "btn btn--secundario btn--largo", href: "/#excedentes" }, ["Ver outros excedentes"]));
+      titulo.textContent = "Indisponível";
+      b.push(texto({ RESERVADO: "Uma ONG já reservou. Se a reserva for cancelada, volta a aparecer.", RETIRADO: "Esta doação já foi retirada.",
+        CANCELADO: "Quem doou cancelou.", EXPIRADO: "O prazo de retirada terminou." }[x.status] || "Esta doação não está disponível."),
+        link("Ver outros alimentos doados", "btn--secundario", "/#excedentes"));
     } else if (!usuario) {
-      titulo.textContent = "Reservar este excedente";
-      blocos.push(el("p", { classe: "doar__texto", texto: "A reserva é feita por ONGs cadastradas. Depois de reservar, o endereço de retirada aparece aqui." }),
-        el("a", { classe: "btn btn--primario btn--largo", href: "/entrar?proximo=" + encodeURIComponent("/excedentes/" + ID) }, ["Entre como ONG para reservar"]),
-        el("p", { classe: "doar__nota" }, ["Sua organização ainda não tem conta? ", el("a", { href: "/cadastro", texto: "Cadastre a ONG com o CNPJ" }), "."]));
+      titulo.textContent = "Para ONGs retirarem";
+      b.push(texto("Uma ONG cadastrada reserva e retira no prazo."),
+        link("Entrar como ONG para reservar", "btn--primario", "/entrar?proximo=" + encodeURIComponent("/excedentes/" + ID)),
+        doarTambem());
     } else if (x.pode_reservar) {
-      titulo.textContent = "Reservar este excedente";
-      blocos.push(el("p", { classe: "doar__texto", texto: "Ao reservar, a sua ONG se compromete a retirar no prazo. O endereço aparece logo depois." }),
-        botao("Reservar este excedente", "btn--primario", function (b) { agir("/reservar", "POST", b, MSG); }));
-    } else if (x.motivo_bloqueio === "Apenas ONGs podem reservar") {
-      // quem não é ONG não reserva, mas pode doar: ação útil em vez de um "não" seco
-      var perfis = (usuario && usuario.perfis) || [];
-      var publica = usuario.tipo === "doador" || perfis.indexOf("empresa_alimentos") !== -1;
-      titulo.textContent = "Oferecido para ONGs retirarem";
-      blocos.push(el("p", { classe: "doar__texto", texto: "Este alimento foi oferecido para uma ONG reservar e retirar. " +
-          (publica ? "Você também pode doar: publique o que sobrou ou escolha um pedido das ONGs." : "Você pode doar escolhendo um pedido das ONGs.") }));
-      if (publica) blocos.push(el("a", { classe: "btn btn--primario btn--largo", href: "/painel#publicar-excedente" }, ["Doar o que sobrou"]));
-      blocos.push(el("a", { classe: "btn btn--secundario btn--largo", href: "/#doacoes" }, ["Ver pedidos das ONGs"]));
+      titulo.textContent = "Reservar";
+      b.push(texto("Ao reservar, sua ONG se compromete a retirar no prazo. O endereço aparece logo depois."),
+        botao("Reservar esta doação", "btn--primario", function (bt) { agir("/reservar", "POST", bt, MSG); }));
+    } else if (x.motivo_bloqueio === "Apenas ONGs podem reservar" || !ehOng()) {
+      // quem não é ONG não reserva, mas pode doar também
+      titulo.textContent = "Para ONGs retirarem";
+      b.push(texto("Esta doação é para uma ONG reservar e retirar."), doarTambem(),
+        link("Ver pedidos das ONGs", "btn--fantasma", "/#doacoes"));
     } else {
-      titulo.textContent = "Reservar este excedente";
-      blocos.push(el("p", { classe: "doar__bloqueio", texto: (x.motivo_bloqueio || "Você não pode reservar este excedente") + "." }),
-        el("a", { classe: "btn btn--secundario btn--largo", href: "/#excedentes" }, ["Ver outros excedentes"]));
+      titulo.textContent = "Reservar";
+      b.push(texto((x.motivo_bloqueio || "Você não pode reservar esta doação") + "."),
+        link("Ver outros alimentos doados", "btn--secundario", "/#excedentes"));
     }
-    alvo.replaceChildren.apply(alvo, blocos);
+    alvo.replaceChildren.apply(alvo, b);
   }
 
   /* ---------- sessão, tempo real e relógio ---------- */
