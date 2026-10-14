@@ -22,6 +22,7 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 | ONGs | O cadastro consulta a natureza jurídica do CNPJ e aceita organização sem fins lucrativos mesmo sem CNAE alimentar; um CNPJ pode ter os dois perfis. `GET /reconecta/cadastro/cnpj/{cnpj}`, `Cadastro.py`, `cnpj_service.py`, `tests/test_dominio_r11.py`. |
 | Reduzir desperdício | Empresas de alimentos publicam excedentes com validade e prazo; ONGs reservam e a publicadora confirma a retirada. `POST /reconecta/excedentes`, `POST /reconecta/excedentes/{id}/reservar`, `POST /reconecta/excedentes/{id}/confirmar-retirada`, `Excedentes.py`, tela `/painel` (`static/js/painel-excedentes.js`), `tests/test_dominio_r11.py`. O sistema registra retiradas; não mede redução total de desperdício. |
 | Conectar com IA | `POST /reconecta/ia/sugerir-destino` interpreta o alimento oferecido e ordena pedidos compatíveis com pontuação e motivos. Usa `conexao.py`, o classificador de `classificador.py` e a LLM local gratuita via `llm_service.py` quando disponível; sem Ollama, aplica classificador e regras. `tests/test_tempo_real.py` e `tests/test_ia.py`. |
+| Perto de quem precisa | Distância em linha reta (haversine) entre quem oferece e a ONG entra na pontuação da sugestão ("a 3,8 km"); o aviso de excedente vai primeiro para as ONGs compatíveis mais próximas (mesma UF ou até 50 km, no máximo 10), com a distância; `GET /reconecta/excedentes/rota` ordena as retiradas da ONG (vizinho mais próximo + 2-opt) com links do OpenStreetMap. Coordenadas por Nominatim/BrasilAPI em segundo plano, com cache e sede do município do IBGE como reserva, sem chave nem custo. `geo.py`, `Rotas.py`, `conexao.py`, [docs/geo.md](docs/geo.md), `tests/test_geo.py`. |
 | Em tempo real | `GET /reconecta/tempo-real` transmite eventos por SSE; `GET /reconecta/novidades` sustenta a consulta periódica se a conexão cair. O sino, os avisos e a atualização do painel e do dashboard estão em `static/js/layout.js`, `static/js/painel.js`, `static/js/painel-excedentes.js` e `static/js/dashboard.js`; testes em `tests/test_tempo_real.py`. |
 | Ciclo fechado | No painel, o dono do pedido marca **Recebi** ou **Não recebi** (`POST /reconecta/painel/contribuicoes/{id}/receber` e `/nao-recebida`); o estado distingue oferta aceita de entrega confirmada. `Painel.py`, `static/js/painel.js`, `tests/test_dominio_r11.py`. |
 | Indicadores | `GET /reconecta/dashboard` apresenta doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva em `/dashboard`; `Dashboard.py`, `static/js/dashboard.js`, `tests/test_dashboard.py`. |
@@ -106,6 +107,7 @@ ReConecta/
 ├── Dashboard.py           # /reconecta/dashboard (agregados)
 ├── IA.py, llm_service.py, conexao.py  # IA local e sugestão de destino
 ├── TempoReal.py, eventos.py # SSE, notificações e registro de eventos
+├── geo.py, Rotas.py       # coordenadas (cache, IBGE, Nominatim/BrasilAPI), distância e rota de coleta
 ├── classificador.py       # Classificador de categorias (Naive Bayes em Python puro)
 ├── modelo/                # Modelo treinado em JSON, métricas do treino e da avaliação
 ├── data/                  # Dataset de alimentos, pedidos de avaliação e gerador
@@ -239,6 +241,7 @@ Crie um `.env` a partir do `.env.example` (não publique o `.env`). Nenhuma é o
 | `ADMIN_TOKEN` | desativado | Token longo e aleatório enviado em `X-Admin-Token` para a escrita dos CRUDs do CP1. Sem configuração: escrita 403; token ausente ou incorreto: 401. Não use no navegador nem publique no repositório. |
 | `OLLAMA_URL` | `http://localhost:11434` | Endereço do Ollama. Só HTTP, com porta, em `localhost`, `127.0.0.1` ou `::1`. |
 | `OLLAMA_MODELO` | `qwen2.5:3b` | Modelo gratuito usado pela IA; outro valor desliga a chamada à LLM. |
+| `GEO_EXTERNO` | `1` | `0` desliga as consultas ao Nominatim e à BrasilAPI; as distâncias usam o cache e a sede do município (`data/municipios.csv`). |
 | `OLLAMA_PERMITIR_DOCKER` | desligado | `1` aceita também, e somente, o host `ollama` do Docker Compose em `OLLAMA_URL` (`http://ollama:11434`). O Compose já define. |
 
 Só no Docker Compose (lidas pelo `docker-compose.yml`):
@@ -307,6 +310,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | POST | `/reconecta/excedentes/{id}/reservar` | ONG reserva um excedente disponível. |
 | POST | `/reconecta/excedentes/{id}/cancelar-reserva` | Reservante ou publicador libera a reserva. |
 | POST | `/reconecta/excedentes/{id}/confirmar-retirada` | Publicador confirma a retirada. |
+| GET | `/reconecta/excedentes/rota` | ONG: ordem das retiradas reservadas (vizinho mais próximo + 2-opt), distâncias e links do OpenStreetMap. |
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
 | GET | `/reconecta/dashboard/impacto` | Kg físicos e estimados, refeições potenciais por UF/região, match, avaliação da IA e calor por dia/hora. |
 | GET | `/reconecta/dashboard/seguranca` | Resumo versionado SAST/STRIDE e controles de segurança declarados. |
@@ -329,7 +333,7 @@ A tabela cobre as **55 operações em 42 caminhos** da API, conferidas contra o 
 
 ## Banco de dados (critério 5 do CP2)
 
-Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao`, `contribuicoes` (doações para pedidos), `excedentes`, `itens_excedente`, `eventos`, `notificacao_leitura` e `reservas` (modelo legado do CP1). A revisão do domínio, com diagrama ER, está em [docs/modelagem.md](docs/modelagem.md), organizada por item do critério:
+Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao`, `contribuicoes` (doações para pedidos), `excedentes`, `itens_excedente`, `eventos`, `notificacao_leitura`, `geolocalizacoes` (cache de coordenadas por hash do endereço) e `reservas` (modelo legado do CP1). A revisão do domínio, com diagrama ER, está em [docs/modelagem.md](docs/modelagem.md), organizada por item do critério:
 
 | Item do critério | Seção em `docs/modelagem.md` | Resumo |
 |---|---|---|
@@ -375,7 +379,7 @@ Resultado atual: **250 passed, 4 skipped**. Os testes usam SQLite isolado (em me
 | Tipo de teste | Arquivos | O que cobrem |
 |---|---|---|
 | Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, `test_ciclo_ia.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, validação da saída da LLM, fallback, treino reprodutível, recomendação e limiares da IA |
-| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, CRUDs e saúde |
+| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_geo.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, rota de coleta, CRUDs e saúde |
 | De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | Elegibilidade por natureza jurídica ou CNAE, reserva exclusiva por ONG, confirmação pelo dono do pedido, privacidade de eventos e fotos, limites de login, IA, publicações e doações |
 | De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + SQLite isolado: migrações, restrições, transições de estado, fluxo de eventos, fuso, consultas SQL, foto no banco, auditoria e classificador dentro da interpretação de pedidos |
 
@@ -536,7 +540,8 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - [docs/implantacao.md](docs/implantacao.md) — Docker Compose, Supabase, Render e CI/CD, passo a passo;
 - [docs/stride.md](docs/stride.md) — matriz de riscos STRIDE;
 - [docs/sast.md](docs/sast.md) — triagem dos relatórios do Bandit e do Trivy;
-- [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar.
+- [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar;
+- [docs/geo.md](docs/geo.md) — localização, distância na recomendação, avisos por proximidade e rota de coleta.
 
 ## Limitações conhecidas
 

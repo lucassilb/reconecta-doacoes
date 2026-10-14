@@ -62,27 +62,6 @@
       }
     },
     "/reconecta/auth/me": {
-      "get": {
-        "responses": {
-          "401": {
-            "description": "Não autenticado",
-            "schema": {
-              "$ref": "#/definitions/AuthErro"
-            }
-          },
-          "200": {
-            "description": "Usuário atual",
-            "schema": {
-              "$ref": "#/definitions/UsuarioAutenticado"
-            }
-          }
-        },
-        "summary": "Retorna o perfil mínimo da sessão atual",
-        "operationId": "get_me",
-        "tags": [
-          "auth"
-        ]
-      },
       "put": {
         "responses": {
           "409": {
@@ -122,6 +101,27 @@
             }
           }
         ],
+        "tags": [
+          "auth"
+        ]
+      },
+      "get": {
+        "responses": {
+          "401": {
+            "description": "Não autenticado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "200": {
+            "description": "Usuário atual",
+            "schema": {
+              "$ref": "#/definitions/UsuarioAutenticado"
+            }
+          }
+        },
+        "summary": "Retorna o perfil mínimo da sessão atual",
+        "operationId": "get_me",
         "tags": [
           "auth"
         ]
@@ -351,18 +351,6 @@
       }
     },
     "/reconecta/doacoes/": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Listar todas as doações cadastradas no PostgreSQL",
-        "operationId": "Listar todas as doações",
-        "tags": [
-          "doacoes"
-        ]
-      },
       "post": {
         "responses": {
           "200": {
@@ -389,6 +377,18 @@
         "tags": [
           "doacoes"
         ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todas as doações cadastradas no PostgreSQL",
+        "operationId": "Listar todas as doações",
+        "tags": [
+          "doacoes"
+        ]
       }
     },
     "/reconecta/doacoes/{id}": {
@@ -401,35 +401,6 @@
           "type": "integer"
         }
       ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter uma doação pelo ID direto do banco",
-        "operationId": "Obter uma doação pelo ID",
-        "tags": [
-          "doacoes"
-        ]
-      },
-      "delete": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Deletar uma doação pelo ID no PostgreSQL",
-        "operationId": "Deletar uma doação pelo ID",
-        "security": [
-          {
-            "AdminToken": []
-          }
-        ],
-        "tags": [
-          "doacoes"
-        ]
-      },
       "put": {
         "responses": {
           "200": {
@@ -456,22 +427,38 @@
         "tags": [
           "doacoes"
         ]
-      }
-    },
-    "/reconecta/estabelecimentos/": {
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar uma doação pelo ID no PostgreSQL",
+        "operationId": "Deletar uma doação pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "tags": [
+          "doacoes"
+        ]
+      },
       "get": {
         "responses": {
           "200": {
             "description": "Success"
           }
         },
-        "summary": "Listar todos os estabelecimentos cadastrados no banco",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Listar todos os estabelecimentos",
+        "summary": "Obter uma doação pelo ID direto do banco",
+        "operationId": "Obter uma doação pelo ID",
         "tags": [
-          "estabelecimentos"
+          "doacoes"
         ]
-      },
+      }
+    },
+    "/reconecta/estabelecimentos/": {
       "post": {
         "responses": {
           "200": {
@@ -498,6 +485,19 @@
         "tags": [
           "estabelecimentos"
         ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todos os estabelecimentos cadastrados no banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Listar todos os estabelecimentos",
+        "tags": [
+          "estabelecimentos"
+        ]
       }
     },
     "/reconecta/estabelecimentos/{id}": {
@@ -510,36 +510,6 @@
           "type": "integer"
         }
       ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter um estabelecimento pelo ID direto do banco",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Obter um estabelecimento pelo ID",
-        "tags": [
-          "estabelecimentos"
-        ]
-      },
-      "delete": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Deletar um estabelecimento pelo ID no PostgreSQL",
-        "operationId": "Deletar um estabelecimento pelo ID",
-        "security": [
-          {
-            "AdminToken": []
-          }
-        ],
-        "tags": [
-          "estabelecimentos"
-        ]
-      },
       "put": {
         "responses": {
           "200": {
@@ -566,26 +536,39 @@
         "tags": [
           "estabelecimentos"
         ]
-      }
-    },
-    "/reconecta/excedentes": {
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar um estabelecimento pelo ID no PostgreSQL",
+        "operationId": "Deletar um estabelecimento pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "tags": [
+          "estabelecimentos"
+        ]
+      },
       "get": {
         "responses": {
           "200": {
-            "description": "Excedentes disponíveis",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ExcedenteSaida"
-              }
-            }
+            "description": "Success"
           }
         },
-        "operationId": "get_excedentes",
+        "summary": "Obter um estabelecimento pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Obter um estabelecimento pelo ID",
         "tags": [
-          "excedentes"
+          "estabelecimentos"
         ]
-      },
+      }
+    },
+    "/reconecta/excedentes": {
       "post": {
         "responses": {
           "429": {
@@ -609,6 +592,23 @@
             }
           }
         ],
+        "tags": [
+          "excedentes"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Excedentes disponíveis",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExcedenteSaida"
+              }
+            }
+          }
+        },
+        "operationId": "get_excedentes",
         "tags": [
           "excedentes"
         ]
@@ -640,6 +640,29 @@
         ]
       }
     },
+    "/reconecta/excedentes/rota": {
+      "get": {
+        "responses": {
+          "403": {
+            "description": "Apenas ONGs"
+          },
+          "401": {
+            "description": "Sem sessão"
+          },
+          "200": {
+            "description": "Ordem de retirada, distâncias e links do OpenStreetMap",
+            "schema": {
+              "$ref": "#/definitions/RotaColeta"
+            }
+          }
+        },
+        "summary": "Ordena as retiradas pendentes da ONG logada (reservas ainda no prazo)",
+        "operationId": "get_rota_coleta",
+        "tags": [
+          "rota"
+        ]
+      }
+    },
     "/reconecta/excedentes/{excedente_id}": {
       "parameters": [
         {
@@ -649,6 +672,17 @@
           "type": "integer"
         }
       ],
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "operationId": "delete_excedente_detalhe",
+        "tags": [
+          "excedentes"
+        ]
+      },
       "get": {
         "responses": {
           "200": {
@@ -659,17 +693,6 @@
           }
         },
         "operationId": "get_excedente_detalhe",
-        "tags": [
-          "excedentes"
-        ]
-      },
-      "delete": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "operationId": "delete_excedente_detalhe",
         "tags": [
           "excedentes"
         ]
@@ -783,20 +806,63 @@
         ]
       }
     },
-    "/reconecta/instituicoes/": {
-      "get": {
+    "/reconecta/ia/risco-descarte": {
+      "post": {
         "responses": {
+          "429": {
+            "description": "Limite de 10 análises por minuto por IP"
+          },
+          "400": {
+            "description": "Lote inválido"
+          },
           "200": {
-            "description": "Success"
+            "description": "Probabilidade e prioridade estimadas em dados simulados"
           }
         },
-        "summary": "Listar todas as instituições cadastradas no PostgreSQL",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Listar todas as instituições",
+        "operationId": "post_risco_descarte",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/LoteRiscoDescarteIA"
+            }
+          }
+        ],
         "tags": [
-          "instituicoes"
+          "ia"
         ]
-      },
+      }
+    },
+    "/reconecta/ia/sugerir-destino": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Sugestões de destino para o excedente",
+            "schema": {
+              "$ref": "#/definitions/PedidoSugeridoIA"
+            }
+          }
+        },
+        "summary": "Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam",
+        "operationId": "post_sugerir_destino",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/TextoDestinoIA"
+            }
+          }
+        ],
+        "tags": [
+          "ia"
+        ]
+      }
+    },
+    "/reconecta/instituicoes/": {
       "post": {
         "responses": {
           "200": {
@@ -823,6 +889,19 @@
         "tags": [
           "instituicoes"
         ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Listar todas as instituições cadastradas no PostgreSQL",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Listar todas as instituições",
+        "tags": [
+          "instituicoes"
+        ]
       }
     },
     "/reconecta/instituicoes/{id}": {
@@ -835,36 +914,6 @@
           "type": "integer"
         }
       ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Obter uma instituição pelo ID direto do banco",
-        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
-        "operationId": "Obter uma instituição pelo ID",
-        "tags": [
-          "instituicoes"
-        ]
-      },
-      "delete": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Deletar uma instituição pelo ID no PostgreSQL",
-        "operationId": "Deletar uma instituição pelo ID",
-        "security": [
-          {
-            "AdminToken": []
-          }
-        ],
-        "tags": [
-          "instituicoes"
-        ]
-      },
       "put": {
         "responses": {
           "200": {
@@ -890,6 +939,89 @@
         ],
         "tags": [
           "instituicoes"
+        ]
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Deletar uma instituição pelo ID no PostgreSQL",
+        "operationId": "Deletar uma instituição pelo ID",
+        "security": [
+          {
+            "AdminToken": []
+          }
+        ],
+        "tags": [
+          "instituicoes"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Obter uma instituição pelo ID direto do banco",
+        "description": "Sem token: id, nome, CNPJ (dígitos) e endereço. Com X-Admin-Token válido: registro completo.",
+        "operationId": "Obter uma instituição pelo ID",
+        "tags": [
+          "instituicoes"
+        ]
+      }
+    },
+    "/reconecta/notificacoes": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "As 30 notificações mais recentes destinadas ao usuário, com `lida`",
+        "operationId": "get_notificacoes",
+        "tags": [
+          "tempo_real"
+        ]
+      }
+    },
+    "/reconecta/notificacoes/lidas": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Marca como lidas as notificações até `ate_id`",
+        "operationId": "post_notificacoes_lidas",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/NotificacoesLidas"
+            }
+          }
+        ],
+        "tags": [
+          "tempo_real"
+        ]
+      }
+    },
+    "/reconecta/novidades": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "summary": "Eventos visíveis desde um id (máx",
+        "description": "50) e o último id global.",
+        "operationId": "get_novidades",
+        "tags": [
+          "tempo_real"
         ]
       }
     },
@@ -938,23 +1070,6 @@
       }
     },
     "/reconecta/painel/doacoes": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Pedidos da empresa",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/PedidoPainel"
-              }
-            }
-          }
-        },
-        "operationId": "get_doacoes_painel",
-        "tags": [
-          "painel"
-        ]
-      },
       "post": {
         "responses": {
           "201": {
@@ -975,6 +1090,23 @@
             }
           }
         ],
+        "tags": [
+          "painel"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Pedidos da empresa",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PedidoPainel"
+              }
+            }
+          }
+        },
+        "operationId": "get_doacoes_painel",
         "tags": [
           "painel"
         ]
@@ -1127,86 +1259,6 @@
         ]
       }
     },
-    "/reconecta/ia/sugerir-destino": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Sugestões de destino para o excedente",
-            "schema": {
-              "$ref": "#/definitions/PedidoSugeridoIA"
-            }
-          }
-        },
-        "summary": "Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam",
-        "operationId": "post_sugerir_destino",
-        "parameters": [
-          {
-            "name": "payload",
-            "required": true,
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/TextoDestinoIA"
-            }
-          }
-        ],
-        "tags": [
-          "ia"
-        ]
-      }
-    },
-    "/reconecta/notificacoes": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "As 30 notificações mais recentes destinadas ao usuário, com `lida`",
-        "operationId": "get_notificacoes",
-        "tags": [
-          "tempo_real"
-        ]
-      }
-    },
-    "/reconecta/notificacoes/lidas": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Marca como lidas as notificações até `ate_id`",
-        "operationId": "post_notificacoes_lidas",
-        "parameters": [
-          {
-            "name": "payload",
-            "required": true,
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/NotificacoesLidas"
-            }
-          }
-        ],
-        "tags": [
-          "tempo_real"
-        ]
-      }
-    },
-    "/reconecta/novidades": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Eventos visíveis desde um id (máx",
-        "description": "50) e o último id global.",
-        "operationId": "get_novidades",
-        "tags": [
-          "tempo_real"
-        ]
-      }
-    },
     "/reconecta/tempo-real": {
       "get": {
         "responses": {
@@ -1218,35 +1270,6 @@
         "operationId": "get_tempo_real",
         "tags": [
           "tempo_real"
-        ]
-      }
-    },
-    "/reconecta/ia/risco-descarte": {
-      "post": {
-        "responses": {
-          "429": {
-            "description": "Limite de 10 análises por minuto por IP"
-          },
-          "400": {
-            "description": "Lote inválido"
-          },
-          "200": {
-            "description": "Probabilidade e prioridade estimadas em dados simulados"
-          }
-        },
-        "operationId": "post_risco_descarte",
-        "parameters": [
-          {
-            "name": "payload",
-            "required": true,
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/LoteRiscoDescarteIA"
-            }
-          }
-        ],
-        "tags": [
-          "ia"
         ]
       }
     }
@@ -1321,6 +1344,10 @@
     {
       "name": "tempo_real",
       "description": "Eventos ao vivo, novidades e notificações"
+    },
+    {
+      "name": "rota",
+      "description": "Rota de coleta dos excedentes reservados pela ONG"
     }
   ],
   "definitions": {
@@ -2045,6 +2072,9 @@
         },
         "reservado_por": {
           "type": "object"
+        },
+        "prioridade": {
+          "type": "object"
         }
       },
       "type": "object"
@@ -2123,29 +2153,6 @@
       },
       "type": "object"
     },
-    "TextoDestinoIA": {
-      "required": [
-        "texto"
-      ],
-      "properties": {
-        "texto": {
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "NotificacoesLidas": {
-      "required": [
-        "ate_id"
-      ],
-      "properties": {
-        "ate_id": {
-          "type": "integer",
-          "description": "Último id de evento lido"
-        }
-      },
-      "type": "object"
-    },
     "LoteRiscoDescarteIA": {
       "required": [
         "categoria",
@@ -2182,6 +2189,105 @@
         },
         "distancia_ong_km": {
           "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "TextoDestinoIA": {
+      "required": [
+        "texto"
+      ],
+      "properties": {
+        "texto": {
+          "type": "string"
+        },
+        "cep": {
+          "type": "string",
+          "description": "Opcional, só pessoa física: CEP para ordenar por distância"
+        },
+        "origem": {
+          "type": "object",
+          "description": "Opcional, só pessoa física: {latitude, longitude}; usado nesta consulta e não gravado"
+        }
+      },
+      "type": "object"
+    },
+    "NotificacoesLidas": {
+      "required": [
+        "ate_id"
+      ],
+      "properties": {
+        "ate_id": {
+          "type": "integer",
+          "description": "Último id de evento lido"
+        }
+      },
+      "type": "object"
+    },
+    "RotaColeta": {
+      "properties": {
+        "partida": {
+          "type": "object"
+        },
+        "paradas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParadaRota"
+          }
+        },
+        "sem_localizacao": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "retorno_km": {
+          "type": "number"
+        },
+        "total_km": {
+          "type": "number"
+        },
+        "link_rota": {
+          "type": "string"
+        },
+        "metodo": {
+          "type": "string"
+        },
+        "aproximada": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ParadaRota": {
+      "properties": {
+        "ordem": {
+          "type": "integer"
+        },
+        "excedente_id": {
+          "type": "integer"
+        },
+        "empresa": {
+          "type": "string"
+        },
+        "endereco": {
+          "type": "string"
+        },
+        "retirar_ate": {
+          "type": "string"
+        },
+        "distancia_km": {
+          "type": "number",
+          "description": "Do ponto anterior, em linha reta"
+        },
+        "acumulado_km": {
+          "type": "number"
+        },
+        "precisao": {
+          "type": "string"
+        },
+        "link_osm": {
+          "type": "string"
         }
       },
       "type": "object"

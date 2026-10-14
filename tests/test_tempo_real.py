@@ -282,7 +282,8 @@ def test_sugerir_destino_sugere_pedido_que_combina():
     assert resposta.json["itens"] and resposta.json["sugestoes"]
     topo = resposta.json["sugestoes"][0]
     assert topo["organizacao"] == "ONG Esperança"
-    assert "mesma UF" in topo["motivos"]
+    # com endereço localizável, a distância (geo.py) substitui a regra de mesma UF
+    assert "na mesma cidade" in topo["motivos"]
     assert topo["quantidade_sugerida"] == 30
     assert resposta.json["pode_publicar_excedente"] is alimentar
 

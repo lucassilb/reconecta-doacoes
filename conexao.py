@@ -4,6 +4,10 @@
 interpretação (`llm_service.interpretar_pedido`) e pedidos no formato de
 `Publico.serializar_doacao`, e devolve até 5 sugestões ordenadas com pontuação
 explicável — a pessoa decide; a função só recomenda.
+
+Distância: quando o chamador anota `distancia_km` (e `distancia_aproximada`) em cada
+pedido — ver `geo.py` —, a proximidade substitui a regra de mesma UF na pontuação
+e vira motivo ("a 3,4 km"). Sem anotação, vale a regra de UF de antes.
 """
 
 import re
@@ -14,6 +18,8 @@ from difflib import SequenceMatcher
 from fuso import agora_brasilia
 
 MAX_SUGESTOES = 5
+# (até km, pontos): perto pesa mais que a mesma UF (10); longe não ganha nada.
+FAIXAS_DISTANCIA = ((5, 15), (15, 12), (50, 9), (150, 5), (400, 2))
 _PALAVRAS_DE_LIGACAO = {"de", "da", "do", "das", "dos", "e", "em", "com", "sem"}
 _TIPOS_GENERICOS = {"pao", "bolo", "suco", "agua", "sopa", "marmita", "carne",
                     "queijo", "leite", "oleo", "biscoito", "file", "salada"}
@@ -90,6 +96,16 @@ def _faltam(item_pedido):
     return resta if resta > 0 else None
 
 
+def texto_distancia(km, aproximada=False):
+    """'a 3,4 km', 'a cerca de 12 km' (centróide do município) ou 'na mesma cidade'."""
+    if aproximada and km < 1:
+        return "na mesma cidade"
+    if km < 1:
+        return "a menos de 1 km"
+    valor = f"{km:.1f}".replace(".", ",") if km < 10 else f"{round(km):d}"
+    return f"a {'cerca de ' if aproximada else ''}{valor} km"
+
+
 def _avaliar(item_doador, item_pedido, pedido, uf):
     """Pontua um par (item do doador × item do pedido) ou devolve None."""
     mesma_categoria = item_pedido.get("categoria") == item_doador.get("categoria")
@@ -151,10 +167,15 @@ def _avaliar(item_doador, item_pedido, pedido, uf):
             pontos += 5
             motivos.append(f"prazo em {int(round(dias))} dias")
 
-    uf_pedido = _uf((pedido.get("empresa") or {}).get("municipio_uf"))
-    if uf and uf_pedido and uf == uf_pedido:
-        pontos += 10
-        motivos.append("mesma UF")
+    km = pedido.get("distancia_km")
+    if isinstance(km, (int, float)) and km >= 0:
+        pontos += next((p for limite, p in FAIXAS_DISTANCIA if km <= limite), 0)
+        motivos.append(texto_distancia(km, pedido.get("distancia_aproximada")))
+    else:
+        uf_pedido = _uf((pedido.get("empresa") or {}).get("municipio_uf"))
+        if uf and uf_pedido and uf == uf_pedido:
+            pontos += 10
+            motivos.append("mesma UF")
 
     sugerida = quantidade
     if faltam and isinstance(quantidade, (int, float)):
@@ -194,6 +215,10 @@ def casar(itens, pedidos, uf=None):
             "item_id": item_pedido.get("id"),
             "quantidade_sugerida": sugerida,
         }
+        if isinstance(pedido.get("distancia_km"), (int, float)):
+            sugestao["distancia_km"] = round(float(pedido["distancia_km"]), 1)
+            sugestao["distancia"] = texto_distancia(pedido["distancia_km"],
+                                                    pedido.get("distancia_aproximada"))
         if pedido.get("estabelecimento_id") is not None:
             sugestao["estabelecimento_id"] = pedido["estabelecimento_id"]
         sugestoes.append(sugestao)

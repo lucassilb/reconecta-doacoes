@@ -9,6 +9,7 @@ from flask_restx import Namespace, Resource, fields
 
 from sqlalchemy.orm import selectinload
 
+import geo
 from Auth import usuario_atual
 from conexao import casar
 from Dashboard import montar_dashboard
@@ -137,7 +138,11 @@ def _pedidos_abertos():
 
 @ns.route("/sugerir-destino")
 class SugerirDestino(Resource):
-    @ns.expect(ns.model("TextoDestinoIA", {"texto": fields.String(required=True)}))
+    @ns.expect(ns.model("TextoDestinoIA", {
+        "texto": fields.String(required=True),
+        "cep": fields.String(description="Opcional, só pessoa física: CEP para ordenar por distância"),
+        "origem": fields.Raw(description="Opcional, só pessoa física: {latitude, longitude}; "
+                                         "usado nesta consulta e não gravado")}))
     @ns.response(200, "Sugestões de destino para o excedente", pedido_model)
     def post(self):
         """Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam."""
@@ -159,8 +164,17 @@ class SugerirDestino(Resource):
         if tipo == "empresa":
             municipio_uf = _municipio_uf(usuario.endereco)
             uf = municipio_uf.rsplit("/", 1)[-1] if municipio_uf else None
-        sugestoes = casar(interpretado["itens"], _pedidos_abertos(), uf)
+            # distância a partir do endereço da organização (cache ou centróide; sem rede)
+            origem = geo.localizar(usuario.endereco)
+        else:
+            # pessoa física: CEP opcional digitado no assistente (ou coordenada enviada por
+            # outro cliente); nada fica ligado à pessoa
+            origem = (geo.localizar_cep(corpo.get("cep")) if corpo.get("cep")
+                      else geo.ponto_informado(corpo.get("origem")))
+        pedidos = geo.anotar_distancias(_pedidos_abertos(), origem)
+        sugestoes = casar(interpretado["itens"], pedidos, uf)
         return {"itens": interpretado["itens"], "sugestoes": sugestoes,
+                "origem": {"precisao": origem.precisao} if origem is not None else None,
                 "pode_publicar_excedente": bool(
                     tipo == "empresa" and getattr(usuario, "atividade_alimentar", False)),
                 "fonte": interpretado.get("fonte"), "modelo": interpretado.get("modelo")}, 200

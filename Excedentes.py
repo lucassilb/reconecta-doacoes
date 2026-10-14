@@ -13,6 +13,7 @@ from sqlalchemy import or_, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
+import geo
 from Auth import registrar_auditoria, usuario_atual
 from conexao import casar
 from eventos import emitir as _emitir
@@ -56,10 +57,22 @@ def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
 
-def _ongs_compativeis(itens, uf, publicador_id):
-    """Usa o mesmo casamento da IA para avisar ONGs com pedido compatível."""
-    if not uf or not itens:
-        return ()
+# Avisos de excedente: ONGs com pedido compatível na mesma UF ou a até RAIO_AVISO_KM,
+# das mais próximas para as mais distantes, no máximo MAX_AVISOS.
+RAIO_AVISO_KM = 50
+MAX_AVISOS = 10
+
+
+def _ongs_compativeis(itens, uf, publicador_id, origem=None):
+    """Destinatários dos avisos, das ONGs mais próximas para as mais distantes."""
+    return tuple(("empresa", id_) for id_, _, _ in
+                 _ongs_proximas(itens, uf, publicador_id, origem))
+
+
+def _ongs_proximas(itens, uf, publicador_id, origem=None):
+    """Usa o mesmo casamento da IA; devolve [(ong_id, km ou None, aproximada)]."""
+    if not itens or not (uf or origem is not None):
+        return []
     from IA import _pedidos_abertos
     ongs = {id_ for (id_,) in db.session.query(Estabelecimento.id).filter(
         Estabelecimento.sem_fins_lucrativos.is_(True)).all()}
@@ -67,17 +80,22 @@ def _ongs_compativeis(itens, uf, publicador_id):
     ofertas = [{"nome": item["nome"], "categoria": item["categoria"],
                "quantidade": float(item["quantidade"]),
                "unidade_medida": item["unidade_medida"]} for item in itens]
-    destinatarios = set()
-    for pedido in _pedidos_abertos():
+    pedidos = [pedido for pedido in _pedidos_abertos()
+               if pedido["estabelecimento_id"] in ongs and pedido["estabelecimento_id"] != publicador_id
+               and any(item["categoria"] in categorias for item in pedido["itens"])]
+    geo.anotar_distancias(pedidos, origem)
+    achadas = {}
+    for pedido in pedidos:
         id_ = pedido["estabelecimento_id"]
         local = (pedido.get("empresa") or {}).get("municipio_uf") or ""
-        if (id_ not in ongs or id_ == publicador_id or
-                not local.upper().endswith(f"/{uf}") or
-                not any(item["categoria"] in categorias for item in pedido["itens"])):
+        km = pedido.get("distancia_km")
+        perto = km is not None and km <= RAIO_AVISO_KM
+        if not (perto or (uf and local.upper().endswith(f"/{uf}"))):
             continue
-        if casar(ofertas, [pedido], uf):
-            destinatarios.add(id_)
-    return tuple(("empresa", id_) for id_ in sorted(destinatarios))
+        if id_ not in achadas and casar(ofertas, [pedido], uf):
+            achadas[id_] = (km, pedido.get("distancia_aproximada"))
+    ordem = sorted(achadas.items(), key=lambda par: (par[1][0] is None, par[1][0] or 0, par[0]))
+    return [(id_, km, aproximada) for id_, (km, aproximada) in ordem[:MAX_AVISOS]]
 
 
 def _empresa():
@@ -247,6 +265,12 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None, prioridade=Non
                      criado_em=iso_evento(excedente.criado_em))
         dados["meu"] = bool(atual and atual[0] == "empresa" and
                             atual[1].id == excedente.estabelecimento_id)
+        if atual and atual[0] == "empresa" and not dados["meu"]:
+            km, aproximada = geo.distancia(geo.localizar(atual[1].endereco),
+                                           geo.localizar(excedente.publicador.endereco))
+            if km is not None:
+                dados["distancia_km"] = round(km, 1)
+                dados["distancia"] = geo.texto_distancia(km, aproximada)
         if atual and atual[0] == "empresa":
             usuario_id = atual[1].id
             if usuario_id == excedente.reservado_por_id:
@@ -326,14 +350,20 @@ class Excedentes(Resource):
             db.session.flush()
             db.session.add_all(ItemExcedente(excedente_id=excedente.id, **item) for item in itens)
             categorias = sorted({item["categoria"] for item in itens})
-            _emitir("excedente.publicado", {
-                "excedente_id": excedente.id, "organizacao": empresa.nome,
-                "municipio_uf": _municipio_uf(empresa.endereco),
-                "categorias": categorias,
-                "retirar_ate": iso_prazo(prazo)},
-                destinatarios=_ongs_compativeis(itens,
-                                                (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
-                                                empresa.id))
+            aviso = {"excedente_id": excedente.id, "organizacao": empresa.nome,
+                     "municipio_uf": _municipio_uf(empresa.endereco),
+                     "categorias": categorias, "retirar_ate": iso_prazo(prazo)}
+            _emitir("excedente.publicado", aviso)
+            # cada ONG recebe o aviso com a própria distância, das mais próximas para as mais distantes
+            for ong_id, km, aproximada in _ongs_proximas(
+                    itens, (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
+                    empresa.id, geo.localizar(empresa.endereco)):
+                privado = dict(aviso)
+                if km is not None:
+                    privado.update(distancia_km=round(km, 1),
+                                   distancia=geo.texto_distancia(km, aproximada))
+                _emitir("excedente.publicado", privado, publico=False,
+                        destinatarios=(("empresa", ong_id),))
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()

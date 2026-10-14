@@ -313,6 +313,13 @@
         <p class="campo__ajuda" id="assistente-ajuda">Escreva do seu jeito: o alimento, a quantidade e a validade. Não inclua dados pessoais.</p>
         <p class="campo__erro" id="assistente-texto-erro" data-erro></p>
       </div>
+      <div class="campo" id="assistente-cep-campo" hidden>
+        <label class="campo__rotulo" for="assistente-cep">Seu CEP <span class="assistente__opcional">(opcional)</span></label>
+        <input id="assistente-cep" class="campo__entrada campo__entrada--mono assistente__cep" inputmode="numeric"
+               autocomplete="postal-code" maxlength="9" placeholder="00000-000" aria-describedby="assistente-cep-ajuda assistente-cep-erro">
+        <p class="campo__ajuda" id="assistente-cep-ajuda">Para mostrar a que distância fica cada ONG. Usado só nesta busca, sem ficar ligado a você.</p>
+        <p class="campo__erro" id="assistente-cep-erro" data-erro></p>
+      </div>
       <button type="submit" class="btn btn--primario" id="assistente-enviar">Ver para onde doar</button>
     </form>
 
