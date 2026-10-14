@@ -147,3 +147,13 @@
 .cta h2 { max-width: 20ch; text-wrap: balance; }
 .cta__acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .regras li.regras__futura::before { color: var(--tinta-suave); }
+
+/* rodada 11: como a IA sugere o destino */
+.conexao {
+  margin-top: clamp(28px, 4vw, 44px); padding: clamp(20px, 3.4vw, 36px);
+  border-radius: var(--raio-folha); background: var(--verde-suave);
+  display: grid; gap: 16px 40px; grid-template-columns: minmax(0, 1fr);
+}
+.conexao h3 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 400; margin-top: 6px; }
+.conexao__texto { display: grid; gap: 12px; max-width: 64ch; }
+@media (min-width: 900px) { .conexao { grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); align-items: start; } }

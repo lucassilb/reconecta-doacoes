@@ -22,7 +22,10 @@
      Para cada evento dispara, no document:
        new CustomEvent("reconecta:evento", { detail: { id, tipo, criado_em, dados, privado } })
      privado = true quando o evento foi destinado ao usuário logado (também aparece no sino).
-     window.ReConecta.tempoReal = { estado: "sse" | "consulta" | "parado", ultimoId }
+     window.ReConecta.tempoReal = { estado: "sse" | "consulta" | "parado", ultimoId, silenciar(ms) }
+       silenciar(ms): a página chama antes de uma ação do próprio usuário (reservar, doar…) para não
+       mostrar o aviso público do que ele mesmo acabou de fazer; o evento continua sendo disparado
+       e os avisos destinados a ele continuam aparecendo.
      window.ReConecta.descreverEvento(evento, privado) → { texto, href } ou null
      As páginas só escutam "reconecta:evento" e recarregam o trecho afetado. */
 (function () {
@@ -233,14 +236,14 @@
     alvo.append(
       el("div", { classe: "rodape__marca" }, [
         linkMarca(),
-        el("p", { texto: "Plataforma em que empresas do setor de alimentos publicam o que precisam e pessoas e empresas doam." })
+        el("p", { texto: "Plataforma que conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [
-        el("span", { texto: "ReConecta · Projeto acadêmico do CP1 de Computational Thinking with Python" }),
+        el("span", { texto: "ReConecta · Projeto acadêmico de Computational Thinking with Python" }),
         el("span", { texto: "Alimento bom não é desperdício." })
       ])
     );
@@ -289,7 +292,9 @@
           ? { href: "/painel", texto: "Seu pedido recebeu uma doação" + (qtd ? ": " + qtd + " de " + d.item : "") + "." }
           : { href: pedido, texto: "Doação aceita agora" + (qtd ? ": " + qtd + " de " + d.item : "") + "." };
       case "doacao.entregue":
-        return { href: "/painel", texto: "A organização confirmou que recebeu a sua doação" + (d.item ? " de " + d.item : "") + ". Obrigado!" };
+        return privado
+          ? { href: "/painel", texto: "A organização confirmou que recebeu a sua doação" + (d.item ? " de " + d.item : "") + ". Obrigado!" }
+          : { href: pedido, texto: "Doação entregue e confirmada" + (d.item ? ": " + d.item : "") + "." };
       case "doacao.nao_recebida":
         return { href: "/painel", texto: "A organização informou que não recebeu a sua doação" + (d.item ? " de " + d.item : "") + "." };
       case "excedente.publicado":
@@ -447,6 +452,8 @@
   var INTERVALO_CONSULTA = 10000;
   var RETORNO_SSE = 60000;
   var tr = api.tempoReal = { estado: "parado", ultimoId: 0 };
+  var semAvisosAte = 0;
+  tr.silenciar = function (ms) { semAvisosAte = Date.now() + (Number(ms) > 0 ? Number(ms) : 6000); };
   api.descreverEvento = descreverEvento;
 
   var fonte = null, relogioConsulta = null, relogioRetorno = null, relogioFila = null;
@@ -477,7 +484,9 @@
         detail: { id: ev.id, tipo: ev.tipo, criado_em: ev.criado_em, dados: ev.dados, privado: ev.privado }
       }));
     });
+    var calado = Date.now() < semAvisosAte;   // a própria pessoa acabou de agir: a tela dela já mostra o resultado
     lote.slice(-3).forEach(function (ev) {
+      if (calado && !ev.privado) return;
       var repetido = !ev.privado && chaves[ev.tipo + "|" + (ev.dados.pedido_id || "") + "|" + (ev.dados.excedente_id || "")];
       // o que a própria organização acabou de publicar não precisa de aviso para ela mesma
       var meu = !ev.privado && meuNome && ev.dados.organizacao === meuNome;
@@ -526,13 +535,17 @@
     if (typeof window.EventSource !== "function") { cairParaConsulta(); return; }
     falhas = 0;
     var esta = fonte = new EventSource("/reconecta/tempo-real?desde=" + (cursor || 0));
-    esta.onopen = function () {
-      if (fonte !== esta) return;
+    function ligado() {
+      if (fonte !== esta || esta.readyState === 2) return;
       falhas = 0;
       clearInterval(relogioConsulta); relogioConsulta = null;
       clearTimeout(relogioRetorno); relogioRetorno = null;
       definirEstado("sse");
-    };
+    }
+    esta.onopen = ligado;
+    // O servidor só manda os cabeçalhos junto com o primeiro evento ou batimento (até 15 s).
+    // Recusa (503) e queda de rede disparam onerror na hora; sem erro em 1,5 s, o fluxo está aberto.
+    setTimeout(function () { if (falhas === 0) ligado(); }, 1500);
     esta.onmessage = function (e) {
       if (fonte !== esta) return;
       try { receber(JSON.parse(e.data)); } catch (erro) { /* linha inválida: ignora */ }
