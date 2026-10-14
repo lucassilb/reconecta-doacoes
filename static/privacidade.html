@@ -21,7 +21,7 @@
     <section class="politica__topo" aria-labelledby="politica-titulo">
       <p class="sobretitulo sobretitulo--acento">Política de Privacidade</p>
       <h1 id="politica-titulo">Seus dados, com <em>regra clara</em></h1>
-      <p class="lead">Esta página explica, direto, o que o ReConecta guarda sobre você, por que precisa disso e como pedir seus dados ou excluir a conta. Versão 2026-10-14.</p>
+      <p class="lead">Esta página explica, direto, o que o ReConecta guarda sobre você, por que precisa disso e como pedir seus dados ou excluir a conta. Versão 2026-10-14-r17.</p>
     </section>
 
     <section class="politica__bloco" aria-labelledby="p-controlador">
@@ -57,7 +57,7 @@
         <li>O endereço de retirada do excedente aparece somente para a ONG que reservou.</li>
         <li>Consultamos o CNPJ em serviços públicos (BrasilAPI, OpenCNPJ, CNPJ.ws) enviando apenas o número do CNPJ.</li>
         <li>Para georreferenciar pedidos e rotas de coleta, o <strong>endereço da organização</strong> é enviado ao Nominatim (OpenStreetMap). O CEP que o doador digita na sugestão de destino vai à BrasilAPI. Os resultados ficam em cache interno (`geolocalizacoes`) indexado só pelo hash do texto — sem nome ou conta associados.</li>
-        <li>O resumo do dashboard usa um modelo de linguagem local que lê só números agregados; nenhum dado pessoal sai do servidor.</li>
+        <li>Quando a chave do Groq Free está configurada, o Groq processa o texto livre dos pedidos após remoção de padrões comuns de CPF, CNPJ, telefone e e-mail, e números agregados do dashboard. É um operador externo; sem a chave, a IA usa Ollama local ou regras. Não envie dados pessoais no texto livre, pois a remoção automática não cobre todos os formatos.</li>
         <li>Não vendemos dados nem usamos rastreadores de publicidade.</li>
       </ul>
     </section>
@@ -80,7 +80,7 @@
         <li>Tráfego criptografado (HTTPS na nuvem), sessão em cookie <code>HttpOnly</code>+<code>SameSite</code>+<code>Secure</code>, cabeçalhos CSP e senha só como hash.</li>
         <li>Cadastros criados antes desta política não têm consentimento gravado; o aceite passa a ser exigido em todo cadastro novo.</li>
       </ul>
-      <p class="politica__nota">Este documento é a versão <strong>2026-10-14</strong>. Se a política mudar, a versão e a data mudam aqui, e o aceite gravado em cada conta mostra qual versão a pessoa viu.</p>
+      <p class="politica__nota">Este documento é a versão <strong>2026-10-14-r17</strong>. Se a política mudar, a versão muda aqui, e o aceite gravado em cada conta mostra qual versão a pessoa viu.</p>
       <p class="politica__nota" style="border-left-color: var(--linha-forte)">As fotos das categorias de alimento são fotografias reais do Wikimedia Commons, de autoria de terceiros sob licenças livres (CC0, CC BY, CC BY-SA e domínio público). Autores e links: <a href="/static/img/categorias/CREDITOS.md">static/img/categorias/CREDITOS.md</a>.</p>
     </section>
   </main>

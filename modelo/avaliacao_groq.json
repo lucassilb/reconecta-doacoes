@@ -1,0 +1,28 @@
+{
+  "data": "2026-10-14",
+  "pedidos": 66,
+  "modelo": "openai/gpt-oss-20b",
+  "regras": {
+    "pedidos_perfeitos": 25,
+    "total": 66,
+    "fontes": {
+      "regras": 66
+    }
+  },
+  "classificador_regras": {
+    "pedidos_perfeitos": 48,
+    "total": 66,
+    "fontes": {
+      "regras": 66
+    }
+  },
+  "ollama_historico": {
+    "executado_em": "2026-10-13 17:37",
+    "pedidos_perfeitos": 50,
+    "total": 66
+  },
+  "groq": {
+    "avaliado": false,
+    "motivo": "GROQ_API_KEY ausente"
+  }
+}

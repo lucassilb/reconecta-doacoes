@@ -14,3 +14,5 @@ services:
         value: "1"
       - key: ADMIN_TOKEN
         sync: false
+      - key: GROQ_API_KEY
+        sync: false

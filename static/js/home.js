@@ -623,7 +623,8 @@
     }
     blocos.push(el("p", { classe: "assistente__nota", texto:
       distancias + "É uma recomendação: você escolhe para quem doar. " +
-      (c.fonte === "llm" ? "Interpretação feita pelo modelo local gratuito" + (c.modelo ? " " + c.modelo : "") + "."
+      (c.fonte === "llm" ? (String(c.modelo || "").startsWith("groq:") ? "Interpretação feita com Groq Free."
+        : "Interpretação feita pelo modelo local gratuito" + (c.modelo ? " " + c.modelo : "") + ".")
                          : "Interpretação feita pelas regras automáticas e pelo classificador do projeto.") }));
     resultado.replaceChildren.apply(resultado, blocos);
     resultado.hidden = false;

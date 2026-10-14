@@ -116,7 +116,7 @@ Em `llm_service.py`, a função `_categoria_item(nome)` decide a categoria nesta
 Ela é usada em dois pontos de `POST /reconecta/ia/interpretar-pedido`:
 
 - quando a LLM devolve uma categoria fora da lista;
-- quando a resposta vem das regras, com o Ollama desligado ou com a saída da LLM rejeitada. É o caso da nuvem: o plano gratuito do Render não roda o Ollama, então lá a categoria vem sempre do classificador.
+- quando a resposta vem das regras, com Groq Free e Ollama indisponíveis ou com a saída da LLM rejeitada. No Render gratuito o Ollama não roda; Groq só é chamado se `GROQ_API_KEY` estiver configurada. Sem ela, a categoria vem do classificador e das regras.
 
 O contrato da API não mudou: mesmos campos, e `fonte` continua `"llm"` ou `"regras"`. O painel não mudou. A empresa sempre revisa os itens antes de publicar, e o POST de publicação valida tudo de novo. Se o arquivo do modelo faltar ou estiver inválido, a aplicação segue só com as palavras-chave, sem erro.
 

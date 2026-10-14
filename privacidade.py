@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from fuso import iso_evento
 from models import Contribuicao, Doacao, Excedente, db
 
-POLITICA_VERSAO = "2026-10-14"
+POLITICA_VERSAO = "2026-10-14-r17"
 
 
 def consentimento_registrado(usuario):

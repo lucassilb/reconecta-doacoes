@@ -79,10 +79,10 @@ def test_aceite_grava_versao_e_data(cliente, monkeypatch):
         doador = Doador.query.one()
         empresa = Estabelecimento.query.one()
         for conta in (doador, empresa):
-            assert conta.consentimento_versao == "2026-10-14"
+            assert conta.consentimento_versao == "2026-10-14-r17"
             assert conta.consentimento_em is not None
     me = cliente.get("/reconecta/auth/me").json
-    assert me["consentimento"]["versao"] == "2026-10-14"
+    assert me["consentimento"]["versao"] == "2026-10-14-r17"
 
 
 def test_exportacao_traz_titular_e_registros(cliente):
@@ -112,7 +112,7 @@ def test_exportacao_traz_titular_e_registros(cliente):
     assert resposta.status_code == 200
     dados = resposta.json
     assert dados["titular"]["cpf"] == CPF
-    assert dados["titular"]["consentimento"]["versao"] == "2026-10-14"
+    assert dados["titular"]["consentimento"]["versao"] == "2026-10-14-r17"
     assert dados["doacoes_feitas"][0]["alimento"] == "Arroz"
     assert dados["politica_versao"]
 

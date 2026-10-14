@@ -2,7 +2,7 @@
 
 Plataforma de doação de alimentos que conecta empresas de alimentos, ONGs e pessoas dispostas a doar.
 
-Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM local e gratuita. Esta entrega acrescenta dataset estruturado, modelo treinado local, matriz de riscos STRIDE, relatórios SAST, Docker e Docker Compose, pipeline de CI/CD e publicação em nuvem com banco gerenciado, tudo com ferramentas e planos gratuitos.
+Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM gratuita. Esta entrega acrescenta dataset estruturado, modelo treinado local, matriz de riscos STRIDE, relatórios SAST, Docker e Docker Compose, pipeline de CI/CD e publicação em nuvem com banco gerenciado, tudo com ferramentas e planos gratuitos.
 
 Na rodada 11, o código local acrescenta perfis de ONG, excedentes, confirmação de entrega, eventos em tempo real e sugestões de destino. A URL pública citada neste README pode continuar na versão anterior até a publicação dessa rodada.
 
@@ -21,7 +21,7 @@ O desperdício de alimentos convive com a falta de alimento em outro lugar. O **
 |---|---|
 | ONGs | O cadastro consulta a natureza jurídica do CNPJ e aceita organização sem fins lucrativos mesmo sem CNAE alimentar; um CNPJ pode ter os dois perfis. `GET /reconecta/cadastro/cnpj/{cnpj}`, `Cadastro.py`, `cnpj_service.py`, `tests/test_dominio_r11.py`. |
 | Reduzir desperdício | Empresas de alimentos publicam excedentes com validade e prazo; ONGs reservam e a publicadora confirma a retirada. `POST /reconecta/excedentes`, `POST /reconecta/excedentes/{id}/reservar`, `POST /reconecta/excedentes/{id}/confirmar-retirada`, `Excedentes.py`, tela `/painel` (`static/js/painel-excedentes.js`), `tests/test_dominio_r11.py`. O sistema registra retiradas; não mede redução total de desperdício. |
-| Conectar com IA | `POST /reconecta/ia/sugerir-destino` interpreta o alimento oferecido e ordena pedidos compatíveis com pontuação e motivos. Usa `conexao.py`, o classificador de `classificador.py` e a LLM local gratuita via `llm_service.py` quando disponível; sem Ollama, aplica classificador e regras. `tests/test_tempo_real.py` e `tests/test_ia.py`. |
+| Conectar com IA | `POST /reconecta/ia/sugerir-destino` interpreta o alimento oferecido e ordena pedidos compatíveis com pontuação e motivos. Usa `conexao.py`, o classificador de `classificador.py` e a LLM via `llm_service.py` quando disponível (Groq Free, depois Ollama local); sem LLM, aplica classificador e regras. `tests/test_tempo_real.py`, `tests/test_ia.py` e `tests/test_groq.py`. |
 | Perto de quem precisa | Distância em linha reta (haversine) entre quem oferece e a ONG entra na pontuação da sugestão ("a 3,8 km"); o aviso de excedente vai primeiro para as ONGs compatíveis mais próximas (mesma UF ou até 50 km, no máximo 10), com a distância; `GET /reconecta/excedentes/rota` ordena as retiradas da ONG (vizinho mais próximo + 2-opt) com links do OpenStreetMap. Coordenadas por Nominatim/BrasilAPI em segundo plano, com cache e sede do município do IBGE como reserva, sem chave nem custo. `geo.py`, `Rotas.py`, `conexao.py`, [docs/geo.md](docs/geo.md), `tests/test_geo.py`. |
 | Em tempo real | `GET /reconecta/tempo-real` transmite eventos por SSE; `GET /reconecta/novidades` sustenta a consulta periódica se a conexão cair. O sino, os avisos e a atualização do painel e do dashboard estão em `static/js/layout.js`, `static/js/painel.js`, `static/js/painel-excedentes.js` e `static/js/dashboard.js`; testes em `tests/test_tempo_real.py`. |
 | Ciclo fechado | No painel, o dono do pedido marca **Recebi** ou **Não recebi** (`POST /reconecta/painel/contribuicoes/{id}/receber` e `/nao-recebida`); o estado distingue oferta aceita de entrega confirmada. `Painel.py`, `static/js/painel.js`, `tests/test_dominio_r11.py`. |
@@ -35,7 +35,7 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 | Critério | Situação | Onde está |
 |---|---|---|
 | Dataset estruturado | Pronto | [`data/alimentos.csv`](data/alimentos.csv) (925 linhas), [`data/pedidos_avaliacao.jsonl`](data/pedidos_avaliacao.jsonl) (66 pedidos com gabarito) e [`data/README.md`](data/README.md). Seção [Dataset estruturado](#dataset-estruturado). |
-| Modelo funcional local | Pronto | Classificador treinado em [`classificador.py`](classificador.py) + [`modelo/classificador_categorias.json`](modelo/classificador_categorias.json), usado em `POST /reconecta/ia/interpretar-pedido`; LLM local `qwen2.5:3b` no Ollama. Seção [Modelo funcional local](#modelo-funcional-local). |
+| Modelo funcional local | Pronto | Classificador treinado em [`classificador.py`](classificador.py) + [`modelo/classificador_categorias.json`](modelo/classificador_categorias.json), usado em `POST /reconecta/ia/interpretar-pedido`; Groq Free opcional e Ollama local como segundo provedor. Seção [Modelo funcional local](#modelo-funcional-local). |
 | Matriz de riscos (STRIDE) | Pronto | [`docs/stride.md`](docs/stride.md), com 40 ameaças nas seis categorias (35 do sistema e 5 próprias da nuvem). Seção [Segurança (STRIDE e SAST)](#segurança-stride-e-sast). |
 | Dockerfile + Docker Compose | Pronto | [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) e [`.dockerignore`](.dockerignore). Seção [Docker e Docker Compose](#docker-e-docker-compose). |
 | Pipeline CI/CD (GitHub Actions) | Pronto | [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Seção [Pipeline CI/CD](#pipeline-cicd-github-actions). |
@@ -65,7 +65,7 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 | Painéis | Organização: publicar pedido (com "Preencher com IA"), acompanhar contribuições e confirmar recebimento; empresa de alimentos também publica e acompanha excedentes; ONG acompanha reservas. Doador: minhas doações e estado da entrega. |
 | Meus dados | No painel, "Editar" altera os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha informando a atual. CNPJ e CPF não mudam. |
 | Dashboard | Indicadores de pedidos, doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva; gráficos, alertas e últimas doações com dados do banco. Botão "Gerar resumo com IA". |
-| LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
+| LLM | Groq Free (`openai/gpt-oss-20b`) quando configurado; Ollama local (`qwen2.5:3b`) como reserva. Interpretam o texto do pedido e resumem o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
 | Classificador treinado | Modelo próprio, treinado no dataset do projeto, que escolhe a categoria de cada item em "Preencher com IA". Roda dentro da aplicação, inclusive na nuvem, onde o Ollama não está disponível. Detalhes em [docs/dataset-modelo.md](docs/dataset-modelo.md). |
 | Segurança | Cabeçalhos de segurança e Content-Security-Policy em todas as respostas; trilha de auditoria em JSON (login, cadastro, edição de dados, pedidos, doações e uso do token de administrador) sem senha, documento, e-mail ou foto; limites de uso nas rotas de IA e de doação. |
 | Saúde | `GET /reconecta/saude` confere a conexão com o banco; é usado pelos healthchecks do Docker, do Compose e do Render. |
@@ -139,7 +139,7 @@ Cada item do critério e onde ele está no código. As páginas ficam em `static
 | Apresentar dados obtidos do backend | Home: contadores e pedidos abertos com progresso (`home.js`). Detalhe do pedido com progresso por item (`doacao.js`). Painel: seus dados, meus pedidos com doações recebidas e fotos, minhas doações, resumo da rede (`painel.js`). Dashboard: indicadores, gráficos com tabela equivalente, alertas, ranking e últimas doações (`dashboard.js`) | `GET /publico/resumo`, `GET /publico/opcoes`, `GET /publico/doacoes`, `GET /publico/doacoes/{id}`, `GET /painel/doacoes`, `GET /painel/minhas-doacoes`, `GET /contribuicoes/{id}/foto`, `GET /dashboard`, `GET /auth/me` |
 | Cadastro ou alteração de informações | Cadastro de conta em `/cadastro` (`cadastro.js`), publicação de pedido em `/painel` (`painel.js`) e doação em `/doacoes/<id>` (`doacao.js`). **Alteração**: em `/painel`, o botão "Editar" de "Seus dados" abre um formulário. A empresa altera e-mail e telefone (nome, CNPJ e endereço vêm da Receita). O doador altera nome, e-mail e telefone (o CPF fica fixo). Os dois podem trocar a senha informando a senha atual (`painel.js`, função `iniciarMeusDados`) | `POST /cadastro/empresa`, `POST /cadastro/doador`, `POST /painel/doacoes`, `POST /publico/doacoes/{id}/contribuicoes`, `PUT /auth/me` |
 | Tratamento visual de erros | Erros por campo (borda vermelha, `aria-invalid` e mensagem abaixo do campo) no cadastro, login, publicar pedido, questionário e "Seus dados". Os erros do servidor em `campos` vão para o campo certo, como e-mail já cadastrado (409) e senha atual errada. Avisos com `role="alert"`/`aria-live`, com "Tentar novamente" quando falta conexão. Mensagens para CNPJ inapto (motivos da Receita), login bloqueado (429), pedido não encontrado, foto inválida e falha ao carregar o dashboard | respostas `{codigo, mensagem, campos}` dos endpoints acima |
-| Feedback das operações realizadas | "Pedido publicado" e "Preenchemos N itens a partir do texto" (`painel.js`). "Doação confirmada", com o endereço de entrega (`doacao.js`). Tela de sucesso do cadastro (`cadastro.js`). "Dados atualizados", com o "Olá, …" do painel e do cabeçalho atualizado sem recarregar (`painel.js`). Lista recarregada depois de remover um pedido. Botões em estado de carregamento durante o envio. Selo da origem do resumo: modelo local ou regras automáticas (`dashboard.js`) | os mesmos endpoints de escrita |
+| Feedback das operações realizadas | "Pedido publicado" e "Preenchemos N itens a partir do texto" (`painel.js`). "Doação confirmada", com o endereço de entrega (`doacao.js`). Tela de sucesso do cadastro (`cadastro.js`). "Dados atualizados", com o "Olá, …" do painel e do cabeçalho atualizado sem recarregar (`painel.js`). Lista recarregada depois de remover um pedido. Botões em estado de carregamento durante o envio. Selo da origem do resumo: Groq Free, modelo local ou regras automáticas (`dashboard.js`) | os mesmos endpoints de escrita |
 
 ## Dashboard (critério 3 do CP2)
 
@@ -153,7 +153,7 @@ Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligad
 | Tabelas | "Empresas com mais doações recebidas", "Últimas doações" e "Ver dados em tabela" embaixo de cada gráfico | `top_empresas[]`, `ultimas_doacoes[]`, `por_categoria[]`, `por_dia[]` |
 | Históricos | Série dos últimos 30 dias (dias sem doação aparecem com 0) e as 10 últimas doações com data e hora | `por_dia[]` (30 dias, fuso de Brasília), `ultimas_doacoes[]` |
 | Alertas | Lista "Alertas" com link "Ver pedido": prazo terminando em até 3 dias, pedido aberto há 3 dias ou mais sem doação, item com 80% ou mais da meta, meta atingida | `alertas[]` com `tipo` = `PRAZO_PROXIMO`, `SEM_DOACOES`, `QUASE_COMPLETO`, `META_ATINGIDA` |
-| Dados consolidados | Totais por categoria, por dia e por empresa; resumo e recomendações gerados pela LLM local a partir desses agregados ("Gerar resumo com IA") | `por_categoria`, `por_dia`, `top_empresas`, `indicadores`; `POST /reconecta/ia/resumo-dashboard` |
+| Dados consolidados | Totais por categoria, por dia e por empresa; resumo e recomendações gerados pela LLM disponível a partir desses agregados ("Gerar resumo com IA") | `por_categoria`, `por_dia`, `top_empresas`, `indicadores`; `POST /reconecta/ia/resumo-dashboard` |
 
 Privacidade: o dashboard é público e só traz dados agregados. "Últimas doações" mostra o item, a quantidade, a empresa que recebeu e se quem doou foi pessoa ou empresa, sem nome, CPF ou contato de pessoas. Testes em `tests/test_dashboard.py`, `tests/test_fuso.py` e `tests/test_cp2_api.py` (agregação, limite da meta, ausência de dados pessoais, fuso e número de consultas).
 
@@ -186,7 +186,7 @@ Todas gratuitas.
 
 - **Aplicação**: Python 3.10+ (testado em 3.14 local e 3.12 na imagem Docker), Flask, Flask-RESTX (Swagger), Flask-SQLAlchemy/SQLAlchemy 2, psycopg 3, python-dotenv, requests, gunicorn (servidor de produção), Chart.js.
 - **Banco**: PostgreSQL (local, no Compose ou no Supabase) ou SQLite para desenvolvimento.
-- **IA**: Ollama + `qwen2.5:3b` (opcional, local) e o classificador próprio em Python puro, sem dependência extra.
+- **IA**: Groq Free (`openai/gpt-oss-20b`, opcional), Ollama + `qwen2.5:3b` (opcional, local) e o classificador próprio em Python puro, sem dependência extra.
 - **Testes e segurança**: pytest, Bandit, Trivy e Playwright (só para a prova opcional de CSP no navegador).
 - **Entrega**: Docker, Docker Compose, GitHub Actions, Render (plano gratuito) e Supabase (plano gratuito).
 
@@ -200,7 +200,7 @@ Pré-requisitos:
 
 - Python 3.10 ou superior e Git;
 - PostgreSQL (opcional: sem `DATABASE_URL` a aplicação usa SQLite em `instance/reconecta.db`);
-- Ollama (opcional, gratuito) para a LLM local. Sem ele as funções de IA usam o classificador treinado e regras automáticas.
+- Chave Groq Free ou Ollama (ambos opcionais) para a LLM. Sem os dois, as funções usam o classificador treinado e regras automáticas.
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
@@ -239,6 +239,8 @@ Crie um `.env` a partir do `.env.example` (não publique o `.env`). Nenhuma é o
 | `FLASK_DEBUG` | `0` | `1` liga o modo debug. |
 | `FLASK_APP` | `app.py` | Usada só pelo comando `flask`. |
 | `ADMIN_TOKEN` | desativado | Token longo e aleatório enviado em `X-Admin-Token` para a escrita dos CRUDs do CP1. Sem configuração: escrita 403; token ausente ou incorreto: 401. Não use no navegador nem publique no repositório. |
+| `GROQ_API_KEY` | ausente | Chave opcional da conta Groq Free, só no ambiente. No Render, preencher no painel (`sync: false`); nunca incluir em Git ou no navegador. |
+| `GROQ_MODEL` | `openai/gpt-oss-20b` | Modelo strict gratuito; aceita também `openai/gpt-oss-120b` e `qwen/qwen3.8-27b`. Outro valor desliga o Groq. |
 | `OLLAMA_URL` | `http://localhost:11434` | Endereço do Ollama. Só HTTP, com porta, em `localhost`, `127.0.0.1` ou `::1`. |
 | `OLLAMA_MODELO` | `qwen2.5:3b` | Modelo gratuito usado pela IA; outro valor desliga a chamada à LLM. |
 | `GEO_EXTERNO` | `1` | `0` desliga as consultas ao Nominatim e à BrasilAPI; as distâncias usam o cache e a sede do município (`data/municipios.csv`). |
@@ -373,9 +375,9 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **250 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
+Resultado atual: **330 passed, 5 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita, o Groq e o Ollama, então rodam sem internet e sem tocar no banco real. Os testes pulados são provas opcionais que precisam de um ambiente a mais:
 
-- 3 provas em PostgreSQL (`tests/test_integridade_banco.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
+- 4 provas em PostgreSQL (`tests/test_integridade_banco.py` e `tests/test_excedente_pessoa_fisica.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
 - 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
 
 | Tipo de teste | Arquivos | O que cobrem |
@@ -387,7 +389,7 @@ Resultado atual: **250 passed, 4 skipped**. Os testes usam SQLite isolado (em me
 
 ## LLM (critério 8 do CP2)
 
-O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API paga) em funções ligadas às regras de negócio — não é um chatbot genérico:
+O ReConecta usa LLM **gratuita** via Groq Free (`openai/gpt-oss-20b`) quando há chave, depois Ollama local (`qwen2.5:3b`). Sem ambos, usa classificador e regras. Essas funções apoiam as regras de negócio:
 
 1. **"Preencher com IA"** (painel da empresa → "Publicar pedido de doação"): a empresa escreve, por exemplo, "Precisamos de 100 caixas de leite e 100 pães até sexta-feira"; a LLM classifica e estrutura os itens nas **categorias e unidades fixas da plataforma** e sugere o prazo. O formulário é preenchido para a empresa revisar; a publicação continua passando pelas validações do pedido.
 2. **"Gerar resumo com IA"** (dashboard): a LLM interpreta os indicadores agregados dos pedidos e doações e devolve um resumo e recomendações para apoiar decisões.
@@ -396,7 +398,7 @@ O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API pag
 
 Quando a LLM não está disponível, ou devolve uma categoria fora da lista, a categoria de cada item vem do classificador treinado do projeto (seção [Modelo funcional local](#modelo-funcional-local)).
 
-Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados enviados, resposta obtida, uso da resposta, limitações e segurança/dados sensíveis — está na tabela do início de [docs/llm.md](docs/llm.md), com exemplos reais de entrada e saída. Endpoints: `POST /reconecta/ia/interpretar-pedido`, `POST /reconecta/ia/resumo-dashboard` e `POST /reconecta/ia/sugerir-destino`; código em `llm_service.py`, `IA.py` e `conexao.py`; testes em `tests/test_ia.py` e `tests/test_tempo_real.py`.
+Modelo, finalidade, dados enviados, validação da saída, limites, fallback e proteção dos dados estão em [docs/llm.md](docs/llm.md). Endpoints: `POST /reconecta/ia/interpretar-pedido`, `POST /reconecta/ia/resumo-dashboard` e `POST /reconecta/ia/sugerir-destino`; código em `llm_service.py`, `IA.py` e `conexao.py`; testes em `tests/test_ia.py`, `tests/test_groq.py` e `tests/test_tempo_real.py`.
 
 ## Dataset estruturado
 
@@ -412,7 +414,7 @@ Divisão treino/teste estratificada por categoria (740/185), com semente fixa. P
 
 ## Modelo funcional local
 
-Além da LLM local (Ollama + `qwen2.5:3b`), o ReConecta tem um **modelo treinado no próprio dataset**: um classificador Naive Bayes multinomial que escolhe a categoria de cada item do pedido. É Python puro (só biblioteca padrão), roda dentro da aplicação em menos de 1 ms, não precisa de GPU nem de serviço externo e é salvo em JSON, sem `pickle`.
+Além da LLM opcional, o ReConecta tem um **modelo treinado no próprio dataset**: um classificador Naive Bayes multinomial que escolhe a categoria de cada item do pedido. É Python puro (só biblioteca padrão), roda dentro da aplicação em menos de 1 ms, não precisa de GPU nem de serviço externo e é salvo em JSON, sem `pickle`.
 
 | Medida (execução de 2026-10-13) | Classificador treinado | Regra de palavras-chave anterior |
 |---|---|---|
@@ -422,14 +424,15 @@ Além da LLM local (Ollama + `qwen2.5:3b`), o ReConecta tem um **modelo treinado
 | Categoria certa nos 130 itens dos pedidos de avaliação | **84,6%** | 56,2% |
 | Pedidos inteiros certos, sem a LLM (66 pedidos) | **48** | 25 |
 
-Com a LLM local ligada, o conjunto completo acerta 50 dos 66 pedidos inteiros, com 3,6 s de latência média por pedido. A comparação entre regras, classificador e LLM, com exemplos de erro, está em [docs/avaliacao-modelos.md](docs/avaliacao-modelos.md).
+Na avaliação local anterior, o Ollama acertou 50 dos 66 pedidos inteiros, com 3,6 s de latência média por pedido. A comparação anterior está em [docs/avaliacao-modelos.md](docs/avaliacao-modelos.md). O Groq ainda não foi medido com chave real; o script [`scripts/avaliar_groq.py`](scripts/avaliar_groq.py) está pronto para os mesmos 66 casos e grava [`modelo/avaliacao_groq.json`](modelo/avaliacao_groq.json). Sem chave na rodada 17, mediu regras **25/66** e classificador + regras **48/66**; a medição do Groq está marcada como não avaliada.
 
-Uso na aplicação: em `POST /reconecta/ia/interpretar-pedido`, a categoria de um item vem do classificador quando a confiança passa do limiar (0,15, escolhido pelos dados); senão das palavras-chave; senão "Outros". Na nuvem, onde o Ollama não roda, é o classificador que responde. O contrato da API e as telas não mudaram, e a empresa continua revisando antes de publicar.
+Uso na aplicação: em `POST /reconecta/ia/interpretar-pedido`, a categoria de um item vem do classificador quando a confiança passa do limiar (0,15, escolhido pelos dados); senão das palavras-chave; senão "Outros". Na nuvem, o Groq responde somente se `GROQ_API_KEY` estiver configurada; sem ela, o classificador e as regras continuam disponíveis. O contrato da API e as telas não mudaram, e a organização continua revisando antes de publicar.
 
 ```bash
 python scripts/treinar_modelo.py                 # treina, avalia e grava modelo/classificador_categorias.json
 python scripts/classificar.py "pao de queijo"    # demonstração no terminal
 python scripts/avaliar_modelos.py                # regras x classificador x LLM (use --sem-llm sem o Ollama)
+python scripts/avaliar_groq.py                  # 66 pedidos; chama Groq Free só com chave local
 python scripts/ciclo_ia.py                        # treina, avalia a conexão e aplica os limiares
 ```
 
@@ -524,11 +527,11 @@ A entrega contínua normal não depende do job `deploy`: o `render.yaml` usa `au
 
 - **Aplicação**: Web Service no plano gratuito do Render, criado pelo Blueprint [`render.yaml`](render.yaml) (`runtime: docker`, `healthCheckPath: /reconecta/saude`). URL pública: **https://reconecta-iota.onrender.com** (saúde em [`/reconecta/saude`](https://reconecta-iota.onrender.com/reconecta/saude), Swagger em [`/swagger`](https://reconecta-iota.onrender.com/swagger)). No plano gratuito o serviço hiberna sem uso; o primeiro acesso depois disso pode levar cerca de um minuto.
 - **Banco**: PostgreSQL no plano gratuito do Supabase, ligado pela `DATABASE_URL` com a URL do Session pooler. Situação: no ar desde 2026-10-13, com as 7 tabelas criadas pela própria aplicação ao iniciar; conferido com um cadastro feito pelo site público e lido direto no banco (registro de teste apagado em seguida). A publicação é automática: o Render só publica um commit da `main` depois que o GitHub Actions passa (`autoDeployTrigger: checksPass`).
-- **Variáveis no Render**: `DATABASE_URL` (informada na criação), `SECRET_KEY` (gerada pelo Render), `COOKIE_SEGURO=1` e `ADMIN_TOKEN` (opcional).
+- **Variáveis no Render**: `DATABASE_URL` (informada na criação), `SECRET_KEY` (gerada pelo Render), `COOKIE_SEGURO=1`, `ADMIN_TOKEN` (opcional) e `GROQ_API_KEY` (opcional, `sync: false`, somente conta Free).
 - **O que muda na nuvem**:
   - As tabelas são criadas e migradas no primeiro início.
   - As fotos das doações ficam no banco, porque o disco do plano gratuito é apagado a cada reinício.
-  - O Ollama não roda no plano gratuito. As funções de IA respondem com o classificador treinado e as regras, e avisam `fonte: "regras"`.
+  - O Ollama não roda no plano gratuito. Com chave Groq Free configurada, a interpretação e o resumo usam o Groq; sem chave, classificador e regras respondem com `fonte: "regras"`.
 
 O passo a passo completo (criar o projeto no Supabase, criar o serviço no Render, ativar o CI/CD e conferir) está em [docs/implantacao.md](docs/implantacao.md).
 
@@ -551,7 +554,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - O modelo legado `reservas` do CP1 continua sem endpoints próprios; a reserva e retirada atuais usam as tabelas `excedentes` e `itens_excedente`.
 - Recuperação de senha não implementada.
 - A consulta de CNPJ depende de serviços públicos externos (com cache de 10 minutos e fontes alternativas).
-- A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam o classificador e regras automáticas e indicam `fonte: "regras"`.
+- A LLM Groq Free é externa e opcional; Ollama pode rodar localmente. As sugestões passam por validação e revisão humana; sem ambos, usam classificador e regras automáticas e indicam `fonte: "regras"`. O Groq recebe texto livre após remoção de padrões comuns de identificadores, que não cobre todos os formatos.
 - O classificador conhece o vocabulário de 254 alimentos do dataset, que é sintético; alimento muito diferente pode cair na categoria errada, e a empresa sempre revisa antes de publicar.
 - O plano gratuito do Render suspende o serviço depois de um tempo sem acesso, então o primeiro acesso seguinte demora; ele também não roda o Ollama.
 - Os limites de uso (login, IA, doações) ficam na memória de cada processo: com 2 workers do gunicorn, cada um conta separado, e a contagem zera quando o serviço reinicia.

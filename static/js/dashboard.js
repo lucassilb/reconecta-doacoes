@@ -1,5 +1,5 @@
 /* ReConecta — dashboard (/dashboard): indicadores, gráficos (Chart.js), alertas, tabelas
-   e o resumo com IA (modelo local gratuito; o servidor monta os números, o cliente não envia dados). */
+   e o resumo com IA (Groq Free ou modelo local; o servidor monta os números). */
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
@@ -415,7 +415,7 @@
     btn.disabled = true; btn.classList.add("is-carregando");
     alvo.hidden = false;
     alvo.setAttribute("aria-busy", "true");
-    alvo.replaceChildren(el("p", { classe: "dash-ia__carregando", texto: "Gerando o resumo… o modelo local pode levar alguns segundos." }));
+    alvo.replaceChildren(el("p", { classe: "dash-ia__carregando", texto: "Gerando o resumo… isso pode levar alguns segundos." }));
     fetch("/reconecta/ia/resumo-dashboard", { method: "POST", credentials: "same-origin", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: "{}" })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (c) { return { status: r.status, ok: r.ok, corpo: c }; }); })
       .then(function (r) {
@@ -426,7 +426,9 @@
         var llm = c.fonte === "llm";
         // a resposta é tratada como texto (textContent), nunca como HTML
         alvo.replaceChildren(
-          el("p", { classe: "selo " + (llm ? "selo--ia" : "selo--regras"), texto: llm ? "Gerado pelo modelo local gratuito " + (c.modelo || "") : "Resumo automático (IA indisponível no momento)" }),
+          el("p", { classe: "selo " + (llm ? "selo--ia" : "selo--regras"), texto: llm
+            ? (String(c.modelo || "").startsWith("groq:") ? "Gerado com Groq Free" : "Gerado pelo modelo local gratuito " + (c.modelo || ""))
+            : "Resumo automático (IA indisponível no momento)" }),
           el("p", { classe: "dash-ia__texto", texto: c.resumo || "" }),
           (c.recomendacoes && c.recomendacoes.length) ? el("div", null, [
             el("h3", { classe: "dash-ia__rec-titulo", texto: "Recomendações" }),

@@ -613,7 +613,7 @@
 
   $("btn-add-item").addEventListener("click", adicionarItem);
 
-  /* ---------- preencher o pedido com IA (modelo local gratuito; a empresa revisa antes de publicar) ---------- */
+  /* ---------- preencher o pedido com IA; a organização revisa antes de publicar ---------- */
 
   function preencherComIA() {
     var texto = $("ia-texto").value.trim();
@@ -643,7 +643,9 @@
         if (OPCOES.unidades.indexOf(it.unidade_medida) !== -1) f.unidade_medida.value = it.unidade_medida;
       });
       if (c.receber_ate) limiteInput.value = String(c.receber_ate).slice(0, 10) + "T18:00";
-      var fonte = c.fonte === "llm" ? "Sugerido pelo modelo local gratuito " + (c.modelo || "") + "." : "Sugerido por regras automáticas (IA indisponível no momento).";
+      var fonte = c.fonte === "llm" ? (String(c.modelo || "").startsWith("groq:")
+        ? "Sugerido com Groq Free." : "Sugerido pelo modelo local gratuito " + (c.modelo || "") + ".")
+        : "Sugerido por regras automáticas (IA indisponível no momento).";
       var partes = [fonte, "Revise os itens, as categorias, as quantidades e o prazo antes de publicar."];
       if (!c.receber_ate) partes.push("O texto não trazia uma data: escolha o \"Receber até\".");
       if (c.observacoes) partes.push("Observação: " + c.observacoes);

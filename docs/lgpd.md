@@ -1,7 +1,7 @@
 # LGPD — mapa de dados e direitos do titular
 
-Estado em 2026-10-14 (rodada 14). Política publicada em `/privacidade`
-(`static/privacidade.html`), versão `2026-10-14` declarada em
+Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
+(`static/privacidade.html`), versão `2026-10-14-r17` declarada em
 `privacidade.py:POLITICA_VERSAO`.
 
 ## Mapa de dados pessoais
@@ -28,11 +28,18 @@ Estado em 2026-10-14 (rodada 14). Política publicada em `/privacidade`
   (`Excedentes.py`, chave `retirada` no detalhe autenticado).
 - O dashboard agrega tudo sem identificar pessoas; `instituicoes` (legado CP1)
   não tem autenticação própria e não recebe consentimento.
-- O resumo com IA lê só números agregados; o classificador/LLM não recebe PII
-  (`llm_service.py` remove e-mail/documento/telefone antes do prompt).
+- O resumo com IA lê só números agregados. O texto livre de pedidos passa pela
+  remoção de padrões comuns de e-mail, documento e telefone em `llm_service.py`
+  antes da chamada à LLM; essa remoção não cobre todos os formatos.
 
 ## Compartilhamento com terceiros
 
+- **Groq Free (operador de LLM, quando `GROQ_API_KEY` está configurada)**:
+  recebe o texto livre do pedido após a remoção de padrões comuns de contato e
+  documento, ou apenas agregados do dashboard. Não recebe cadastro, sessão,
+  endereço ou foto. Sem chave, esse envio não ocorre; entram Ollama local ou
+  classificador/regras. O usuário revisa os itens antes de publicar. Como a
+  remoção é heurística, a política orienta a não incluir dados pessoais no texto.
 - CNPJ → BrasilAPI / OpenCNPJ / CNPJ.ws (só o número, na verificação).
 - **Endereço da organização → Nominatim (OpenStreetMap)** e **CEP do doador →
   BrasilAPI**, para georreferenciar pedidos e montar a rota de coleta
