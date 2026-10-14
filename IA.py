@@ -175,6 +175,7 @@ class SugerirDestino(Resource):
         sugestoes = casar(interpretado["itens"], pedidos, uf)
         return {"itens": interpretado["itens"], "sugestoes": sugestoes,
                 "origem": {"precisao": origem.precisao} if origem is not None else None,
+                # pessoa física também publica o que sobrou (com endereço de retirada)
                 "pode_publicar_excedente": bool(
-                    tipo == "empresa" and getattr(usuario, "atividade_alimentar", False)),
+                    tipo == "doador" or getattr(usuario, "atividade_alimentar", False)),
                 "fonte": interpretado.get("fonte"), "modelo": interpretado.get("modelo")}, 200

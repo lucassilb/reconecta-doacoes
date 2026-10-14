@@ -1,4 +1,8 @@
-"""Publicação e resgate de excedentes alimentares entre CNPJs cadastrados."""
+"""Publicação e resgate de excedentes alimentares.
+
+Publica quem tem alimento sobrando: empresa de alimentos (CNPJ) ou pessoa física (CPF),
+que informa o endereço de retirada. Só ONGs reservam; quem publicou confirma a retirada.
+"""
 
 import re
 import threading
@@ -35,6 +39,9 @@ entrada = ns.model("ExcedenteEntrada", {
     "dentro_validade": fields.Boolean(required=True),
     "embalagem_ok": fields.Boolean(required=True),
     "armazenado_ok": fields.Boolean(required=True),
+    "nao_caseiro": fields.Boolean(description="Obrigatório para pessoa física: não é comida feita em casa"),
+    "retirada": fields.Raw(description="Obrigatório para pessoa física: {logradouro, numero, bairro, "
+                                       "municipio, uf, cep}; só a ONG que reservar vê o endereço"),
 })
 saida = ns.model("ExcedenteSaida", {
     "id": fields.Integer, "empresa": fields.Raw, "retirar_ate": fields.String,
@@ -107,9 +114,76 @@ def _empresa():
     return atual[1], None
 
 
-def _cota_esgotada(acao, empresa_id):
+def _sessao():
+    """(tipo, usuario) de quem pode publicar e gerenciar: empresa ou pessoa física."""
+    atual = usuario_atual()
+    if not atual:
+        return None, _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
+    return atual, None
+
+
+def _dono(excedente):
+    """Quem publicou, no formato dos destinatários de eventos."""
+    if excedente.doador_id is not None:
+        return ("doador", excedente.doador_id)
+    return ("empresa", excedente.estabelecimento_id)
+
+
+def _eh_dono(excedente, atual):
+    return bool(atual) and _dono(excedente) == (atual[0], atual[1].id)
+
+
+def nome_publicador(excedente):
+    # pessoa física não tem o nome exposto: aparece só como "Pessoa física"
+    return excedente.publicador.nome if excedente.publicador else "Pessoa física"
+
+
+def endereco_retirada(excedente):
+    return excedente.publicador.endereco if excedente.publicador else excedente.retirada_endereco
+
+
+def _filtro_dono(atual):
+    if atual[0] == "doador":
+        return Excedente.doador_id == atual[1].id
+    return Excedente.estabelecimento_id == atual[1].id
+
+
+def _validar_retirada(bruto):
+    """Endereço de retirada da pessoa física, no mesmo formato do cadastro das organizações."""
+    campos = {}
+    bruto = bruto if isinstance(bruto, dict) else {}
+
+    def texto(chave, minimo, maximo):
+        valor = bruto.get(chave)
+        valor = valor.strip() if isinstance(valor, str) else ""
+        return valor if minimo <= len(valor) <= maximo else None
+
+    logradouro = texto("logradouro", 3, 100)
+    numero = texto("numero", 1, 10)
+    bairro = texto("bairro", 0, 60)
+    municipio = texto("municipio", 2, 60)
+    uf = (bruto.get("uf") or "").strip().upper() if isinstance(bruto.get("uf"), str) else ""
+    cep = re.sub(r"\D", "", str(bruto.get("cep") or ""))
+    if logradouro is None:
+        campos["retirada.logradouro"] = "Informe a rua ou avenida."
+    if numero is None:
+        campos["retirada.numero"] = "Informe o número (ou S/N)."
+    if bairro is None:
+        campos["retirada.bairro"] = "Use até 60 caracteres."
+    if municipio is None or not re.fullmatch(r"[A-Z]{2}", uf) or geo.centroide(municipio, uf) is None:
+        campos["retirada.municipio"] = "Informe a cidade e a UF (ex.: Campinas e SP)."
+    if cep and len(cep) != 8:
+        campos["retirada.cep"] = "Informe o CEP com 8 números ou deixe em branco."
+    if campos:
+        return None, campos
+    local = ", ".join(p for p in (bairro, municipio) if p) + f"/{uf}"
+    endereco = " - ".join(p for p in (f"{logradouro}, {numero}", local, cep) if p)
+    return endereco[:200], {}
+
+
+def _cota_esgotada(acao, usuario_id, tipo="empresa"):
     agora = time.monotonic()
-    chave = (acao, empresa_id)
+    chave = (acao, tipo, usuario_id)
     with _cotas_lock:
         recentes = [instante for instante in _cotas.get(chave, ()) if agora - instante < JANELA]
         if len(recentes) >= LIMITES[acao]:
@@ -200,7 +274,7 @@ def _bloqueio(excedente, atual):
         return "Entre como ONG para reservar"
     if atual[0] != "empresa" or not atual[1].sem_fins_lucrativos:
         return "Apenas ONGs podem reservar"
-    if atual[1].id == excedente.estabelecimento_id:
+    if _eh_dono(excedente, atual):
         return "Não é possível reservar o próprio excedente"
     if status_efetivo(excedente) != "DISPONIVEL":
         return "Excedente indisponível"
@@ -227,7 +301,7 @@ def _prioridade_excedente(excedente):
              for item in itens)
     mais_urgente = min(itens, key=lambda item: item.validade)
     publicado = utc_para_brasilia(excedente.criado_em)
-    municipio_uf = _municipio_uf(excedente.publicador.endereco) or ""
+    municipio_uf = _municipio_uf(endereco_retirada(excedente)) or ""
     uf = municipio_uf.rsplit("/", 1)[-1] if "/" in municipio_uf else "NA"
     lote = {"categoria": mais_urgente.categoria,
             "perecivel": mais_urgente.categoria in PERECIVEIS,
@@ -249,8 +323,9 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None, prioridade=Non
     prioridade = prioridade if prioridade is not None else _prioridade_excedente(excedente)
     dados = {
         "id": excedente.id,
-        "empresa": {"nome": excedente.publicador.nome,
-                    "municipio_uf": _municipio_uf(excedente.publicador.endereco)},
+        "empresa": {"nome": nome_publicador(excedente),
+                    "municipio_uf": _municipio_uf(endereco_retirada(excedente)),
+                    "pessoa_fisica": excedente.doador_id is not None},
         "retirar_ate": iso_prazo(excedente.retirar_ate),
         "itens": [{"nome": item.nome, "categoria": item.categoria,
                    "quantidade": float(item.quantidade), "unidade_medida": item.unidade_medida,
@@ -263,22 +338,21 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None, prioridade=Non
         dados.update(pode_reservar=motivo is None, motivo_bloqueio=motivo,
                      observacao=excedente.observacao,
                      criado_em=iso_evento(excedente.criado_em))
-        dados["meu"] = bool(atual and atual[0] == "empresa" and
-                            atual[1].id == excedente.estabelecimento_id)
+        dados["meu"] = _eh_dono(excedente, atual)
         if atual and atual[0] == "empresa" and not dados["meu"]:
             km, aproximada = geo.distancia(geo.localizar(atual[1].endereco),
-                                           geo.localizar(excedente.publicador.endereco))
+                                           geo.localizar(endereco_retirada(excedente)))
             if km is not None:
                 dados["distancia_km"] = round(km, 1)
                 dados["distancia"] = geo.texto_distancia(km, aproximada)
-        if atual and atual[0] == "empresa":
-            usuario_id = atual[1].id
-            if usuario_id == excedente.reservado_por_id:
-                dados["retirada"] = {"endereco": excedente.publicador.endereco,
-                                     "retirar_ate": iso_prazo(excedente.retirar_ate)}
-            if usuario_id == excedente.estabelecimento_id and excedente.reservado_por:
-                dados["reservado_por"] = {"id": excedente.reservado_por_id,
-                                          "nome": excedente.reservado_por.nome}
+        if atual and atual[0] == "empresa" and atual[1].id == excedente.reservado_por_id:
+            dados["retirada"] = {"endereco": endereco_retirada(excedente),
+                                 "retirar_ate": iso_prazo(excedente.retirar_ate)}
+        if dados["meu"] and excedente.reservado_por:
+            dados["reservado_por"] = {"id": excedente.reservado_por_id,
+                                      "nome": excedente.reservado_por.nome}
+        if dados["meu"] and excedente.doador_id is not None:
+            dados["retirada_informada"] = excedente.retirada_endereco
     return dados
 
 
@@ -313,9 +387,11 @@ class Excedentes(Resource):
         if categoria:
             query = query.filter(Excedente.itens.any(categoria=categoria))
         if uf:
-            query = query.join(Excedente.publicador).filter(or_(
+            query = query.outerjoin(Excedente.publicador).filter(or_(
                 Estabelecimento.endereco.ilike(f"%/{uf} - %"),
-                Estabelecimento.endereco.ilike(f"%/{uf}")))
+                Estabelecimento.endereco.ilike(f"%/{uf}"),
+                Excedente.retirada_endereco.ilike(f"%/{uf} - %"),
+                Excedente.retirada_endereco.ilike(f"%/{uf}")))
         pontuados = [(item, _prioridade_excedente(item)) for item in query.all()]
         total = len(pontuados)
         pontuados.sort(key=lambda par: (
@@ -331,33 +407,47 @@ class Excedentes(Resource):
     @ns.response(201, "Excedente publicado", saida)
     @ns.response(429, "Cota de 20 publicações por hora")
     def post(self):
-        empresa, erro = _empresa()
+        atual, erro = _sessao()
         if erro:
             return erro
-        if not empresa.atividade_alimentar:
+        tipo, usuario = atual
+        if tipo == "empresa" and not usuario.atividade_alimentar:
             return _erro("PERFIL_SEM_ATIVIDADE_ALIMENTAR", "Este CNPJ não pode publicar excedentes.", 403)
-        if _cota_esgotada("publicar", empresa.id):
+        if _cota_esgotada("publicar", usuario.id, tipo):
             return _erro("MUITAS_TENTATIVAS", "Aguarde antes de publicar outro excedente.", 429)
         corpo = request.get_json(silent=True)
         corpo = corpo if isinstance(corpo, dict) else {}
         prazo, itens, observacao, campos = _validar(corpo)
+        retirada = None
+        if tipo == "doador":
+            # pessoa física: comida caseira não entra e o endereço de retirada é obrigatório
+            if corpo.get("nao_caseiro") is not True:
+                campos["nao_caseiro"] = "Confirme que não é comida feita em casa."
+            retirada, campos_retirada = _validar_retirada(corpo.get("retirada"))
+            campos.update(campos_retirada)
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
-        excedente = Excedente(estabelecimento_id=empresa.id, retirar_ate=prazo,
-                              observacao=observacao.strip() if observacao else None)
+        if tipo == "doador":
+            excedente = Excedente(doador_id=usuario.id, retirada_endereco=retirada)
+            endereco, publicador_id, nome = retirada, None, "Pessoa física"
+        else:
+            excedente = Excedente(estabelecimento_id=usuario.id)
+            endereco, publicador_id, nome = usuario.endereco, usuario.id, usuario.nome
+        excedente.retirar_ate = prazo
+        excedente.observacao = observacao.strip() if observacao else None
         try:
             db.session.add(excedente)
             db.session.flush()
             db.session.add_all(ItemExcedente(excedente_id=excedente.id, **item) for item in itens)
             categorias = sorted({item["categoria"] for item in itens})
-            aviso = {"excedente_id": excedente.id, "organizacao": empresa.nome,
-                     "municipio_uf": _municipio_uf(empresa.endereco),
+            aviso = {"excedente_id": excedente.id, "organizacao": nome,
+                     "municipio_uf": _municipio_uf(endereco),
                      "categorias": categorias, "retirar_ate": iso_prazo(prazo)}
             _emitir("excedente.publicado", aviso)
             # cada ONG recebe o aviso com a própria distância, das mais próximas para as mais distantes
             for ong_id, km, aproximada in _ongs_proximas(
-                    itens, (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
-                    empresa.id, geo.localizar(empresa.endereco)):
+                    itens, (_municipio_uf(endereco) or "").rsplit("/", 1)[-1],
+                    publicador_id, geo.localizar(endereco)):
                 privado = dict(aviso)
                 if km is not None:
                     privado.update(distancia_km=round(km, 1),
@@ -369,18 +459,18 @@ class Excedentes(Resource):
             db.session.rollback()
             current_app.logger.exception("Falha ao criar excedente")
             return _erro("ERRO_INTERNO", "Não foi possível publicar o excedente.", 500)
-        registrar_auditoria("excedente_publicado", "ok", tipo="empresa", ator_id=empresa.id)
-        return serializar_excedente(excedente, detalhe=True, atual=("empresa", empresa)), 201
+        registrar_auditoria("excedente_publicado", "ok", tipo=tipo, ator_id=usuario.id)
+        return serializar_excedente(excedente, detalhe=True, atual=atual), 201
 
 
 @ns.route("/meus")
 class MeusExcedentes(Resource):
     def get(self):
-        empresa, erro = _empresa()
+        atual, erro = _sessao()
         if erro:
             return erro
-        anuncios = _consulta().filter_by(estabelecimento_id=empresa.id).order_by(Excedente.criado_em.desc(), Excedente.id.desc()).all()
-        return [serializar_excedente(item, detalhe=True, atual=("empresa", empresa)) for item in anuncios], 200
+        anuncios = _consulta().filter(_filtro_dono(atual)).order_by(Excedente.criado_em.desc(), Excedente.id.desc()).all()
+        return [serializar_excedente(item, detalhe=True, atual=atual) for item in anuncios], 200
 
 
 @ns.route("/reservas")
@@ -403,11 +493,11 @@ class ExcedenteDetalhe(Resource):
         return serializar_excedente(excedente, detalhe=True, atual=usuario_atual()), 200
 
     def delete(self, excedente_id):
-        empresa, erro = _empresa()
+        atual, erro = _sessao()
         if erro:
             return erro
         excedente = db.session.get(Excedente, excedente_id)
-        if not excedente or excedente.estabelecimento_id != empresa.id:
+        if not excedente or not _eh_dono(excedente, atual):
             return _erro("EXCEDENTE_NAO_ENCONTRADO", "Excedente não encontrado.", 404)
         if status_efetivo(excedente) != "DISPONIVEL":
             return _erro("EXCEDENTE_INDISPONIVEL", "Este excedente não pode ser cancelado.", 409)
@@ -418,9 +508,9 @@ class ExcedenteDetalhe(Resource):
             db.session.rollback()
             return _erro("EXCEDENTE_INDISPONIVEL", "Este excedente não pode ser cancelado.", 409)
         _emitir("excedente.cancelado", {"excedente_id": excedente_id},
-                destinatarios=(("empresa", empresa.id),))
+                destinatarios=(_dono(excedente),))
         db.session.commit()
-        registrar_auditoria("excedente_cancelado", "ok", tipo="empresa", ator_id=empresa.id)
+        registrar_auditoria("excedente_cancelado", "ok", tipo=atual[0], ator_id=atual[1].id)
         return "", 204
 
 
@@ -433,19 +523,20 @@ class ReservarExcedente(Resource):
             return erro
         if not empresa.sem_fins_lucrativos:
             return _erro("APENAS_ONGS", "Apenas ONGs podem reservar excedentes.", 403)
-        if _cota_esgotada("reservar", empresa.id):
+        if _cota_esgotada("reservar", empresa.id, "empresa"):
             return _erro("MUITAS_TENTATIVAS", "Aguarde antes de fazer outra reserva.", 429)
         excedente = _consulta().filter_by(id=excedente_id).first()
         if not excedente:
             return _erro("EXCEDENTE_NAO_ENCONTRADO", "Excedente não encontrado.", 404)
-        if empresa.id == excedente.estabelecimento_id:
+        if _eh_dono(excedente, ("empresa", empresa)):
             return _erro("EXCEDENTE_PROPRIO", "Não é possível reservar o próprio excedente.", 409)
         if status_efetivo(excedente) != "DISPONIVEL":
             return _erro("EXCEDENTE_INDISPONIVEL", "Excedente indisponível.", 409)
         resultado = db.session.execute(update(Excedente).where(
             Excedente.id == excedente_id, Excedente.status == "DISPONIVEL",
             Excedente.reservado_por_id.is_(None), Excedente.retirar_ate > agora_brasilia_sem_fuso(),
-            Excedente.estabelecimento_id != empresa.id).values(
+            # NULL (pessoa física) também é "outro publicador": NULL != id não seria verdadeiro no SQL
+            or_(Excedente.estabelecimento_id.is_(None), Excedente.estabelecimento_id != empresa.id)).values(
                 status="RESERVADO", reservado_por_id=empresa.id,
                 reservado_em=_utc_naive()))
         if resultado.rowcount != 1:
@@ -453,7 +544,7 @@ class ReservarExcedente(Resource):
             return _erro("EXCEDENTE_INDISPONIVEL", "Excedente indisponível.", 409)
         _emitir("excedente.reservado", {"excedente_id": excedente_id})
         _emitir("excedente.reservado", {"excedente_id": excedente_id, "ong": empresa.nome},
-                publico=False, destinatarios=(("empresa", excedente.estabelecimento_id),))
+                publico=False, destinatarios=(_dono(excedente),))
         db.session.commit()
         db.session.refresh(excedente)
         registrar_auditoria("excedente_reservado", "ok", tipo="empresa", ator_id=empresa.id)
@@ -463,11 +554,12 @@ class ReservarExcedente(Resource):
 @ns.route("/<int:excedente_id>/cancelar-reserva")
 class CancelarReserva(Resource):
     def post(self, excedente_id):
-        empresa, erro = _empresa()
+        atual, erro = _sessao()
         if erro:
             return erro
         excedente = _consulta().filter_by(id=excedente_id).first()
-        if not excedente or empresa.id not in (excedente.estabelecimento_id, excedente.reservado_por_id):
+        reservante = bool(excedente) and atual[0] == "empresa" and atual[1].id == excedente.reservado_por_id
+        if not excedente or not (reservante or _eh_dono(excedente, atual)):
             return _erro("EXCEDENTE_NAO_ENCONTRADO", "Excedente não encontrado.", 404)
         if status_efetivo(excedente) != "RESERVADO":
             return _erro("RESERVA_INDISPONIVEL", "Esta reserva não pode ser cancelada.", 409)
@@ -481,21 +573,20 @@ class CancelarReserva(Resource):
             db.session.rollback()
             return _erro("RESERVA_INDISPONIVEL", "Esta reserva não pode ser cancelada.", 409)
         _emitir("excedente.reserva_cancelada", {"excedente_id": excedente_id},
-                destinatarios=(("empresa", excedente.estabelecimento_id),
-                               ("empresa", reservante_id)))
+                destinatarios=(_dono(excedente), ("empresa", reservante_id)))
         db.session.commit()
         db.session.refresh(excedente)
-        registrar_auditoria("excedente_reserva_cancelada", "ok", tipo="empresa", ator_id=empresa.id)
-        return serializar_excedente(excedente, detalhe=True, atual=("empresa", empresa)), 200
+        registrar_auditoria("excedente_reserva_cancelada", "ok", tipo=atual[0], ator_id=atual[1].id)
+        return serializar_excedente(excedente, detalhe=True, atual=atual), 200
 
 
 @ns.route("/<int:excedente_id>/confirmar-retirada")
 class ConfirmarRetirada(Resource):
     def post(self, excedente_id):
-        empresa, erro = _empresa()
+        atual, erro = _sessao()
         if erro:
             return erro
-        excedente = _consulta().filter_by(id=excedente_id, estabelecimento_id=empresa.id).first()
+        excedente = _consulta().filter(Excedente.id == excedente_id, _filtro_dono(atual)).first()
         if not excedente:
             return _erro("EXCEDENTE_NAO_ENCONTRADO", "Excedente não encontrado.", 404)
         if status_efetivo(excedente) != "RESERVADO":
@@ -508,9 +599,8 @@ class ConfirmarRetirada(Resource):
             db.session.rollback()
             return _erro("RETIRADA_INDISPONIVEL", "Não há reserva válida para confirmar.", 409)
         _emitir("excedente.retirado", {"excedente_id": excedente_id},
-                destinatarios=(("empresa", excedente.estabelecimento_id),
-                               ("empresa", excedente.reservado_por_id)))
+                destinatarios=(_dono(excedente), ("empresa", excedente.reservado_por_id)))
         db.session.commit()
         db.session.refresh(excedente)
-        registrar_auditoria("excedente_retirado", "ok", tipo="empresa", ator_id=empresa.id)
-        return serializar_excedente(excedente, detalhe=True, atual=("empresa", empresa)), 200
+        registrar_auditoria("excedente_retirado", "ok", tipo=atual[0], ator_id=atual[1].id)
+        return serializar_excedente(excedente, detalhe=True, atual=atual), 200

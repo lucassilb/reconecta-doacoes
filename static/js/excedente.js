@@ -206,9 +206,8 @@
     var x = excedente;
     if (!x || usuario === undefined) return;
     var titulo = $("acao-titulo");
-    var eu = usuario && usuario.tipo === "empresa" ? usuario : null;
-    // o servidor marca "meu": true no detalhe para quem publicou
-    var souPublicador = !!(eu && x.meu === true);
+    // o servidor marca "meu": true no detalhe para quem publicou (empresa ou pessoa física)
+    var souPublicador = !!(usuario && x.meu === true);
     var reserveiEu = !!x.retirada;
     var blocos = [];
 
@@ -273,8 +272,9 @@
     } else {
       titulo.textContent = "Reservar este excedente";
       blocos.push(el("p", { classe: "doar__bloqueio", texto: (x.motivo_bloqueio || "Você não pode reservar este excedente") + "." }),
-        el("p", { classe: "doar__nota", texto: "Excedentes são reservados por organizações sem fins lucrativos. Quem tem alimento pode doar para os pedidos abertos." }),
-        el("a", { classe: "btn btn--secundario btn--largo", href: "/#doacoes" }, ["Ver pedidos abertos"]));
+        el("p", { classe: "doar__nota", texto: "Excedentes são reservados por organizações sem fins lucrativos. Quem tem alimento pode doar para um pedido aberto ou publicar o que sobrou para as ONGs retirarem." }),
+        el("a", { classe: "btn btn--secundario btn--largo", href: "/#doacoes" }, ["Ver pedidos abertos"]),
+        el("a", { classe: "btn btn--fantasma btn--largo", href: "/painel#publicar-excedente" }, ["Publicar o que sobrou"]));
     }
     alvo.replaceChildren.apply(alvo, blocos);
   }

@@ -2062,6 +2062,14 @@
         },
         "armazenado_ok": {
           "type": "boolean"
+        },
+        "nao_caseiro": {
+          "type": "boolean",
+          "description": "Obrigatório para pessoa física: não é comida feita em casa"
+        },
+        "retirada": {
+          "type": "object",
+          "description": "Obrigatório para pessoa física: {logradouro, numero, bairro, municipio, uf, cep}; só a ONG que reservar vê o endereço"
         }
       },
       "type": "object"

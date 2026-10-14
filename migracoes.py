@@ -64,6 +64,10 @@ def _migrar_integridade_postgresql(engine):
         ("excedentes", "ck_excedentes_reservante",
          "CHECK ((status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR "
          "(status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL))"),
+        ("excedentes", "ck_excedentes_origem",
+         "CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL))"),
+        ("excedentes", "ck_excedentes_retirada_pf",
+         "CHECK (doador_id IS NULL OR retirada_endereco IS NOT NULL)"),
         ("itens_excedente", "ck_itens_excedente_quantidade", "CHECK (quantidade > 0)"),
     )
     with engine.begin() as conexao:
@@ -81,6 +85,70 @@ def _migrar_integridade_postgresql(engine):
                         f"Migração de integridade interrompida: dados existentes violam "
                         f"{nome} em {tabela}; corrija os registros e repita a migração."
                     ) from erro
+
+
+_EXCEDENTES_SQLITE = """
+    CREATE TABLE excedentes_nova (
+        id INTEGER PRIMARY KEY,
+        estabelecimento_id INTEGER REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+        doador_id INTEGER REFERENCES doadores(id) ON DELETE RESTRICT,
+        retirada_endereco VARCHAR(200),
+        retirar_ate DATETIME NOT NULL,
+        status VARCHAR(20) DEFAULT 'DISPONIVEL' NOT NULL,
+        reservado_por_id INTEGER REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+        reservado_em DATETIME,
+        retirado_em DATETIME,
+        observacao VARCHAR(200),
+        criado_em DATETIME NOT NULL,
+        CONSTRAINT ck_excedentes_status CHECK (status IN ('DISPONIVEL', 'RESERVADO', 'RETIRADO', 'CANCELADO', 'EXPIRADO')),
+        CONSTRAINT ck_excedentes_observacao CHECK (length(observacao) <= 200),
+        CONSTRAINT ck_excedentes_reservante CHECK (
+            (status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR
+            (status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL)),
+        CONSTRAINT ck_excedentes_origem CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)),
+        CONSTRAINT ck_excedentes_retirada_pf CHECK (doador_id IS NULL OR retirada_endereco IS NOT NULL)
+    )
+"""
+
+
+def _migrar_excedentes_pessoa_fisica(engine):
+    """Excedente publicado por pessoa física: doador_id, endereço de retirada e
+    estabelecimento_id opcional. SQLite recria a tabela; PostgreSQL altera no lugar."""
+    inspector = inspect(engine)
+    if not inspector.has_table("excedentes"):
+        return
+    colunas = inspector.get_columns("excedentes")
+    nomes = {coluna["name"] for coluna in colunas}
+    if {"doador_id", "retirada_endereco"} <= nomes and next(
+            c["nullable"] for c in colunas if c["name"] == "estabelecimento_id"):
+        return
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as conexao:
+            conexao.execute(text("ALTER TABLE excedentes ALTER COLUMN estabelecimento_id DROP NOT NULL"))
+            conexao.execute(text("ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS doador_id INTEGER "
+                                 "REFERENCES doadores(id) ON DELETE RESTRICT"))
+            conexao.execute(text("ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS retirada_endereco VARCHAR(200)"))
+        return  # restrições e índice: _migrar_integridade_postgresql e _migrar_indices
+    campos = ["id", "estabelecimento_id", "retirar_ate", "status", "reservado_por_id",
+              "reservado_em", "retirado_em", "observacao", "criado_em"]
+    with engine.connect() as conexao:
+        # Desativar antes da transação conserva os itens que referenciam excedentes.
+        conexao.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        conexao.commit()
+        try:
+            with conexao.begin():
+                conexao.exec_driver_sql(_EXCEDENTES_SQLITE)
+                conexao.exec_driver_sql(
+                    f"INSERT INTO excedentes_nova ({', '.join(campos)}) "  # nomes de lista interna; # nosec B608
+                    f"SELECT {', '.join(campos)} FROM excedentes")
+                conexao.exec_driver_sql("DROP TABLE excedentes")
+                conexao.exec_driver_sql("ALTER TABLE excedentes_nova RENAME TO excedentes")
+        finally:
+            conexao.exec_driver_sql("PRAGMA foreign_keys=ON")
+            conexao.commit()
+        violacoes = conexao.exec_driver_sql("PRAGMA foreign_key_check").fetchall()
+        if violacoes:
+            raise RuntimeError(f"Migração de excedentes deixou referências inválidas: {violacoes}")
 
 
 def _migrar_consentimento(engine):
@@ -272,6 +340,7 @@ def aplicar_migracoes(engine=None):
             _migrar_doacoes_postgresql(engine)
     if engine.dialect.name == "postgresql":
         _migrar_chave_item_postgresql(engine)
+    _migrar_excedentes_pessoa_fisica(engine)
     _migrar_pedidos(engine)
     _migrar_foto_contribuicao(engine)
     _migrar_indices(engine)

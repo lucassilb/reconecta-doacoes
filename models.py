@@ -151,12 +151,20 @@ class Excedente(db.Model):
         db.CheckConstraint("(status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR "
                            "(status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL)",
                            name='ck_excedentes_reservante'),
+        # quem publica: uma organização (CNPJ) ou uma pessoa física, que informa onde retirar
+        db.CheckConstraint('(estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)',
+                           name='ck_excedentes_origem'),
+        db.CheckConstraint('doador_id IS NULL OR retirada_endereco IS NOT NULL',
+                           name='ck_excedentes_retirada_pf'),
         db.Index('ix_excedentes_status_prazo', 'status', 'retirar_ate'),
         db.Index('ix_excedentes_estabelecimento', 'estabelecimento_id'),
+        db.Index('ix_excedentes_doador', 'doador_id'),
         db.Index('ix_excedentes_reservado_por', 'reservado_por_id'),
     )
     id = db.Column(db.Integer, primary_key=True)
-    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'), nullable=False)
+    estabelecimento_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'), nullable=True)
+    doador_id = db.Column(db.Integer, db.ForeignKey('doadores.id', ondelete='RESTRICT'), nullable=True)
+    retirada_endereco = db.Column(db.String(200), nullable=True)
     retirar_ate = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), nullable=False, default='DISPONIVEL', server_default='DISPONIVEL')
     reservado_por_id = db.Column(db.Integer, db.ForeignKey('estabelecimentos.id', ondelete='RESTRICT'))
@@ -165,6 +173,7 @@ class Excedente(db.Model):
     observacao = db.Column(db.String(200))
     criado_em = db.Column(db.DateTime, nullable=False, default=_utc_naive)
     publicador = db.relationship('Estabelecimento', foreign_keys=[estabelecimento_id])
+    doador = db.relationship('Doador', foreign_keys=[doador_id])
     reservado_por = db.relationship('Estabelecimento', foreign_keys=[reservado_por_id])
     itens = db.relationship('ItemExcedente', backref='excedente', cascade='all, delete-orphan', lazy=True)
 
