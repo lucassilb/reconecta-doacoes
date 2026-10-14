@@ -151,7 +151,7 @@ def montar_impacto():
                         Contribuicao.criado_em.isnot(None))
                 .group_by(ano, mes, dia, hora).all())
     for ano_utc, mes_utc, dia_utc, hora_utc, contagem in horarios:
-        local = utc_para_brasilia(datetime(ano_utc, mes_utc, dia_utc, hora_utc))
+        local = utc_para_brasilia(datetime(int(ano_utc), int(mes_utc), int(dia_utc), int(hora_utc)))
         calor[local.weekday()][local.hour] += contagem
 
     contribuicoes = (db.session.query(
