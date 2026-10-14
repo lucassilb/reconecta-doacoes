@@ -6,7 +6,7 @@ import random
 from threading import RLock
 from pathlib import Path
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from decimal import Decimal
 
 from flask import Flask, current_app, request
@@ -14,7 +14,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy import extract, func, select
 from sqlalchemy.pool import StaticPool
 
-from fuso import agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
+from fuso import BRASILIA, agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
                     Excedente, Instituicao, ItemDoacao, ItemExcedente, db)
 from Publico import _municipio_uf
@@ -33,6 +33,7 @@ MACROREGIOES = {
 }
 REGIAO_UF = {uf: regiao for regiao, ufs in MACROREGIOES.items() for uf in ufs}
 _DEMO_APP = None
+_DEMO_DIA = None
 _DEMO_LOCK = RLock()
 
 
@@ -234,8 +235,8 @@ def montar_dashboard() -> dict:
              .filter(*abertas).all())
 
     categorias = defaultdict(lambda: [Decimal(0), Decimal(0)])
-    meta_total = Decimal(0)
-    atendido_total = Decimal(0)
+    cobertura_total = Decimal(0)
+    itens_com_meta = 0
     itens_atendidos = 0
     alertas = []
     for pedido in pedidos:
@@ -253,8 +254,8 @@ def montar_dashboard() -> dict:
         categorias[item.categoria][0] += meta
         categorias[item.categoria][1] += recebido
         if meta > 0:
-            meta_total += meta
-            atendido_total += min(recebido, meta)
+            itens_com_meta += 1
+            cobertura_total += min(recebido / meta, Decimal(1))
             if recebido >= meta:
                 itens_atendidos += 1
                 tipo = "META_ATINGIDA"
@@ -358,8 +359,8 @@ def montar_dashboard() -> dict:
             "empresas_alimentos": novos.empresas_alimentos,
             "tempo_medio_reserva_min": round(float(novos.tempo_reserva), 2) if novos.tempo_reserva is not None else None,
             "itens_pedidos": len(itens), "itens_atendidos": itens_atendidos,
-            "percentual_atendimento": round(float(atendido_total / meta_total * 100), 2)
-            if meta_total else 0.0,
+            "percentual_atendimento": round(float(cobertura_total / itens_com_meta * 100), 2)
+            if itens_com_meta else 0.0,
         },
         "por_categoria": [{"categoria": nome, "pedido": float(valores[0]),
                            "recebido": float(valores[1])}
@@ -380,10 +381,10 @@ def montar_dashboard() -> dict:
     }
 
 
-def _semear_demonstracao(dados):
+def _semear_demonstracao(dados, dia):
     """Cria fatos fictícios de forma reprodutível no app SQLite isolado."""
     sorteio = random.Random(dados["semente"])
-    agora = agora_brasilia()
+    agora = datetime.combine(dia, time.min, BRASILIA)
     agora_utc = agora.astimezone(timezone.utc).replace(tzinfo=None)
     prazo_atual = (agora + timedelta(days=7)).replace(tzinfo=None)
     validade = agora.date() + timedelta(days=14)
@@ -466,8 +467,9 @@ def _semear_demonstracao(dados):
 
 
 def _aplicacao_demonstracao():
-    global _DEMO_APP
-    if _DEMO_APP is None:
+    global _DEMO_APP, _DEMO_DIA
+    dia = agora_brasilia().date()
+    if _DEMO_APP is None or _DEMO_DIA != dia:
         dados = _ler_json(RAIZ / "data" / "demonstracao.json")
         app_demo = Flask("reconecta_dashboard_demonstracao")
         app_demo.config.update(
@@ -479,8 +481,8 @@ def _aplicacao_demonstracao():
         db.init_app(app_demo)
         with app_demo.app_context():
             db.create_all()
-            _semear_demonstracao(dados)
-        _DEMO_APP = app_demo
+            _semear_demonstracao(dados, dia)
+        _DEMO_APP, _DEMO_DIA = app_demo, dia
     return _DEMO_APP
 
 

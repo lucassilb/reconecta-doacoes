@@ -366,9 +366,14 @@
   }
 
   var resumoReal = document.querySelector(".dash-ia__sub").textContent;
+  var impactoReal = $("impacto-sobretitulo").textContent;
+  var descricaoImpactoReal = $("impacto-descricao").textContent;
   function aplicarModo() {
     var demo = modo === "demonstracao";
     $("dash-demo-faixa").hidden = !demo;
+    $("impacto-sobretitulo").textContent = demo ? "Impacto simulado" : impactoReal;
+    $("impacto-descricao").textContent = demo ?
+      "Cálculos sobre doações entregues e excedentes retirados fictícios da demonstração." : descricaoImpactoReal;
     $("modo-real").setAttribute("aria-pressed", String(!demo));
     $("modo-demonstracao").setAttribute("aria-pressed", String(demo));
     $("btn-resumo").disabled = demo;

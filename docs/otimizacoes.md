@@ -8,7 +8,7 @@ A consulta usa `EXISTS` para filtrar itens por categoria/nome, sem duplicar pedi
 
 ## Dashboard
 
-`GET /reconecta/dashboard` e `montar_dashboard()` usam somas e contagens por `GROUP BY` para contribuições por item, por pedido, por empresa e por dia. Consultas limitadas obtêm as 10 últimas doações e as 10 empresas com mais doações recebidas. A quantidade de consultas não cresce por pedido ou contribuição. A série temporal sempre contém 30 dias, com zero nos dias sem doações. O percentual soma `min(recebido, meta)` por item de pedido aberto antes da divisão pela soma das metas; excedentes não elevam o percentual acima de 100%.
+`GET /reconecta/dashboard` e `montar_dashboard()` usam somas e contagens por `GROUP BY` para contribuições por item, por pedido, por empresa e por dia. Consultas limitadas obtêm as 10 últimas doações e as 10 empresas com mais doações recebidas. A quantidade de consultas não cresce por pedido ou contribuição. A série temporal sempre contém 30 dias, com zero nos dias sem doações. O percentual é a média de `min(recebido / meta, 1)` por item de pedido aberto com meta positiva; assim, unidades diferentes não são somadas e excedentes não elevam o percentual acima de 100%.
 
 ## Medição local
 

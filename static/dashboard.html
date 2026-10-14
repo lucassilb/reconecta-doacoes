@@ -40,7 +40,7 @@
     <div id="dash-erro" class="aviso aviso--erro" role="alert" hidden></div>
 
     <section class="dash-impacto" aria-labelledby="impacto-titulo">
-      <div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento">Impacto comprovado</p><h2 id="impacto-titulo">Da oferta à entrega</h2></div><p>Somente doações confirmadas como entregues e excedentes retirados entram no peso.</p></div>
+      <div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento" id="impacto-sobretitulo">Impacto comprovado</p><h2 id="impacto-titulo">Da oferta à entrega</h2></div><p id="impacto-descricao">Somente doações confirmadas como entregues e excedentes retirados entram no peso.</p></div>
       <div class="impacto-cards">
         <article class="cartao impacto-card impacto-card--principal"><h3>Kg em unidades físicas</h3><strong id="kg-medido">—</strong><p>kg e g convertidos; 1 L = 1 kg como premissa operacional.</p></article>
         <article class="cartao impacto-card"><h3>Kg por média de categoria</h3><strong id="kg-estimado">—</strong><p>Unidade, pacote e caixa são estimativas. Não são peso aferido.</p></article>
@@ -64,7 +64,7 @@
       <h2 id="ind-titulo" class="sr-only">Indicadores</h2>
       <ul class="indicadores" id="indicadores" aria-busy="true">
         <li class="indicador indicador--destaque" data-ind="percentual_atendimento">
-          <span class="indicador__rotulo">Atendimento dos pedidos abertos</span>
+          <span class="indicador__rotulo">Cobertura média por item aberto</span>
           <span class="indicador__valor">—</span>
           <span class="indicador__barra" aria-hidden="true"><span></span></span>
           <span class="indicador__nota" id="ind-itens">—</span>
@@ -76,11 +76,9 @@
         <li class="indicador" data-ind="excedentes_resgatados"><span class="indicador__rotulo">Excedentes resgatados</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="tempo_medio_reserva_min"><span class="indicador__rotulo">Tempo médio até a reserva</span><span class="indicador__valor">—</span><span class="indicador__nota">Minutos, após a publicação</span></li>
         <li class="indicador" data-ind="pedidos_encerrados"><span class="indicador__rotulo">Pedidos encerrados</span><span class="indicador__valor">—</span></li>
-        <li class="indicador" data-ind="empresas"><span class="indicador__rotulo">Empresas</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="empresas_alimentos"><span class="indicador__rotulo">Empresas de alimentos</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="ongs"><span class="indicador__rotulo">ONGs</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="doadores"><span class="indicador__rotulo">Doadores (CPF)</span><span class="indicador__valor">—</span></li>
-        <li class="indicador" data-ind="instituicoes"><span class="indicador__rotulo">Instituições</span><span class="indicador__valor">—</span></li>
       </ul>
     </section>
 
