@@ -217,6 +217,61 @@
   }
   function carregarMeus() { carregarLista("/reconecta/excedentes/meus", "ex-lista-meus", true); }
   function carregarReservas() { carregarLista("/reconecta/excedentes/reservas", "ex-lista-reservas", false); }
+  /* Rota de coleta da ONG: o servidor ordena as retiradas (vizinho mais próximo + 2-opt). */
+  function km(valor) {
+    return Number(valor).toLocaleString("pt-BR", { maximumFractionDigits: Number(valor) < 10 ? 1 : 0 }) + " km";
+  }
+  function linkMapa(href, texto, rotulo) {
+    return el("a", { classe: "link-seta", href: href, target: "_blank", rel: "noopener noreferrer", "aria-label": rotulo, texto: texto });
+  }
+  function desenharRota(rota) {
+    var alvo = $("ex-rota-resultado");
+    var paradas = rota.paradas || [];
+    var blocos = [];
+    if (!paradas.length && !(rota.sem_localizacao || []).length) {
+      blocos.push(el("p", { classe: "doacoes__vazio", texto: "Você não tem retiradas pendentes. Reserve excedentes para montar a rota." }));
+    }
+    if (paradas.length) {
+      blocos.push(el("p", { classe: "doacao__retirada" }, [
+        el("strong", { texto: paradas.length + (paradas.length === 1 ? " parada" : " paradas") + " · " + km(rota.total_km) }),
+        " em linha reta, saindo de " + (rota.partida && rota.partida.nome ? rota.partida.nome : "sua organização") +
+        " e voltando (" + km(rota.retorno_km) + " na volta). O mapa traça o caminho pelas ruas."]));
+      blocos.push(el("ol", { classe: "doacoes rota-coleta", style: "margin:0;padding:0;list-style:none", "aria-label": "Ordem das retiradas" }, paradas.map(function (p) {
+        return el("li", { classe: "doacao" }, [
+          el("div", { classe: "doacao__topo" }, [
+            el("a", { classe: "doacao__onde", href: "/excedentes/" + p.excedente_id, texto: p.ordem + "ª parada · " + p.empresa }),
+            el("span", { classe: "selo", texto: km(p.distancia_km) + (p.ordem === 1 ? " da saída" : " da anterior") })
+          ]),
+          el("p", { classe: "doacao__retirada", texto: p.endereco }),
+          el("p", { classe: "doacao__prazo", texto: "Retirar até " + hora(p.retirar_ate) + ((p.itens || []).length ? " · " + p.itens.join(", ") : "") }),
+          el("div", { classe: "doacao__acoes" }, [linkMapa(p.link_osm, "Ver o trecho no mapa", "Ver no OpenStreetMap o trecho até " + p.empresa)])
+        ]);
+      })));
+      blocos.push(el("div", { classe: "doacao__acoes" }, [linkMapa(rota.link_rota, "Abrir a rota completa no mapa", "Abrir a rota completa no mapa (OpenStreetMap)")]));
+      if (rota.aproximada) blocos.push(el("p", { classe: "doacoes__vazio", texto: "Algum endereço foi localizado só pela cidade; a distância desse trecho é aproximada." }));
+    }
+    (rota.sem_localizacao || []).forEach(function (s) {
+      blocos.push(el("p", { classe: "doacao__retirada", texto: "Sem localização no mapa, inclua por conta própria: " + s.empresa + " — " + s.endereco }));
+    });
+    alvo.replaceChildren.apply(alvo, blocos);
+    alvo.hidden = false;
+  }
+  function carregarRota() {
+    var btn = $("ex-rota"), alvo = $("ex-rota-resultado");
+    btn.disabled = true;
+    btn.setAttribute("aria-expanded", "true");
+    alvo.setAttribute("aria-busy", "true");
+    pedir("/reconecta/excedentes/rota").then(function (r) {
+      if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
+      if (!r.ok) throw new Error(r.corpo.mensagem || "rota");
+      desenharRota(r.corpo);
+      alvo.focus();
+    }).catch(function (erro) {
+      alvo.replaceChildren(el("p", { classe: "campo__erro", role: "alert", texto: erro && erro.message !== "rota" ? erro.message : "Não foi possível montar a rota agora. Tente de novo." }));
+      alvo.hidden = false;
+    }).then(function () { btn.disabled = false; alvo.setAttribute("aria-busy", "false"); });
+  }
+  $("ex-rota").addEventListener("click", carregarRota);
   $("ex-recarregar-meus").addEventListener("click", carregarMeus);
   $("ex-recarregar-reservas").addEventListener("click", carregarReservas);
   $("ex-add-item").addEventListener("click", adicionarItem);
@@ -225,7 +280,10 @@
   document.addEventListener("reconecta:evento", function (evento) {
     if (evento.detail && /^excedente\./.test(evento.detail.tipo)) {
       clearTimeout(recargaPendente);
-      recargaPendente = setTimeout(function () { carregarMeus(); carregarReservas(); }, 200);
+      recargaPendente = setTimeout(function () {
+        carregarMeus(); carregarReservas();
+        if (!$("ex-rota-resultado").hidden) carregarRota();  // rota aberta acompanha reservas e retiradas
+      }, 200);
     }
   });
   /* Vindo do assistente da Home ("Publicar como excedente"): os itens já interpretados

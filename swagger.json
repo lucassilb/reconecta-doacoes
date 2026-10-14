@@ -1220,6 +1220,29 @@
           "tempo_real"
         ]
       }
+    },
+    "/reconecta/excedentes/rota": {
+      "get": {
+        "responses": {
+          "403": {
+            "description": "Apenas ONGs"
+          },
+          "401": {
+            "description": "Sem sessão"
+          },
+          "200": {
+            "description": "Ordem de retirada, distâncias e links do OpenStreetMap",
+            "schema": {
+              "$ref": "#/definitions/RotaColeta"
+            }
+          }
+        },
+        "summary": "Ordena as retiradas pendentes da ONG logada (reservas ainda no prazo)",
+        "operationId": "get_rota_coleta",
+        "tags": [
+          "rota"
+        ]
+      }
     }
   },
   "info": {
@@ -1292,6 +1315,10 @@
     {
       "name": "tempo_real",
       "description": "Eventos ao vivo, novidades e notificações"
+    },
+    {
+      "name": "rota",
+      "description": "Rota de coleta dos excedentes reservados pela ONG"
     }
   ],
   "definitions": {
@@ -2101,6 +2128,14 @@
       "properties": {
         "texto": {
           "type": "string"
+        },
+        "cep": {
+          "type": "string",
+          "description": "Opcional, só pessoa física: CEP para ordenar por distância"
+        },
+        "origem": {
+          "type": "object",
+          "description": "Opcional, só pessoa física: {latitude, longitude}; usado nesta consulta e não gravado"
         }
       },
       "type": "object"
@@ -2113,6 +2148,74 @@
         "ate_id": {
           "type": "integer",
           "description": "Último id de evento lido"
+        }
+      },
+      "type": "object"
+    },
+    "RotaColeta": {
+      "properties": {
+        "partida": {
+          "type": "object"
+        },
+        "paradas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ParadaRota"
+          }
+        },
+        "sem_localizacao": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "retorno_km": {
+          "type": "number"
+        },
+        "total_km": {
+          "type": "number"
+        },
+        "link_rota": {
+          "type": "string"
+        },
+        "metodo": {
+          "type": "string"
+        },
+        "aproximada": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ParadaRota": {
+      "properties": {
+        "ordem": {
+          "type": "integer"
+        },
+        "excedente_id": {
+          "type": "integer"
+        },
+        "empresa": {
+          "type": "string"
+        },
+        "endereco": {
+          "type": "string"
+        },
+        "retirar_ate": {
+          "type": "string"
+        },
+        "distancia_km": {
+          "type": "number",
+          "description": "Do ponto anterior, em linha reta"
+        },
+        "acumulado_km": {
+          "type": "number"
+        },
+        "precisao": {
+          "type": "string"
+        },
+        "link_osm": {
+          "type": "string"
         }
       },
       "type": "object"

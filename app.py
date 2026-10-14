@@ -182,6 +182,7 @@ from Dashboard import ns as dashboard_ns
 from Excedentes import ns as excedentes_ns
 from IA import ns as ia_ns
 from TempoReal import ns as tempo_real_ns
+from Rotas import ns as rotas_ns
 
 api.add_namespace(estabelecimentos_ns, path="/reconecta/estabelecimentos")
 api.add_namespace(instituicoes_ns, path="/reconecta/instituicoes")
@@ -195,6 +196,7 @@ api.add_namespace(dashboard_ns, path="/reconecta/dashboard")
 api.add_namespace(excedentes_ns, path="/reconecta/excedentes")
 api.add_namespace(ia_ns, path="/reconecta/ia")
 api.add_namespace(tempo_real_ns, path="/reconecta")
+api.add_namespace(rotas_ns, path="/reconecta/excedentes/rota")
 
 with app.app_context():
     db.create_all()

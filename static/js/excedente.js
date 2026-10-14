@@ -107,7 +107,8 @@
     $("exc-titulo").textContent = titulo;
     var emp = x.empresa || {};
     $("exc-empresa").replaceChildren(el("span", { classe: "det__empresa-icone", "aria-hidden": "true" }), el("span", null, [
-      "Publicado por ", el("strong", { texto: nome(emp.nome) }), emp.municipio_uf ? " · " + local(emp.municipio_uf) : ""]));
+      "Publicado por ", el("strong", { texto: nome(emp.nome) }), emp.municipio_uf ? " · " + local(emp.municipio_uf) : "",
+      x.distancia ? el("span", { classe: "det__distancia", texto: " · " + x.distancia + " de você" }) : null]));
     $("exc-empresa").firstChild.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 9.5 5.6 5A1.6 1.6 0 0 1 7.1 4h9.8a1.6 1.6 0 0 1 1.5 1L20 9.5M4 9.5h16v1a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 10.5zM5.5 13.500V20h13v-6.500M10 20v-4h4v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
 
     var s = SITUACAO[x.status] || [x.status, "selo selo--cinza"];
