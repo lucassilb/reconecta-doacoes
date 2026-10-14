@@ -1236,16 +1236,16 @@
    ]
   ]
  },
- "acuracia_top1": 0.8814,
- "acuracia_top3": 0.8814,
+ "acuracia_top1": 0.8906,
+ "acuracia_top3": 0.8906,
  "taxa_sem_sugestao_correta": 1.0,
  "tamanho_conjuntos": {
   "alimentos": 925,
   "alimentos_treino": 740,
   "alimentos_teste": 185,
-  "ofertas": 80,
-  "ofertas_com_destino": 59,
-  "ofertas_sem_destino": 21,
+  "ofertas": 86,
+  "ofertas_com_destino": 64,
+  "ofertas_sem_destino": 22,
   "lotes_descarte": 3200,
   "lotes_teste": 640
  }

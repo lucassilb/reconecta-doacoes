@@ -21,6 +21,8 @@ MAX_SUGESTOES = 5
 # (até km, pontos): perto pesa mais que a mesma UF (10); longe não ganha nada.
 FAIXAS_DISTANCIA = ((5, 15), (15, 12), (50, 9), (150, 5), (400, 2))
 _PALAVRAS_DE_LIGACAO = {"de", "da", "do", "das", "dos", "e", "em", "com", "sem"}
+_PALAVRAS_IRRELEVANTES = {"hoje", "fresco", "fresca", "sobra"}
+_SINGULARES_TERMINADOS_EM_S = {"frances", "ingles", "portugues"}
 _TIPOS_GENERICOS = {"pao", "bolo", "suco", "agua", "sopa", "marmita", "carne",
                     "queijo", "leite", "oleo", "biscoito", "file", "salada"}
 
@@ -36,7 +38,7 @@ def _similaridade(a, b):
 
 
 def _termos_nome(nome):
-    """Palavras do nome em forma simples, inclusive plurais frequentes."""
+    """Palavras do alimento sem flexão de número nem descrição de frescor."""
     termos = set()
     for termo in re.findall(r"[a-z]+", _normalizar(nome)):
         if termo in _PALAVRAS_DE_LIGACAO:
@@ -45,15 +47,33 @@ def _termos_nome(nome):
             termo = termo[:-3] + "ao"
         elif termo.endswith("ais") and len(termo) > 4:
             termo = termo[:-3] + "al"
-        elif termo.endswith("s") and len(termo) > 3:
+        elif termo.endswith("eses") and len(termo) > 5:
+            termo = termo[:-2]
+        elif termo.endswith("s") and len(termo) > 3 and termo not in _SINGULARES_TERMINADOS_EM_S:
             termo = termo[:-1]
-        termos.add(termo)
+        if termo not in _PALAVRAS_IRRELEVANTES:
+            termos.add(termo)
     return termos
 
 
-def _termos_alimento(nome):
-    """Termos úteis para distinguir alimentos da mesma categoria ampla."""
-    return _termos_nome(nome) - _TIPOS_GENERICOS
+def _forca_nome(oferta, pedido):
+    """Nome exato vale mais; cobertura parcial exige núcleo sem conflito de tipo."""
+    comuns = oferta & pedido
+    if not comuns:
+        return None
+    especificos_oferta = oferta - _TIPOS_GENERICOS
+    especificos_pedido = pedido - _TIPOS_GENERICOS
+    if (especificos_oferta and especificos_pedido and
+            not especificos_oferta & especificos_pedido):
+        return None
+    if oferta == pedido:
+        return 1.0
+    cobertura = len(comuns) / max(len(oferta), len(pedido))
+    if oferta <= pedido or pedido <= oferta:
+        return min(.78, .42 + .45 * cobertura)
+    if len(comuns) >= 2 and cobertura >= .5:
+        return min(.68, .36 + .45 * cobertura)
+    return None
 
 
 def _restricoes(nome, palavra):
@@ -116,13 +136,8 @@ def _avaliar(item_doador, item_pedido, pedido, uf):
     termos_nome_pedido = _termos_nome(nome_pedido)
     if not termos_nome_oferta or not termos_nome_pedido:
         return None
-    termos_oferta = _termos_alimento(nome_oferta)
-    termos_pedido = _termos_alimento(nome_pedido)
-    termos_comuns = termos_oferta & termos_pedido
-    if not termos_comuns and sim < 0.82 and termos_nome_oferta != termos_nome_pedido:
-        return None
-    if termos_oferta and termos_pedido and not (termos_oferta <= termos_pedido or
-                                               termos_pedido <= termos_oferta):
+    forca_nome = _forca_nome(termos_nome_oferta, termos_nome_pedido)
+    if forca_nome is None:
         return None
     if _restricoes(nome_pedido, "sem") - _restricoes(nome_oferta, "sem"):
         return None
@@ -143,8 +158,8 @@ def _avaliar(item_doador, item_pedido, pedido, uf):
     if mesma_categoria:
         pontos += 35
         motivos.append(f"pede {item_pedido['categoria']}")
-    pontos += 25 * sim
-    if sim >= 0.55:
+    pontos += 25 * forca_nome
+    if forca_nome >= 0.55:
         motivos.append(f"item parecido com '{item_pedido.get('nome')}'")
 
     quantidade = item_doador.get("quantidade")
