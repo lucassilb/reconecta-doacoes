@@ -14,7 +14,7 @@ from Auth import usuario_atual
 from conexao import casar
 from Dashboard import montar_dashboard
 from fuso import agora_brasilia_sem_fuso
-from llm_service import interpretar_pedido, resumir_dashboard
+from llm_service import EntradaRecusada, interpretar_pedido, resumir_dashboard
 from models import Doacao
 from Publico import _municipio_uf, serializar_doacao
 from risco_descarte import prever as prever_risco
@@ -65,10 +65,17 @@ def _permitir(chave):
         return True
 
 
+def _recusa(recusa):
+    """Guarda de entrada (guardas_ia/NeMo): a mensagem aparece no campo do texto."""
+    return {"codigo": "ENTRADA_RECUSADA", "motivo": recusa.motivo, "mensagem": recusa.mensagem,
+            "campos": {"texto": recusa.mensagem}}, 400
+
+
 @ns.route("/interpretar-pedido")
 class InterpretarPedido(Resource):
     @ns.expect(ns.model("TextoPedidoIA", {"texto": fields.String(required=True)}))
     @ns.response(200, "Sugestão para revisão", pedido_model)
+    @ns.response(400, "Texto inválido ou recusado pela guarda (injeção de prompt ou fora do tema)")
     @ns.response(429, "Limite de 10 interpretações por minuto por empresa")
     def post(self):
         atual = usuario_atual()
@@ -87,7 +94,10 @@ class InterpretarPedido(Resource):
             return {"codigo": "MUITAS_TENTATIVAS",
                     "mensagem": "Limite de 10 interpretações por minuto atingido. "
                                 "Tente de novo em instantes."}, 429, {"Retry-After": "60"}
-        return interpretar_pedido(texto.strip()), 200
+        try:
+            return interpretar_pedido(texto.strip()), 200
+        except EntradaRecusada as recusa:
+            return _recusa(recusa)
 
 
 @ns.route("/resumo-dashboard")
@@ -159,7 +169,10 @@ class SugerirDestino(Resource):
             return {"codigo": "MUITAS_TENTATIVAS",
                     "mensagem": "Limite de 10 sugestões por minuto atingido. "
                                 "Tente de novo em instantes."}, 429, {"Retry-After": "60"}
-        interpretado = interpretar_pedido(texto.strip())
+        try:
+            interpretado = interpretar_pedido(texto.strip())
+        except EntradaRecusada as recusa:
+            return _recusa(recusa)
         uf = None
         if tipo == "empresa":
             municipio_uf = _municipio_uf(usuario.endereco)

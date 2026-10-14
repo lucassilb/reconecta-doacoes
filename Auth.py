@@ -19,6 +19,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from cnpj_service import formatar_cnpj
 from models import Doador, Estabelecimento, db
+from pii import ip_reduzido
 from privacidade import (anonimizar_conta, consentimento_registrado,
                          conta_removida, exportar_dados)
 
@@ -34,11 +35,14 @@ if not _auditoria.handlers:
 
 
 def registrar_auditoria(evento, resultado, *, tipo=None, ator_id=None):
-    """Emite somente metadados de segurança, sem dados pessoais nem payloads."""
+    """Emite somente metadados de segurança, sem dados pessoais nem payloads.
+
+    O IP sai truncado (/24 no IPv4, /48 no IPv6): basta para ver rajadas de tentativas
+    vindas da mesma rede sem identificar a pessoa."""
     _auditoria.info(json.dumps({
         "data": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "evento": evento, "ator_tipo": tipo, "ator_id": ator_id,
-        "ip": request.remote_addr, "resultado": resultado,
+        "ip": ip_reduzido(request.remote_addr), "resultado": resultado,
     }, ensure_ascii=False, separators=(",", ":")))
 
 _falhas = {}

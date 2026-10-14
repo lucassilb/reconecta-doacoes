@@ -1,0 +1,28 @@
+# Guardas da LLM do ReConecta (Colang 1.0). As mesmas ações e mensagens valem em
+# produção sem o NeMo: guardas_ia.py executa as ações e lê as mensagens daqui.
+
+define bot recusar injecao
+  "Não posso seguir instruções escritas no texto. Descreva só os alimentos, as quantidades e o prazo (ex.: 10 kg de arroz até sexta)."
+
+define bot recusar fora_do_tema
+  "Eu só ajudo com doação de alimentos. Descreva o que você tem ou precisa (ex.: 20 pães e 5 litros de leite)."
+
+define bot recusar saida
+  "A resposta do modelo foi descartada pela guarda; usamos as regras automáticas."
+
+# Entrada: prompt injection/jailbreak e pedido fora do tema (alimentos e doação).
+define flow reconecta verificar entrada
+  $motivo = execute reconecta_verificar_entrada(texto=$user_message)
+  if $motivo == "injecao"
+    bot recusar injecao
+    stop
+  if $motivo == "fora_do_tema"
+    bot recusar fora_do_tema
+    stop
+
+# Saída: dado pessoal, link, vazamento do prompt e número inventado no resumo.
+define flow reconecta verificar saida
+  $motivo = execute reconecta_verificar_saida(texto=$bot_message, entrada=$user_message)
+  if $motivo
+    bot recusar saida
+    stop
