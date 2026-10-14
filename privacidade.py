@@ -66,6 +66,9 @@ def exportar_dados(tipo, usuario):
         dados["titular"]["cpf"] = usuario.cpf
         dados["doacoes_feitas"] = [_contribuicao(c) for c in usuario.contribuicoes]
         dados["pedidos_publicados"] = [_pedido(d) for d in usuario.doacoes]
+        dados["excedentes_publicados"] = [
+            {**_excedente(e), "retirada_endereco": e.retirada_endereco} for e in
+            Excedente.query.filter_by(doador_id=usuario.id).all()]
     else:
         dados["titular"].update(cnpj=usuario.cnpj, endereco=usuario.endereco)
         dados["pedidos_publicados"] = [_pedido(d) for d in usuario.doacoes]
@@ -103,6 +106,11 @@ def anonimizar_conta(tipo, usuario):
         (Contribuicao.query.filter_by(doador_id=usuario.id)
          .update({"foto_dados": None, "foto_arquivo": "removida"},
                  synchronize_session=False))
+        # a oferta da pessoa física guarda o endereço dela: some, e a oferta ainda aberta sai do ar
+        (Excedente.query.filter_by(doador_id=usuario.id, status="DISPONIVEL")
+         .update({"status": "CANCELADO"}, synchronize_session=False))
+        (Excedente.query.filter_by(doador_id=usuario.id)
+         .update({"retirada_endereco": "Endereço removido"}, synchronize_session=False))
     else:
         usuario.cnpj = f"REMOVIDO-{usuario.id:08d}"
         usuario.endereco = "Endereço removido"

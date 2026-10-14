@@ -269,3 +269,35 @@ def test_impacto_expõe_refeicoes_por_mes(cliente):
     serie = resposta.json["refeicoes_mensal"]["serie"]
     assert serie == [{"mes": "2026-09", "kg": 5, "refeicoes": 10},
                      {"mes": "2026-10", "kg": 3, "refeicoes": 6}]
+
+
+def test_exclusao_doador_apaga_endereco_da_oferta_e_exportacao_traz_ofertas(cliente):
+    from models import Excedente
+
+    assert _cadastrar_doador(cliente, aceite_privacidade=True).status_code == 201
+    with app.app_context():
+        doador = Doador.query.one()
+        for status in ("DISPONIVEL", "RETIRADO"):
+            ong = None
+            if status == "RETIRADO":
+                ong = Estabelecimento(nome="ONG Luz", cnpj="11111111000191",
+                                      email="ong@teste.local", telefone="11000000000",
+                                      endereco="Rua A, 1 - Centro, Osasco/SP - 06000000",
+                                      sem_fins_lucrativos=True)
+                db.session.add(ong)
+                db.session.flush()
+            db.session.add(Excedente(
+                doador_id=doador.id, retirada_endereco="Rua da Maria, 10 - Centro, Osasco/SP - 06000000",
+                retirar_ate=datetime.now() + timedelta(days=1), status=status,
+                reservado_por_id=ong.id if ong else None, criado_em=datetime.now()))
+        db.session.commit()
+
+    exportado = cliente.get("/reconecta/auth/me/dados").json
+    assert len(exportado["excedentes_publicados"]) == 2
+    assert "Rua da Maria" in json.dumps(exportado, ensure_ascii=False)
+
+    assert cliente.delete("/reconecta/auth/me").status_code == 204
+    with app.app_context():
+        ofertas = Excedente.query.order_by(Excedente.id).all()
+        assert all(o.retirada_endereco == "Endereço removido" for o in ofertas)
+        assert [o.status for o in ofertas] == ["CANCELADO", "RETIRADO"]
