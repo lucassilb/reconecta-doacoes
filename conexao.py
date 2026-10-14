@@ -14,6 +14,9 @@ from difflib import SequenceMatcher
 from fuso import agora_brasilia
 
 MAX_SUGESTOES = 5
+_PALAVRAS_DE_LIGACAO = {"de", "da", "do", "das", "dos", "e", "em", "com", "sem"}
+_TIPOS_GENERICOS = {"pao", "bolo", "suco", "agua", "sopa", "marmita", "carne",
+                    "queijo", "leite", "oleo", "biscoito", "file", "salada"}
 
 
 def _normalizar(valor):
@@ -24,6 +27,32 @@ def _normalizar(valor):
 
 def _similaridade(a, b):
     return SequenceMatcher(None, _normalizar(a), _normalizar(b)).ratio()
+
+
+def _termos_nome(nome):
+    """Palavras do nome em forma simples, inclusive plurais frequentes."""
+    termos = set()
+    for termo in re.findall(r"[a-z]+", _normalizar(nome)):
+        if termo in _PALAVRAS_DE_LIGACAO:
+            continue
+        if termo.endswith(("aes", "oes")) and len(termo) >= 4:
+            termo = termo[:-3] + "ao"
+        elif termo.endswith("ais") and len(termo) > 4:
+            termo = termo[:-3] + "al"
+        elif termo.endswith("s") and len(termo) > 3:
+            termo = termo[:-1]
+        termos.add(termo)
+    return termos
+
+
+def _termos_alimento(nome):
+    """Termos úteis para distinguir alimentos da mesma categoria ampla."""
+    return _termos_nome(nome) - _TIPOS_GENERICOS
+
+
+def _restricoes(nome, palavra):
+    termos = _normalizar(nome).split()
+    return {termos[i + 1] for i, termo in enumerate(termos[:-1]) if termo == palavra}
 
 
 def _uf(texto):
@@ -50,8 +79,8 @@ def _dias_ate(iso):
 def _faltam(item_pedido):
     """Quanto falta para a meta do item; None se o pedido não informar."""
     faltam = item_pedido.get("faltam")
-    if isinstance(faltam, (int, float)) and faltam > 0:
-        return float(faltam)
+    if isinstance(faltam, (int, float)):
+        return float(faltam) if faltam > 0 else None
     meta = item_pedido.get("quantidade")
     recebido = item_pedido.get("recebido", 0)
     try:
@@ -65,7 +94,32 @@ def _avaliar(item_doador, item_pedido, pedido, uf):
     """Pontua um par (item do doador × item do pedido) ou devolve None."""
     mesma_categoria = item_pedido.get("categoria") == item_doador.get("categoria")
     sim = _similaridade(item_doador.get("nome"), item_pedido.get("nome"))
-    if not mesma_categoria and sim < 0.55:
+    nome_oferta = item_doador.get("nome")
+    nome_pedido = item_pedido.get("nome")
+    termos_nome_oferta = _termos_nome(nome_oferta)
+    termos_nome_pedido = _termos_nome(nome_pedido)
+    if not termos_nome_oferta or not termos_nome_pedido:
+        return None
+    termos_oferta = _termos_alimento(nome_oferta)
+    termos_pedido = _termos_alimento(nome_pedido)
+    termos_comuns = termos_oferta & termos_pedido
+    if not termos_comuns and sim < 0.82 and termos_nome_oferta != termos_nome_pedido:
+        return None
+    if termos_oferta and termos_pedido and not (termos_oferta <= termos_pedido or
+                                               termos_pedido <= termos_oferta):
+        return None
+    if _restricoes(nome_pedido, "sem") - _restricoes(nome_oferta, "sem"):
+        return None
+    if _restricoes(nome_oferta, "sem") & _restricoes(nome_pedido, "com"):
+        return None
+    if not mesma_categoria and sim < 0.72:
+        return None
+    unidade_doador = item_doador.get("unidade_medida")
+    unidade_pedido = item_pedido.get("unidade_medida")
+    if unidade_doador and unidade_pedido and unidade_doador != unidade_pedido:
+        return None
+    faltam = _faltam(item_pedido)
+    if faltam is None:
         return None
 
     pontos = 0.0
@@ -77,7 +131,6 @@ def _avaliar(item_doador, item_pedido, pedido, uf):
     if sim >= 0.55:
         motivos.append(f"item parecido com '{item_pedido.get('nome')}'")
 
-    faltam = _faltam(item_pedido)
     quantidade = item_doador.get("quantidade")
     unidade_igual = (not item_doador.get("unidade_medida") or
                      item_doador.get("unidade_medida") == item_pedido.get("unidade_medida"))
@@ -114,15 +167,24 @@ def casar(itens, pedidos, uf=None):
     "motivos","item_id","quantidade_sugerida"} ordenadas por pontuação."""
     sugestoes = []
     for pedido in pedidos or []:
-        melhor = None
-        for item_doador in itens or []:
-            for item_pedido in pedido.get("itens") or []:
+        candidatos = []
+        for indice_doador, item_doador in enumerate(itens or []):
+            for indice_pedido, item_pedido in enumerate(pedido.get("itens") or []):
                 avaliado = _avaliar(item_doador, item_pedido, pedido, uf)
-                if avaliado and (melhor is None or avaliado[0] > melhor[0]):
-                    melhor = avaliado
-        if melhor is None:
+                if avaliado:
+                    candidatos.append((avaliado, indice_doador, indice_pedido))
+        if not candidatos:
             continue
-        pontos, motivos, sugerida, item_pedido = melhor
+        candidatos.sort(key=lambda c: -c[0][0])
+        usados_doador, usados_pedido = set(), set()
+        for _, indice_doador, indice_pedido in candidatos:
+            if indice_doador not in usados_doador and indice_pedido not in usados_pedido:
+                usados_doador.add(indice_doador)
+                usados_pedido.add(indice_pedido)
+        pontos, motivos, sugerida, item_pedido = candidatos[0][0]
+        if len(usados_doador) > 1:
+            pontos += 12 * (len(usados_doador) - 1)
+            motivos = [*motivos, f"atende {len(usados_doador)} itens"]
         sugestao = {
             "pedido_id": pedido.get("id"),
             "organizacao": (pedido.get("empresa") or {}).get("nome"),

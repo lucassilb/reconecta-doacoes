@@ -205,12 +205,12 @@ def test_notificacoes_exigem_login_e_marcam_lidas():
 # ---------------- casar (função pura) ----------------
 
 def _pedido_dicionario(pid=1, categoria="Padaria", nome="pães", faltam=70,
-                       quantidade=100, uf="SP", dias=2):
+                       quantidade=100, uf="SP", dias=2, unidade="unidade"):
     return {"id": pid, "estabelecimento_id": pid + 100,
             "empresa": {"nome": f"ONG {pid}", "municipio_uf": f"BARUERI/{uf}"},
             "receber_ate": (agora_brasilia_sem_fuso() + timedelta(days=dias)).isoformat(),
             "itens": [{"id": pid * 10, "nome": nome, "categoria": categoria,
-                       "quantidade": quantidade, "unidade_medida": "unidade",
+                       "quantidade": quantidade, "unidade_medida": unidade,
                        "recebido": quantidade - faltam, "faltam": faltam}]}
 
 
@@ -241,7 +241,8 @@ def test_casar_limita_a_cinco_sugestoes():
     itens = [{"nome": "arroz", "categoria": "Grãos e cereais", "quantidade": 10,
               "unidade_medida": "kg"}]
     pedidos = [_pedido_dicionario(i, categoria="Grãos e cereais", nome="arroz",
-                                faltam=50, quantidade=50) for i in range(1, 8)]
+                                  faltam=50, quantidade=50, unidade="kg")
+               for i in range(1, 8)]
     assert len(casar(itens, pedidos)) == 5
 
 

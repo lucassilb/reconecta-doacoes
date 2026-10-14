@@ -30,6 +30,28 @@ jobs:
           path: pytest.xml
           if-no-files-found: warn
 
+  ia:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Treinar, avaliar e conferir limiares
+        run: python scripts/ciclo_ia.py
+        env:
+          DATABASE_URL: sqlite://
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metricas-ia
+          path: |
+            modelo/metricas.json
+            modelo/avaliacao_conexao.json
+          if-no-files-found: error
+
   sast-bandit:
     runs-on: ubuntu-24.04
     steps:
@@ -144,7 +166,7 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: [testes, sast-bandit, sast-trivy, docker]
+    needs: [testes, ia, sast-bandit, sast-trivy, docker]
     runs-on: ubuntu-24.04
     env:
       RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

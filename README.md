@@ -265,7 +265,7 @@ Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `
 python -m pytest -q
 ```
 
-Resultado atual: **244 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
+Resultado atual: **250 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -356,14 +356,14 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **244 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
+Resultado atual: **250 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
 
 - 3 provas em PostgreSQL (`tests/test_integridade_banco.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
 - 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
 
 | Tipo de teste | Arquivos | O que cobrem |
 |---|---|---|
-| Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, normalização e validação da saída da LLM, fallback por regras, formato do dataset, treino reprodutível e acurácia mínima do classificador |
+| Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, `test_ciclo_ia.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, validação da saída da LLM, fallback, treino reprodutível, recomendação e limiares da IA |
 | De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, CRUDs e saúde |
 | De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | Elegibilidade por natureza jurídica ou CNAE, reserva exclusiva por ONG, confirmação pelo dono do pedido, privacidade de eventos e fotos, limites de login, IA, publicações e doações |
 | De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + SQLite isolado: migrações, restrições, transições de estado, fluxo de eventos, fuso, consultas SQL, foto no banco, auditoria e classificador dentro da interpretação de pedidos |
@@ -413,9 +413,16 @@ Uso na aplicação: em `POST /reconecta/ia/interpretar-pedido`, a categoria de u
 python scripts/treinar_modelo.py                 # treina, avalia e grava modelo/classificador_categorias.json
 python scripts/classificar.py "pao de queijo"    # demonstração no terminal
 python scripts/avaliar_modelos.py                # regras x classificador x LLM (use --sem-llm sem o Ollama)
+python scripts/ciclo_ia.py                        # treina, avalia a conexão e aplica os limiares
 ```
 
 Detalhes (atributos, treino, métricas por categoria, matriz de confusão, limiar e limitações) em [docs/dataset-modelo.md](docs/dataset-modelo.md).
+
+### Validação e ciclo da IA
+
+O gabarito manual [`data/ofertas_avaliacao.jsonl`](data/ofertas_avaliacao.jsonl) tem 80 ofertas com pedidos abertos: 59 com destino correto e 21 sem destino. `python scripts/avaliar_conexao.py` mede `conexao.casar` e grava [`modelo/avaliacao_conexao.json`](modelo/avaliacao_conexao.json). Na execução de 2026-10-14, o classificador acertou **144/185 (77,84%)** no teste separado; a conexão acertou **52/59 (88,14%)** no top-1 e no top-3 e retornou vazio corretamente em **21/21 (100%)** casos sem destino. Os sete erros restantes, sobretudo nomes regionais equivalentes, estão no JSON.
+
+`python scripts/ciclo_ia.py` refaz o treino determinístico e as duas avaliações, grava data, versão e tamanhos em [`modelo/metricas.json`](modelo/metricas.json) e falha abaixo dos mínimos de [`modelo/limiares.json`](modelo/limiares.json): **75%** no classificador, **85%** no top-1 e top-3, **95%** na rejeição correta. O job `ia` em [CI](.github/workflows/ci.yml) roda esse comando, publica as métricas e é exigido antes do deploy. Tudo roda sem LLM ou serviço pago; detalhes e critério do gabarito em [docs/dataset-modelo.md](docs/dataset-modelo.md).
 
 ## Segurança (STRIDE e SAST)
 
@@ -471,6 +478,7 @@ O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda a cada pu
 | Job | O que faz | Quando falha |
 |---|---|---|
 | `testes` | Python 3.12, instala `requirements.txt` e `requirements-dev.txt`, roda `python -m pytest` e guarda o relatório JUnit como artefato | Algum teste falha |
+| `ia` | Treina o classificador, avalia a conexão, confere `modelo/limiares.json` e publica `metricas-ia` | Qualquer métrica cai abaixo do mínimo |
 | `sast-bandit` | Bandit no código da aplicação; relatórios JSON e texto como artefato `bandit-report` | Achado de severidade alta |
 | `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Vulnerabilidade crítica com correção disponível |
 | `docker` | `docker compose build app`, `docker compose up -d --wait` e chamada a `/reconecta/saude` | A imagem não constrói ou a aplicação não fica saudável |
