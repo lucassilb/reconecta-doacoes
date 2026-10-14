@@ -54,9 +54,18 @@
   background: var(--verde-suave); color: var(--verde-texto); font-size: .78rem; font-weight: 700;
 }
 
+/* filtro: em telas largas quebra em linhas (nada cortado); no celular rola, com a borda
+   direita esmaecida indicando que há mais */
 .filtro {
-  display: flex; gap: 8px; margin-top: 14px; padding-bottom: 4px;
-  overflow-x: auto; scrollbar-width: thin; scroll-snap-type: x proximity;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+}
+@media (max-width: 759.98px) {
+  .filtro {
+    flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; scrollbar-width: thin;
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+            mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .filtro::after { content: ""; flex: none; width: 40px; }   /* o último chip sai de baixo do esmaecido */
 }
 .filtro[hidden] { display: none; }
 .filtro__chip {

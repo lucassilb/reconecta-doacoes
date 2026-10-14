@@ -172,7 +172,7 @@
   function confirmarNoCartao(pergunta, rotuloSim, executar) {
     var alvo = $("exc-acao");
     var sim = botao(rotuloSim, "btn--perigo", function (b) { executar(b); });
-    var nao = botao("Voltar", "btn--fantasma", function () { desenharAcao(); $("acao-titulo").focus(); });
+    var nao = botao("Voltar", "btn--secundario", function () { desenharAcao(); $("acao-titulo").focus(); });
     alvo.replaceChildren(texto(pergunta, true), sim, nao);
     sim.focus();
   }
@@ -228,7 +228,7 @@
       titulo.textContent = "Sua doação";
       if (x.status === "DISPONIVEL") {
         b.push(texto("Aguardando uma ONG reservar. Você é avisado no sino quando isso acontecer."),
-          botao("Cancelar esta doação", "btn--fantasma", function () {
+          botao("Cancelar esta doação", "btn--perigo", function () {
             confirmarNoCartao("Cancelar a doação? Ela deixa de aparecer para as ONGs.", "Sim, cancelar a doação",
               function (bt) { agir("", "DELETE", bt, MSG); });
           }));
@@ -239,7 +239,7 @@
             el("p", { texto: "Retirada até " + dataHora(x.retirar_ate) + "." })]),
           texto("Quando a ONG buscar, confirme aqui."),
           botao("Confirmar retirada", "btn--primario", function (bt) { agir("/confirmar-retirada", "POST", bt, MSG); }),
-          botao("Cancelar a reserva", "btn--fantasma", function () {
+          botao("Cancelar a reserva", "btn--perigo", function () {
             confirmarNoCartao("Cancelar a reserva desta ONG? A doação volta a ficar disponível.", "Sim, cancelar a reserva",
               function (bt) { agir("/cancelar-reserva", "POST", bt, MSG); });
           }));
@@ -249,7 +249,7 @@
         b.push(texto(x.status === "EXPIRADO" ? "O prazo terminou sem retirada." : "Você cancelou esta doação."),
           link("Doar de novo", "btn--secundario", "/painel#publicar-excedente"));
       }
-      b.push(link("Minhas doações no painel", "btn--fantasma", "/painel"));
+      b.push(link("Minhas doações no painel", "btn--secundario", "/painel"));
     } else if (x.retirada && x.status === "RESERVADO") {
       // a ONG que reservou
       titulo.textContent = "Reservado para a sua ONG";
@@ -261,7 +261,7 @@
           confirmarNoCartao("Cancelar a reserva? A doação volta a ficar disponível para outras ONGs.", "Sim, cancelar a reserva",
             function (bt) { agir("/cancelar-reserva", "POST", bt, MSG); });
         }),
-        link("Minhas reservas no painel", "btn--fantasma", "/painel"));
+        link("Minhas reservas no painel", "btn--secundario", "/painel"));
     } else if (x.retirada && x.status === "RETIRADO") {
       titulo.textContent = "Retirada confirmada";
       b.push(texto("A sua ONG retirou esta doação. Alimento aproveitado!"), link("Ver outros alimentos doados", "btn--secundario", "/#excedentes"));
@@ -283,7 +283,7 @@
       // quem não é ONG não reserva, mas pode doar também
       titulo.textContent = "Para ONGs retirarem";
       b.push(texto("Esta doação é para uma ONG reservar e retirar."), doarTambem(),
-        link("Ver pedidos das ONGs", "btn--fantasma", "/#doacoes"));
+        link("Ver pedidos das ONGs", "btn--secundario", "/#doacoes"));
     } else {
       titulo.textContent = "Reservar";
       b.push(texto((x.motivo_bloqueio || "Você não pode reservar esta doação") + "."),

@@ -68,5 +68,7 @@
 .exc-aviso[hidden] { display: none; }
 .exc-aviso p:first-child { font-weight: 700; }
 
+/* todas as ações do cartão com cara de botão e a mesma largura; cancelar em alerta discreto */
+.exc-acao .btn { min-height: 46px; border: 1.5px solid var(--btn-borda, transparent); }
 .btn--perigo { --btn-cor: var(--erro); --btn-borda: var(--erro-linha); --btn-bg: var(--superficie); }
 .btn--perigo:hover:not(:disabled) { --btn-bg: var(--erro-suave); --btn-cor: var(--erro); }
