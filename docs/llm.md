@@ -14,6 +14,10 @@ O endpoint oficial é `https://api.groq.com/openai/v1/chat/completions`. A requi
 
 Groq é um **operador externo** desses dados tratados. As expressões de remoção não cobrem todos os formatos de dados pessoais; evite incluir contatos ou documentos no texto livre. A [política de privacidade](/privacidade) e [mapa LGPD](lgpd.md) informam o compartilhamento. O tráfego usa HTTPS e a chave não vai ao navegador, à resposta da API nem aos logs.
 
+## Guardas de entrada e saída (NeMo Guardrails)
+
+Antes de qualquer LLM, `guardas_ia.checar_entrada` recusa injeção de prompt/jailbreak e pedido fora do tema: a API responde `400 ENTRADA_RECUSADA` com a mensagem em `campos.texto`, sem gastar cota. Depois da validação de formato, `guardas_ia.checar_saida` descarta resposta com dado pessoal, link/HTML, trecho do prompt ou, no resumo, número que não veio dos agregados; aí entram Ollama ou regras. As regras estão em `guardrails/` (Colang do NVIDIA NeMo Guardrails), que o CI executa com o NeMo de verdade; a produção roda as mesmas ações sem a biblioteca, pelos números de memória em [seguranca.md](seguranca.md). Nenhuma rail chama a LLM.
+
 ## Limites, falhas e fallback
 
 O Groq Free informa 30 requisições/minuto, 1.000/dia, 8 mil tokens/minuto e 200 mil/dia **por organização** para o modelo padrão. Cada processo reserva no máximo 25 requisições/minuto, 900/dia, 7.200 tokens estimados/minuto e 180 mil/dia. Vários workers não compartilham a guarda local; os limites do Groq continuam sendo a barreira da organização. `429` abre um disjuntor em memória pelo `retry-after` (ou 60 s), sem retry na requisição. Após três falhas HTTP, de rede, de JSON ou de conteúdo, o disjuntor abre por 60 s. `401/403` geram log de status sem chave, prompt, corpo da resposta ou exceção. Timeout do Groq: 2 s de conexão e 8 s de leitura. Falhas e cota local fazem a execução seguir para Ollama quando disponível e depois para regras. O Ollama mantém URL local restrita, sem redirecionamento/proxy, e timeout próprio.

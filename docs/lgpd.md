@@ -17,7 +17,7 @@ Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
 | Consentimento | `*.consentimento_versao`, `.consentimento_em` | comprovar qual versão da política foi aceita e quando | obrigação legal, art. 7º II | enquanto a conta existir |
 | Pedidos, doações, excedentes, reservas | `doacoes`, `itens_doacao`, `contribuicoes`, `reservas`, `excedentes` | operar a rede e agregar impacto | execução do serviço, art. 7º V; legítimo interesse, art. 7º IX | persistem anonimizados após exclusão |
 | Foto da doação | `contribuicoes.foto_dados` | evidência para quem participa da doação | consentimento, art. 7º I | apagada na exclusão da conta |
-| Log de auditoria | stdout (`reconecta.auditoria`) | segurança da conta; data, evento, IP, id do ator — sem payload | legítimo interesse, art. 7º IX | retenção do coletor de logs da plataforma |
+| Log de auditoria | stdout (`reconecta.auditoria`) | segurança da conta; data, evento, IP truncado (/24), id do ator — sem payload | legítimo interesse, art. 7º IX | 7 dias (logs do Render, plano Hobby) |
 
 ## O que é público (minimização)
 
@@ -31,6 +31,10 @@ Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
 - O resumo com IA lê só números agregados. O texto livre de pedidos passa pela
   remoção de padrões comuns de e-mail, documento e telefone em `llm_service.py`
   antes da chamada à LLM; essa remoção não cobre todos os formatos.
+- Guardas da IA (`guardas_ia.py`, configuração NeMo Guardrails em `guardrails/`):
+  texto com injeção de prompt ou fora do tema é recusado antes de chegar à LLM, e
+  resposta da LLM com e-mail, documento, telefone, CEP ou link é descartada
+  (`docs/seguranca.md`, frente C).
 
 ## Compartilhamento com terceiros
 
@@ -47,6 +51,30 @@ Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
   `sha256(texto) + latitude/longitude + precisão + fonte` — sem id de conta e
   sem o texto original — então não identifica o titular e **não há o que
   apagar por conta na exclusão**.
+
+## Logs (log mínimo)
+
+Estado em 2026-10-14 (rodada 18). Os logs vão para o stdout do contêiner e o Render
+os guarda por **7 dias** no plano Hobby ([docs do Render](https://render.com/docs/logging));
+não há envio a outro coletor. Nível `INFO` em produção (`LOG_LEVEL`, padrão `INFO`).
+
+| Log | O que registra | Por quê |
+|---|---|---|
+| Auditoria (`reconecta.auditoria`, JSON) | data, evento, tipo e id do ator, **IP truncado** (/24 no IPv4, /48 no IPv6), resultado | investigar abuso de conta (rajada de logins por rede) sem identificar a pessoa |
+| Acesso do gunicorn (`gunicorn.conf.py`) | método, caminho **sem query string**, status, bytes, duração | operar o serviço; sem IP, usuário, referer, user-agent nem query |
+| Erros do gunicorn e do Flask (`app.logger.exception`) | caminho e traceback, já mascarados; erros do banco **sem os valores** (`hide_parameters=True`) | diagnosticar falhas |
+| `llm_service` / guardas | motivo fixo ("limite HTTP 429", "Guarda de entrada recusou o texto: injecao") | operar o fallback e as guardas; nunca o texto do usuário, o prompt, a resposta ou a chave |
+| `reconecta.geo` | nome da fonte e tipo do erro | operar a geocodificação; nunca o endereço ou o CEP |
+| NeMo Guardrails (só com `RECONECTA_NEMO=1`) | nada abaixo de WARNING | a biblioteca registraria o texto da conversa em INFO/DEBUG |
+| Tempo real (SSE) | nada | — |
+
+Rede de segurança central: `registro.py` troca a fábrica de `LogRecord` do processo,
+e toda mensagem e todo traceback, de qualquer logger (inclusive bibliotecas), passam
+por `pii.mascarar`. Saem mascarados: e-mail, CPF, CNPJ, telefone, CEP, IP (truncado),
+`Authorization`, `Cookie`, tokens, senha, chave do Groq e parâmetros sensíveis de URL
+(`cep`, `email`, `cpf`, `busca`…). Nome, endereço e texto livre não têm formato fixo:
+por isso nenhum log do projeto os inclui. `tests/test_log_minimo.py` captura todos os
+logs de um fluxo completo e prova que nada disso aparece.
 
 ## Consentimento
 

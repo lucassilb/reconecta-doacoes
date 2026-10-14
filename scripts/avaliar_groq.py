@@ -70,7 +70,13 @@ def main():
             espera = llm_service._groq_estado["aberto_ate"] - time.monotonic()
             if espera > 0:
                 time.sleep(espera + 0.2)
-            saida = llm_service.interpretar_pedido(pedido["texto"])
+            try:
+                saida = llm_service.interpretar_pedido(pedido["texto"])
+            except llm_service.EntradaRecusada:
+                # a guarda de entrada recusa (caso 58, injeção): no app a pessoa reescreve o texto
+                fontes["guarda_recusou"] += 1
+                print(f"{indice + 1}/{len(pedidos)} fonte=guarda_recusou", flush=True)
+                continue
             fontes[saida["modelo"] or "regras"] += 1
             esperado = resolver_prazo(pedido["prazo"], hoje_brasilia())
             perfeitos += pontuar(pedido, saida, esperado)["perfeito"]

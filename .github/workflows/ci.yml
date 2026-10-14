@@ -271,9 +271,39 @@ jobs:
             relatorios/seguranca/iast-dast.json
           if-no-files-found: warn
 
+  guardrails:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-guardrails.txt pytest==9.0.3
+      - name: "Gate: guardas da IA executadas pelo NeMo Guardrails e log mínimo sem dado pessoal"
+        run: python -m pytest -q tests/test_guardrails_ia.py tests/test_log_minimo.py
+        env:
+          DATABASE_URL: sqlite://
+          RECONECTA_NEMO: "1"
+      - name: Relatórios (corpus de ataques no NeMo e fluxo completo de logs)
+        if: always()
+        run: |
+          python scripts/relatorio_guardrails.py
+          python scripts/relatorio_log_minimo.py
+        env:
+          DATABASE_URL: sqlite://
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: guardrails-log-minimo
+          path: |
+            relatorios/seguranca/nemo-guardrails.json
+            relatorios/seguranca/log-minimo.json
+          if-no-files-found: warn
+
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker, dast, iast]
+    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker, dast, iast, guardrails]
     runs-on: ubuntu-24.04
     env:
       RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

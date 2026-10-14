@@ -1,0 +1,4 @@
+# NVIDIA NeMo Guardrails: executa guardrails/ (Colang) no job "guardrails" do CI e nos testes.
+# Fora da imagem de produção (Render free, 512 MB): lá as mesmas ações rodam via guardas_ia.py.
+# Medição e decisão em docs/seguranca.md.
+nemoguardrails==0.24.1

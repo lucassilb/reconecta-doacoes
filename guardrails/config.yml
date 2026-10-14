@@ -1,0 +1,12 @@
+# NVIDIA NeMo Guardrails (open source, Apache-2.0) — guardas da IA do ReConecta.
+# Nenhum modelo configurado: as rails são locais e determinísticas (não gastam o Groq Free).
+# Os fluxos ficam em rails.co e as ações em actions.py (que chama guardas_ia.py).
+colang_version: "1.0"
+models: []
+rails:
+  input:
+    flows:
+      - reconecta verificar entrada
+  output:
+    flows:
+      - reconecta verificar saida

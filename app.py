@@ -11,10 +11,13 @@ from dotenv import load_dotenv
 from models import db
 from Auth import configurar_chave_secreta
 from migracoes import aplicar_migracoes
+from registro import configurar_logs
 
 load_dotenv()
 
 app = Flask(__name__)
+# log mínimo: máscara de dados pessoais em todo log do processo (registro.py)
+configurar_logs(app)
 
 def _database_url(valor):
     # painéis de nuvem costumam colar a URL com espaço ou quebra de linha no fim
@@ -34,7 +37,8 @@ def _database_url(valor):
 
 app.config["SQLALCHEMY_DATABASE_URI"] = _database_url(os.getenv("DATABASE_URL"))
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
+# hide_parameters: erros do banco não levam valores (e-mail, CPF, endereço) para o log
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "hide_parameters": True}
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # foto até 5 MB + campos do questionário
 app.config["ERROR_INCLUDE_MESSAGE"] = False  # erros RESTX usam codigo/mensagem da API
 configurar_chave_secreta(app)

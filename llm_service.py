@@ -17,6 +17,7 @@ from urllib.parse import urlsplit
 import requests
 
 import classificador
+import guardas_ia
 from fuso import hoje_brasilia
 from Publico import CATEGORIAS, UNIDADES
 
@@ -98,6 +99,23 @@ def _groq_falhou(motivo, espera=None):
             _groq_estado["falhas"] = 0
     # Não incluir resposta HTTP, exceção, prompt nem cabeçalho Authorization no log.
     _log.warning("Groq indisponível: %s; usando provedor local ou regras", motivo)
+
+
+class EntradaRecusada(ValueError):
+    """Texto barrado pela guarda de entrada (injeção de prompt ou fora do tema)."""
+
+    def __init__(self, veredito):
+        super().__init__(veredito.motivo)
+        self.motivo, self.mensagem = veredito.motivo, veredito.mensagem
+
+
+def _saida_segura(objeto, formato, entrada):
+    veredito = guardas_ia.checar_saida(objeto, formato, entrada)
+    if veredito.bloqueado:
+        # só o motivo fixo: nada do texto do usuário nem da resposta vai para o log
+        _log.warning("Guarda de saída descartou a resposta da LLM: %s", veredito.motivo)
+        return False
+    return True
 
 
 def _groq_sucesso():
@@ -472,6 +490,11 @@ def _sistema_pedido(*, incluir_esquema=True):
 
 
 def interpretar_pedido(texto):
+    veredito = guardas_ia.checar_entrada(texto)
+    if veredito.bloqueado:
+        # recusado antes de qualquer LLM: não gasta cota e não chega ao modelo
+        _log.info("Guarda de entrada recusou o texto: %s", veredito.motivo)
+        raise EntradaRecusada(veredito)
     sistema, usuario = _sistema_pedido(), _sem_identificadores(texto)
     groq = _chamar_groq(_sistema_pedido(incluir_esquema=False), usuario, formato="pedido")
     for provedor, bruto, modelo in (("groq", groq, _modelo_groq()),
@@ -481,7 +504,7 @@ def interpretar_pedido(texto):
         validado = _validar_pedido(bruto)
         if validado:
             conferido = _conferir_com_texto(validado, texto)
-            if conferido:
+            if conferido and _saida_segura(conferido, "pedido", usuario):
                 if provedor == "groq":
                     _groq_sucesso()
                 return {**conferido, "fonte": "llm",
@@ -571,7 +594,7 @@ def resumir_dashboard(dashboard):
         if provedor == "ollama":
             bruto = _chamar_ollama(sistema, usuario)
         validado = _validar_resumo(bruto)
-        if validado:
+        if validado and _saida_segura(validado, "resumo", usuario):
             if provedor == "groq":
                 _groq_sucesso()
             return {**validado, "fonte": "llm",

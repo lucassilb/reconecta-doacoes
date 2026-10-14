@@ -1,0 +1,27 @@
+{
+ "ferramenta": "scripts/relatorio_log_minimo.py (captura de logs em fluxo completo)",
+ "comando": "python scripts/relatorio_log_minimo.py",
+ "data": "2026-10-14T22:33:22+00:00",
+ "linhas_de_log": 181,
+ "dados_procurados": [
+  "cep",
+  "cpf",
+  "cpf_digitos",
+  "email",
+  "ip_completo",
+  "nome",
+  "observacao",
+  "rua",
+  "senha",
+  "telefone"
+ ],
+ "vazamentos": {},
+ "antes_main_a0ba325": {
+  "nome": 1,
+  "cpf": 2,
+  "cpf_digitos": 1,
+  "email": 3,
+  "telefone": 1,
+  "ip_completo": 7
+ }
+}
