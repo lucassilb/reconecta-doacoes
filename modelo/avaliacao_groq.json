@@ -22,7 +22,14 @@
     "total": 66
   },
   "groq": {
-    "avaliado": false,
-    "motivo": "GROQ_API_KEY ausente"
+    "avaliado": true,
+    "pedidos_perfeitos": 51,
+    "total": 66,
+    "fontes": {
+      "qwen2.5:3b": 11,
+      "groq:openai/gpt-oss-20b": 44,
+      "regras": 11
+    },
+    "chamadas_groq": 66
   }
 }

@@ -145,11 +145,13 @@ Execução de 2026-10-13, 66 pedidos e 130 itens:
 
 O que os números mostram:
 
-- **O classificador é o que mais muda o resultado sem a LLM**: a categoria certa sobe de 56% para 85% dos itens e o pedido inteiro certo quase dobra, de 25 para 48 em 66, sem custo de tempo. É esse o caminho usado na nuvem, onde não há Ollama.
+- **O classificador é o que mais muda o resultado sem a LLM**: a categoria certa sobe de 56% para 85% dos itens e o pedido inteiro certo quase dobra, de 25 para 48 em 66, sem custo de tempo. É o caminho disponível na nuvem quando a chave Groq Free não está configurada, pois lá não há Ollama.
 - **A LLM sozinha encontra mais itens** (128 de 130) e entende números por extenso, mas erra prazo em um terço dos pedidos e troca quantidades ("80 marmitas" virou 1). Por isso a aplicação não usa a saída dela direto.
 - **O conjunto completo (c2) é o melhor**: 50 de 66 pedidos inteiros certos. Em 54 dos 66 a resposta saiu com `fonte: "llm"`; nos outros 12 a saída da LLM foi rejeitada na conferência e a resposta veio de (b).
 - **Fáceis e médios ficam resolvidos** com (b): 20 de 20 e 21 de 22. Os difíceis continuam difíceis para todos: 7 de 24 com (b) e 9 de 24 com (c2). Formatos como "Arroz: 50 kg" e "Leite (100 caixas)" não são entendidos pelas regras.
 - Um erro do classificador que sobrou: "leite de coco" sai como Laticínios, porque a primeira palavra pesa mais.
+
+Em 2026-10-14, o fluxo Groq Free → Ollama → regras acertou **51/66** pedidos inteiros no mesmo gabarito: 44 respostas finais foram do Groq, 11 do Ollama e 11 das regras. Foram feitas 66 chamadas ao Groq. Esse resultado é do fluxo completo, não uma acurácia isolada do Groq. Veja [`modelo/avaliacao_groq.json`](../modelo/avaliacao_groq.json) e [`scripts/avaliar_groq.py`](../scripts/avaliar_groq.py).
 
 ## Limitações
 
