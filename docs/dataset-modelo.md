@@ -6,6 +6,7 @@ O ReConecta tem um dataset próprio de alimentos e um classificador treinado nel
 |---|---|
 | Dataset de alimentos (925 linhas) | [`data/alimentos.csv`](../data/alimentos.csv) |
 | Pedidos de avaliação com gabarito (66) | [`data/pedidos_avaliacao.jsonl`](../data/pedidos_avaliacao.jsonl) |
+| Ofertas e pedidos com destino esperado (80) | [`data/ofertas_avaliacao.jsonl`](../data/ofertas_avaliacao.jsonl) |
 | Dicionário de dados e construção | [`data/README.md`](../data/README.md) |
 | Código do classificador | [`classificador.py`](../classificador.py) |
 | Modelo treinado (JSON, 115 KB) | [`modelo/classificador_categorias.json`](../modelo/classificador_categorias.json) |
@@ -13,6 +14,18 @@ O ReConecta tem um dataset próprio de alimentos e um classificador treinado nel
 | Treino | `python scripts/treinar_modelo.py` |
 | Demonstração no terminal | `python scripts/classificar.py "leite integral 1L"` |
 | Comparação com regras e LLM | `python scripts/avaliar_modelos.py` → [avaliacao-modelos.md](avaliacao-modelos.md) |
+| Ciclo automático e limiares | `python scripts/ciclo_ia.py` → [`modelo/metricas.json`](../modelo/metricas.json) |
+
+## Validação da inteligência central e ciclo automático
+
+| Critério | Como validar e resultado local de 2026-10-14 | Limiar do CI |
+|---|---|---|
+| Categoria do alimento | `python scripts/ciclo_ia.py` treina com semente 42 em 740 das 925 linhas de `data/alimentos.csv` e avalia nas 185 separadas: **144/185 (77,84%)**. O teste não participa da escolha de configuração ou limiar do classificador. | Acurácia ≥ **75%**. |
+| Destino recomendado | `python scripts/avaliar_conexao.py` roda `conexao.casar` em 80 ofertas com pedidos abertos rotulados manualmente: 59 têm destino e 21 não. **Top-1: 52/59 (88,14%); top-3: 52/59 (88,14%)**. O denominador é só o conjunto com destino. | Top-1 e top-3 ≥ **85%**. |
+| Sem sugestão correta | Nos 21 casos sem pedido que receba o alimento e a unidade oferecidos, `casar` retornou vazio em **21/21 (100%)**. O arquivo [`modelo/avaliacao_conexao.json`](../modelo/avaliacao_conexao.json) inclui os erros por caso. | Taxa ≥ **95%**. |
+| Automação | `scripts/ciclo_ia.py` grava o modelo e `modelo/metricas.json` com data, versão, métricas e tamanhos; lê os mínimos em [`modelo/limiares.json`](../modelo/limiares.json) e sai com erro se algum cair. O job `ia` de [CI](../.github/workflows/ci.yml) publica as métricas como artefato e é exigido por `deploy`. | Todos os mínimos acima. |
+
+O gabarito da conexão foi escrito antes de rodar a recomendação: o destino correto exige o mesmo alimento (ou equivalência comum), unidade compatível e quantidade ainda pendente; havendo mais de um destino, prioriza atendimento de mais itens, proximidade por UF e prazo. Os 80 casos incluem oito categorias, várias UFs, restrições alimentares e ofertas com dois itens. Sete equivalências de nomes regionais ou grafias continuam sem sugestão (por exemplo, “mandioca”/“aipim”); elas permanecem no relatório. É um conjunto sintético de regressão, não uma estimativa de acerto em uso real. O ciclo é local, sem Ollama e sem serviço pago.
 
 ## Dataset
 

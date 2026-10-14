@@ -1179,5 +1179,19 @@
    0.7945
   ],
   "media": 0.7828
+ },
+ "data": "2026-10-14",
+ "versao": 1,
+ "acuracia_classificador": 0.7784,
+ "acuracia_top1": 0.8814,
+ "acuracia_top3": 0.8814,
+ "taxa_sem_sugestao_correta": 1.0,
+ "tamanho_conjuntos": {
+  "alimentos": 925,
+  "alimentos_treino": 740,
+  "alimentos_teste": 185,
+  "ofertas": 80,
+  "ofertas_com_destino": 59,
+  "ofertas_sem_destino": 21
  }
 }

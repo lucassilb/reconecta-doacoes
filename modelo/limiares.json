@@ -1,0 +1,6 @@
+{
+  "acuracia_classificador": 0.75,
+  "acuracia_top1": 0.85,
+  "acuracia_top3": 0.85,
+  "taxa_sem_sugestao_correta": 0.95
+}
