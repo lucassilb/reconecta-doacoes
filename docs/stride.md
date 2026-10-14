@@ -8,6 +8,10 @@
 - **3ª passada:** 2026-10-13, base `main` local `520d5b1` (rodada 11: perfis ONG/empresa
   por natureza jurídica, excedentes, confirmação de entrega, eventos + SSE, notificações,
   IA de conexão). Superfícies novas na seção 8, com referências a `520d5b1`.
+- **4ª passada:** 2026-10-14, base `main` `b4232aa` + frente LGPD (rodada 14: página
+  `/privacidade`, consentimento gravado no cadastro, exportação `GET /auth/me/dados`,
+  exclusão por anonimização `DELETE /auth/me`, Security Gates ampliados no CI).
+  Superfícies novas na seção 9.
 
 Método: leitura do código (`app.py`, `Auth.py`, `Cadastro.py`, `cnpj_service.py`,
 `cnae_alimentos.py`, `Publico.py`, `Contribuicoes.py`, `Painel.py`, `Dashboard.py`,
@@ -280,3 +284,28 @@ da Fronteira 2 (gravada na mesma transação da operação) e o ator "ONG" disti
 | ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
 |---|---|---|---|---|---|---|---|---|
 | E8 | Papéis ONG × empresa de alimentos | Empresa comum reserva excedente; não-alimentar publica | 2 | 3 | 6 | Papel **derivado da Receita**, não declarado pelo usuário: reservar exige `sem_fins_lucrativos` (`Excedentes.py:353-354`), publicar exige `atividade_alimentar` (`:262-263`), proibido reservar o próprio (`:360-361`); gravação no cadastro
+
+## 9. Rodada 14 — privacidade (LGPD) e gates (base `b4232aa` + frente/r14-lgpd)
+
+Entraram: página `/privacidade` com mapa de dados (`docs/lgpd.md`), aceite
+obrigatório gravado em `consentimento_versao`/`consentimento_em`
+(`Cadastro.py`, `models.py`), exportação `GET /reconecta/auth/me/dados` e
+exclusão por anonimização `DELETE /reconecta/auth/me` (`Auth.py`,
+`privacidade.py`). O gate do Trivy `fs` no CI subiu de CRITICAL para
+HIGH/CRITICAL corrigível e `trivy config` virou gate próprio (`ci.yml`); o
+resumo publicado passa a declarar a regra e o resultado de cada portão em
+`relatorios/sast/resumo.json` (`scripts/resumo_sast.py`).
+
+### I — Divulgação de informação (r14)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| I14 | `GET /reconecta/auth/me/dados` | Exportação vaza dados de terceiro ou expõe PII a quem não devia | 2 | 3 | 6 | Só a sessão do titular (`Auth.py`); saída limitada aos próprios registros (`privacidade.py:exportar_dados`); auditoria `dados_exportados` | 1 | ✔ |
+| I15 | Exclusão de conta | Resíduo identificável após o pedido de exclusão | 2 | 3 | 6 | Anonimização cobre nome, documento, contato, endereço, senha, `retirada_*` e `foto_dados` (`privacidade.py:anonimizar_conta`); sessões em outro navegador morrem pelo marcador `@removido.invalid` (`Auth.py:usuario_atual`) | 2 | ◐ `contribuicoes.respostas` (questionário) é texto JSON não estruturado e permanece — convenção do formulário é não pedir dados pessoais; reavaliar se novos campos livres entrarem |
+| I16 | Marcadores de anonimização | `REM<id>`/e-mail `removido.invalid` reidentificam por correlação | 1 | 2 | 2 | Marcadores não carregam dado pessoal; id é interno | 1 | ✔ |
+
+### R — Repúdio (r14)
+
+| ID | Componente/fluxo | Ameaça | P | I | R | Controle existente | Residual | Estado / ação |
+|---|---|---|---|---|---|---|---|---|
+| R6 | Consentimento, exportação, exclusão | Titular ou operador nega o que foi aceito/feito | 2 | 2 | 4 | `consentimento_versao`+`consentimento_em` gravados por conta e **mantidos na anonimização** (o registro prova o aceite sem identificar ninguém); auditoria `dados_exportados` e `conta_removida` (`Auth.py`) | 2 | ◐ Auditoria continua só em stdout (R3) |

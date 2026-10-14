@@ -11,15 +11,19 @@ from werkzeug.security import generate_password_hash
 from Auth import iniciar_sessao, registrar_auditoria
 from cnpj_service import ConsultaCNPJError, consultar_cnpj, formatar_cnpj, validar_cnpj
 from models import Doador, Estabelecimento, db
+from privacidade import registrar_consentimento
 
 
 ns = Namespace("cadastro", description="Verificação de CNPJ e cadastro de doadores")
 
+_ACEITE = fields.Boolean(required=True,
+                         description="Aceite da Política de Privacidade (/privacidade)")
 empresa_entrada = ns.model("CadastroEmpresaEntrada", {
     "cnpj": fields.String(required=True, description="CNPJ com ou sem máscara"),
     "email": fields.String(required=True),
     "telefone": fields.String(required=True, description="DDD e telefone, 10 ou 11 dígitos"),
     "senha": fields.String(required=True, description="Mínimo 8 caracteres, com letra e número"),
+    "aceite_privacidade": _ACEITE,
 })
 doador_entrada = ns.model("CadastroDoadorEntrada", {
     "nome": fields.String(required=True),
@@ -27,6 +31,7 @@ doador_entrada = ns.model("CadastroDoadorEntrada", {
     "email": fields.String(required=True),
     "telefone": fields.String(required=True),
     "senha": fields.String(required=True, description="Mínimo 8 caracteres, com letra e número"),
+    "aceite_privacidade": _ACEITE,
 })
 motivo_model = ns.model("CadastroMotivo", {
     "codigo": fields.String,
@@ -80,6 +85,13 @@ erro_model = ns.model("CadastroErro", {
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
+
+
+def _aceite_faltando(corpo, campos):
+    """O aceite da Política de Privacidade é obrigatório em qualquer cadastro."""
+    if corpo.get("aceite_privacidade") is not True:
+        campos["privacidade"] = ("É preciso ler e aceitar a Política de "
+                                 "Privacidade para criar a conta.")
 
 
 def _email(valor):
@@ -195,6 +207,7 @@ class CadastroEmpresa(Resource):
             campos["telefone"] = "Informe um telefone com DDD e 10 ou 11 dígitos."
         if not _senha_valida(corpo.get("senha")):
             campos["senha"] = "Use pelo menos 8 caracteres, com uma letra e um número."
+        _aceite_faltando(corpo, campos)
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
         email = email.strip().lower()
@@ -217,6 +230,7 @@ class CadastroEmpresa(Resource):
             sem_fins_lucrativos=bool(dados.get("sem_fins_lucrativos")),
             atividade_alimentar=bool(dados["relacionado_alimentacao"]),
         )
+        registrar_consentimento(empresa)
         db.session.add(empresa)
         try:
             db.session.commit()
@@ -258,6 +272,7 @@ class CadastroDoador(Resource):
             campos["telefone"] = "Informe um telefone com DDD e 10 ou 11 dígitos."
         if not _senha_valida(corpo.get("senha")):
             campos["senha"] = "Use pelo menos 8 caracteres, com uma letra e um número."
+        _aceite_faltando(corpo, campos)
         if campos:
             return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
         email = email.strip().lower()
@@ -267,6 +282,7 @@ class CadastroDoador(Resource):
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
         doador = Doador(nome=nome.strip(), cpf=cpf, email=email, telefone=telefone,
                         senha_hash=generate_password_hash(corpo["senha"]))
+        registrar_consentimento(doador)
         db.session.add(doador)
         try:
             db.session.commit()

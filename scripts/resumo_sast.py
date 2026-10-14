@@ -29,6 +29,112 @@ def contar_stride(texto):
     return dict(estados) | {"fonte": "docs/stride.md; estado declarado por risco"}
 
 
+def _trivy_bloqueantes(documento, severidades):
+    """Achados que reprovam o gate: vulns corrigíveis, segredos e misconfigs nas
+    severidades bloqueadas. Segredos do Trivy vêm sempre como CRITICAL."""
+    total = 0
+    for resultado in documento.get("Results", []):
+        for vuln in resultado.get("Vulnerabilities") or []:
+            if (vuln.get("Severity", "").upper() in severidades and
+                    vuln.get("FixedVersion")):
+                total += 1
+        total += len(resultado.get("Secrets") or [])
+        for misconfig in resultado.get("Misconfigurations") or []:
+            if misconfig.get("Severity", "").upper() in severidades:
+                total += 1
+    return total
+
+
+def _gate(nome, regra, resultado, detalhe):
+    return {"gate": nome, "regra": regra, "resultado": resultado, "detalhe": detalhe}
+
+
+def _metricas_ia(raiz):
+    """metricas.json × limiares.json: True passa, False reprova, None sem dados."""
+    pasta = raiz / "modelo"
+    try:
+        metricas = json.loads((pasta / "metricas.json").read_text(encoding="utf-8"))
+        limiares = json.loads((pasta / "limiares.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None, "modelo/metricas.json ou limiares.json ausente"
+    abaixo = []
+    for chave, limiar in limiares.items():
+        medido = metricas.get(chave)
+        if isinstance(medido, dict):
+            medido = medido.get("acuracia")
+        if isinstance(medido, (int, float)) and medido < limiar:
+            abaixo.append(f"{chave}={medido}<{limiar}")
+    if abaixo:
+        return False, "abaixo do limiar: " + ", ".join(abaixo)
+    return True, "todas as métricas com limiar atendem"
+
+
+def _avaliar_gates(ferramentas, raiz):
+    """Reproduz a regra de cada job do CI sobre os relatórios já gerados."""
+    gates = []
+    bandit = ferramentas.get("bandit", {})
+    if bandit.get("disponivel"):
+        altas = bandit.get("severidades", {}).get("HIGH", 0)
+        gates.append(_gate("bandit-high",
+                           "sast-bandit falha com qualquer achado de severidade HIGH",
+                           "passou" if altas == 0 else "falhou",
+                           f"{altas} achado(s) HIGH no último relatório"))
+    else:
+        gates.append(_gate("bandit-high",
+                           "sast-bandit falha com qualquer achado de severidade HIGH",
+                           "sem_dados", "relatório bandit.json ausente"))
+
+    pasta = raiz / "relatorios" / "sast"
+    fs = ferramentas.get("trivy-fs", {})
+    if fs.get("disponivel"):
+        bloqueantes = _trivy_bloqueantes(
+            json.loads((pasta / "trivy-fs.json").read_text(encoding="utf-8")),
+            {"HIGH", "CRITICAL"})
+        gates.append(_gate("trivy-fs",
+                           "sast-trivy falha em HIGH/CRITICAL com correção nos arquivos",
+                           "passou" if bloqueantes == 0 else "falhou",
+                           f"{bloqueantes} achado(s) bloqueante(s) (corrigível, segredo ou misconfig alta)"))
+    else:
+        gates.append(_gate("trivy-fs",
+                           "sast-trivy falha em HIGH/CRITICAL com correção nos arquivos",
+                           "sem_dados", "relatório trivy-fs.json ausente"))
+
+    config = ferramentas.get("trivy-config", {})
+    if config.get("disponivel"):
+        bloqueantes = _trivy_bloqueantes(
+            json.loads((pasta / "trivy-config.json").read_text(encoding="utf-8")),
+            {"HIGH", "CRITICAL"})
+        gates.append(_gate("trivy-config",
+                           "sast-trivy falha em HIGH/CRITICAL na configuração (IaC)",
+                           "passou" if bloqueantes == 0 else "falhou",
+                           f"{bloqueantes} achado(s) bloqueante(s)"))
+    else:
+        gates.append(_gate("trivy-config",
+                           "sast-trivy falha em HIGH/CRITICAL na configuração (IaC)",
+                           "sem_dados", "relatório trivy-config.json ausente"))
+
+    imagem = ferramentas.get("trivy-image", {})
+    if imagem.get("disponivel"):
+        bloqueantes = _trivy_bloqueantes(
+            json.loads((pasta / "trivy-image.json").read_text(encoding="utf-8")),
+            {"CRITICAL"})
+        gates.append(_gate("trivy-imagem",
+                           "sast-trivy falha em CRITICAL com correção na imagem Docker",
+                           "passou" if bloqueantes == 0 else "falhou",
+                           f"{bloqueantes} achado(s) bloqueante(s)"))
+    else:
+        gates.append(_gate("trivy-imagem",
+                           "sast-trivy falha em CRITICAL com correção na imagem Docker",
+                           "sem_dados", "relatório trivy-image.json ausente"))
+
+    passou_ia, detalhe_ia = _metricas_ia(raiz)
+    gates.append(_gate("ia-limiares",
+                       "job ia falha se métricas caírem abaixo de modelo/limiares.json",
+                       "passou" if passou_ia else "falhou" if passou_ia is False else "sem_dados",
+                       detalhe_ia))
+    return gates
+
+
 def correcoes_documentadas(texto):
     linhas = [linha for linha in texto.splitlines() if linha.startswith("| ")]
     cves = sorted({cve for linha in linhas for cve in re.findall(r"CVE-\d{4}-\d+", linha)})
@@ -57,6 +163,7 @@ def resumir(raiz=RAIZ):
             arquivos[nome]["segredos"] = contagens["segredos"]
             arquivos[nome]["configuracoes"] = contagens["configuracoes"]
     return {"ferramentas": arquivos,
+            "gates": _avaliar_gates(arquivos, raiz),
             "stride": contar_stride((raiz / "docs" / "stride.md").read_text(encoding="utf-8")),
             "correcoes_documentadas": correcoes_documentadas(
                 (raiz / "docs" / "sast.md").read_text(encoding="utf-8")),

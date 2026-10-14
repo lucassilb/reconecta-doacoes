@@ -163,6 +163,14 @@
               </div>
             </fieldset>
 
+            <div class="campo campo--consentimento">
+              <label class="consentimento">
+                <input id="empresa-privacidade" type="checkbox" required aria-describedby="empresa-privacidade-erro">
+                <span>Li e aceito a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
+              </label>
+              <p id="empresa-privacidade-erro" class="campo__erro" data-erro></p>
+            </div>
+
             <div id="aviso-empresa" class="aviso" role="alert" hidden></div>
 
             <button type="submit" id="btn-empresa" class="botao botao--primario" disabled>
@@ -229,6 +237,14 @@
                 <p id="doador-confirmar-erro" class="campo__erro" data-erro></p>
               </div>
             </fieldset>
+
+            <div class="campo campo--consentimento">
+              <label class="consentimento">
+                <input id="doador-privacidade" type="checkbox" required aria-describedby="doador-privacidade-erro">
+                <span>Li e aceito a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
+              </label>
+              <p id="doador-privacidade-erro" class="campo__erro" data-erro></p>
+            </div>
 
             <div id="aviso-doador" class="aviso" role="alert" hidden></div>
 

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacidade · ReConecta</title>
+  <meta name="description" content="Política de Privacidade do ReConecta: quais dados coletamos, por quê, por quanto tempo e como exercer seus direitos pela LGPD.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/privacidade.css">
+  <script src="/static/js/layout.js" defer></script>
+</head>
+<body class="privacidade">
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="container politica">
+    <section class="politica__topo" aria-labelledby="politica-titulo">
+      <p class="sobretitulo sobretitulo--acento">Política de Privacidade</p>
+      <h1 id="politica-titulo">Seus dados, com <em>regra clara</em></h1>
+      <p class="lead">Esta página explica, direto, o que o ReConecta guarda sobre você, por que precisa disso e como pedir seus dados ou excluir a conta. Versão 2026-10-14.</p>
+    </section>
+
+    <section class="politica__bloco" aria-labelledby="p-controlador">
+      <h2 id="p-controlador">Quem responde pelos dados</h2>
+      <p>O controlador é o grupo responsável pelo ReConecta, projeto acadêmico de redistribuição de excedentes alimentares (FIAP — Projeto Integrador DevSecOps). Para qualquer pedido sobre dados pessoais, use o painel da sua conta (em <strong>Meus dados</strong>) ou escreva para a equipe pelo repositório público do projeto.</p>
+    </section>
+
+    <section class="politica__bloco" aria-labelledby="p-dados">
+      <h2 id="p-dados">O que coletamos e por quê</h2>
+      <div class="tabela-rolagem" role="region" aria-label="Dados coletados, finalidade e base legal" tabindex="0">
+        <table class="tabela tabela--politica">
+          <thead>
+            <tr><th scope="col">Dado</th><th scope="col">Quem fornece</th><th scope="col">Para que serve</th><th scope="col">Base legal (LGPD)</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Nome e CPF</th><td>Doador pessoa física</td><td>Identificar quem doa e impedir cadastro duplicado. O CPF nunca aparece para outros usuários.</td><td>Consentimento (art. 7º, I)</td></tr>
+            <tr><th scope="row">E-mail e telefone</th><td>Todos os cadastrados</td><td>Entrar na conta e combinar a retirada das doações.</td><td>Consentimento (art. 7º, I)</td></tr>
+            <tr><th scope="row">CNPJ, razão social e endereço</th><td>Organização (ONG ou empresa)</td><td>Conferir na Receita Federal se o cadastro pode participar e informar onde fica a retirada.</td><td>Consentimento (art. 7º, I); o CNPJ e o endereço são dados já públicos da Receita</td></tr>
+            <tr><th scope="row">Senha</th><td>Todos os cadastrados</td><td>Acesso ao painel. Guardamos só o hash (Werkzeug), nunca a senha.</td><td>Consentimento (art. 7º, I)</td></tr>
+            <tr><th scope="row">Pedidos, doações, excedentes e reservas</td><td>Gerados no uso</td><td>Operar a rede e medir o impacto agregado (kg, refeições potenciais, tempos de reserva).</td><td>Execução do serviço (art. 7º, V) e legítimo interesse (art. 7º, IX)</td></tr>
+            <tr><th scope="row">Foto da doação</th><td>Quem doa</td><td>Evidência da condição do alimento; visível só para quem participa daquela doação.</td><td>Consentimento (art. 7º, I)</td></tr>
+            <tr><th scope="row">Consentimento (versão e data)</th><td>Todos os cadastrados</td><td>Comprovar que a política vigente foi aceita no cadastro.</td><td>Cumprimento de obrigação legal (art. 7º, II)</td></tr>
+            <tr><th scope="row">Log de auditoria (data, evento, IP)</th><td>Sistema</td><td>Segurança da conta: detectar abuso e reconstruir incidentes. Não registra payload nem senha.</td><td>Legítimo interesse (art. 7º, IX)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="politica__bloco" aria-labelledby="p-compartilha">
+      <h2 id="p-compartilha">Com quem os dados aparecem</h2>
+      <ul class="politica__lista">
+        <li>Visitantes veem só o nome da organização e a cidade/UF nos pedidos e excedentes. E-mail, telefone e endereço completo não são públicos.</li>
+        <li>O endereço de retirada do excedente aparece somente para a ONG que reservou.</li>
+        <li>Consultamos o CNPJ em serviços públicos (BrasilAPI, OpenCNPJ, CNPJ.ws) enviando apenas o número do CNPJ.</li>
+        <li>O resumo do dashboard usa um modelo de linguagem local que lê só números agregados; nenhum dado pessoal sai do servidor.</li>
+        <li>Não vendemos dados nem usamos rastreadores de publicidade.</li>
+      </ul>
+    </section>
+
+    <section class="politica__bloco" aria-labelledby="p-direitos">
+      <h2 id="p-direitos">Seus direitos, direto no painel</h2>
+      <ul class="politica__lista">
+        <li><strong>Ver e baixar:</strong> em Meus dados, o botão “Baixar meus dados” exporta tudo em JSON (LGPD art. 18, II).</li>
+        <li><strong>Corrigir:</strong> o painel permite editar nome, e-mail, telefone e senha (art. 18, III).</li>
+        <li><strong>Excluir:</strong> “Excluir minha conta” anonimiza o cadastro na hora: nome, documento, e-mail, telefone e endereço viram marcadores sem identificação. Pedidos e doações ficam apenas como estatística agregada (art. 16).</li>
+        <li><strong>Revogar o consentimento:</strong> excluir a conta encerra o tratamento futuro (art. 8º, §5º).</li>
+      </ul>
+    </section>
+
+    <section class="politica__bloco" aria-labelledby="p-retencao">
+      <h2 id="p-retencao">Retenção e segurança</h2>
+      <ul class="politica__lista">
+        <li>Conta ativa: os dados ficam guardados enquanto a conta existir.</li>
+        <li>Conta excluída: os identificadores são apagados de imediato; totais anônimos continuam alimentando o dashboard público.</li>
+        <li>Tráfego criptografado (HTTPS na nuvem), sessão em cookie <code>HttpOnly</code>+<code>SameSite</code>+<code>Secure</code>, cabeçalhos CSP e senha só como hash.</li>
+        <li>Cadastros criados antes desta política não têm consentimento gravado; o aceite passa a ser exigido em todo cadastro novo.</li>
+      </ul>
+      <p class="politica__nota">Este documento é a versão <strong>2026-10-14</strong>. Se a política mudar, a versão e a data mudam aqui, e o aceite gravado em cada conta mostra qual versão a pessoa viu.</p>
+    </section>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+/* ReConecta — Política de Privacidade. Depende de base.css. */
+
+.politica { padding-block: clamp(32px, 6vw, 80px); max-width: 900px; }
+.politica__topo { display: grid; gap: 16px; margin-bottom: clamp(36px, 6vw, 64px); }
+.politica__topo h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1.05; }
+.politica__topo h1 em { font-style: normal; color: var(--verde-texto); }
+
+.politica__bloco {
+  padding: clamp(20px, 3.4vw, 32px) 0;
+  border-top: 1px solid var(--linha);
+  display: grid; gap: 14px;
+}
+.politica__bloco h2 { font-weight: 400; font-size: clamp(1.5rem, 3.4vw, 2rem); letter-spacing: -0.03em; }
+.politica__bloco p, .politica__lista { color: var(--tinta-suave); max-width: 68ch; line-height: 1.65; }
+.politica__lista { margin: 0; padding-left: 1.2em; display: grid; gap: 10px; }
+.politica__lista strong { color: var(--tinta); }
+.politica__nota { font-size: .9rem; border-left: 3px solid var(--acento); padding-left: 14px; }
+.politica__nota strong { color: var(--acento-texto); }
+
+.tabela-rolagem { overflow-x: auto; }
+.tabela--politica { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.tabela--politica th, .tabela--politica td {
+  text-align: left; vertical-align: top; padding: 10px 12px;
+  border-bottom: 1px solid var(--linha);
+}
+.tabela--politica thead th { color: var(--tinta); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+.tabela--politica tbody th { font-weight: 600; color: var(--tinta); }
+.tabela--politica td { color: var(--tinta-suave); }

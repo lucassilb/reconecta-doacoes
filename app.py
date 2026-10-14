@@ -74,6 +74,10 @@ def home_page():
 def sobre_page():
     return send_from_directory(app.static_folder, "sobre.html")
 
+@app.get("/privacidade")
+def privacidade_page():
+    return send_from_directory(app.static_folder, "privacidade.html")
+
 @app.get("/cadastro")
 def cadastro_page():
     return send_from_directory(app.static_folder, "cadastro.html")

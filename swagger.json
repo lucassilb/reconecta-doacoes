@@ -125,6 +125,25 @@
         "tags": [
           "auth"
         ]
+      },
+      "delete": {
+        "responses": {
+          "401": {
+            "description": "Não autenticado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "204": {
+            "description": "Conta excluída e dados anonimizados"
+          }
+        },
+        "summary": "Exclui a conta por anonimização, preservando a estatística agregada",
+        "description": "Pedidos, doações e excedentes ficam sem identificação do titular.",
+        "operationId": "delete_me",
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/reconecta/cadastro/cnpj/{cnpj}": {
@@ -1220,6 +1239,27 @@
           "tempo_real"
         ]
       }
+    },
+    "/reconecta/auth/me/dados": {
+      "get": {
+        "responses": {
+          "401": {
+            "description": "Não autenticado",
+            "schema": {
+              "$ref": "#/definitions/AuthErro"
+            }
+          },
+          "200": {
+            "description": "Cópia dos dados pessoais e registros da conta"
+          }
+        },
+        "summary": "Exporta os dados da conta em JSON, para portabilidade pela LGPD",
+        "description": "Cópia completa do cadastro e dos registros do titular (artigo 18).",
+        "operationId": "get_meus_dados",
+        "tags": [
+          "auth"
+        ]
+      }
     }
   },
   "info": {
@@ -1538,6 +1578,7 @@
     },
     "CadastroEmpresaEntrada": {
       "required": [
+        "aceite_privacidade",
         "cnpj",
         "email",
         "senha",
@@ -1558,6 +1599,10 @@
         "senha": {
           "type": "string",
           "description": "Mínimo 8 caracteres, com letra e número"
+        },
+        "aceite_privacidade": {
+          "type": "boolean",
+          "description": "Aceite da Política de Privacidade (/privacidade)"
         }
       },
       "type": "object"
@@ -1599,6 +1644,7 @@
     },
     "CadastroDoadorEntrada": {
       "required": [
+        "aceite_privacidade",
         "cpf",
         "email",
         "nome",
@@ -1622,6 +1668,10 @@
         "senha": {
           "type": "string",
           "description": "Mínimo 8 caracteres, com letra e número"
+        },
+        "aceite_privacidade": {
+          "type": "boolean",
+          "description": "Aceite da Política de Privacidade (/privacidade)"
         }
       },
       "type": "object"
@@ -1718,6 +1768,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "consentimento": {
+          "type": "object"
         }
       },
       "type": "object"
