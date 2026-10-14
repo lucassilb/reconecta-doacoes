@@ -124,4 +124,42 @@
 .barra__cheia { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); min-width: 0; transition: width .4s ease; }
 
 /* sugestão do assistente da Home já aplicada ao questionário */
+
+/* Pedido curto: resumo em faixa, alimentos e ação lado a lado. */
+.pedido [hidden] { display: none !important; }
+.det { gap: 18px 24px; }
+.det__info { display: contents; }
+.det__resumo { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); gap: 4px 22px; padding: 16px 20px; background: var(--superficie); border: 1px solid var(--linha); border-radius: 16px; }
+.det__resumo .sobretitulo, .det__resumo h1, .det__resumo .det__empresa { grid-column: 1; }
+.det__resumo h1 { font-size: clamp(1.5rem, 2.4vw, 2.2rem); line-height: 1.15; }
+.det__fatos { grid-column: 2; grid-row: 1 / span 3; align-self: center; margin: 0; border: 0; }
+.det__fato { grid-template-columns: 7.5em minmax(0,1fr); padding: 5px 0; gap: 6px; }
+.det__itens { grid-column: 1; min-width: 0; }
+.det__itens .det__subtitulo { margin: 0 0 10px; }
+.pedido-itens { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.pedido-item { padding: 10px; gap: 8px; align-items: start; }
+.pedido-item__img { width: 48px; height: 48px; object-fit: cover; padding: 0; }
+.pedido-item__linha { display: grid; gap: 2px; }
+.pedido-item__linha strong { font-size: .95rem; }
+.pedido-item__falta { font-size: .8rem; }
+.pedido-item__acao { margin-top: 4px; }
+.det__como { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; font-size: .84rem; line-height: 1.35; }
+.det__doar { grid-column: 2; padding: 20px; border-radius: 18px; }
+.det__doar h2 { font-size: 1.35rem; }
+.quest { gap: 12px; }
+.quest__etapas { display: flex; gap: 4px; list-style: none; padding: 0; margin: 0; }
+.quest__etapas li { flex: 1; padding: 7px 5px; border-radius: 8px; background: var(--superficie-2); color: var(--tinta-suave); text-align: center; font-size: .75rem; }
+.quest__etapas li[aria-current="step"] { background: var(--verde-suave); color: var(--verde-texto); font-weight: 700; }
+.quest__etapa { display: grid; gap: 12px; }
+.quest__acoes { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.quest__resumo { display: grid; gap: 6px; padding: 14px; border-radius: 10px; background: var(--superficie-2); }
+.quest__resumo span { color: var(--tinta-suave); font-size: .9rem; }
+@media (min-width: 1000px) { .det { grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr); gap: 18px 24px; } }
+@media (max-width: 999.98px) {
+  .det { grid-template-columns: 1fr; }
+  .det__resumo, .det__itens, .det__doar { grid-column: 1; }
+  .det__resumo { grid-template-columns: 1fr; }
+  .det__fatos { grid-column: 1; grid-row: auto; }
+  .pedido-itens { grid-template-columns: 1fr; }
+}
 .doar__sugestao { padding: 10px 14px; border-radius: 12px; background: var(--verde-suave); color: var(--verde-texto); font-size: .92rem; font-weight: 600; }

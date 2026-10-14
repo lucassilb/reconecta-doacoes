@@ -229,6 +229,51 @@
 .ex-cartao .pedido-linha { color: var(--tinta-suave); font-size: .88rem; }
 .ex-cartao .doacao__onde { color: var(--tinta); }
 
+/* Navegação por tarefa: os blocos continuam na página para preservar formulários em andamento. */
+.painel [data-painel-oculto="true"], .painel [hidden] { display: none !important; }
+.painel-abas { display: flex; gap: 6px; overflow-x: auto; margin: 0 0 8px; padding: 4px; border-radius: 14px; background: var(--superficie-2); scrollbar-width: thin; }
+.painel-abas__link { flex: 1 0 auto; padding: 10px 14px; border-radius: 10px; color: var(--tinta); text-align: center; text-decoration: none; font-weight: 700; white-space: nowrap; }
+.painel-abas__link[aria-current="page"] { background: var(--superficie); color: var(--verde-texto); box-shadow: 0 1px 5px rgba(0,0,0,.09); }
+.painel-abas__link:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: -2px; }
+.painel-aba-descricao { margin: 0 0 18px; color: var(--tinta-suave); font-size: .92rem; }
+.painel-subabas { display: flex; gap: 8px; max-width: 920px; margin: 0 0 14px; }
+.painel-subabas__botao { padding: 9px 14px; border: 1px solid var(--linha); border-radius: 9px; background: var(--superficie); color: var(--tinta); font: inherit; font-weight: 700; cursor: pointer; }
+.painel-subabas__botao[aria-pressed="true"] { background: var(--verde-suave); border-color: var(--verde-texto); color: var(--verde-texto); }
+.painel-subabas__botao:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+.ia-pedido { padding: 10px 12px; border: 1px solid var(--linha); border-radius: 10px; }
+.ia-pedido summary { cursor: pointer; font-weight: 700; }
+.ia-pedido[open] { display: grid; gap: 8px; }
+.painel-semana { margin: 0; padding: 9px 12px; border-radius: 10px; background: var(--verde-suave); color: var(--verde-texto); font-weight: 700; }
+.painel .doacoes { display: grid; gap: 8px; }
+.painel .doacao { padding: 12px 14px; }
+.painel-recebidas { list-style: none; margin: 0; padding: 0; }
+.painel-etapas { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.painel-etapas li { flex: 1 0 auto; padding: 9px 12px; border-radius: 10px; background: var(--superficie-2); color: var(--tinta-suave); font-size: .85rem; text-align: center; }
+.painel-etapas li[aria-current="step"] { background: var(--verde-suave); color: var(--verde-texto); font-weight: 700; }
+.painel-etapa { display: grid; gap: 14px; }
+.painel-etapa h3 { font-size: 1.1rem; }
+.painel-etapa__acoes { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.painel-resumo { display: grid; gap: 8px; padding: 14px; background: var(--superficie-2); border-radius: 12px; }
+.painel-resumo ul { margin: 0; padding-left: 20px; }
+#ex-retirada { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+#ex-retirada > legend, #ex-retirada > p, #ex-retirada > .campo:first-of-type, #ex-retirada > .campo:nth-of-type(4) { grid-column: 1 / -1; }
+.ex-categorias { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.ex-categorias__titulo { margin: 0; font-size: .86rem; font-weight: 700; }
+.ex-categoria { min-width: 0; min-height: 74px; padding: 8px; border: 2px solid var(--linha); border-radius: 12px; background: linear-gradient(to top, rgba(255,255,255,.92), rgba(255,255,255,.18)), var(--foto) center / cover, var(--superficie-2); color: var(--tinta); font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; display: flex; align-items: end; justify-content: center; text-align: center; }
+.ex-categoria[aria-pressed="true"] { border-color: var(--verde-texto); box-shadow: inset 0 0 0 1px var(--verde-texto); }
+.ex-categoria:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+#bloco-rede > section:first-child { display: none; }
+#bloco-excedentes, #bloco-doacoes, #bloco-minhas-doacoes { max-width: 920px; }
+@media (max-width: 600px) {
+  .painel-abas__link { padding: 9px 11px; font-size: .84rem; }
+  .painel-etapas li { font-size: .75rem; padding: 8px 5px; }
+  .ex-categorias { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 8px; }
+  .ex-categorias__titulo::after { content: " · deslize para ver todas"; color: var(--tinta-suave); font-weight: 400; }
+  .ex-categoria { flex: 0 0 104px; min-height: 78px; scroll-snap-align: start; }
+  .ex-item__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ex-item__grade .campo:nth-child(2), .ex-item__grade .campo:nth-child(5) { grid-column: 1 / -1; }
+}
+
 /* ---------- privacidade (LGPD) ---------- */
 
 .privacidade-acoes { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
