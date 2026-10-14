@@ -122,3 +122,6 @@
 .pedido-item--completo .pedido-item__falta { color: var(--verde-texto); font-weight: 600; }
 .barra { height: 10px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
 .barra__cheia { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7DBB55, var(--verde)); min-width: 0; transition: width .4s ease; }
+
+/* sugestão do assistente da Home já aplicada ao questionário */
+.doar__sugestao { padding: 10px 14px; border-radius: 12px; background: var(--verde-suave); color: var(--verde-texto); font-size: .92rem; font-weight: 600; }

@@ -233,14 +233,14 @@
     alvo.append(
       el("div", { classe: "rodape__marca" }, [
         linkMarca(),
-        el("p", { texto: "Plataforma em que empresas do setor de alimentos publicam o que precisam e pessoas e empresas doam." })
+        el("p", { texto: "Plataforma que conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [
-        el("span", { texto: "ReConecta · Projeto acadêmico do CP1 de Computational Thinking with Python" }),
+        el("span", { texto: "ReConecta · Projeto acadêmico de Computational Thinking with Python" }),
         el("span", { texto: "Alimento bom não é desperdício." })
       ])
     );
@@ -289,7 +289,9 @@
           ? { href: "/painel", texto: "Seu pedido recebeu uma doação" + (qtd ? ": " + qtd + " de " + d.item : "") + "." }
           : { href: pedido, texto: "Doação aceita agora" + (qtd ? ": " + qtd + " de " + d.item : "") + "." };
       case "doacao.entregue":
-        return { href: "/painel", texto: "A organização confirmou que recebeu a sua doação" + (d.item ? " de " + d.item : "") + ". Obrigado!" };
+        return privado
+          ? { href: "/painel", texto: "A organização confirmou que recebeu a sua doação" + (d.item ? " de " + d.item : "") + ". Obrigado!" }
+          : { href: pedido, texto: "Doação entregue e confirmada" + (d.item ? ": " + d.item : "") + "." };
       case "doacao.nao_recebida":
         return { href: "/painel", texto: "A organização informou que não recebeu a sua doação" + (d.item ? " de " + d.item : "") + "." };
       case "excedente.publicado":
@@ -526,13 +528,17 @@
     if (typeof window.EventSource !== "function") { cairParaConsulta(); return; }
     falhas = 0;
     var esta = fonte = new EventSource("/reconecta/tempo-real?desde=" + (cursor || 0));
-    esta.onopen = function () {
-      if (fonte !== esta) return;
+    function ligado() {
+      if (fonte !== esta || esta.readyState === 2) return;
       falhas = 0;
       clearInterval(relogioConsulta); relogioConsulta = null;
       clearTimeout(relogioRetorno); relogioRetorno = null;
       definirEstado("sse");
-    };
+    }
+    esta.onopen = ligado;
+    // O servidor só manda os cabeçalhos junto com o primeiro evento ou batimento (até 15 s).
+    // Recusa (503) e queda de rede disparam onerror na hora; sem erro em 1,5 s, o fluxo está aberto.
+    setTimeout(function () { if (falhas === 0) ligado(); }, 1500);
     esta.onmessage = function (e) {
       if (fonte !== esta) return;
       try { receber(JSON.parse(e.data)); } catch (erro) { /* linha inválida: ignora */ }

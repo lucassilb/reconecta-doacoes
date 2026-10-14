@@ -113,7 +113,8 @@
     var logado = p.pode_doar !== undefined && p.motivo_bloqueio !== "Entre para doar";
     ["btn-abrir", "link-entrar", "doar-bloqueio", "doar-cadastro"].forEach(function (id) { $(id).hidden = true; });
     if (!logado) {
-      $("link-entrar").href = "/entrar?proximo=" + encodeURIComponent("/doacoes/" + p.id);
+      // volta para esta página com a sugestão do assistente (item e quantidade), se houver
+      $("link-entrar").href = "/entrar?proximo=" + encodeURIComponent("/doacoes/" + p.id + location.search);
       $("link-entrar").hidden = false;
       $("doar-cadastro").hidden = false;
     } else if (p.pode_doar) {
@@ -268,6 +269,42 @@
   }
 
   function abrir() { $("doar-inicio").hidden = true; $("form-contribuicao").hidden = false; $("c-item").focus(); }
+
+  /* Vindo do assistente da Home: /doacoes/<id>?item=<id do item>&quantidade=<n> já abre o
+     questionário com o item e a quantidade sugeridos. A pessoa confere e completa o resto. */
+  function aplicarSugestao() {
+    var q = new URLSearchParams(location.search);
+    var itemId = q.get("item");
+    if (!itemId || !pedido || !pedido.pode_doar) return;
+    var existe = (pedido.itens || []).some(function (i) { return String(i.id) === itemId; });
+    if (!existe) return;
+    abrir();
+    $("c-item").value = itemId;
+    atualizarUnidade();
+    var n = Number(q.get("quantidade"));
+    if (isFinite(n) && n > 0) $("c-quantidade").value = String(n).replace(".", ",");
+    $("doar-sugestao").hidden = false;
+    $("c-validade").focus();
+  }
+
+  /* Progresso ao vivo: outra pessoa doou (ou a organização confirmou uma entrega) enquanto a página está aberta. */
+  function atualizarProgresso() {
+    requisitar("/reconecta/publico/doacoes/" + ID).then(function (r) {
+      if (!r.ok || !pedido) return;
+      pedido.itens = r.corpo.itens || [];
+      pedido.doacoes_recebidas = r.corpo.doacoes_recebidas;
+      $("det-itens").replaceChildren.apply($("det-itens"), pedido.itens.map(itemPedido));
+      var n = Number(pedido.doacoes_recebidas) || 0;
+      $("det-contagem").textContent = plural(n, "doação recebida", "doações recebidas");
+    }).catch(function () {});
+  }
+  var relogioVivo = null;
+  document.addEventListener("reconecta:evento", function (e) {
+    var d = e.detail || {};
+    if (String(d.tipo || "").indexOf("doacao.") !== 0 || String((d.dados || {}).pedido_id) !== String(ID)) return;
+    clearTimeout(relogioVivo);
+    relogioVivo = setTimeout(atualizarProgresso, 250);
+  });
   function cancelar() { $("form-contribuicao").hidden = true; $("doar-inicio").hidden = false; $("doar-titulo").focus(); }
 
   function enviar(e) {
@@ -335,5 +372,5 @@
   $("btn-abrir").addEventListener("click", abrir);
   $("btn-cancelar").addEventListener("click", cancelar);
   $("form-contribuicao").addEventListener("submit", enviar);
-  carregar();
+  carregar().then(aplicarSugestao);
 })();

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pedido de doação · ReConecta</title>
-  <meta name="description" content="Pedido de doação de alimentos de uma empresa do setor. Veja o que falta e doe com um questionário rápido.">
+  <meta name="description" content="Pedido de doação de alimentos de uma ONG ou organização. Veja o que falta, com o progresso ao vivo, e doe com um questionário rápido.">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +39,7 @@
           <div class="det__fato"><dt>Doações recebidas</dt><dd id="det-contagem"></dd></div>
         </dl>
 
-        <h2 class="det__subtitulo">O que a empresa precisa</h2>
+        <h2 class="det__subtitulo">O que a organização precisa</h2>
         <ul class="pedido-itens" id="det-itens"></ul>
 
         <div class="det__como">
@@ -47,7 +47,8 @@
           <ol class="det__passos">
             <li>Escolha o item que você vai doar e diga a quantidade e a validade.</li>
             <li>Responda a 4 perguntas rápidas de sim ou não sobre o alimento.</li>
-            <li>Mande uma foto. Se estiver tudo de acordo, a doação é confirmada e você recebe o endereço de entrega.</li>
+            <li>Mande uma foto. Se estiver tudo de acordo, a doação é aceita e você recebe o endereço de entrega.</li>
+            <li>Quando a organização confirmar que recebeu, você é avisado pelo sino de notificações.</li>
           </ol>
         </div>
       </article>
@@ -65,6 +66,7 @@
         </div>
 
         <form id="form-contribuicao" class="quest" novalidate hidden>
+          <p id="doar-sugestao" class="doar__sugestao" hidden>Preenchemos o item e a quantidade com a sugestão do assistente. Confira antes de enviar.</p>
           <fieldset class="quest__item">
             <legend class="quest__legenda">O que você vai doar</legend>
             <div class="campo quest__largo">

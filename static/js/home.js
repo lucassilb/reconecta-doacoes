@@ -1,4 +1,6 @@
-/* ReConecta — Home: resumo, doação mais recente e carrossel de doações disponíveis. */
+/* ReConecta — Home: resumo, pedido mais recente, carrossel de pedidos, faixa de excedentes
+   e o assistente "Tenho alimento para doar". Os trechos se atualizam sozinhos com os eventos
+   de tempo real que o layout.js dispara em "reconecta:evento". */
 (function () {
   "use strict";
 
@@ -122,10 +124,8 @@
     var alvo = $("resumo");
     var valores = r ? {
       doacoes: inteiro.format(Number(r.doacoes_disponiveis) || 0),      // pedidos abertos
-      recebidas: typeof r.doacoes_recebidas === "number" ? inteiro.format(r.doacoes_recebidas) : "—",
-      // "instituicoes" vem do backend a partir da rodada 4; sem ele, mostra traço
-      instituicoes: typeof r.instituicoes === "number" ? inteiro.format(r.instituicoes) : "—"
-    } : { doacoes: "—", recebidas: "—", instituicoes: "—" };
+      recebidas: typeof r.doacoes_recebidas === "number" ? inteiro.format(r.doacoes_recebidas) : "—"
+    } : { doacoes: "—", recebidas: "—" };
     Object.keys(valores).forEach(function (k) {
       alvo.querySelector('[data-resumo="' + k + '"]').textContent = valores[k];
     });
@@ -150,7 +150,7 @@
     if (!d) {
       c.append(
         el("p", { classe: "sobretitulo", texto: "Pedidos abertos" }),
-        el("p", { classe: "ultima__vazia" }, ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua empresa", "data-convite": "" }), " e publique o primeiro."])
+        el("p", { classe: "ultima__vazia" }, ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua ONG", "data-convite": "" }), " e publique o primeiro."])
       );
       ajustarConvites();
       return;
@@ -207,8 +207,13 @@
     ]);
   }
 
+  var atualizarControles = null;
+  window.addEventListener("resize", function () { if (atualizarControles) atualizarControles(); });
+
   function montarCarrossel(doacoes) {
     var alvo = $("doacoes-conteudo");
+    var anteriorLista = $("lista-doacoes");
+    var posicao = anteriorLista ? anteriorLista.scrollLeft : 0;
     var lista = el("ul", {
       classe: "carrossel", id: "lista-doacoes", tabindex: "0",
       "aria-label": doacoes.length + (doacoes.length === 1 ? " doação disponível" : " doações disponíveis")
@@ -235,7 +240,8 @@
     anterior.onclick = function () { passo(-1); };
     proximo.onclick = function () { passo(1); };
     lista.addEventListener("scroll", function () { window.requestAnimationFrame(atualizar); }, { passive: true });
-    window.addEventListener("resize", atualizar);
+    atualizarControles = atualizar;
+    if (posicao) lista.scrollLeft = posicao;
     atualizar();
   }
 
@@ -256,16 +262,17 @@
   function montarVazio(categorias) {
     var alvo = $("doacoes-conteudo");
     $("carrossel-controles").hidden = true;
+    atualizarControles = null;
     alvo.replaceChildren(el("div", { classe: "vazio" }, [
       el("div", { classe: "vazio__texto" }, [
         el("h3", { texto: "Nenhuma doação aberta agora" }),
-        el("p", { texto: "Assim que uma empresa publicar um pedido, ele aparece aqui para quem quiser doar. Estas são as categorias que a plataforma recebe:" })
+        el("p", { texto: "Assim que uma ONG publicar um pedido, ele aparece aqui na hora para quem quiser doar. Estas são as categorias que a plataforma recebe:" })
       ]),
       el("ul", { classe: "categorias" }, categorias.map(function (c) {
         var slug = IMG_CATEGORIA[c] || "outros";
         return el("li", null, [
           el("a", { classe: "categoria categoria--" + slug, href: "/cadastro", "data-destino-empresa": "",
-                      "aria-label": c + ": cadastrar empresa que doa esta categoria" }, [
+                      "aria-label": c + ": cadastrar ONG ou empresa" }, [
             el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "", "foto")]),
             el("span", { classe: "categoria__nome", texto: c }),
             svg("chevron", "categoria__seta")
@@ -274,7 +281,7 @@
       })),
       el("div", { classe: "vazio__acoes" }, [
         el("a", { classe: "vazio__cta", href: "/cadastro", "data-destino-empresa": "" }, [
-          svg("predio", "vazio__cta-icone"), el("span", { texto: "Cadastrar minha empresa" }), svg("seta", "vazio__cta-seta")
+          svg("predio", "vazio__cta-icone"), el("span", { texto: "Cadastrar ONG ou empresa" }), svg("seta", "vazio__cta-seta")
         ]),
         el("a", { classe: "vazio__quem", href: "/sobre#criterio" }, [svg("duvida", "vazio__quem-icone"), "Quem pode doar"])
       ])
@@ -296,9 +303,10 @@
 
   /* ---------- carga ---------- */
 
-  function carregar() {
-    $("doacoes-conteudo").setAttribute("aria-busy", "true");
-    obter("/resumo").then(preencherResumo, function () { preencherResumo(null); });
+  function carregar(aoVivo) {
+    aoVivo = aoVivo === true;
+    if (!aoVivo) $("doacoes-conteudo").setAttribute("aria-busy", "true");
+    obter("/resumo").then(preencherResumo, function () { if (!aoVivo) preencherResumo(null); });
 
     obter("/doacoes?limite=8").then(function (doacoes) {
       doacoes = Array.isArray(doacoes) ? doacoes : [];
@@ -309,10 +317,293 @@
               function () { return CATEGORIAS_PADRAO; })
         .then(montarVazio);
     }).catch(function () {
+      if (aoVivo) return;            // falha numa atualização ao vivo: fica o que já estava na tela
       preencherUltima([], true);
       montarFalha();
     });
   }
+
+  /* ---------- excedentes de hoje ---------- */
+
+  function faltaTexto(ate) {
+    var d = data(ate);
+    if (!d) return "";
+    var min = Math.floor((d.getTime() - Date.now()) / 60000);
+    if (min < 1) return "encerra agora";
+    if (min < 60) return "faltam " + min + " min";
+    var h = Math.floor(min / 60), resto = min % 60;
+    if (h < 24) return "faltam " + h + " h" + (resto ? " " + resto + " min" : "");
+    var dias = Math.floor(h / 24);
+    return "faltam " + dias + (dias === 1 ? " dia" : " dias");
+  }
+
+  function validadeCurta(iso) {
+    var d = data(iso);
+    if (!d) return "";
+    var hoje = window.ReConecta.diaISO(new Date());
+    if (iso === hoje) return "vence hoje";
+    return "vence " + d.toLocaleDateString("pt-BR", { timeZone: window.ReConecta.fuso, day: "2-digit", month: "2-digit" });
+  }
+
+  function ehOng() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && (usuarioAtual.perfis || []).indexOf("ong") !== -1); }
+  function ehEmpresaAlimentos() { return !!(usuarioAtual && usuarioAtual.tipo === "empresa" && (usuarioAtual.perfis || []).indexOf("empresa_alimentos") !== -1); }
+
+  function cartaoExcedente(x) {
+    var emp = x.empresa || {};
+    var itens = x.itens || [];
+    var MAX = 3;
+    return el("li", { classe: "excedente", "data-excedente": String(x.id) }, [
+      el("div", { classe: "excedente__topo" }, [
+        imgCategoria(itens[0] && itens[0].categoria, 52, ""),
+        el("div", null, [
+          el("h3", { classe: "excedente__nome", texto: titulo(emp.nome) }),
+          el("p", { classe: "excedente__local", texto: local(emp.municipio_uf) })
+        ])
+      ]),
+      el("ul", { classe: "excedente__itens" }, itens.slice(0, MAX).map(function (i) {
+        return el("li", null, [
+          el("span", { classe: "excedente__item", texto: quantidade(i) + " de " + i.nome }),
+          el("span", { classe: "excedente__validade", texto: validadeCurta(i.validade) })
+        ]);
+      })),
+      itens.length > MAX ? el("p", { classe: "doacao__mais", texto: "+ " + (itens.length - MAX) + (itens.length - MAX === 1 ? " item" : " itens") }) : null,
+      el("div", { classe: "excedente__rodape" }, [
+        el("p", { classe: "excedente__prazo" }, [
+          "Retirar até ", el("strong", { texto: prazo(x.retirar_ate) }),
+          el("span", { classe: "excedente__falta", "data-ate": x.retirar_ate, texto: faltaTexto(x.retirar_ate) })
+        ]),
+        el("a", { classe: "btn btn--primario btn--pequeno", href: "/excedentes/" + x.id,
+                  "aria-label": (ehOng() ? "Ver e reservar" : "Ver") + " o excedente de " + titulo(emp.nome) },
+           [ehOng() ? "Ver e reservar" : "Ver detalhes"])
+      ])
+    ]);
+  }
+
+  var excedentesAtuais = null, excedentesTotal = 0;
+  function desenharExcedentes(lista, total) {
+    excedentesAtuais = lista; excedentesTotal = total;
+    var alvo = $("excedentes-conteudo");
+    var metrica = document.querySelector('[data-resumo="excedentes"]');
+    if (metrica) metrica.textContent = inteiro.format(total);
+    $("excedentes-publicar").hidden = !ehEmpresaAlimentos();
+    if (!lista.length) {
+      alvo.replaceChildren(el("div", { classe: "excedentes__vazio" }, [
+        el("h3", { texto: "Nenhum excedente disponível agora" }),
+        el("p", { texto: ehEmpresaAlimentos()
+          ? "Sobrou alimento bom hoje? Publique e as ONGs com pedido parecido são avisadas na hora."
+          : "Quando uma empresa de alimentos publicar o que sobrou, o cartão aparece aqui na hora, sem recarregar a página." })
+      ]));
+    } else {
+      alvo.replaceChildren(el("ul", { classe: "excedentes__lista",
+        "aria-label": lista.length + (lista.length === 1 ? " excedente disponível" : " excedentes disponíveis") },
+        lista.map(cartaoExcedente)));
+    }
+    alvo.setAttribute("aria-busy", "false");
+  }
+
+  function carregarExcedentes(aoVivo) {
+    return fetch("/reconecta/excedentes?limite=8", { headers: { "Accept": "application/json" }, credentials: "same-origin" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        var total = Number(r.headers.get("X-Total-Count"));
+        return r.json().then(function (lista) {
+          lista = Array.isArray(lista) ? lista : [];
+          desenharExcedentes(lista, isFinite(total) && total >= lista.length ? total : lista.length);
+        });
+      })
+      .catch(function () {
+        if (aoVivo === true) return;
+        var alvo = $("excedentes-conteudo");
+        var tentar = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Tentar novamente" });
+        tentar.addEventListener("click", carregarExcedentes);
+        alvo.replaceChildren(el("div", { classe: "aviso falha", role: "alert" }, [
+          el("p", { texto: "Não conseguimos carregar os excedentes agora." }), tentar]));
+        alvo.setAttribute("aria-busy", "false");
+      });
+  }
+
+  // contagem regressiva: atualiza o texto a cada 30 s e tira da lista o que venceu
+  setInterval(function () {
+    var venceu = false;
+    document.querySelectorAll(".excedente__falta[data-ate]").forEach(function (no) {
+      var d = data(no.getAttribute("data-ate"));
+      if (d && d.getTime() <= Date.now()) venceu = true;
+      else no.textContent = faltaTexto(no.getAttribute("data-ate"));
+    });
+    if (venceu) carregarExcedentes(true);
+  }, 30000);
+
+  /* ---------- tempo real ---------- */
+
+  var relogios = {};
+  function agendar(chave, funcao) {
+    clearTimeout(relogios[chave]);
+    relogios[chave] = setTimeout(funcao, 250);   // junta eventos que chegam juntos
+  }
+
+  document.addEventListener("reconecta:evento", function (e) {
+    var tipo = (e.detail && e.detail.tipo) || "";
+    if (tipo === "pedido.publicado" || tipo.indexOf("doacao.") === 0) agendar("pedidos", function () { carregar(true); });
+    if (tipo.indexOf("excedente.") === 0) agendar("excedentes", function () { carregarExcedentes(true); });
+  });
+
+  /* "Ao vivo" quando o fluxo está aberto; na consulta periódica, diz o intervalo */
+  function mostrarEstado() {
+    var estado = document.documentElement.getAttribute("data-tempo-real");
+    document.querySelectorAll("[data-ao-vivo]").forEach(function (no) {
+      no.hidden = estado !== "sse" && estado !== "consulta";
+      no.textContent = estado === "sse" ? "Ao vivo" : "Atualiza a cada 10 s";
+      no.classList.toggle("ao-vivo--consulta", estado === "consulta");
+    });
+  }
+  if (typeof MutationObserver === "function") {
+    new MutationObserver(mostrarEstado).observe(document.documentElement, { attributes: true, attributeFilter: ["data-tempo-real"] });
+  }
+  mostrarEstado();
+
+  /* ---------- assistente "Tenho alimento para doar" ---------- */
+
+  var CHAVE_TEXTO = "reconecta:assistente-texto";
+  var CHAVE_RASCUNHO = "reconecta:rascunho-excedente";
+  function guardar(chave, valor) { try { sessionStorage.setItem(chave, valor); } catch (erro) { /* sem armazenamento: segue sem guardar */ } }
+  function ler(chave) { try { return sessionStorage.getItem(chave) || ""; } catch (erro) { return ""; } }
+  function apagar(chave) { try { sessionStorage.removeItem(chave); } catch (erro) { /* idem */ } }
+
+  var dlg = $("assistente");
+  var campoTexto = $("assistente-texto");
+  var resultado = $("assistente-resultado");
+  var avisoAssistente = $("assistente-aviso");
+
+  function erroTexto(mensagem) {
+    $("assistente-texto-erro").textContent = mensagem || "";
+    if (mensagem) campoTexto.setAttribute("aria-invalid", "true"); else campoTexto.removeAttribute("aria-invalid");
+  }
+
+  function avisar(tituloAviso, texto) {
+    avisoAssistente.className = "aviso aviso--erro";
+    avisoAssistente.replaceChildren(el("p", { classe: "aviso__titulo", texto: tituloAviso }), texto ? el("p", { texto: texto }) : null);
+    avisoAssistente.hidden = false;
+  }
+
+  function abrirAssistente() {
+    $("assistente-entrar").hidden = true;
+    avisoAssistente.hidden = true;
+    if (!campoTexto.value) campoTexto.value = ler(CHAVE_TEXTO);
+    if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); }
+    else dlg.setAttribute("open", "");
+    campoTexto.focus();
+  }
+  function fecharAssistente() {
+    if (typeof dlg.close === "function" && dlg.open) dlg.close(); else dlg.removeAttribute("open");
+  }
+
+  function pedirEntrada() {
+    guardar(CHAVE_TEXTO, campoTexto.value.trim());
+    $("assistente-link-entrar").href = "/entrar?proximo=" + encodeURIComponent("/?assistente=1");
+    resultado.hidden = true;
+    $("assistente-entrar").hidden = false;
+    $("assistente-link-entrar").focus();
+  }
+
+  function maiuscula(t) { t = String(t || ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+
+  function cartaoSugestao(sg) {
+    var pontos = Math.max(0, Math.min(100, Number(sg.pontuacao) || 0));
+    var qtdSugerida = Number(sg.quantidade_sugerida);
+    var destino = "/doacoes/" + sg.pedido_id + "?item=" + encodeURIComponent(sg.item_id) +
+      (isFinite(qtdSugerida) && qtdSugerida > 0 ? "&quantidade=" + encodeURIComponent(qtdSugerida) : "");
+    return el("li", { classe: "sugestao" }, [
+      el("div", { classe: "sugestao__topo" }, [
+        el("div", null, [
+          el("h4", { classe: "sugestao__nome", texto: titulo(sg.organizacao) }),
+          sg.municipio_uf ? el("p", { classe: "sugestao__local", texto: local(sg.municipio_uf) }) : null
+        ]),
+        el("p", { classe: "sugestao__pontos" }, [el("strong", { texto: String(pontos) }), " de 100"])
+      ]),
+      el("span", { classe: "sugestao__barra", "aria-hidden": "true" }, [el("span", { style: "width:" + pontos + "%" })]),
+      el("ul", { classe: "sugestao__motivos", "aria-label": "Por que combina" },
+        (sg.motivos || []).map(function (m) { return el("li", { texto: maiuscula(m) }); })),
+      el("a", { classe: "btn btn--primario btn--pequeno", href: destino,
+                "aria-label": "Doar para o pedido de " + titulo(sg.organizacao) }, ["Doar para este pedido"])
+    ]);
+  }
+
+  function mostrarResultado(c, texto) {
+    var itens = Array.isArray(c.itens) ? c.itens : [];
+    var sugestoes = Array.isArray(c.sugestoes) ? c.sugestoes : [];
+    var blocos = [];
+    if (itens.length) {
+      blocos.push(el("h3", { texto: "Entendemos assim" }));
+      blocos.push(el("ul", { classe: "assistente__itens" }, itens.map(function (i) {
+        return el("li", null, [el("strong", { texto: quantidade(i) + " de " + i.nome }), " · " + i.categoria]);
+      })));
+    } else {
+      blocos.push(el("p", { classe: "assistente__nada", texto: "Não conseguimos identificar os alimentos. Escreva a quantidade e o alimento, como “30 pães e 5 kg de tomate”." }));
+    }
+    if (sugestoes.length) {
+      blocos.push(el("h3", { texto: sugestoes.length === 1 ? "O pedido que mais combina" : "Os pedidos que mais combinam" }));
+      blocos.push(el("ol", { classe: "assistente__sugestoes" }, sugestoes.map(cartaoSugestao)));
+    } else if (itens.length) {
+      blocos.push(el("p", { classe: "assistente__nada", texto: "Nenhum pedido aberto combina com isso agora." }));
+    }
+    var acoes = [];
+    if (c.pode_publicar_excedente && itens.length) {
+      var publicar = el("a", { classe: "btn " + (sugestoes.length ? "btn--secundario" : "btn--primario") + " btn--pequeno",
+        href: "/painel#publicar-excedente" }, ["Publicar como excedente"]);
+      // o painel pode aproveitar os itens já interpretados
+      publicar.addEventListener("click", function () { guardar(CHAVE_RASCUNHO, JSON.stringify({ texto: texto, itens: itens })); });
+      acoes.push(publicar);
+    }
+    if (!sugestoes.length) {
+      var ver = el("a", { classe: "btn btn--secundario btn--pequeno", href: "#doacoes" }, ["Ver os pedidos abertos"]);
+      ver.addEventListener("click", fecharAssistente);
+      acoes.push(ver);
+    }
+    if (acoes.length) blocos.push(el("div", { classe: "assistente__acoes" }, acoes));
+    blocos.push(el("p", { classe: "assistente__nota", texto:
+      "É uma recomendação: você escolhe para quem doar. " +
+      (c.fonte === "llm" ? "Interpretação feita pelo modelo local gratuito" + (c.modelo ? " " + c.modelo : "") + "."
+                         : "Interpretação feita pelas regras automáticas e pelo classificador do projeto.") }));
+    resultado.replaceChildren.apply(resultado, blocos);
+    resultado.hidden = false;
+    resultado.focus();
+  }
+
+  $("assistente-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var texto = campoTexto.value.trim();
+    avisoAssistente.hidden = true;
+    if (texto.length < 5) { erroTexto("Descreva o que você tem, com pelo menos 5 caracteres."); campoTexto.focus(); return; }
+    erroTexto("");
+    if (!usuarioAtual) { pedirEntrada(); return; }
+    var btn = $("assistente-enviar");
+    btn.disabled = true; btn.classList.add("is-carregando"); btn.textContent = "Procurando…";
+    resultado.hidden = true;
+    fetch("/reconecta/ia/sugerir-destino", {
+      method: "POST", credentials: "same-origin",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ texto: texto })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (c) { return { status: r.status, corpo: c || {} }; });
+    }).then(function (r) {
+      var c = r.corpo;
+      if (r.status === 200) { apagar(CHAVE_TEXTO); mostrarResultado(c, texto); return; }
+      if (r.status === 401) { pedirEntrada(); return; }
+      if (r.status === 400 && c.campos && c.campos.texto) { erroTexto(c.campos.texto); campoTexto.focus(); return; }
+      if (r.status === 429) { avisar("Muitas consultas seguidas", c.mensagem || "Aguarde um minuto e tente de novo."); return; }
+      avisar("Não foi possível sugerir agora", c.mensagem || "Tente novamente em instantes.");
+    }).catch(function () {
+      avisar("Sem conexão com o servidor", "Verifique sua internet e tente de novo.");
+    }).then(function () {
+      btn.disabled = false; btn.classList.remove("is-carregando"); btn.textContent = "Ver para onde doar";
+    });
+  });
+  campoTexto.addEventListener("input", function () { if (campoTexto.getAttribute("aria-invalid")) erroTexto(""); });
+  $("assistente-fechar").addEventListener("click", fecharAssistente);
+  // clique fora do cartão (no fundo do diálogo) fecha
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) fecharAssistente(); });
+  dlg.addEventListener("close", function () { $("hero-cta").focus(); });
+  $("hero-cta").addEventListener("click", abrirAssistente);
 
   /* ---------- CTA conforme a sessão ---------- */
 
@@ -325,23 +616,27 @@
     document.querySelectorAll("[data-destino-empresa]").forEach(function (a) { a.href = empresa ? "/painel" : "/cadastro"; });
   }
 
+  var abriuPeloEndereco = false;
   document.addEventListener("reconecta:sessao", function (e) {
     var u = e.detail && e.detail.usuario;
+    var mudouPerfil = !!excedentesAtuais && JSON.stringify((u && u.perfis) || []) !== JSON.stringify((usuarioAtual && usuarioAtual.perfis) || []);
     usuarioAtual = u;
     ajustarConvites();
-    var cta = $("hero-cta");
-    if (!cta) return;
-    var rotulo = cta.querySelector("[data-cta-rotulo]");
     var sec = $("hero-secundario");
-    // empresa publica pedidos; quem tem CPF (ou visita) vai direto aos pedidos para doar
-    if (u && u.tipo === "empresa") {
-      cta.href = "/painel#publicar"; rotulo.textContent = "Publicar pedido";
-      if (sec) { sec.href = "#doacoes"; sec.textContent = "Ver doações disponíveis"; }
-    } else {
-      cta.href = "#doacoes"; rotulo.textContent = "Quero doar";
-      if (sec && u) { sec.href = "#como-funciona"; sec.textContent = "Como funciona"; }
+    if (sec) {
+      if (u && u.tipo === "empresa") { sec.href = "/painel#publicar"; sec.textContent = "Preciso de doações · publicar pedido"; }
+      else if (u) { sec.href = "#doacoes"; sec.textContent = "Ver os pedidos abertos"; }
+      else { sec.href = "/cadastro"; sec.textContent = "Preciso de doações · publicar pedido"; }
+    }
+    // os cartões de excedente dizem "Ver e reservar" só para ONG
+    if (excedentesAtuais && (mudouPerfil || u)) desenharExcedentes(excedentesAtuais, excedentesTotal);
+    // volta do login com ?assistente=1: reabre com o texto guardado
+    if (!abriuPeloEndereco && /[?&]assistente=1(&|$)/.test(location.search)) {
+      abriuPeloEndereco = true;
+      abrirAssistente();
     }
   });
 
   carregar();
+  carregarExcedentes();
 })();

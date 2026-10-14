@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ReConecta · Alimento bom não é desperdício</title>
-  <meta name="description" content="No ReConecta, empresas do setor de alimentos publicam o que precisam e pessoas com CPF ou outras empresas doam. Veja os pedidos abertos e doe.">
+  <meta name="description" content="O ReConecta conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam. Veja os pedidos abertos, os excedentes de hoje e doe.">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@
         <div class="hero__texto">
           <p class="sobretitulo sobretitulo--acento">Redistribuição de excedentes alimentares</p>
           <h1 id="hero-titulo">Excedente de hoje, <br><em>refeição</em> de amanhã</h1>
-          <p class="lead">Empresas e associações do setor de alimentos publicam o que precisam, com quantidade e prazo. Pessoas com CPF e outras empresas doam pelo site, com um questionário rápido e uma foto. O que iria para o lixo <strong>vira refeição.</strong></p>
+          <p class="lead">ONGs publicam o que precisam. Empresas de alimentos avisam o que sobrou hoje. Pessoas e empresas doam pelo site, e cada mudança aparece na hora para todo mundo. O que iria para o lixo <strong>vira refeição.</strong></p>
 
           <ul class="hero__metricas" id="resumo" aria-live="polite" aria-busy="true" aria-label="A plataforma agora">
             <li class="hero-metrica">
@@ -59,15 +59,15 @@
               <span class="hero-metrica__icone hero-metrica__icone--verde" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false"><circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="9.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.8 14.2c2.4-.3 4.2 1.1 4.7 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </span>
-              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">instituições</span><span class="hero-metrica__valor" data-resumo="instituicoes">—</span></span>
+              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">excedentes hoje</span><span class="hero-metrica__valor" data-resumo="excedentes">—</span></span>
             </li>
           </ul>
 
           <div class="hero__acoes">
-            <a class="hero__cta" id="hero-cta" href="#doacoes">
-              <span data-cta-rotulo>Quero doar</span>
+            <button type="button" class="hero__cta" id="hero-cta" aria-haspopup="dialog">
+              <span>Tenho alimento para doar</span>
               <svg class="hero__cta-seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
+            </button>
             <a class="hero__secundario" id="hero-secundario" href="/cadastro">Preciso de doações <span aria-hidden="true">·</span> publicar pedido</a>
           </div>
         </div>
@@ -102,9 +102,9 @@
           <article class="cartao cartao--flutuante hero__cartao hero__cartao--passos" aria-labelledby="passos-titulo">
             <p class="sobretitulo" id="passos-titulo">Em três passos</p>
             <ol class="mini-passos">
-              <li><span class="mini-passos__n">1</span> <span>A empresa publica o pedido</span></li>
+              <li><span class="mini-passos__n">1</span> <span>A ONG publica o pedido</span></li>
               <li><span class="mini-passos__n">2</span> <span>Pessoas e empresas doam</span></li>
-              <li><span class="mini-passos__n">3</span> <span>A doação fica registrada</span></li>
+              <li><span class="mini-passos__n">3</span> <span>A ONG confirma que recebeu</span></li>
             </ol>
           </article>
         </div>
@@ -117,7 +117,7 @@
         <div class="faixa__principal">
           <div class="faixa__topo">
             <div>
-              <p class="sobretitulo sobretitulo--acento">Agora na plataforma</p>
+              <p class="sobretitulo sobretitulo--acento">Agora na plataforma <span class="ao-vivo" data-ao-vivo hidden></span></p>
               <h2 id="doacoes-titulo">Doações disponíveis</h2>
             </div>
             <div class="faixa__controles" id="carrossel-controles" hidden>
@@ -146,7 +146,7 @@
           <div class="impacto__texto">
             <h3 id="impacto-titulo">Menos desperdício, <span>mais impacto.</span></h3>
             <span class="impacto__fio" aria-hidden="true"></span>
-            <p>Conectamos quem precisa de alimento a pessoas e empresas que podem doar.</p>
+            <p>Conectamos quem tem alimento sobrando a ONGs e organizações que precisam, em tempo real.</p>
           </div>
 
           <div class="impacto__sacola" aria-hidden="true">
@@ -181,28 +181,46 @@
       </div>
     </section>
 
+    <!-- ============ EXCEDENTES DE HOJE ============ -->
+    <section class="secao container excedentes" id="excedentes" aria-labelledby="excedentes-titulo">
+      <div class="excedentes__topo">
+        <div>
+          <p class="sobretitulo sobretitulo--acento">Para ONGs <span class="ao-vivo" data-ao-vivo hidden></span></p>
+          <h2 id="excedentes-titulo">Excedentes de hoje</h2>
+          <p class="lead">Alimento bom que sobrou em empresas e precisa sair antes de vencer. A ONG reserva pelo site e retira no prazo; quando alguém reserva, o cartão some daqui na hora.</p>
+        </div>
+        <a class="btn btn--secundario btn--pequeno" id="excedentes-publicar" href="/painel#publicar-excedente" hidden>Publicar excedente</a>
+      </div>
+      <div id="excedentes-conteudo" aria-busy="true">
+        <ul class="excedentes__lista" aria-hidden="true">
+          <li class="excedente excedente--esqueleto"><div class="esqueleto"><span></span><span></span><span></span></div></li>
+          <li class="excedente excedente--esqueleto"><div class="esqueleto"><span></span><span></span><span></span></div></li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ============ COMO FUNCIONA ============ -->
     <section class="secao container" id="como-funciona" aria-labelledby="como-titulo">
       <div class="secao__cabeca">
         <p class="sobretitulo sobretitulo--acento">Como funciona</p>
         <h2 id="como-titulo">Do balcão à mesa, <em>sem perder o dia</em></h2>
-        <p class="lead">Cada pedido diz o que falta, quanto e até quando dá para receber. Quem doa responde a quatro perguntas sobre o alimento e manda uma foto; a plataforma só aceita alimento dentro da validade.</p>
+        <p class="lead">Há dois caminhos para o alimento não se perder. No pedido, a ONG diz o que falta e quem tem doa. No excedente, a empresa avisa o que sobrou e a ONG reserva. Nos dois, só entra alimento dentro da validade.</p>
       </div>
       <ol class="passos">
         <li class="passo">
           <span class="passo__n" aria-hidden="true">01</span>
-          <h3>A empresa publica o pedido</h3>
-          <p>A empresa ou associação diz do que precisa: os itens, a quantidade de cada um e até quando pode receber.</p>
+          <h3>A ONG pede ou a empresa oferece</h3>
+          <p>A ONG publica o pedido com os itens, a quantidade e até quando pode receber. A empresa de alimentos publica o excedente do dia, com a validade e até quando dá para retirar.</p>
         </li>
         <li class="passo">
           <span class="passo__n" aria-hidden="true">02</span>
-          <h3>Pessoas e empresas doam</h3>
-          <p>Quem tem CPF ou outra empresa escolhe o item, informa a quantidade e a validade, responde ao questionário e manda a foto.</p>
+          <h3>A plataforma conecta na hora</h3>
+          <p>Quem tem alimento descreve o que tem e recebe a sugestão dos pedidos que mais combinam, com o motivo. Para doar, responde a quatro perguntas e manda uma foto. A ONG reserva o excedente com um clique.</p>
         </li>
         <li class="passo">
           <span class="passo__n" aria-hidden="true">03</span>
-          <h3>A doação fica registrada</h3>
-          <p>Quem doou recebe o endereço de entrega, o progresso do pedido sobe e a empresa vê cada doação com a foto no painel.</p>
+          <h3>A entrega é confirmada</h3>
+          <p>A ONG marca que recebeu a doação e a empresa confirma a retirada do excedente. Quem doou é avisado, e o painel de impacto conta só o que chegou de verdade.</p>
         </li>
       </ol>
     </section>
@@ -216,8 +234,8 @@
       <div class="publicos">
         <article class="publico publico--empresa">
           <img src="/static/img/categorias/padaria.svg" width="88" height="88" alt="">
-          <h3>Empresas do setor de alimentos</h3>
-          <p>Restaurantes, padarias, mercados, associações e outros negócios de alimentos que publicam o que precisam ou doam para pedidos de outras empresas.</p>
+          <h3>Empresas de alimentos</h3>
+          <p>Restaurantes, padarias, mercados e indústrias. Publicam o excedente do dia para as ONGs reservarem e doam para os pedidos abertos.</p>
           <a class="btn btn--primario btn--pequeno" href="/cadastro">Cadastrar empresa</a>
         </article>
         <article class="publico publico--doador">
@@ -228,9 +246,9 @@
         </article>
         <article class="publico publico--instituicao">
           <img src="/static/img/categorias/refeicoes.svg" width="88" height="88" alt="">
-          <h3>Instituições sociais</h3>
-          <p>ONGs, associações e projetos com CNPJ ativo e atividade ligada a alimentos entram como empresa e publicam os seus pedidos.</p>
-          <a class="btn btn--fantasma btn--pequeno" href="#doacoes">Ver doações abertas <span aria-hidden="true">→</span></a>
+          <h3>ONGs</h3>
+          <p>Associações, fundações e outras organizações sem fins lucrativos com CNPJ ativo. Publicam pedidos, reservam excedentes e confirmam o que receberam.</p>
+          <a class="btn btn--fantasma btn--pequeno" href="/cadastro">Cadastrar ONG <span aria-hidden="true">→</span></a>
         </article>
       </div>
     </section>
@@ -239,9 +257,9 @@
     <section class="secao container" aria-labelledby="criterio-titulo">
       <div class="criterio">
         <div class="criterio__texto">
-          <p class="sobretitulo sobretitulo--acento">Quem pode entrar como empresa</p>
+          <p class="sobretitulo sobretitulo--acento">Quem pode entrar com CNPJ</p>
           <h2 id="criterio-titulo">Conferimos na Receita Federal antes de aceitar</h2>
-          <p class="lead">Para manter a rede focada em alimento, o cadastro de empresa só é aceito quando o CNPJ passa nas duas verificações. Nada disso depende do que a pessoa digita: os dados vêm da Receita.</p>
+          <p class="lead">Para manter a rede focada em alimento e em quem atende pessoas, o cadastro com CNPJ só é aceito quando passa nas duas verificações. Nada disso depende do que a pessoa digita: os dados vêm da Receita.</p>
           <a class="link-sobre" href="/sobre#criterio">Entenda o critério completo <span aria-hidden="true">→</span></a>
         </div>
         <ul class="checagens">
@@ -251,7 +269,7 @@
           </li>
           <li class="checagem">
             <span class="checagem__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div><h3>Atividade ligada a alimentos</h3><p>Olhamos a atividade principal e as secundárias. Um supermercado entra mesmo que a principal seja genérica; uma empresa de tecnologia, não.</p></div>
+            <div><h3>ONG ou atividade ligada a alimentos</h3><p>Entra a organização sem fins lucrativos, pela natureza jurídica, e a empresa com atividade principal ou secundária de alimentos. Uma organização pode ter os dois perfis; uma empresa de tecnologia, nenhum.</p></div>
           </li>
         </ul>
       </div>
@@ -262,11 +280,45 @@
       <div class="cta-final__cartao">
         <img class="cta-final__img" src="/static/img/categorias/graos.svg" width="120" height="120" alt="">
         <h2 id="cta-titulo">Precisa de alimento para quem você <em>atende</em>?</h2>
-        <p class="lead">Cadastre a empresa e publique o pedido em poucos minutos. Basta o CNPJ: o resto a gente busca na Receita.</p>
+        <p class="lead">Cadastre a ONG e publique o pedido em poucos minutos. Basta o CNPJ: o resto a gente busca na Receita.</p>
         <a class="btn btn--primario" href="/cadastro">Publicar pedido <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
       </div>
     </section>
   </main>
+
+  <!-- ============ ASSISTENTE "TENHO ALIMENTO PARA DOAR" ============ -->
+  <dialog class="assistente" id="assistente" aria-labelledby="assistente-titulo">
+    <div class="assistente__topo">
+      <div>
+        <p class="sobretitulo sobretitulo--acento">Assistente de doação</p>
+        <h2 id="assistente-titulo" tabindex="-1">Tenho alimento para doar</h2>
+      </div>
+      <button type="button" class="assistente__fechar" id="assistente-fechar" aria-label="Fechar o assistente">×</button>
+    </div>
+
+    <div id="assistente-entrar" hidden>
+      <p>Para sugerir o melhor destino, precisamos saber quem está doando. Entre ou crie uma conta; o que você escreveu fica guardado.</p>
+      <div class="assistente__acoes">
+        <a class="btn btn--primario" id="assistente-link-entrar" href="/entrar">Entrar</a>
+        <a class="btn btn--secundario" href="/cadastro">Criar conta</a>
+      </div>
+    </div>
+
+    <form id="assistente-form" novalidate>
+      <div class="campo">
+        <label class="campo__rotulo" for="assistente-texto">O que você tem?</label>
+        <textarea id="assistente-texto" class="campo__entrada" rows="3" maxlength="600" required
+                  aria-describedby="assistente-ajuda assistente-texto-erro"
+                  placeholder="Ex.: sobraram 30 pães e 5 kg de tomate, vencem amanhã"></textarea>
+        <p class="campo__ajuda" id="assistente-ajuda">Escreva do seu jeito: o alimento, a quantidade e a validade. Não inclua dados pessoais.</p>
+        <p class="campo__erro" id="assistente-texto-erro" data-erro></p>
+      </div>
+      <button type="submit" class="btn btn--primario" id="assistente-enviar">Ver para onde doar</button>
+    </form>
+
+    <div id="assistente-aviso" class="aviso" role="alert" hidden></div>
+    <div id="assistente-resultado" class="assistente__resultado" tabindex="-1" hidden></div>
+  </dialog>
 
   <footer data-layout="rodape"></footer>
 </body>

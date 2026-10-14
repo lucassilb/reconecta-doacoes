@@ -1,0 +1,18 @@
+/* ReConecta — página do excedente (/excedentes/<id>). Usa base.css e o layout de detalhe de doacao.css. */
+
+.selo--cinza { background: var(--superficie-2); color: var(--tinta-suave); }
+.btn--perigo { --btn-cor: var(--erro); --btn-borda: var(--erro-linha); --btn-bg: var(--superficie); }
+.btn--perigo:hover:not(:disabled) { --btn-bg: var(--erro-suave); --btn-cor: var(--erro); }
+
+.exc__falta { color: var(--acento-texto); font-weight: 600; font-size: .9rem; white-space: nowrap; }
+
+.exc__acao { display: grid; gap: 12px; }
+.exc__acao .doar__texto { margin-bottom: 0; }
+.exc__reserva {
+  display: grid; gap: 4px; padding: 16px 18px; border-radius: 16px;
+  background: var(--verde-suave); color: var(--tinta);
+}
+.exc__reserva-titulo { font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--verde-texto); }
+.exc__endereco { font-size: 1.08rem; font-weight: 700; overflow-wrap: anywhere; }
+.exc__pergunta { font-weight: 600; }
+.excedente-pagina .quest__aviso { margin-top: 12px; }

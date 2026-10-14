@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Excedente de alimentos · ReConecta</title>
+  <meta name="description" content="Excedente de alimentos publicado por uma empresa. ONGs reservam pelo site e retiram no prazo.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/doacao.css">
+  <link rel="stylesheet" href="/static/css/excedente.css">
+  <script src="/static/js/layout.js" defer></script>
+  <script src="/static/js/excedente.js" defer></script>
+</head>
+<body class="pedido excedente-pagina">
+  <header data-layout="cabecalho"></header>
+
+  <main id="conteudo" class="container">
+    <a class="voltar-lista" href="/#excedentes">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Excedentes de hoje
+    </a>
+
+    <div id="exc-carregando" class="det-carregando" role="status">Carregando o excedente…</div>
+    <div id="exc-erro" class="aviso aviso--erro" role="alert" hidden></div>
+
+    <div id="exc" class="det" hidden>
+      <!-- ===== o excedente ===== -->
+      <article class="det__info" aria-labelledby="exc-titulo">
+        <p class="sobretitulo sobretitulo--acento">Excedente de alimentos</p>
+        <h1 id="exc-titulo"></h1>
+        <p class="det__empresa" id="exc-empresa"></p>
+
+        <dl class="det__fatos">
+          <div class="det__fato"><dt>Situação</dt><dd><span class="selo" id="exc-situacao" role="status" aria-live="polite"></span></dd></div>
+          <div class="det__fato"><dt>Retirar até</dt><dd><span id="exc-prazo"></span> <span class="exc__falta" id="exc-falta"></span></dd></div>
+          <div class="det__fato"><dt>Retirada</dt><dd id="exc-local"></dd></div>
+          <div class="det__fato" id="exc-obs-linha" hidden><dt>Observação</dt><dd id="exc-obs"></dd></div>
+        </dl>
+
+        <h2 class="det__subtitulo">O que está disponível</h2>
+        <ul class="pedido-itens" id="exc-itens"></ul>
+
+        <div class="det__como">
+          <h2 class="det__subtitulo">Como funciona a retirada</h2>
+          <ol class="det__passos">
+            <li>A ONG reserva pelo site. Só uma organização reserva por vez.</li>
+            <li>Depois da reserva, o endereço completo aparece aqui e em Minhas reservas, no painel.</li>
+            <li>A ONG retira no prazo e a empresa confirma a retirada. Se não for possível ir, cancele a reserva para outra ONG aproveitar.</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- ===== ação ===== -->
+      <section class="det__doar cartao" aria-labelledby="acao-titulo">
+        <h2 id="acao-titulo" tabindex="-1">Reservar este excedente</h2>
+        <div id="exc-acao" class="exc__acao"></div>
+        <div id="exc-aviso" class="quest__aviso" role="alert" hidden></div>
+      </section>
+    </div>
+  </main>
+
+  <footer data-layout="rodape"></footer>
+</body>
+</html>
