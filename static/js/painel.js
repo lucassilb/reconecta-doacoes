@@ -455,7 +455,8 @@
     iniciarMeusDados(u);
 
     if (ong) iniciarDoacoes();
-    carregarMinhasDoacoes();
+    if (!ong) carregarMinhasDoacoes();
+    iniciarAbas(ong ? "ong" : "empresa");
   }
 
   /* Publicar pedido e "Meus pedidos": só empresa (rodada 9). */
@@ -678,15 +679,24 @@
 
   function carregarDoacoes() {
     var lista = $("lista-doacoes");
+    var recebidas = $("lista-recebidas");
     lista.setAttribute("aria-busy", "true");
     requisitar("/reconecta/painel/doacoes").then(function (r) {
       if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
       lista.replaceChildren();
+      recebidas.replaceChildren();
       if (!r.ok || !Array.isArray(r.corpo) || !r.corpo.length) {
         lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhum pedido publicado ainda. Use o formulário acima para dizer do que você precisa." }));
+        recebidas.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhuma doação recebida. Publique um pedido para começar." }));
         return;
       }
-      r.corpo.forEach(function (d) { lista.appendChild(cartaoDoacao(d, true)); });
+      var total = 0;
+      r.corpo.forEach(function (d) {
+        lista.appendChild(cartaoDoacao(d, true));
+        var contrib = Array.isArray(d.contribuicoes) ? d.contribuicoes : (Array.isArray(d.doacoes_recebidas) ? d.doacoes_recebidas : []);
+        contrib.forEach(function (c) { recebidas.appendChild(recebida(c)); total++; });
+      });
+      if (!total) recebidas.appendChild(el("p", { classe: "doacoes__vazio", texto: "Seus pedidos ainda não receberam doações." }));
     }).catch(function () {
       lista.replaceChildren(el("p", { classe: "doacoes__vazio", texto: "Não foi possível carregar suas doações. Tente atualizar." }));
     }).then(function () { lista.setAttribute("aria-busy", "false"); });
@@ -843,6 +853,7 @@
     carregarMinhasDoacoes();
 
     carregarRede();
+    iniciarAbas("pessoa");
   }
 
   function carregarRede() {
@@ -862,7 +873,7 @@
     requisitar("/reconecta/publico/doacoes?limite=8").then(function (r) {
       lista.replaceChildren();
       if (!r.ok || !Array.isArray(r.corpo) || !r.corpo.length) {
-        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: "Nenhum pedido aberto agora. Quando uma empresa publicar, ele aparece aqui." }));
+        lista.appendChild(el("p", { classe: "doacoes__vazio" }, ["Nenhuma ONG publicou um pedido aberto ainda. Você pode ", el("a", { href: "/painel#publicar-excedente", texto: "oferecer alimentos para retirada" }), "."]));
         return;
       }
       r.corpo.forEach(function (d) { lista.appendChild(cartaoDoacao(d, false)); });
@@ -901,6 +912,7 @@
     requisitar("/reconecta/painel/minhas-doacoes").then(function (r) {
       lista.replaceChildren();
       var itens = r.ok && Array.isArray(r.corpo) ? r.corpo : [];
+      atualizarSemana(itens);
       if (!itens.length) {
         lista.appendChild(el("p", { classe: "doacoes__vazio" }, ["Você ainda não doou para nenhum pedido. ", el("a", { href: "/#doacoes", texto: "Veja as doações disponíveis" }), "."]));
         return;
@@ -914,11 +926,101 @@
     });
   }
 
+  function atualizarSemana(contribuicoes) {
+    var hoje = window.ReConecta.diaISO(new Date());
+    var segunda = new Date(hoje + "T12:00:00Z");
+    segunda.setUTCDate(segunda.getUTCDate() - ((segunda.getUTCDay() + 6) % 7));
+    var inicio = segunda.toISOString().slice(0, 10);
+    function destaSemana(item) {
+      return item.criado_em && window.ReConecta.diaISO(new Date(item.criado_em)) >= inicio;
+    }
+    requisitar("/reconecta/excedentes/meus").then(function (r) {
+      var oferecidas = r.ok && Array.isArray(r.corpo) ? r.corpo : [];
+      var total = contribuicoes.filter(destaSemana).length + oferecidas.filter(destaSemana).length;
+      $("minhas-semana").textContent = total + (total === 1 ? " doação registrada" : " doações registradas") + " nesta semana";
+    }).catch(function () { $("minhas-semana").textContent = "Veja abaixo suas doações registradas."; });
+  }
+
   function resumoNumero(n, rotulo) {
     return el("li", { classe: "metrica" }, [
       el("span", { classe: "metrica__valor", texto: n == null ? "—" : String(n) }),
       el("span", { classe: "metrica__rotulo", texto: rotulo })
     ]);
+  }
+
+  function iniciarAbas(perfil) {
+    var configuracao = perfil === "ong" ? [
+      ["pedidos", "Pedidos", "Publique o que sua organização precisa e acompanhe seus pedidos."],
+      ["reservas", "Reservas", "Alimentos que sua organização reservou para retirar."],
+      ["recebidas", "Doações recebidas", "Confirme as entregas feitas para seus pedidos."],
+      ["dados", "Meus dados", "Cadastro e privacidade da sua conta."]
+    ] : [
+      ["doar", perfil === "empresa" ? "Doar excedente" : "Doar", "Publique um alimento para uma ONG retirar ou escolha um pedido aberto."],
+      ["minhas-doacoes", "Minhas doações", "Acompanhe o que você ofereceu e o que já entregou."],
+      ["dados", "Meus dados", "Cadastro e privacidade da sua conta."]
+    ];
+    var mapa = {
+      "publicar-excedente": perfil === "ong" ? "pedidos" : "doar",
+      "publicar": perfil === "ong" ? "pedidos" : "doar",
+      "meus-excedentes": "minhas-doacoes",
+      "meus-pedidos": "pedidos"
+    };
+    var regioes = {
+      "bloco-empresa": "dados", "bloco-doador": "dados", "bloco-privacidade": "dados",
+      "publicar-excedente": perfil === "ong" ? "pedidos" : "doar",
+      "meus-excedentes": "minhas-doacoes", "minhas-reservas": "reservas",
+      "bloco-minhas-doacoes": "minhas-doacoes", "bloco-rede": "doar",
+      "publicar": "pedidos", "meus-pedidos": "pedidos", "recebidas": "recebidas"
+    };
+    var nav = $("painel-abas");
+    var subnav = $("painel-subabas");
+    var submodo = perfil === "ong" ? "lista" : "oferta";
+    function ajustarSubmodoPeloHash() {
+      if (location.hash === "#publicar" && perfil === "ong") submodo = "criar";
+      if (location.hash === "#publicar-excedente") submodo = "oferta";
+    }
+    var modos = perfil === "pessoa" ? [["oferta", "Oferecer alimento"], ["pedidos", "Doar para um pedido"]]
+      : perfil === "ong" ? [["lista", "Meus pedidos"], ["criar", "Criar pedido"]] : [];
+    subnav.replaceChildren.apply(subnav, modos.map(function (modo) {
+      var botao = el("button", { type: "button", classe: "painel-subabas__botao", texto: modo[1] });
+      botao.dataset.modo = modo[0];
+      botao.addEventListener("click", function () { submodo = modo[0]; aplicar(); });
+      return botao;
+    }));
+    nav.replaceChildren.apply(nav, configuracao.map(function (aba) {
+      return el("a", { href: "#" + aba[0], classe: "painel-abas__link", texto: aba[1] });
+    }));
+    function aplicar() {
+      var pedido = location.hash.slice(1);
+      var chave = mapa[pedido] || pedido;
+      if (!configuracao.some(function (aba) { return aba[0] === chave; })) chave = configuracao[0][0];
+      configuracao.forEach(function (aba) {
+        var link = nav.querySelector('[href="#' + aba[0] + '"]');
+        link.setAttribute("aria-current", aba[0] === chave ? "page" : "false");
+        if (aba[0] === chave) $("painel-aba-descricao").textContent = aba[2];
+      });
+      Object.keys(regioes).forEach(function (id) {
+        var no = $(id);
+        var ocultar = regioes[id] !== chave;
+        if (perfil === "pessoa" && chave === "doar") {
+          if (id === "publicar-excedente") ocultar = submodo !== "oferta";
+          if (id === "bloco-rede") ocultar = submodo !== "pedidos";
+        }
+        if (perfil === "ong" && chave === "pedidos") {
+          if (id === "publicar") ocultar = submodo !== "criar";
+          if (id === "meus-pedidos") ocultar = submodo !== "lista";
+        }
+        if (no) no.dataset.painelOculto = String(ocultar);
+      });
+      subnav.hidden = !((perfil === "pessoa" && chave === "doar") || (perfil === "ong" && chave === "pedidos"));
+      subnav.querySelectorAll("button").forEach(function (botao) {
+        botao.setAttribute("aria-pressed", String(botao.dataset.modo === submodo));
+      });
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener("hashchange", function () { ajustarSubmodoPeloHash(); aplicar(); });
+    ajustarSubmodoPeloHash();
+    aplicar();
   }
 
   var recargaPendente;

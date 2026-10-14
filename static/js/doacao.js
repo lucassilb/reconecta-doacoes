@@ -49,8 +49,8 @@
     if (nomes.length <= 1) return nomes.join("");
     return nomes.slice(0, -1).join(", ") + " e " + nomes[nomes.length - 1].toLowerCase();
   }
-  var IMG = { "Hortifrúti": "hortifruti", "Padaria": "padaria", "Laticínios": "laticinios", "Carnes e peixes": "carnes",
-    "Grãos e cereais": "graos", "Refeições prontas": "refeicoes", "Bebidas não alcoólicas": "bebidas", "Outros": "outros" };
+  var IMG = { "Hortifrúti": "hortifruti", "Padaria": "padaria", "Laticínios": "laticinios", "Carnes e peixes": "carnes-peixes",
+    "Grãos e cereais": "graos-cereais", "Refeições prontas": "refeicoes-prontas", "Bebidas não alcoólicas": "bebidas", "Outros": "outros" };
 
   var m = location.pathname.match(/\/doacoes\/(\d+)/);
   var ID = m ? m[1] : null;
@@ -64,15 +64,30 @@
     var faltam = i.faltam != null ? Number(i.faltam) : Math.max(0, meta - recebido);
     var pct = meta > 0 ? Math.min(100, Math.round(recebido / meta * 100)) : 0;
     return el("li", { classe: "pedido-item" + (faltam <= 0 ? " pedido-item--completo" : "") }, [
-      el("img", { classe: "pedido-item__img", src: "/static/img/doacoes/cat-" + (IMG[i.categoria] || "outros") + ".webp", alt: "", width: "40", height: "40" }),
+      el("img", { classe: "pedido-item__img", src: "/static/img/categorias/" + (IMG[i.categoria] || "outros") + ".webp", alt: "", width: "48", height: "48" }),
       el("div", { classe: "pedido-item__texto" }, [
         el("p", { classe: "pedido-item__linha" }, [el("strong", { texto: i.nome }), el("span", { texto: numero.format(recebido) + " de " + qtd(meta, i.unidade_medida) })]),
         el("div", { classe: "barra", role: "progressbar", "aria-label": "Recebido de " + i.nome, "aria-valuemin": "0", "aria-valuemax": String(meta), "aria-valuenow": String(Math.min(recebido, meta)), "aria-valuetext": numero.format(recebido) + " de " + qtd(meta, i.unidade_medida) }, [
           el("span", { classe: "barra__cheia", style: "width:" + pct + "%" })
         ]),
-        el("p", { classe: "pedido-item__falta", texto: faltam > 0 ? "Faltam " + qtd(faltam, i.unidade_medida) : "Meta atingida. Doações a mais continuam bem-vindas." })
+          el("p", { classe: "pedido-item__falta", texto: faltam > 0 ? "Faltam " + qtd(faltam, i.unidade_medida) : "Meta atingida. Doações a mais continuam bem-vindas." }),
+          botaoItem(i)
       ])
     ]);
+  }
+  function botaoItem(i) {
+    var botao = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno pedido-item__acao", texto: "Doar este item" });
+    botao.addEventListener("click", function () {
+      if (pedido && pedido.pode_doar) {
+        abrir();
+        $("c-item").value = String(i.id);
+        atualizarUnidade();
+        $("c-quantidade").focus();
+      } else {
+        $("doar").scrollIntoView({ block: "start" });
+      }
+    });
+    return botao;
   }
 
   function preencher(p) {
@@ -255,7 +270,11 @@
   function aplicarCampos(campos) {
     var primeiro = null;
     Object.keys(campos).forEach(function (k) { var i = erroCampo(k === "item" ? "item_id" : k, campos[k]); if (i && !primeiro) primeiro = i; });
-    if (primeiro) primeiro.focus();
+    if (primeiro) {
+      var grupo = primeiro.closest("[data-quest-etapa]");
+      if (grupo) mostrarQuestEtapa(Number(grupo.dataset.questEtapa));
+      primeiro.focus();
+    }
     else if (Object.keys(campos).length) mostrarAviso("Confira os dados", [campos[Object.keys(campos)[0]]], false);
   }
   function mostrarAviso(titulo, linhas, recusa) {
@@ -268,7 +287,32 @@
     a.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 
-  function abrir() { $("doar-inicio").hidden = true; $("form-contribuicao").hidden = false; $("c-item").focus(); }
+  function mostrarQuestEtapa(numero) {
+    document.querySelectorAll("[data-quest-etapa]").forEach(function (no) { no.hidden = Number(no.dataset.questEtapa) !== numero; });
+    document.querySelectorAll("[data-quest-indicador]").forEach(function (no) {
+      no.setAttribute("aria-current", Number(no.dataset.questIndicador) === numero ? "step" : "false");
+    });
+    if (numero === 3) {
+      var i = itemEscolhido();
+      $("quest-resumo").replaceChildren(
+        el("strong", { texto: i ? i.nome + " · " + $("c-quantidade").value + " " + unidade(i.unidade_medida, Number(String($("c-quantidade").value).replace(",", "."))) : "Alimento" }),
+        el("span", { texto: "Validade: " + $("c-validade").value + " · foto: " + (($("c-foto").files || [])[0] || {}).name })
+      );
+    }
+    $("doar").scrollIntoView({ block: "start" });
+  }
+  function abrir() {
+    if (!$("doar-ok").hidden) {
+      $("form-contribuicao").reset();
+      atualizarFoto();
+      limparErros();
+      $("doar-ok").hidden = true;
+    }
+    $("doar-inicio").hidden = true;
+    $("form-contribuicao").hidden = false;
+    mostrarQuestEtapa(1);
+    $("c-item").focus();
+  }
 
   /* Vindo do assistente da Home: /doacoes/<id>?item=<id do item>&quantidade=<n> já abre o
      questionário com o item e a quantidade sugeridos. A pessoa confere e completa o resto. */
@@ -305,7 +349,7 @@
     clearTimeout(relogioVivo);
     relogioVivo = setTimeout(atualizarProgresso, 250);
   });
-  function cancelar() { $("form-contribuicao").hidden = true; $("doar-inicio").hidden = false; $("doar-titulo").focus(); }
+  function cancelar() { $("form-contribuicao").hidden = true; $("doar-inicio").hidden = false; mostrarQuestEtapa(1); $("doar-titulo").focus(); }
 
   function enviar(e) {
     e.preventDefault();
@@ -372,6 +416,23 @@
   $("c-item").addEventListener("change", atualizarUnidade);
   $("c-foto").addEventListener("change", atualizarFoto);
   $("btn-abrir").addEventListener("click", abrir);
+  $("quest-avancar-1").addEventListener("click", function () {
+    limparErros();
+    var todos = validar(), campos = {};
+    ["item_id", "quantidade", "validade"].forEach(function (k) { if (todos[k]) campos[k] = todos[k]; });
+    if (Object.keys(campos).length) aplicarCampos(campos); else mostrarQuestEtapa(2);
+  });
+  $("quest-avancar-2").addEventListener("click", function () {
+    limparErros();
+    var todos = validar();
+    var campos = {};
+    PERGUNTAS.forEach(function (p) { if (todos[p[0]]) campos[p[0]] = todos[p[0]]; });
+    if (todos.foto) campos.foto = todos.foto;
+    if (Object.keys(campos).length) aplicarCampos(campos); else mostrarQuestEtapa(3);
+  });
+  document.querySelectorAll("[data-quest-voltar]").forEach(function (botao) {
+    botao.addEventListener("click", function () { mostrarQuestEtapa(Number(botao.dataset.questVoltar)); });
+  });
   $("btn-cancelar").addEventListener("click", cancelar);
   $("form-contribuicao").addEventListener("submit", enviar);
   carregar().then(aplicarSugestao);

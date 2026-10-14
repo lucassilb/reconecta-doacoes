@@ -35,6 +35,10 @@
         <div id="saudacao-selos" class="painel__selos" aria-label="Perfis da conta"></div>
       </header>
 
+      <nav id="painel-abas" class="painel-abas" aria-label="Áreas do painel"></nav>
+      <p id="painel-aba-descricao" class="painel-aba-descricao"></p>
+      <div id="painel-subabas" class="painel-subabas" role="group" aria-label="O que fazer agora" hidden></div>
+
       <!-- ===== empresa ===== -->
       <div id="bloco-empresa" class="painel__grade" hidden>
 
@@ -53,28 +57,36 @@
       <!-- excedentes: publicação por empresa de alimentos ou pessoa física; reservas por ONG -->
       <div id="bloco-excedentes" class="painel__grade" hidden>
         <section class="cartao" id="publicar-excedente" aria-labelledby="publicar-excedente-t" hidden>
-          <h2 id="publicar-excedente-t" class="cartao__titulo">Publicar excedente</h2>
-          <p class="cartao__sub" id="publicar-excedente-sub">Ofereça alimentos dentro da validade para uma ONG retirar antes do prazo.</p>
+          <h2 id="publicar-excedente-t" class="cartao__titulo">Criar uma doação</h2>
+          <p class="cartao__sub" id="publicar-excedente-sub">Informe o alimento, o local de retirada e confirme as condições.</p>
+          <div id="ex-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
           <form id="form-excedente" class="form-doacao" novalidate>
+            <ol class="painel-etapas" aria-label="Etapas da doação"><li data-etapa-indicador="1" aria-current="step">1 · Alimento</li><li data-etapa-indicador="2">2 · Retirada</li><li data-etapa-indicador="3">3 · Confirmar</li></ol>
+            <div class="painel-etapa" data-etapa="1">
+            <h3>O que você está doando?</h3>
+            <fieldset class="itens">
+              <legend class="itens__legenda">Alimentos</legend>
+              <p id="ex-itens-erro" class="campo__erro" data-erro></p>
+              <div id="ex-itens" class="itens__lista"></div>
+              <button type="button" id="ex-add-item" class="btn btn--secundario btn--pequeno btn--add">Adicionar outro alimento</button>
+            </fieldset>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--primario" data-ex-avancar="2">Continuar</button></div>
+            </div>
+            <div class="painel-etapa" data-etapa="2" hidden>
+            <h3>Onde e até quando a ONG retira?</h3>
             <div class="campo campo--limite">
               <label for="ex-retirar-ate" class="campo__rotulo">Retirar até</label>
               <input id="ex-retirar-ate" type="datetime-local" class="campo__entrada campo__entrada--mono" required aria-describedby="ex-retirar-ate-erro">
               <p id="ex-retirar-ate-erro" class="campo__erro" data-erro></p>
             </div>
-            <fieldset class="itens">
-              <legend class="itens__legenda">Itens disponíveis</legend>
-              <p id="ex-itens-erro" class="campo__erro" data-erro></p>
-              <div id="ex-itens" class="itens__lista"></div>
-              <button type="button" id="ex-add-item" class="btn btn--secundario btn--pequeno btn--add">Adicionar item</button>
-            </fieldset>
             <fieldset class="itens" id="ex-retirada" hidden>
               <legend class="itens__legenda">Onde a ONG retira</legend>
               <p class="campo__ajuda" id="ex-retirada-ajuda">Só a ONG que reservar vê o endereço; para as outras aparece só a cidade.</p>
               <p id="ex-retirada-erro" class="campo__erro" data-erro></p>
               <div class="campo"><label for="ex-ret-logradouro" class="campo__rotulo">Rua ou avenida</label>
                 <input id="ex-ret-logradouro" class="campo__entrada" maxlength="100" autocomplete="address-line1" aria-describedby="ex-retirada-ajuda ex-retirada-erro"></div>
-              <div class="campo"><label for="ex-ret-numero" class="campo__rotulo">Número</label>
-                <input id="ex-ret-numero" class="campo__entrada campo__entrada--mono" maxlength="10" placeholder="Ex.: 120 ou S/N"></div>
+              <div class="campo"><label for="ex-ret-numero" class="campo__rotulo">Número / S/N</label>
+                <input id="ex-ret-numero" class="campo__entrada campo__entrada--mono" maxlength="10" placeholder="120"></div>
               <div class="campo"><label for="ex-ret-bairro" class="campo__rotulo">Bairro (opcional)</label>
                 <input id="ex-ret-bairro" class="campo__entrada" maxlength="60" autocomplete="address-level3"></div>
               <div class="campo"><label for="ex-ret-municipio" class="campo__rotulo">Cidade</label>
@@ -88,16 +100,21 @@
               <label for="ex-observacao" class="campo__rotulo">Observação para a ONG (opcional)</label>
               <textarea id="ex-observacao" class="campo__entrada" maxlength="200" rows="2" placeholder="Ex.: Retirada pela portaria lateral"></textarea>
             </div>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--secundario" data-ex-voltar="1">Voltar</button><button type="button" class="btn btn--primario" data-ex-avancar="3">Continuar</button></div>
+            </div>
+            <div class="painel-etapa" data-etapa="3" hidden>
+            <h3>Confira sua doação</h3>
+            <div id="ex-resumo" class="painel-resumo" aria-live="polite"></div>
             <fieldset class="ex-declaracoes">
               <legend class="itens__legenda">Confirme as condições dos alimentos</legend>
               <label><input id="ex-dentro-validade" type="checkbox" required> Todos os alimentos estão dentro da validade.</label>
-              <label><input id="ex-embalagem-ok" type="checkbox" required> As embalagens estão íntegras.</label>
+              <label><input id="ex-embalagem-ok" type="checkbox" required> As embalagens estão íntegras, quando houver; os alimentos não têm sinais de estrago.</label>
               <label><input id="ex-armazenado-ok" type="checkbox" required> Os alimentos foram armazenados corretamente.</label>
               <label id="ex-nao-caseiro-linha" hidden><input id="ex-nao-caseiro" type="checkbox"> Não é comida feita em casa.</label>
               <p id="ex-declaracoes-erro" class="campo__erro" data-erro></p>
             </fieldset>
-            <div id="ex-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
-            <button id="ex-publicar" type="submit" class="btn btn--primario">Publicar excedente</button>
+            <div class="painel-etapa__acoes"><button type="button" class="btn btn--secundario" data-ex-voltar="2">Voltar</button><button id="ex-publicar" type="submit" class="btn btn--primario">Publicar doação</button></div>
+            </div>
           </form>
         </section>
         <section class="cartao" id="meus-excedentes" aria-labelledby="meus-excedentes-t" hidden>
@@ -134,7 +151,8 @@
           <h2 id="publicar-t" class="cartao__titulo">Publicar pedido de doação</h2>
           <p class="cartao__sub">Diga do que você precisa: cada item, a quantidade e até quando pode receber. O pedido aparece em Pedidos das ONGs, na Home, e pessoas com CPF ou outras empresas doam, com questionário e foto.</p>
 
-          <div class="ia-pedido" id="ia-pedido">
+          <details class="ia-pedido" id="ia-pedido">
+            <summary>Preencher com IA (opcional)</summary>
             <label for="ia-texto" class="campo__rotulo">Descreva o que vocês precisam <span class="ia-pedido__opcional">(opcional)</span></label>
             <textarea id="ia-texto" class="campo__entrada" rows="2" maxlength="600"
                       placeholder="Ex.: Precisamos de 100 caixas de leite e 100 pães até sexta"
@@ -143,7 +161,7 @@
             <p id="ia-erro" class="campo__erro" data-erro></p>
             <button type="button" id="btn-ia" class="btn btn--secundario btn--pequeno">Preencher com IA</button>
             <div id="ia-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
-          </div>
+          </details>
 
           <form id="form-doacao" class="form-doacao" novalidate>
             <div class="campo campo--limite">
@@ -179,6 +197,11 @@
           </div>
           <div id="lista-doacoes" class="doacoes" aria-live="polite"></div>
         </section>
+        <section class="cartao" id="recebidas" aria-labelledby="recebidas-t">
+          <h2 id="recebidas-t" class="cartao__titulo">Doações recebidas</h2>
+          <p class="cartao__sub">Confirme a entrega de cada alimento ou marque Não recebi.</p>
+          <ul id="lista-recebidas" class="doacoes painel-recebidas" aria-live="polite"></ul>
+        </section>
       </div>
 
       <!-- ===== o que a pessoa doou: empresa e doador ===== -->
@@ -188,7 +211,8 @@
             <h2 id="minhas-doacoes-t" class="cartao__titulo">Minhas doações</h2>
             <a class="link-seta" href="/#doacoes">Ver doações disponíveis <span aria-hidden="true">→</span></a>
           </div>
-          <p class="cartao__sub">O que você doou para pedidos de empresas, com o endereço e o prazo de entrega.</p>
+          <p class="cartao__sub">Alimentos doados para pedidos das ONGs.</p>
+          <p id="minhas-semana" class="painel-semana" role="status"></p>
           <div id="lista-minhas-doacoes" class="doacoes" aria-live="polite"></div>
         </section>
       </div>
@@ -202,7 +226,7 @@
         </section>
 
         <section class="cartao" aria-labelledby="disponiveis-t">
-          <h2 id="disponiveis-t" class="cartao__titulo">Pedidos abertos agora</h2>
+          <h2 id="disponiveis-t" class="cartao__titulo">Pedidos das ONGs</h2>
           <div id="lista-disponiveis" class="doacoes" aria-live="polite"></div>
         </section>
       </div>

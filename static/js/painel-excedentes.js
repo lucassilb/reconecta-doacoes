@@ -48,6 +48,63 @@
   var opcoes = { categorias: [], unidades: [] };
   var linhas = [];
   var sequencia = 0;
+  var etapa = 1;
+  var FOTOS = { "Hortifrúti": "hortifruti", "Padaria": "padaria", "Laticínios": "laticinios",
+    "Carnes e peixes": "carnes-peixes", "Grãos e cereais": "graos-cereais",
+    "Refeições prontas": "refeicoes-prontas", "Bebidas não alcoólicas": "bebidas", "Outros": "outros" };
+  function mostrarEtapa(numero) {
+    etapa = numero;
+    document.querySelectorAll("#form-excedente [data-etapa]").forEach(function (no) {
+      no.hidden = Number(no.dataset.etapa) !== numero;
+    });
+    document.querySelectorAll("#form-excedente [data-etapa-indicador]").forEach(function (no) {
+      no.setAttribute("aria-current", Number(no.dataset.etapaIndicador) === numero ? "step" : "false");
+    });
+    if (numero === 3) resumir();
+    $("publicar-excedente-t").scrollIntoView({ block: "start" });
+  }
+  function resumir() {
+    function dataCurta(valor) { return valor ? valor.slice(0, 10).split("-").reverse().join("/") : "—"; }
+    var local = pessoaFisica ? [$("ex-ret-logradouro").value, $("ex-ret-numero").value,
+      $("ex-ret-municipio").value, $("ex-ret-uf").value].filter(Boolean).join(", ") : "Endereço do seu cadastro";
+    var prazo = $("ex-retirar-ate").value;
+    $("ex-resumo").replaceChildren(
+      el("strong", { texto: "Você está doando" }),
+      el("ul", null, linhas.map(function (i) { return el("li", { texto: i.nome.value.trim() + " · " + i.quantidade.value + " " + i.unidade_medida.value + " · validade " + dataCurta(i.validade.value) }); })),
+      el("p", { texto: "Retirada: " + local + " · até " + dataCurta(prazo) + (prazo ? " às " + prazo.slice(11, 16) : "") })
+    );
+  }
+  function validarEtapa(numero) {
+    var grupo = document.querySelector('#form-excedente [data-etapa="' + numero + '"]');
+    var invalido = Array.from(grupo.querySelectorAll("input, select")).find(function (no) {
+      return !no.closest("[hidden]") && !no.checkValidity();
+    });
+    if (invalido) { invalido.reportValidity(); invalido.focus(); return false; }
+    if (numero === 1) {
+      if (!linhas.length || linhas.some(function (i) { return !i.nome.value.trim() || !i.categoria.value || !i.unidade_medida.value || !i.validade.value; })) {
+        $("ex-itens-erro").textContent = "Preencha alimento, categoria, quantidade, unidade e validade.";
+        return false;
+      }
+      $("ex-itens-erro").textContent = "";
+    }
+    if (numero === 2) {
+      var prazo = $("ex-retirar-ate").value;
+      if (!prazo || window.ReConecta.dataBrasilia(prazo) <= new Date() ||
+          linhas.some(function (i) { return i.validade.value && prazo.slice(0, 10) > i.validade.value; })) {
+        $("ex-retirar-ate-erro").textContent = "Escolha um prazo futuro, até a validade dos alimentos.";
+        $("ex-retirar-ate").focus(); return false;
+      }
+      if (pessoaFisica && (!$('ex-ret-logradouro').value.trim() || !$('ex-ret-numero').value.trim() ||
+          !$('ex-ret-municipio').value.trim() || !$('ex-ret-uf').value ||
+          ($('ex-ret-cep').value && $('ex-ret-cep').value.replace(/\D/g, '').length !== 8))) {
+        $("ex-retirada-erro").textContent = "Informe rua, número, cidade e UF. Se incluir CEP, use 8 números.";
+        $('ex-ret-logradouro').focus(); return false;
+      }
+      $("ex-retirar-ate-erro").textContent = "";
+      $("ex-retirada-erro").textContent = "";
+    }
+    return true;
+  }
   function seletor(lista, rotulo) {
     var no = el("select");
     no.appendChild(el("option", { value: "", texto: rotulo }));
@@ -57,15 +114,29 @@
   function adicionarItem() {
     var id = "ex-item-" + (++sequencia);
     var nome = el("input", { type: "text", maxlength: "100", required: "" });
-    var categoria = seletor(opcoes.categorias, "Selecione");
+    var categoria = el("input", { type: "hidden" });
     var quantidade = el("input", { type: "number", min: "0.01", max: "99999999.99", step: "0.01", inputmode: "decimal", required: "" });
-    var unidade = seletor(opcoes.unidades, "Selecione");
+    var unidade = seletor(opcoes.unidades, "Unid.");
+    unidade.required = true;
     var validade = el("input", { type: "date", min: window.ReConecta.diaISO(new Date()), required: "" });
     var registro = { nome: nome, categoria: categoria, quantidade: quantidade, unidade_medida: unidade, validade: validade };
     var remover = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: "Remover item", "aria-label": "Remover este item" });
+    var fotos = el("div", { classe: "ex-categorias", role: "group", "aria-label": "Escolha a categoria do alimento" });
+    opcoes.categorias.forEach(function (rotulo) {
+      var slug = FOTOS[rotulo] || "outros";
+      var botao = el("button", { type: "button", classe: "ex-categoria", "aria-pressed": "false", texto: rotulo });
+      botao.style.setProperty("--foto", 'url("/static/img/categorias/' + slug + '.webp")');
+      botao.addEventListener("click", function () { categoria.value = rotulo; categoria.dispatchEvent(new Event("change")); });
+      fotos.appendChild(botao);
+    });
+    categoria.addEventListener("change", function () {
+      fotos.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.textContent === categoria.value)); });
+    });
     var linha = el("div", { classe: "item ex-item" }, [
+      el("p", { classe: "ex-categorias__titulo", texto: "Categoria do alimento" }),
+      fotos,
       el("div", { classe: "ex-item__grade" }, [
-        campo("Alimento", nome, id + "-nome"), campo("Categoria", categoria, id + "-categoria"),
+        categoria, campo("Alimento", nome, id + "-nome"),
         campo("Quantidade", quantidade, id + "-quantidade"), campo("Unidade", unidade, id + "-unidade"),
         campo("Validade", validade, id + "-validade")
       ]), remover
@@ -124,7 +195,11 @@
           : !$("ex-ret-municipio").value.trim() ? $("ex-ret-municipio") : !$("ex-ret-uf").value ? $("ex-ret-uf") : $("ex-ret-cep"));
       }
     }
-    if (erros.length) erros[0].focus();
+    if (erros.length) {
+      var destino = erros[0].closest("[data-etapa]");
+      if (destino) mostrarEtapa(Number(destino.dataset.etapa));
+      erros[0].focus();
+    }
     return !erros.length;
   }
   function publicar(evento) {
@@ -162,18 +237,23 @@
         aviso(deRetirada.length ? campos[deRetirada[0]] : (r.corpo.mensagem || "Não foi possível publicar o excedente."), true);
         return;
       }
-      aviso(pessoaFisica ? "Publicado. As ONGs perto de você são avisadas e, quando uma reservar, você recebe o aviso no sino."
-                         : "Excedente publicado. ONGs já podem reservá-lo.", false);
+      var id = r.corpo.id || (r.corpo.excedente && r.corpo.excedente.id);
+      var alvo = $("ex-aviso");
+      alvo.className = "aviso aviso--ok";
+      alvo.replaceChildren(el("strong", { texto: "Sua doação foi publicada. " }),
+        id ? el("a", { href: "/excedentes/" + id, texto: "Ver sua doação" }) : "As ONGs já podem reservá-la.");
+      alvo.hidden = false;
       $("form-excedente").reset();
       linhas = [];
       $("ex-itens").replaceChildren();
       adicionarItem();
+      mostrarEtapa(1);
       carregarMeus();
     }).catch(function () { aviso("Sem conexão com o servidor. Tente novamente.", true); })
       .then(function () { btn.disabled = false; });
   }
   var STATUS = {
-    DISPONIVEL: ["Disponível", ""], RESERVADO: ["Reservado", "selo--acento"],
+    DISPONIVEL: ["Aguardando uma ONG retirar", ""], RESERVADO: ["Reservado", "selo--acento"],
     RETIRADO: ["Retirado", ""], CANCELADO: ["Cancelado", "selo--cinza"],
     EXPIRADO: ["Prazo expirado", "selo--cinza"]
   };
@@ -204,7 +284,7 @@
     var nome = item.empresa && item.empresa.nome ? item.empresa.nome : "Organização";
     var cartao = el("article", { classe: "doacao ex-cartao" }, [
       el("div", { classe: "doacao__topo" }, [
-        el("a", { href: "/excedentes/" + item.id, classe: "doacao__onde", texto: propria ? "Excedente #" + item.id : nome }),
+        el("a", { href: "/excedentes/" + item.id, classe: "doacao__onde", texto: propria ? "Sua doação #" + item.id : nome }),
         el("span", { classe: "selo " + estado[1], texto: estado[0] })
       ]),
       el("p", { classe: "doacao__prazo", texto: "Retirar até " + hora(item.retirar_ate) }),
@@ -220,7 +300,7 @@
       acoes.appendChild(acao("Confirmar retirada", base + "/confirmar-retirada", "POST", acoes, true));
       acoes.appendChild(acao("Cancelar reserva", base + "/cancelar-reserva", "POST", acoes, true));
     } else if (propria && item.status === "DISPONIVEL") {
-      acoes.appendChild(acao("Cancelar excedente", base, "DELETE", acoes, true));
+      acoes.appendChild(acao("Cancelar doação", base, "DELETE", acoes, true));
     } else if (!propria && item.status === "RESERVADO") {
       acoes.appendChild(acao("Cancelar reserva", base + "/cancelar-reserva", "POST", acoes, true));
     }
@@ -235,7 +315,7 @@
       if (!r.ok || !Array.isArray(r.corpo)) throw new Error("lista");
       lista.replaceChildren();
       if (!r.corpo.length) {
-        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: propria ? "Você ainda não publicou excedentes." : "Você ainda não reservou excedentes." }));
+        lista.appendChild(el("p", { classe: "doacoes__vazio", texto: propria ? "Você ainda não ofereceu alimentos para retirada." : "Você ainda não reservou alimentos." }));
       } else r.corpo.forEach(function (item) { lista.appendChild(cartao(item, propria)); });
     }).catch(function () {
       lista.replaceChildren(el("p", { classe: "doacoes__vazio", texto: "Não foi possível carregar a lista. Tente atualizar." }));
@@ -302,6 +382,12 @@
   $("ex-recarregar-reservas").addEventListener("click", carregarReservas);
   $("ex-add-item").addEventListener("click", adicionarItem);
   $("form-excedente").addEventListener("submit", publicar);
+  document.querySelectorAll("[data-ex-avancar]").forEach(function (botao) {
+    botao.addEventListener("click", function () { if (validarEtapa(etapa)) mostrarEtapa(Number(botao.dataset.exAvancar)); });
+  });
+  document.querySelectorAll("[data-ex-voltar]").forEach(function (botao) {
+    botao.addEventListener("click", function () { mostrarEtapa(Number(botao.dataset.exVoltar)); });
+  });
   var recargaPendente;
   document.addEventListener("reconecta:evento", function (evento) {
     if (evento.detail && /^excedente\./.test(evento.detail.tipo)) {
@@ -327,7 +413,10 @@
       adicionarItem();
       var linha = linhas[linhas.length - 1];
       linha.nome.value = String(item.nome || "").slice(0, 100);
-      if (opcoes.categorias.indexOf(item.categoria) !== -1) linha.categoria.value = item.categoria;
+      if (opcoes.categorias.indexOf(item.categoria) !== -1) {
+        linha.categoria.value = item.categoria;
+        linha.categoria.dispatchEvent(new Event("change"));
+      }
       if (Number(item.quantidade) > 0) linha.quantidade.value = String(Number(item.quantidade));
       if (opcoes.unidades.indexOf(item.unidade_medida) !== -1) linha.unidade_medida.value = item.unidade_medida;
     });
@@ -348,12 +437,12 @@
       var alimentos = pessoaFisica || perfis.indexOf("empresa_alimentos") !== -1;
       if (!ong && !alimentos) return;
       if (pessoaFisica) {
-        $("publicar-excedente-t").textContent = "Doar o que sobrou";
-        $("publicar-excedente-sub").textContent = "Sem pedido aberto para o seu alimento? Publique aqui: as ONGs perto de você são avisadas, uma reserva e retira no endereço que você informar.";
-        $("meus-excedentes-t").textContent = "Meus alimentos publicados";
+        $("publicar-excedente-t").textContent = "Criar uma doação";
+        $("publicar-excedente-sub").textContent = "Uma ONG poderá reservar e retirar este alimento no local que você informar.";
+        $("meus-excedentes-t").textContent = "Alimentos que ofereci";
         $("ex-retirada").hidden = false;
         $("ex-nao-caseiro-linha").hidden = false;
-        $("ex-publicar").textContent = "Publicar para as ONGs";
+        $("ex-publicar").textContent = "Publicar doação";
         $("ex-ret-cep").addEventListener("input", function () {
           var d = this.value.replace(/\D/g, "").slice(0, 8);
           this.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
