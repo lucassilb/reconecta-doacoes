@@ -140,6 +140,19 @@
     return nomes.join(", ") + (resto > 0 ? " e mais " + resto : "");
   }
 
+  /* Frase do cartão "Pedidos abertos" sem pedido: o convite muda com quem está vendo. */
+  function conviteSemPedido() {
+    if (usuarioAtual && !ehOng() && podePublicar()) {
+      return ["Nenhum pedido aberto neste momento. Tem alimento sobrando? ",
+              el("a", { href: "/painel#publicar-excedente", texto: "Doe o que sobrou", "data-convite": "" }), " para uma ONG retirar."];
+    }
+    if (usuarioAtual) {
+      return ["Nenhum pedido aberto neste momento. ",
+              el("a", { href: "/painel#publicar", texto: "Publique o pedido da sua ONG", "data-convite": "" }), "."];
+    }
+    return ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua ONG", "data-convite": "" }), " e publique o primeiro."];
+  }
+
   function preencherUltima(doacoes, falhou) {
     var cartao = $("ultima-doacao");
     var c = $("ultima-doacao-corpo");   // o ícone da caixa fica fixo no HTML
@@ -150,7 +163,7 @@
     if (!d) {
       c.append(
         el("p", { classe: "sobretitulo", texto: "Pedidos abertos" }),
-        el("p", { classe: "ultima__vazia" }, ["Nenhum pedido aberto neste momento. ", el("a", { href: "/cadastro", texto: "Cadastre sua ONG", "data-convite": "" }), " e publique o primeiro."])
+        el("p", { classe: "ultima__vazia" }, conviteSemPedido())
       );
       ajustarConvites();
       return;
@@ -257,34 +270,54 @@
     return span;
   }
 
-  /* Sem doações: grade de categorias aceitas. Cada cartão leva ao cadastro da empresa
-     (ou ao painel, se uma empresa já estiver logada): não há filtro por categoria. */
+  /* Sem pedido aberto: diz isso com clareza e oferece o caminho que existe agora,
+     "Doar o que sobrou" (publicar para as ONGs retirarem). As categorias são só
+     informativas: nenhum cartão leva a cadastro ou login de quem já entrou. */
+  var categoriasVazio = null;
+  function podePublicar() { return !!(usuarioAtual && (usuarioAtual.tipo === "doador" || ehEmpresaAlimentos())); }
+  function acoesVazio() {
+    var principal, secundaria;
+    if (!usuarioAtual) {
+      principal = el("button", { type: "button", classe: "vazio__cta" }, [
+        svg("predio", "vazio__cta-icone"), el("span", { texto: "Doar o que sobrou" }), svg("seta", "vazio__cta-seta")]);
+      principal.addEventListener("click", abrirAssistente);
+      secundaria = el("a", { classe: "vazio__quem", href: "/cadastro" }, [svg("duvida", "vazio__quem-icone"), "Criar conta (CPF ou CNPJ)"]);
+    } else if (!ehOng() && podePublicar()) {
+      principal = el("a", { classe: "vazio__cta", href: "/painel#publicar-excedente" }, [
+        svg("predio", "vazio__cta-icone"), el("span", { texto: "Doar o que sobrou" }), svg("seta", "vazio__cta-seta")]);
+      secundaria = el("a", { classe: "vazio__quem", href: "#excedentes" }, [svg("duvida", "vazio__quem-icone"), "O que já foi oferecido"]);
+    } else {
+      // ONG: o caminho dela é pedir ou reservar o que foi oferecido
+      principal = el("a", { classe: "vazio__cta", href: "/painel#publicar" }, [
+        svg("predio", "vazio__cta-icone"), el("span", { texto: "Publicar um pedido" }), svg("seta", "vazio__cta-seta")]);
+      secundaria = el("a", { classe: "vazio__quem", href: "#excedentes" }, [svg("duvida", "vazio__quem-icone"), "Ver excedentes de hoje"]);
+    }
+    return el("div", { classe: "vazio__acoes" }, [principal, secundaria]);
+  }
   function montarVazio(categorias) {
+    categoriasVazio = categorias;
     var alvo = $("doacoes-conteudo");
     $("carrossel-controles").hidden = true;
     atualizarControles = null;
+    var ong = !!usuarioAtual && ehOng();
     alvo.replaceChildren(el("div", { classe: "vazio" }, [
       el("div", { classe: "vazio__texto" }, [
-        el("h3", { texto: "Nenhuma doação aberta agora" }),
-        el("p", { texto: "Assim que uma ONG publicar um pedido, ele aparece aqui na hora para quem quiser doar. Estas são as categorias que a plataforma recebe:" })
+        el("h3", { texto: "Nenhum pedido aberto agora" }),
+        el("p", { texto: ong
+          ? "Quando uma ONG publicar o que está faltando, o pedido aparece aqui na hora. Publique o pedido da sua organização para receber doações."
+          : "Quando uma ONG publicar o que está faltando, o pedido aparece aqui na hora. Tem alimento sobrando? Dá para doar agora: publique o que sobrou e uma ONG reserva e retira." })
       ]),
-      el("ul", { classe: "categorias" }, categorias.map(function (c) {
+      acoesVazio(),
+      el("p", { classe: "vazio__legenda", texto: "Categorias que a plataforma recebe:" }),
+      el("ul", { classe: "categorias categorias--info", "aria-label": "Categorias que a plataforma recebe" }, categorias.map(function (c) {
         var slug = IMG_CATEGORIA[c] || "outros";
         return el("li", null, [
-          el("a", { classe: "categoria categoria--" + slug, href: "/cadastro", "data-destino-empresa": "",
-                      "aria-label": c + ": cadastrar ONG ou empresa" }, [
+          el("span", { classe: "categoria categoria--" + slug }, [
             el("span", { classe: "categoria__icone" }, [imgCategoria(c, 56, "", "foto")]),
-            el("span", { classe: "categoria__nome", texto: c }),
-            svg("chevron", "categoria__seta")
+            el("span", { classe: "categoria__nome", texto: c })
           ])
         ]);
-      })),
-      el("div", { classe: "vazio__acoes" }, [
-        el("a", { classe: "vazio__cta", href: "/cadastro", "data-destino-empresa": "" }, [
-          svg("predio", "vazio__cta-icone"), el("span", { texto: "Cadastrar ONG ou empresa" }), svg("seta", "vazio__cta-seta")
-        ]),
-        el("a", { classe: "vazio__quem", href: "/sobre#criterio" }, [svg("duvida", "vazio__quem-icone"), "Quem pode doar"])
-      ])
+      }))
     ]));
     alvo.setAttribute("aria-busy", "false");
     ajustarConvites();
@@ -385,13 +418,30 @@
     var alvo = $("excedentes-conteudo");
     var metrica = document.querySelector('[data-resumo="excedentes"]');
     if (metrica) metrica.textContent = inteiro.format(total);
-    $("excedentes-publicar").hidden = !ehEmpresaAlimentos();
+    // uma linha de explicação e uma ação útil para cada perfil, nunca um beco sem saída
+    var publicar = $("excedentes-publicar"), lead = $("excedentes-lead");
+    if (ehOng()) {
+      publicar.hidden = !ehEmpresaAlimentos();
+      publicar.textContent = "Publicar excedente"; publicar.href = "/painel#publicar-excedente";
+      lead.textContent = "Alimentos oferecidos por empresas e pessoas para a sua ONG reservar e retirar antes de vencer. Quando alguém reserva, o cartão some daqui na hora.";
+    } else if (podePublicar()) {
+      publicar.hidden = false;
+      publicar.textContent = "Doar o que sobrou"; publicar.href = "/painel#publicar-excedente";
+      lead.textContent = "Alimentos oferecidos para ONGs retirarem; só ONGs reservam. Quer doar também? Publique o que sobrou e uma ONG retira.";
+    } else if (!usuarioAtual) {
+      publicar.hidden = false;
+      publicar.textContent = "Entrar como ONG"; publicar.href = "/entrar?proximo=" + encodeURIComponent("/#excedentes");
+      lead.textContent = "Alimentos oferecidos por empresas e pessoas para ONGs retirarem antes de vencer. A ONG entra, reserva pelo site e retira no prazo.";
+    } else {
+      publicar.hidden = true;
+      lead.textContent = "Alimentos oferecidos para ONGs retirarem; só ONGs reservam. Para doar, escolha um pedido das ONGs acima.";
+    }
     if (!lista.length) {
       alvo.replaceChildren(el("div", { classe: "excedentes__vazio" }, [
         el("h3", { texto: "Nenhum excedente disponível agora" }),
-        el("p", { texto: ehEmpresaAlimentos()
+        el("p", { texto: podePublicar()
           ? "Sobrou alimento bom hoje? Publique e as ONGs com pedido parecido são avisadas na hora."
-          : "Quando uma empresa de alimentos publicar o que sobrou, o cartão aparece aqui na hora, sem recarregar a página." })
+          : "Quando alguém publicar o que sobrou, o cartão aparece aqui na hora, sem recarregar a página." })
       ]));
     } else {
       alvo.replaceChildren(el("ul", { classe: "excedentes__lista",
@@ -629,16 +679,37 @@
   dlg.addEventListener("click", function (e) { if (e.target === dlg) fecharAssistente(); });
   dlg.addEventListener("close", function () { $("hero-cta").focus(); });
   $("hero-cta").addEventListener("click", abrirAssistente);
+  // "Doar" do cabeçalho: na própria Home abre o assistente sem recarregar
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href="/?assistente=1"]');
+    if (!a) return;
+    e.preventDefault();
+    abrirAssistente();
+  });
 
   /* ---------- CTA conforme a sessão ---------- */
 
   var usuarioAtual = null;
+  /* Quem já entrou nunca é mandado para o cadastro: cada convite vira a ação do perfil. */
   function ajustarConvites() {
-    document.querySelectorAll("[data-convite]").forEach(function (a) {
-      if (usuarioAtual && usuarioAtual.tipo === "empresa") { a.href = "/painel"; a.textContent = "Abra o painel"; }
+    var vazio = document.querySelector("#ultima-doacao-corpo .ultima__vazia");
+    if (vazio) vazio.replaceChildren.apply(vazio, conviteSemPedido());
+    var ong = !!usuarioAtual && ehOng();
+    var acoes = {
+      empresa: usuarioAtual && usuarioAtual.tipo === "empresa" ? ["/painel", "Abrir o painel"] : null,
+      doador: usuarioAtual && usuarioAtual.tipo === "doador" ? ["/?assistente=1", "Doar agora"] : null,
+      ong: ong ? ["/painel#publicar", "Publicar pedido"] : null
+    };
+    document.querySelectorAll("[data-sessao]").forEach(function (a) {
+      var tipo = a.getAttribute("data-sessao");
+      if (!a.dataset.original) a.dataset.original = a.innerHTML;
+      if (!usuarioAtual) { a.hidden = false; a.href = "/cadastro"; a.innerHTML = a.dataset.original; return; }
+      var acao = tipo === "cta" ? (ong ? ["/painel#publicar", "Publicar pedido"] : null) : acoes[tipo];
+      a.hidden = !acao;
+      if (acao) { a.href = acao[0]; a.textContent = acao[1]; }
     });
-    var empresa = usuarioAtual && usuarioAtual.tipo === "empresa";
-    document.querySelectorAll("[data-destino-empresa]").forEach(function (a) { a.href = empresa ? "/painel" : "/cadastro"; });
+    // o convite final é para ONGs: quem não é ONG e já entrou não precisa dele
+    $("cta-final").hidden = !!usuarioAtual && !ong;
   }
 
   var abriuPeloEndereco = false;
@@ -657,6 +728,8 @@
     }
     // os cartões de excedente dizem "Ver e reservar" só para ONG
     if (excedentesAtuais && (mudouPerfil || u)) desenharExcedentes(excedentesAtuais, excedentesTotal);
+    // o estado vazio dos pedidos depende de quem está vendo (visitante, pessoa, empresa ou ONG)
+    if (categoriasVazio && !document.querySelector("#doacoes-conteudo .carrossel")) montarVazio(categoriasVazio);
     // volta do login com ?assistente=1: reabre com o texto guardado
     if (!abriuPeloEndereco && /[?&]assistente=1(&|$)/.test(location.search)) {
       abriuPeloEndereco = true;

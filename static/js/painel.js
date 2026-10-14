@@ -638,7 +638,7 @@
         limparFormulario();
         carregarDoacoes();
         mostrarAviso(avisoDoacao, "Pedido publicado",
-          "Ele já aparece em Doações disponíveis para quem quiser doar.", { ok: true });
+          "Ele já aparece em Pedidos das ONGs, na Home, para quem quiser doar.", { ok: true });
         $("minhas-t").scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
       }

@@ -269,12 +269,19 @@
       titulo.textContent = "Reservar este excedente";
       blocos.push(el("p", { classe: "doar__texto", texto: "Ao reservar, a sua ONG se compromete a retirar no prazo. O endereço aparece logo depois." }),
         botao("Reservar este excedente", "btn--primario", function (b) { agir("/reservar", "POST", b, MSG); }));
+    } else if (x.motivo_bloqueio === "Apenas ONGs podem reservar") {
+      // quem não é ONG não reserva, mas pode doar: ação útil em vez de um "não" seco
+      var perfis = (usuario && usuario.perfis) || [];
+      var publica = usuario.tipo === "doador" || perfis.indexOf("empresa_alimentos") !== -1;
+      titulo.textContent = "Oferecido para ONGs retirarem";
+      blocos.push(el("p", { classe: "doar__texto", texto: "Este alimento foi oferecido para uma ONG reservar e retirar. " +
+          (publica ? "Você também pode doar: publique o que sobrou ou escolha um pedido das ONGs." : "Você pode doar escolhendo um pedido das ONGs.") }));
+      if (publica) blocos.push(el("a", { classe: "btn btn--primario btn--largo", href: "/painel#publicar-excedente" }, ["Doar o que sobrou"]));
+      blocos.push(el("a", { classe: "btn btn--secundario btn--largo", href: "/#doacoes" }, ["Ver pedidos das ONGs"]));
     } else {
       titulo.textContent = "Reservar este excedente";
       blocos.push(el("p", { classe: "doar__bloqueio", texto: (x.motivo_bloqueio || "Você não pode reservar este excedente") + "." }),
-        el("p", { classe: "doar__nota", texto: "Excedentes são reservados por organizações sem fins lucrativos. Quem tem alimento pode doar para um pedido aberto ou publicar o que sobrou para as ONGs retirarem." }),
-        el("a", { classe: "btn btn--secundario btn--largo", href: "/#doacoes" }, ["Ver pedidos abertos"]),
-        el("a", { classe: "btn btn--fantasma btn--largo", href: "/painel#publicar-excedente" }, ["Publicar o que sobrou"]));
+        el("a", { classe: "btn btn--secundario btn--largo", href: "/#excedentes" }, ["Ver outros excedentes"]));
     }
     alvo.replaceChildren.apply(alvo, blocos);
   }

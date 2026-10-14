@@ -34,7 +34,7 @@
   var NAV = [
     { rotulo: "Início", href: "/" },
     { rotulo: "Sobre", href: "/sobre" },
-    { rotulo: "Doações", href: "/#doacoes" },
+    { rotulo: "Pedidos das ONGs", href: "/#doacoes" },
     { rotulo: "Como funciona", href: "/#como-funciona" },
     { rotulo: "Dashboard", href: "/dashboard" }
   ];
@@ -208,6 +208,8 @@
       sair.addEventListener("click", function () { sair.disabled = true; api.sair(); });
       aba.append(
         el("span", { classe: "cabecalho__ola", title: usuario.nome || "" }, ["Olá, ", el("strong", { texto: nomeCurto(usuario) })]),
+        // caminho direto para doar: abre o assistente "Tenho alimento para doar" na Home
+        el("a", { href: "/?assistente=1", classe: "btn btn--primario btn--pequeno cabecalho__doar" }, ["Doar"]),
         montarSino(),
         el("a", painel, ["Painel"]),
         sair
@@ -239,7 +241,7 @@
         el("p", { texto: "Plataforma que conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Pedidos das ONGs", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Privacidade", "/privacidade"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [
@@ -608,8 +610,22 @@
     }, function (erro) { clearTimeout(limite); throw erro; });
   }
 
+  /* Os scripts da página (home.js, excedente.js...) também são "defer" e rodam depois
+     deste; se /auth/me responder antes de eles executarem, o evento "reconecta:sessao"
+     se perderia e a pessoa logada seria tratada como visitante (convites de cadastro e
+     login). Por isso o evento só sai depois do DOMContentLoaded, quando todos os
+     scripts "defer" já registraram os ouvintes. */
+  var domPronto = new Promise(function (resolver) {
+    if (document.readyState === "complete") resolver();
+    else {
+      document.addEventListener("DOMContentLoaded", function () { resolver(); }, { once: true });
+      window.addEventListener("load", function () { resolver(); }, { once: true });  // se já passou do DOMContentLoaded
+    }
+  });
+
   function consultarSessao(resposta) {
     return resposta.then(function (r) { return r.ok ? r.corpo : null; }, function () { return null; })
+      .then(function (usuario) { return domPronto.then(function () { return usuario; }); })
       .then(function (usuario) {
         usuario = usuario && typeof usuario === "object" && usuario.nome !== undefined ? usuario : null;
         desenharAba(usuario);

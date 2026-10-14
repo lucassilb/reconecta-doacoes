@@ -11,7 +11,7 @@ Na rodada 11, o código local acrescenta perfis de ONG, excedentes, confirmaçã
 O desperdício de alimentos convive com a falta de alimento em outro lugar. O **ReConecta** organiza a ponte entre quem precisa e quem pode doar:
 
 1. Uma **ONG com CNPJ ativo e natureza jurídica sem fins lucrativos** ou uma **empresa de alimentos** publica um **pedido de doação** (ex.: "precisamos de 100 caixas de leite e 100 pães até sexta").
-2. O pedido aparece em **Doações disponíveis**. Qualquer **pessoa com CPF válido** ou **outra empresa** escolhe um item e doa.
+2. O pedido aparece em **Pedidos das ONGs**, na Home. Qualquer **pessoa com CPF válido** ou **outra empresa** escolhe um item e doa.
 3. Antes de confirmar, quem doa responde um **questionário curto** (4 perguntas de segurança alimentar) e envia uma **foto** do alimento. Se tudo estiver de acordo, a doação é aceita, o progresso do pedido é atualizado e a pessoa recebe o endereço e o prazo de entrega.
 4. Uma empresa de alimentos também pode publicar o **excedente do dia**; uma ONG reserva, retira e a publicadora confirma a retirada. A organização que abriu um pedido confirma se recebeu cada doação.
 

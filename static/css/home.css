@@ -297,6 +297,15 @@ span.doacao__img { background: var(--superficie-2); box-shadow: none; }
 .categoria--bebidas    { --cat: #8A5CD1; }
 .categoria--outros     { --cat: #7A7F8C; }
 
+/* categorias do estado vazio: só informação, sem link */
+.categorias--info .categoria { min-height: 64px; box-shadow: none; }
+.categorias--info .categoria:hover { transform: none; box-shadow: none; }
+.categorias--info .categoria__icone { width: 48px; height: 48px; border-radius: 12px; }
+.categorias--info .categoria__icone img { width: 38px; height: 38px; }
+.vazio__legenda { margin-top: 18px; font-size: .82rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.faixa__sub { margin-top: 6px; color: var(--tinta-suave); }
+button.vazio__cta { border: 0; cursor: pointer; font-family: inherit; }
+
 /* botões do estado vazio */
 .vazio__acoes { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-top: 8px; }
 .vazio__cta {
