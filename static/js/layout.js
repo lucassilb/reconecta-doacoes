@@ -241,7 +241,7 @@
         el("p", { texto: "Plataforma que conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam." })
       ]),
       el("div", { classe: "rodape__colunas" }, [
-        coluna("Plataforma", [["Início", "/"], ["Pedidos das ONGs", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
+        coluna("Plataforma", [["Início", "/"], ["Pedidos das ONGs", "/#doacoes"], ["Alimentos doados", "/#excedentes"], ["ONGs na rede", "/#ongs"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
         coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Privacidade", "/privacidade"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [

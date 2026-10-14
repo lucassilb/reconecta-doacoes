@@ -1,15 +1,15 @@
-"""Home e cabeçalho para quem já entrou (R15b).
+"""Home, cabeçalho e página do alimento doado para quem já entrou (R15b e R16).
 
-O comportamento é provado no navegador (r15/prova/corrida.mjs e ux.mjs). Estes testes
-guardam o contrato no código servido, para a regressão não voltar sem ninguém ver:
+O comportamento é provado no navegador (r15/prova/corrida.mjs, r16/home-prova/telas.mjs).
+Estes testes guardam o contrato no código servido, para a regressão não voltar sem ninguém ver:
 - o evento "reconecta:sessao" só sai depois do DOMContentLoaded (antes, se /auth/me
   respondesse antes de home.js/excedente.js executarem, a pessoa logada era tratada
   como visitante e recebia convites de cadastro e login);
-- o estado vazio dos pedidos não manda ninguém logado para /cadastro;
-- a seção chama "Pedidos das ONGs" e o topo tem "Doar" para quem entrou.
+- a Home tem o bloco "Agora na rede" com três abas e o filtro por categoria não leva a
+  cadastro; o estado vazio só manda o visitante ao cadastro;
+- os nomes são fixos: "Pedidos das ONGs" e "Alimentos doados"; "Sua doação" para quem doou.
 """
 import os
-import re
 
 os.environ["DATABASE_URL"] = "sqlite://"
 
@@ -30,25 +30,37 @@ def test_evento_de_sessao_espera_os_scripts_da_pagina():
     assert 'addEventListener("DOMContentLoaded"' in layout and 'addEventListener("load"' in layout
 
 
-def test_estado_vazio_dos_pedidos_nao_leva_quem_entrou_ao_cadastro():
-    home = _js("home.js")
-    vazio = home[home.index("function acoesVazio"):home.index("function montarFalha")]
-    logado = vazio[vazio.index("} else if"):]  # ramos de quem já entrou
-    assert "/cadastro" not in logado and "/entrar" not in logado
-    assert "Doar o que sobrou" in vazio and "/painel#publicar-excedente" in vazio
-    # as categorias são só informação: nenhum link
-    lista = vazio[vazio.index('"categorias categorias--info"'):]
-    assert 'el("a"' not in lista
-    convites = home[home.index("function ajustarConvites"):home.index("var abriuPeloEndereco")]
-    assert re.search(r"if \(!usuarioAtual\) \{[^}]*\"/cadastro\"", convites)  # /cadastro só para visitante
-
-
-def test_pagina_e_cabecalho_nomeiam_e_oferecem_doar():
+def test_home_tem_tres_abas_e_filtro_sem_cadastro():
     html = cliente.get("/").get_data(as_text=True)
-    assert 'id="doacoes-titulo">Pedidos das ONGs<' in html
-    assert "Para ONGs retirarem" in html
+    for aba in ("aba-pedidos", "aba-doados", "aba-ongs"):
+        assert f'id="{aba}" aria-controls="rede-painel"' in html
+    assert 'role="tablist"' in html and 'role="tabpanel"' in html
+    assert ">\n          Pedidos das ONGs <" in html and ">\n          Alimentos doados <" in html and ">\n          ONGs na rede <" in html
+    for ancora in ('id="doacoes"', 'id="excedentes"', 'id="ongs"', 'id="como-funciona"'):
+        assert ancora in html  # links antigos e do menu continuam chegando à aba certa
+    home = _js("home.js")
+    filtro = home[home.index("function montarFiltro"):home.index("function temCategoria")]
+    assert 'el("button"' in filtro and "/cadastro" not in filtro and 'el("a"' not in filtro
+
+
+def test_estado_vazio_so_manda_visitante_ao_cadastro():
+    home = _js("home.js")
+    acao = home[home.index("function acaoVazio"):home.index("function vazio(")]
+    linhas_cadastro = [linha for linha in acao.splitlines() if "/cadastro" in linha]
+    assert linhas_cadastro and all("usuarioAtual ? null :" in linha for linha in linhas_cadastro)
+    assert "Doar o que sobrou" in acao and "Publicar o primeiro pedido" in acao
+    assert "Cadastrar uma ONG não cria pedido" in home
+
+
+def test_nomes_fixos_e_sua_doacao():
     layout = _js("layout.js")
     assert '{ rotulo: "Pedidos das ONGs", href: "/#doacoes" }' in layout
+    assert '["Alimentos doados", "/#excedentes"]' in layout and "Excedentes de hoje" not in layout
     assert 'href: "/?assistente=1", classe: "btn btn--primario btn--pequeno cabecalho__doar" }, ["Doar"]' in layout
+    home = _js("home.js")
+    assert '"Sua doação"' in home and "Aguardando uma ONG retirar" in home and "Doado por " in home
     excedente = _js("excedente.js")
-    assert "Oferecido para ONGs retirarem" in excedente and "Doar o que sobrou" in excedente
+    assert 'titulo.textContent = "Sua doação"' in excedente and "Doar também" in excedente
+    assert "Apenas ONGs podem reservar." not in excedente  # sem o "não" seco para quem não é ONG
+    pagina = cliente.get("/excedentes/1").get_data(as_text=True)
+    assert "Alimentos doados" in pagina and "doacao.css" not in pagina

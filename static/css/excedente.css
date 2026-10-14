@@ -1,18 +1,74 @@
-/* ReConecta — página do excedente (/excedentes/<id>). Usa base.css e o layout de detalhe de doacao.css. */
+/* ReConecta — página do alimento doado (/excedentes/<id>), rodada 16: compacta, dados à
+   esquerda e ação à direita em 1280; uma coluna em 360. Só depende de base.css. */
 
-.selo--cinza { background: var(--superficie-2); color: var(--tinta-suave); }
+.exc-pagina { padding-block: 14px 40px; }
+.exc-voltar {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  color: var(--tinta-suave); font-weight: 600; font-size: .92rem; text-decoration: none;
+}
+.exc-voltar:hover { color: var(--verde-texto); }
+.exc-voltar svg { width: 18px; height: 18px; }
+.exc-carregando { color: var(--tinta-suave); padding: 24px 0; }
+
+.exc { display: grid; gap: 18px; align-items: start; }
+@media (min-width: 900px) { .exc { grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr); gap: 24px; } }
+
+/* dados */
+.exc-dados {
+  position: relative; overflow: hidden; border-radius: var(--raio);
+  background: var(--superficie); border: 1px solid var(--linha); box-shadow: var(--sombra-1);
+}
+.exc-dados__foto { display: block; width: 100%; height: 170px; object-fit: cover; background: var(--superficie-2); }
+.exc-dados__selo {
+  position: absolute; top: 12px; left: 12px; padding: 5px 12px; border-radius: var(--pilula);
+  background: var(--verde); color: var(--verde-tinta); font-weight: 700; font-size: .85rem;
+}
+.exc-dados__selo[hidden] { display: none; }
+.exc-dados__corpo { display: grid; gap: 6px; padding: 16px 20px 20px; }
+.exc-dados__tipo { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.exc-dados h1 { font-family: var(--fonte-texto); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; overflow-wrap: anywhere; }
+.exc-dados__quem { color: var(--tinta-suave); overflow-wrap: anywhere; }
+.exc-dados__quem strong { color: var(--tinta); }
+.exc-estado {
+  justify-self: start; margin-top: 4px; padding: 4px 12px; border-radius: var(--pilula);
+  font-size: .86rem; font-weight: 700; background: var(--superficie-2); color: var(--tinta-suave);
+}
+.exc-estado--espera { background: var(--acento-suave); color: var(--acento-texto); }
+.exc-estado--reservado { background: #E3EEFB; color: #24538F; }
+.exc-estado--ok { background: var(--verde-suave); color: var(--verde-texto); }
+
+.exc-fatos { margin: 10px 0 0; display: grid; gap: 10px 18px; grid-template-columns: 1fr 1fr; }
+.exc-fatos > div { min-width: 0; }
+.exc-fatos > div[hidden] { display: none; }
+.exc-fatos__largo { grid-column: 1 / -1; }
+.exc-fatos dt { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.exc-fatos dd { margin: 2px 0 0; color: var(--tinta); overflow-wrap: anywhere; }
+.exc-falta { color: var(--acento-texto); font-weight: 600; font-size: .88rem; white-space: nowrap; }
+
+.exc-itens { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.exc-itens:empty { display: none; }
+.exc-itens li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--superficie-2); font-size: .92rem; }
+.exc-itens li span { color: var(--tinta-suave); white-space: nowrap; }
+
+/* ação */
+.exc-acao-cartao {
+  display: grid; gap: 12px; padding: 20px; border-radius: var(--raio);
+  background: var(--superficie); border: 1px solid var(--linha); box-shadow: var(--sombra-1);
+}
+@media (min-width: 900px) { .exc-acao-cartao { position: sticky; top: 16px; } }
+.exc-acao-cartao h2 { font-family: var(--fonte-texto); font-size: 1.3rem; font-weight: 700; outline: none; }
+.exc-acao { display: grid; gap: 10px; }
+.exc-acao p { color: var(--tinta-suave); }
+.exc-acao .btn { width: 100%; justify-content: center; }
+.exc-reserva { display: grid; gap: 2px; padding: 12px 14px; border-radius: 14px; background: var(--verde-suave); }
+.exc-reserva__rotulo { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--verde-texto); }
+.exc-acao .exc-reserva p { color: var(--tinta); }
+.exc-reserva__valor { font-weight: 700; overflow-wrap: anywhere; }
+.exc-aviso { padding: 12px 14px; border-radius: 14px; background: var(--erro-suave, #FCEBEA); color: var(--erro, #A3261E); }
+.exc-aviso[hidden] { display: none; }
+.exc-aviso p:first-child { font-weight: 700; }
+
+/* todas as ações do cartão com cara de botão e a mesma largura; cancelar em alerta discreto */
+.exc-acao .btn { min-height: 46px; border: 1.5px solid var(--btn-borda, transparent); }
 .btn--perigo { --btn-cor: var(--erro); --btn-borda: var(--erro-linha); --btn-bg: var(--superficie); }
 .btn--perigo:hover:not(:disabled) { --btn-bg: var(--erro-suave); --btn-cor: var(--erro); }
-
-.exc__falta { color: var(--acento-texto); font-weight: 600; font-size: .9rem; white-space: nowrap; }
-
-.exc__acao { display: grid; gap: 12px; }
-.exc__acao .doar__texto { margin-bottom: 0; }
-.exc__reserva {
-  display: grid; gap: 4px; padding: 16px 18px; border-radius: 16px;
-  background: var(--verde-suave); color: var(--tinta);
-}
-.exc__reserva-titulo { font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--verde-texto); }
-.exc__endereco { font-size: 1.08rem; font-weight: 700; overflow-wrap: anywhere; }
-.exc__pergunta { font-weight: 600; }
-.excedente-pagina .quest__aviso { margin-top: 12px; }

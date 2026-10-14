@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ReConecta · Alimento bom não é desperdício</title>
-  <meta name="description" content="O ReConecta conecta, em tempo real, quem tem alimento sobrando a ONGs e organizações que precisam. Veja os pedidos abertos, os excedentes de hoje e doe.">
+  <meta name="description" content="O ReConecta conecta, em tempo real, quem tem alimento sobrando a ONGs que precisam. Veja os pedidos das ONGs, os alimentos doados e as ONGs da rede.">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,274 +16,88 @@
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/home.js" defer></script>
 </head>
-<body class="home">
+<body class="home home--r16">
   <header data-layout="cabecalho"></header>
 
   <main id="conteudo">
 
-    <!-- ============ HERO ============ -->
-    <div class="hero-palco">
-      <!-- decoração: folhas desfocadas nos cantos e ondas na base -->
-      <svg class="hero-deco hero-deco--folha-dir" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
-        <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#7DBB55"/>
-        <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#5E9A3A" stroke-width="4" stroke-linecap="round"/>
-      </svg>
-      <svg class="hero-deco hero-deco--folha-esq" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
-        <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#9CCB76"/>
-      </svg>
-      <svg class="hero-deco hero-deco--ondas" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path d="M0 120C240 60 420 150 720 110s520-90 720-30v120H0z" fill="var(--hero-onda-1)"/>
-        <path d="M0 160c260-50 520 20 760-10s460-60 680-10v60H0z" fill="var(--hero-onda-2)"/>
-      </svg>
-
-      <section class="hero container" aria-labelledby="hero-titulo">
-        <div class="hero__texto">
-          <p class="sobretitulo sobretitulo--acento">Redistribuição de excedentes alimentares</p>
-          <h1 id="hero-titulo">Excedente de hoje, <br><em>refeição</em> de amanhã</h1>
-          <p class="lead">ONGs publicam o que precisam. Empresas de alimentos avisam o que sobrou hoje. Pessoas e empresas doam pelo site, e cada mudança aparece na hora para todo mundo. O que iria para o lixo <strong>vira refeição.</strong></p>
-
-          <ul class="hero__metricas" id="resumo" aria-live="polite" aria-busy="true" aria-label="A plataforma agora">
-            <li class="hero-metrica">
-              <span class="hero-metrica__icone hero-metrica__icone--verde" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 19c0-8 5-13.5 14-14-.5 9-6 14-14 14z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19l7.5-7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </span>
-              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">pedidos abertos</span><span class="hero-metrica__valor" data-resumo="doacoes">—</span></span>
-            </li>
-            <li class="hero-metrica">
-              <span class="hero-metrica__icone hero-metrica__icone--pessego" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">doações recebidas</span><span class="hero-metrica__valor" data-resumo="recebidas">—</span></span>
-            </li>
-            <li class="hero-metrica">
-              <span class="hero-metrica__icone hero-metrica__icone--verde" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="9.5" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.8 14.2c2.4-.3 4.2 1.1 4.7 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </span>
-              <span class="hero-metrica__texto"><span class="hero-metrica__rotulo">excedentes hoje</span><span class="hero-metrica__valor" data-resumo="excedentes">—</span></span>
-            </li>
-          </ul>
-
-          <div class="hero__acoes">
-            <button type="button" class="hero__cta" id="hero-cta" aria-haspopup="dialog">
-              <span>Tenho alimento para doar</span>
-              <svg class="hero__cta-seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <a class="hero__secundario" id="hero-secundario" href="/cadastro">Preciso de doações <span aria-hidden="true">·</span> publicar pedido</a>
-          </div>
+    <!-- ============ TOPO: uma frase, duas ações, três números ============ -->
+    <section class="topo container" aria-labelledby="hero-titulo">
+      <div class="topo__texto">
+        <p class="sobretitulo sobretitulo--acento">Doação de alimentos em tempo real</p>
+        <h1 id="hero-titulo">Alimento bom <em>não é desperdício</em></h1>
+        <p class="topo__lead">ONGs pedem o que falta. Empresas e pessoas doam o que sobrou. Tudo aparece aqui na hora.</p>
+        <div class="topo__acoes">
+          <button type="button" class="btn btn--primario topo__cta" id="hero-cta" aria-haspopup="dialog">Tenho alimento para doar</button>
+          <a class="btn btn--secundario" id="hero-secundario" href="/cadastro">Sou ONG · pedir doações</a>
         </div>
-
-        <div class="hero__visual">
-          <div class="hero__forma">
-            <img class="hero__foto" id="hero-foto" src="/static/img/hero/caixote.webp" width="1200" height="900" fetchpriority="high"
-                 alt="Caixote de madeira com alface, pimentão, bananas, cenouras, tomates, laranja e pão">
-          </div>
-          <svg class="hero__folha hero__folha--topo" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
-            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#6DAE45"/>
-            <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#467A2A" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-          <svg class="hero__folha hero__folha--base" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
-            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#5A9A38"/>
-            <path d="M40 240C80 170 120 100 180 25" fill="none" stroke="#3E6F1F" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-          <svg class="hero__folha hero__folha--lado" viewBox="0 0 200 260" aria-hidden="true" focusable="false">
-            <path d="M30 250C10 150 50 40 190 10c10 120-40 210-160 240z" fill="#8CC56A"/>
-          </svg>
-
-          <article class="cartao cartao--flutuante hero__cartao hero__cartao--doacao" id="ultima-doacao" aria-live="polite" aria-busy="true">
-            <span class="hero__cartao-icone" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </span>
-            <div class="hero__cartao-corpo" id="ultima-doacao-corpo">
-              <p class="sobretitulo">Doações abertas</p>
-              <div class="esqueleto" aria-hidden="true"><span></span><span></span><span></span></div>
-            </div>
-          </article>
-
-          <article class="cartao cartao--flutuante hero__cartao hero__cartao--passos" aria-labelledby="passos-titulo">
-            <p class="sobretitulo" id="passos-titulo">Em três passos</p>
-            <ol class="mini-passos">
-              <li><span class="mini-passos__n">1</span> <span>A ONG publica o pedido</span></li>
-              <li><span class="mini-passos__n">2</span> <span>Pessoas e empresas doam</span></li>
-              <li><span class="mini-passos__n">3</span> <span>A ONG confirma que recebeu</span></li>
-            </ol>
-          </article>
-        </div>
-      </section>
-    </div>
-
-    <!-- ============ PEDIDOS DAS ONGS (doações disponíveis) ============ -->
-    <section class="faixa container" id="doacoes" aria-labelledby="doacoes-titulo">
-      <div class="faixa__cartao">
-        <div class="faixa__principal">
-          <div class="faixa__topo">
-            <div>
-              <p class="sobretitulo sobretitulo--acento">Agora na plataforma <span class="ao-vivo" data-ao-vivo hidden></span></p>
-              <h2 id="doacoes-titulo">Pedidos das ONGs</h2>
-              <p class="faixa__sub" id="doacoes-sub">O que as ONGs pediram e ainda falta. Escolha um pedido e doe.</p>
-            </div>
-            <div class="faixa__controles" id="carrossel-controles" hidden>
-              <button type="button" class="link-seta" id="carrossel-anterior" aria-controls="lista-doacoes"><span aria-hidden="true">←</span> Anterior</button>
-              <button type="button" class="link-seta" id="carrossel-proximo" aria-controls="lista-doacoes">Próximo <span aria-hidden="true">→</span></button>
-            </div>
-          </div>
-          <div id="doacoes-conteudo" aria-live="polite" aria-busy="true">
-            <ul class="carrossel" aria-hidden="true">
-              <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
-              <li class="doacao doacao--esqueleto"><span class="doacao__img"></span><div class="esqueleto"><span></span><span></span><span></span></div></li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- painel de impacto: texto real; imagens só decorativas -->
-        <aside class="impacto" aria-labelledby="impacto-titulo">
-          <div class="impacto__fundo" aria-hidden="true">
-            <img class="impacto__bokeh" src="/static/img/doacoes/bokeh.webp" alt="" width="218" height="420" loading="lazy" decoding="async">
-            <img class="impacto__blob" src="/static/img/doacoes/blob-1.webp" alt="" width="400" height="339" loading="lazy" decoding="async">
-            <img class="impacto__folha impacto__folha--1" src="/static/img/doacoes/folha-3.webp" alt="" width="59" height="126" loading="lazy" decoding="async">
-            <img class="impacto__folha impacto__folha--2" src="/static/img/doacoes/folha-1.webp" alt="" width="156" height="140" loading="lazy" decoding="async">
-            <img class="impacto__folha impacto__folha--3" src="/static/img/doacoes/folha-6.webp" alt="" width="84" height="76" loading="lazy" decoding="async">
-          </div>
-
-          <div class="impacto__texto">
-            <h3 id="impacto-titulo">Menos desperdício, <span>mais impacto.</span></h3>
-            <span class="impacto__fio" aria-hidden="true"></span>
-            <p>Conectamos quem tem alimento sobrando a ONGs e organizações que precisam, em tempo real.</p>
-          </div>
-
-          <div class="impacto__sacola" aria-hidden="true">
-            <img class="impacto__brotos" src="/static/img/doacoes/brotos.webp" alt="" width="259" height="124" loading="lazy" decoding="async">
-            <img class="impacto__sacola-img" src="/static/img/doacoes/sacola.webp" alt="" width="324" height="372" loading="lazy" decoding="async">
-          </div>
-
-          <ul class="impacto__cartao">
-            <li class="impacto__item">
-              <span class="impacto__icone impacto__icone--verde" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><path d="M5 19c0-8 5-13.5 14-14-.5 9-6 14-14 14z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19l7.5-7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </span>
-              <strong>Alimenta comunidades</strong>
-              <span>Mais alimento para quem precisa.</span>
-            </li>
-            <li class="impacto__item">
-              <span class="impacto__icone impacto__icone--ambar" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="5.8" cy="9.5" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="18.2" cy="9.5" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7.5 18.5c.5-3.2 2.3-5 4.5-5s4 1.8 4.5 5M2.5 17c.3-2.2 1.5-3.4 3.3-3.4M21.5 17c-.3-2.2-1.5-3.4-3.3-3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-              </span>
-              <strong>Fortalece instituições</strong>
-              <span>Apoia iniciativas sociais locais.</span>
-            </li>
-            <li class="impacto__item">
-              <span class="impacto__icone impacto__icone--azul" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5s1.2-6.2 3.6-8.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
-              </span>
-              <strong>Constrói um futuro sustentável</strong>
-              <span>Reduz o desperdício de alimentos.</span>
-            </li>
-          </ul>
-        </aside>
-      </div>
-    </section>
-
-    <!-- ============ EXCEDENTES DE HOJE ============ -->
-    <section class="secao container excedentes" id="excedentes" aria-labelledby="excedentes-titulo">
-      <div class="excedentes__topo">
-        <div>
-          <p class="sobretitulo sobretitulo--acento">Para ONGs retirarem <span class="ao-vivo" data-ao-vivo hidden></span></p>
-          <h2 id="excedentes-titulo">Excedentes de hoje</h2>
-          <p class="lead" id="excedentes-lead">Alimentos oferecidos por empresas e pessoas para as ONGs retirarem antes de vencer. A ONG reserva pelo site e retira no prazo; quando alguém reserva, o cartão some daqui na hora.</p>
-        </div>
-        <a class="btn btn--secundario btn--pequeno" id="excedentes-publicar" href="/painel#publicar-excedente" hidden>Publicar excedente</a>
-      </div>
-      <div id="excedentes-conteudo" aria-busy="true">
-        <ul class="excedentes__lista" aria-hidden="true">
-          <li class="excedente excedente--esqueleto"><div class="esqueleto"><span></span><span></span><span></span></div></li>
-          <li class="excedente excedente--esqueleto"><div class="esqueleto"><span></span><span></span><span></span></div></li>
+        <ul class="topo__numeros" id="resumo" aria-live="polite" aria-busy="true" aria-label="A rede agora">
+          <li><strong data-resumo="pedidos">—</strong> <span>pedidos abertos</span></li>
+          <li><strong data-resumo="doados">—</strong> <span>alimentos doados aguardando</span></li>
+          <li><strong data-resumo="ongs">—</strong> <span>ONGs na rede</span></li>
         </ul>
       </div>
-    </section>
-
-    <!-- ============ COMO FUNCIONA ============ -->
-    <section class="secao container" id="como-funciona" aria-labelledby="como-titulo">
-      <div class="secao__cabeca">
-        <p class="sobretitulo sobretitulo--acento">Como funciona</p>
-        <h2 id="como-titulo">Do balcão à mesa, <em>sem perder o dia</em></h2>
-        <p class="lead">Há dois caminhos para o alimento não se perder. No pedido, a ONG diz o que falta e quem tem doa. No excedente, a empresa avisa o que sobrou e a ONG reserva. Nos dois, só entra alimento dentro da validade.</p>
-      </div>
-      <ol class="passos">
-        <li class="passo">
-          <span class="passo__n" aria-hidden="true">01</span>
-          <h3>A ONG pede ou a empresa oferece</h3>
-          <p>A ONG publica o pedido com os itens, a quantidade e até quando pode receber. A empresa de alimentos publica o excedente do dia, com a validade e até quando dá para retirar.</p>
-        </li>
-        <li class="passo">
-          <span class="passo__n" aria-hidden="true">02</span>
-          <h3>A plataforma conecta na hora</h3>
-          <p>Quem tem alimento descreve o que tem e recebe a sugestão dos pedidos que mais combinam, com o motivo. Para doar, responde a quatro perguntas e manda uma foto. A ONG reserva o excedente com um clique.</p>
-        </li>
-        <li class="passo">
-          <span class="passo__n" aria-hidden="true">03</span>
-          <h3>A entrega é confirmada</h3>
-          <p>A ONG marca que recebeu a doação e a empresa confirma a retirada do excedente. Quem doou é avisado, e o painel de impacto conta só o que chegou de verdade.</p>
-        </li>
-      </ol>
-    </section>
-
-    <!-- ============ PARA QUEM ============ -->
-    <section class="secao container" aria-labelledby="quem-titulo">
-      <div class="secao__cabeca">
-        <p class="sobretitulo sobretitulo--acento">Quem participa</p>
-        <h2 id="quem-titulo">Uma rede com três pontas</h2>
-      </div>
-      <div class="publicos">
-        <article class="publico publico--empresa">
-          <img src="/static/img/categorias/padaria.svg" width="88" height="88" alt="">
-          <h3>Empresas de alimentos</h3>
-          <p>Restaurantes, padarias, mercados e indústrias. Publicam o excedente do dia para as ONGs reservarem e doam para os pedidos abertos.</p>
-          <a class="btn btn--primario btn--pequeno" href="/cadastro" data-sessao="empresa">Cadastrar empresa</a>
-        </article>
-        <article class="publico publico--doador">
-          <img src="/static/img/categorias/hortifruti.svg" width="88" height="88" alt="">
-          <h3>Doadores</h3>
-          <p>Pessoas que doam alimentos para os pedidos publicados. O cadastro é pelo CPF.</p>
-          <a class="btn btn--secundario btn--pequeno" href="/cadastro" data-sessao="doador">Quero ser doador</a>
-        </article>
-        <article class="publico publico--instituicao">
-          <img src="/static/img/categorias/refeicoes.svg" width="88" height="88" alt="">
-          <h3>ONGs</h3>
-          <p>Associações, fundações e outras organizações sem fins lucrativos com CNPJ ativo. Publicam pedidos, reservam excedentes e confirmam o que receberam.</p>
-          <a class="btn btn--fantasma btn--pequeno" href="/cadastro" data-sessao="ong">Cadastrar ONG <span aria-hidden="true">→</span></a>
-        </article>
+      <div class="topo__foto">
+        <img id="hero-foto" src="/static/img/hero/caixote.webp" width="1200" height="900" fetchpriority="high"
+             alt="Caixote de madeira com alface, pimentão, bananas, cenouras, tomates, laranja e pão">
       </div>
     </section>
 
-    <!-- ============ CRITÉRIO ============ -->
-    <section class="secao container" aria-labelledby="criterio-titulo">
-      <div class="criterio">
-        <div class="criterio__texto">
-          <p class="sobretitulo sobretitulo--acento">Quem pode entrar com CNPJ</p>
-          <h2 id="criterio-titulo">Conferimos na Receita Federal antes de aceitar</h2>
-          <p class="lead">Para manter a rede focada em alimento e em quem atende pessoas, o cadastro com CNPJ só é aceito quando passa nas duas verificações. Nada disso depende do que a pessoa digita: os dados vêm da Receita.</p>
-          <a class="link-sobre" href="/sobre#criterio">Entenda o critério completo <span aria-hidden="true">→</span></a>
+    <!-- ============ AGORA NA REDE: pedidos | alimentos doados | ONGs ============ -->
+    <section class="rede container" id="doacoes" aria-labelledby="rede-titulo">
+      <span id="excedentes" class="rede__ancora" aria-hidden="true"></span>
+      <span id="ongs" class="rede__ancora" aria-hidden="true"></span>
+      <div class="rede__cabeca">
+        <h2 id="rede-titulo">Agora na rede <span class="ao-vivo" data-ao-vivo hidden></span></h2>
+      </div>
+
+      <div class="abas" role="tablist" aria-label="O que ver">
+        <button type="button" class="aba" role="tab" id="aba-pedidos" aria-controls="rede-painel" aria-selected="true" data-aba="pedidos">
+          Pedidos das ONGs <span class="aba__n" data-conta="pedidos"></span></button>
+        <button type="button" class="aba" role="tab" id="aba-doados" aria-controls="rede-painel" aria-selected="false" tabindex="-1" data-aba="doados">
+          Alimentos doados <span class="aba__n" data-conta="doados"></span></button>
+        <button type="button" class="aba" role="tab" id="aba-ongs" aria-controls="rede-painel" aria-selected="false" tabindex="-1" data-aba="ongs">
+          ONGs na rede <span class="aba__n" data-conta="ongs"></span></button>
+      </div>
+
+      <div class="filtro" id="filtro" role="group" aria-label="Filtrar por categoria"></div>
+
+      <div class="rede__painel" id="rede-painel" role="tabpanel" aria-labelledby="aba-pedidos" tabindex="0">
+        <p class="rede__explica" id="rede-explica">O que as ONGs pediram e ainda falta. Escolha um pedido e doe.</p>
+        <div id="rede-conteudo" aria-live="polite" aria-busy="true">
+          <ul class="grade" aria-hidden="true">
+            <li class="cartao-rede cartao-rede--esqueleto"></li>
+            <li class="cartao-rede cartao-rede--esqueleto"></li>
+            <li class="cartao-rede cartao-rede--esqueleto"></li>
+          </ul>
         </div>
-        <ul class="checagens">
-          <li class="checagem">
-            <span class="checagem__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div><h3>CNPJ ativo</h3><p>Empresas com situação baixada, inapta, suspensa ou nula não entram.</p></div>
-          </li>
-          <li class="checagem">
-            <span class="checagem__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <div><h3>ONG ou atividade ligada a alimentos</h3><p>Entra a organização sem fins lucrativos, pela natureza jurídica, e a empresa com atividade principal ou secundária de alimentos. Uma organização pode ter os dois perfis; uma empresa de tecnologia, nenhum.</p></div>
-          </li>
-        </ul>
       </div>
     </section>
 
-    <!-- ============ CTA FINAL ============ -->
-    <section class="cta-final container" id="cta-final" aria-labelledby="cta-titulo">
-      <div class="cta-final__cartao">
-        <img class="cta-final__img" src="/static/img/categorias/graos.svg" width="120" height="120" alt="">
-        <h2 id="cta-titulo">Precisa de alimento para quem você <em>atende</em>?</h2>
-        <p class="lead">Cadastre a ONG e publique o pedido em poucos minutos. Basta o CNPJ: o resto a gente busca na Receita.</p>
-        <a class="btn btn--primario" href="/cadastro" data-sessao="cta">Publicar pedido <span class="btn__traco" aria-hidden="true"></span><span class="btn__acao">Cadastrar</span></a>
+    <!-- ============ COMO FUNCIONA: as duas formas de doar, em seis linhas ============ -->
+    <section class="como container" id="como-funciona" aria-labelledby="como-titulo">
+      <h2 id="como-titulo">Como funciona</h2>
+      <div class="como__grade">
+        <article class="como__cartao">
+          <h3>Pedido</h3>
+          <p class="como__quem">A ONG diz o que precisa</p>
+          <ol>
+            <li>A ONG publica os itens e até quando recebe.</li>
+            <li>Você escolhe o pedido e doa com foto.</li>
+            <li>A ONG confirma que recebeu.</li>
+          </ol>
+        </article>
+        <article class="como__cartao">
+          <h3>Alimento doado</h3>
+          <p class="como__quem">Você oferece o que sobrou</p>
+          <ol>
+            <li>Empresa ou pessoa publica o alimento e onde retirar.</li>
+            <li>Uma ONG reserva e retira no prazo.</li>
+            <li>Quem doou confirma a retirada.</li>
+          </ol>
+        </article>
       </div>
+      <p class="como__mais"><a href="/sobre">Regras, quem pode participar e como conferimos cada CNPJ</a></p>
     </section>
   </main>
 
