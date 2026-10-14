@@ -18,6 +18,7 @@
 </head>
 <body class="dash">
   <header data-layout="cabecalho"></header>
+  <div class="dash-demo-faixa" id="dash-demo-faixa" role="status" hidden>Dados de demonstração — simulados, não são doações reais</div>
 
   <main id="conteudo" class="container">
     <section class="dash-topo" aria-labelledby="dash-titulo">
@@ -27,6 +28,10 @@
         <p class="lead">Pedidos, doações entregues e alimentos resgatados por ONGs, com os números atualizados quando a rede muda.</p>
       </div>
       <div class="dash-topo__acoes">
+        <div class="dash-modos" role="group" aria-label="Origem dos indicadores">
+          <button type="button" id="modo-real" aria-pressed="true">Dados reais</button>
+          <button type="button" id="modo-demonstracao" aria-pressed="false">Demonstração</button>
+        </div>
         <p class="dash-gerado" id="dash-gerado" aria-live="polite">Carregando…</p>
         <button type="button" class="btn btn--secundario btn--pequeno" id="btn-atualizar">Atualizar dados</button>
       </div>
@@ -34,12 +39,32 @@
 
     <div id="dash-erro" class="aviso aviso--erro" role="alert" hidden></div>
 
+    <section class="dash-impacto" aria-labelledby="impacto-titulo">
+      <div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento" id="impacto-sobretitulo">Impacto comprovado</p><h2 id="impacto-titulo">Da oferta à entrega</h2></div><p id="impacto-descricao">Somente doações confirmadas como entregues e excedentes retirados entram no peso.</p></div>
+      <div class="impacto-cards">
+        <article class="cartao impacto-card impacto-card--principal"><h3>Kg em unidades físicas</h3><strong id="kg-medido">—</strong><p>kg e g convertidos; 1 L = 1 kg como premissa operacional.</p></article>
+        <article class="cartao impacto-card"><h3>Kg por média de categoria</h3><strong id="kg-estimado">—</strong><p>Unidade, pacote e caixa são estimativas. Não são peso aferido.</p></article>
+        <article class="cartao impacto-card"><h3>Refeições potenciais</h3><strong id="refeicoes-total">—</strong><p id="refeicoes-premissa">Premissa: 0,5 kg por refeição; não mede pratos servidos.</p></article>
+        <article class="cartao impacto-card"><h3>Match doador × ONG</h3><strong id="match-total">—</strong><p id="match-detalhe">Do pedido à doação aceita e da oferta à reserva.</p></article>
+      </div>
+      <p class="dash-fonte">Conversões declaradas em <code>data/conversao_kg.csv</code>. <span id="sem-conversao"></span></p>
+    </section>
+
+    <section class="dash-grade dash-analise" aria-label="Análise regional e da inteligência">
+      <article class="cartao dash-graf"><h2>Refeições potenciais por região</h2><p class="dash-graf__sub">UF da organização que recebeu; peso físico e estimado somados apenas para esta projeção.</p><figure class="dash-graf__area"><canvas id="g-regiao" role="img" aria-label="Gráfico de refeições potenciais por região"></canvas></figure><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-regiao"></div></details></article>
+      <article class="cartao dash-graf"><h2>Qualidade da IA</h2><p class="dash-graf__sub" id="ia-medicao">Carregando avaliação…</p><figure class="dash-graf__area"><canvas id="g-acuracia" role="img" aria-label="Acurácia medida e limiares do classificador e da recomendação"></canvas></figure><div id="ia-metricas" class="dash-metricas"></div></article>
+      <article class="cartao dash-graf"><h2>Mapa de calor por UF</h2><p class="dash-graf__sub">Cartograma por UF de destino; cor representa refeições potenciais, não população.</p><div class="mapa-uf" id="mapa-uf" role="img" aria-label="Cartograma de refeições potenciais por UF"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-uf"></div></details></article>
+      <article class="cartao dash-graf"><h2>Quando as doações são aceitas</h2><p class="dash-graf__sub">Dia da semana × hora em Brasília, em todo o histórico. Inclui aceitas e depois entregues.</p><div class="mapa-horas" id="mapa-horas"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-horas"></div></details></article>
+    </section>
+
+    <section class="cartao dash-seguranca" aria-labelledby="seg-titulo"><div class="dash-secao-topo"><div><p class="sobretitulo sobretitulo--acento">DevSecOps</p><h2 id="seg-titulo">Segurança observável</h2></div><p>Achados atuais e controles reais; relatórios com datas próprias.</p></div><div id="sast-cards" class="sast-cards"></div><p id="stride-resumo"></p><div id="seg-controles" class="seg-controles"></div></section>
+
     <!-- indicadores -->
     <section aria-labelledby="ind-titulo">
       <h2 id="ind-titulo" class="sr-only">Indicadores</h2>
       <ul class="indicadores" id="indicadores" aria-busy="true">
         <li class="indicador indicador--destaque" data-ind="percentual_atendimento">
-          <span class="indicador__rotulo">Atendimento dos pedidos abertos</span>
+          <span class="indicador__rotulo">Cobertura média por item aberto</span>
           <span class="indicador__valor">—</span>
           <span class="indicador__barra" aria-hidden="true"><span></span></span>
           <span class="indicador__nota" id="ind-itens">—</span>
@@ -51,11 +76,9 @@
         <li class="indicador" data-ind="excedentes_resgatados"><span class="indicador__rotulo">Excedentes resgatados</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="tempo_medio_reserva_min"><span class="indicador__rotulo">Tempo médio até a reserva</span><span class="indicador__valor">—</span><span class="indicador__nota">Minutos, após a publicação</span></li>
         <li class="indicador" data-ind="pedidos_encerrados"><span class="indicador__rotulo">Pedidos encerrados</span><span class="indicador__valor">—</span></li>
-        <li class="indicador" data-ind="empresas"><span class="indicador__rotulo">Empresas</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="empresas_alimentos"><span class="indicador__rotulo">Empresas de alimentos</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="ongs"><span class="indicador__rotulo">ONGs</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="doadores"><span class="indicador__rotulo">Doadores (CPF)</span><span class="indicador__valor">—</span></li>
-        <li class="indicador" data-ind="instituicoes"><span class="indicador__rotulo">Instituições</span><span class="indicador__valor">—</span></li>
       </ul>
     </section>
 

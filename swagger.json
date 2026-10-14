@@ -295,6 +295,56 @@
           }
         },
         "operationId": "get_dashboard",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: indicadores simulados em SQLite isolado",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/reconecta/dashboard/impacto": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Kg medidos/estimados, refeições projetadas por região, match, IA e calor"
+          }
+        },
+        "operationId": "get_impacto",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: impacto simulado em SQLite isolado",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/reconecta/dashboard/seguranca": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Relatórios SAST/STRIDE e controles verificáveis, sem dados pessoais"
+          }
+        },
+        "operationId": "get_seguranca",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: mesmo SAST e controles reais; origem sinalizada",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
         "tags": [
           "dashboard"
         ]

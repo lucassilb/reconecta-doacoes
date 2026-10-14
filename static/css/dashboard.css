@@ -7,10 +7,46 @@
 .dash-topo h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; margin: 6px 0 12px; }
 .dash-topo .lead { max-width: 44em; }
 .dash-topo__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.dash-modos { display: inline-flex; max-width: 100%; padding: 3px; gap: 2px; border: 1px solid var(--linha-forte); border-radius: 12px; background: var(--superficie); }
+.dash-modos button { border: 0; border-radius: 9px; background: transparent; color: var(--tinta); padding: 8px 12px; font: 700 .83rem var(--fonte-texto); cursor: pointer; white-space: nowrap; }
+.dash-modos button[aria-pressed="true"] { background: var(--verde); color: white; }
+.dash-modos button:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+.dash-demo-faixa { position: sticky; top: 0; z-index: 50; padding: 10px 16px; text-align: center; background: #7c440b; color: white; font-weight: 700; font-size: .9rem; box-shadow: 0 3px 12px rgba(42,26,6,.2); }
+.dash-demo-faixa[hidden] { display: none; }
 .dash-gerado { font-size: .9rem; color: var(--tinta-suave); }
 @media (min-width: 900px) { .dash-topo { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } .dash-topo__acoes { justify-content: flex-end; } }
 
 /* indicadores */
+.dash-impacto, .dash-analise, .dash-seguranca { margin-bottom: 24px; }
+.dash-secao-topo { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 24px; margin-bottom: 16px; }
+.dash-secao-topo h2 { margin: 0; }
+.dash-secao-topo > p { color: var(--tinta-suave); max-width: 42em; font-size: .9rem; }
+.impacto-cards, .sast-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.impacto-card { min-width: 0; display: grid; align-content: start; gap: 8px; }
+.impacto-card--principal { background: var(--verde-suave); }
+.impacto-card h3 { font: 700 .75rem var(--fonte-texto); letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-suave); }
+.impacto-card strong { font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.impacto-card p, .dash-fonte { font-size: .85rem; color: var(--tinta-suave); }
+.dash-fonte { margin-top: 10px; }
+.dash-metricas { display: grid; gap: 4px; font-size: .86rem; color: var(--tinta-suave); }
+.dash-analise .cartao { min-width: 0; display: grid; align-content: start; gap: 10px; }
+.mapa-uf { width: 100%; min-height: 280px; }
+.mapa-uf svg { display: block; width: 100%; max-height: 370px; }
+.mapa-horas { display: grid; grid-template-columns: 32px repeat(24, minmax(0, 1fr)); gap: 3px; align-items: center; overflow-x: auto; padding-bottom: 8px; }
+.mapa-horas span { font-size: .65rem; text-align: center; }
+.mapa-horas .celula { min-width: 5px; aspect-ratio: 1; border-radius: 3px; background: var(--verde-suave); }
+.sast-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sast-card { min-width: 0; padding: 12px; background: var(--superficie-2); border-radius: 12px; }
+.sast-card strong { display: block; font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+.sast-card small { color: var(--tinta-suave); overflow-wrap: anywhere; }
+.sast-card--alerta { background: var(--erro-suave); }
+.seg-controles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.seg-controles p { background: var(--superficie-2); border-radius: 12px; padding: 12px; font-size: .86rem; }
+@media (max-width: 600px) {
+  .impacto-cards, .sast-cards, .seg-controles { grid-template-columns: 1fr; }
+  .mapa-horas { gap: 1px; grid-template-columns: 24px repeat(24, minmax(5px, 1fr)); }
+  .mapa-horas span { font-size: .55rem; }
+}
 .indicadores { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 720px) { .indicadores { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (min-width: 1100px) { .indicadores { grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr)); } }

@@ -97,6 +97,40 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
                ("sigilo@", "pessoa@", "52998224725", "11999999999"))
 
 
+def test_cobertura_media_por_item_nao_soma_unidades_diferentes():
+    with app.app_context():
+        ong = Estabelecimento(nome="ONG", cnpj="12345678000195",
+                             email="ong@exemplo.com", telefone="11999999999",
+                             endereco="Rua A, 1 - Centro, São Paulo/SP - 01000000")
+        doador = Doador(nome="Pessoa", cpf="52998224725",
+                        email="pessoa@exemplo.com", telefone="11999999998")
+        db.session.add_all((ong, doador))
+        db.session.flush()
+        pedido = Doacao(estabelecimento_id=ong.id, status="DISPONIVEL",
+                        data_cadastro=_utc_naive(),
+                        data_limite_retirada=datetime.now() + timedelta(days=2))
+        db.session.add(pedido)
+        db.session.flush()
+        for nome, meta, recebido, unidade in (("Arroz", 1, .25, "kg"),
+                                               ("Feijão", 1000, 750, "g")):
+            item = ItemDoacao(doacao_id=pedido.id, nome=nome, categoria="Grãos e cereais",
+                              quantidade=meta, unidade_medida=unidade)
+            db.session.add(item)
+            db.session.flush()
+            db.session.add(Contribuicao(
+                doacao_id=pedido.id, item_doacao_id=item.id, doador_id=doador.id,
+                alimento=nome, categoria=item.categoria, quantidade=recebido,
+                unidade_medida=unidade, validade=date.today() + timedelta(days=10),
+                respostas="{}", foto_arquivo="foto.jpg", status="ACEITA",
+                criado_em=_utc_naive()))
+        db.session.commit()
+
+    indicadores = app.test_client().get("/reconecta/dashboard").json["indicadores"]
+    assert indicadores["percentual_atendimento"] == 50.0
+    assert indicadores["itens_atendidos"] == 0
+    assert indicadores["itens_pedidos"] == 2
+
+
 def test_rota_dashboard_entrega_html(monkeypatch, tmp_path):
     (tmp_path / "dashboard.html").write_text("<h1>Dashboard</h1>", encoding="utf-8")
     monkeypatch.setattr(app, "static_folder", str(tmp_path))

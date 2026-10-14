@@ -1,18 +1,205 @@
 """Indicadores agregados e públicos dos pedidos de doação."""
 
+import csv
+import json
+import random
+from threading import RLock
+from pathlib import Path
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from decimal import Decimal
 
+from flask import Flask, current_app, request
 from flask_restx import Namespace, Resource
 from sqlalchemy import extract, func, select
+from sqlalchemy.pool import StaticPool
 
-from fuso import agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
+from fuso import BRASILIA, agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
-                    Excedente, Instituicao, ItemDoacao, db)
+                    Excedente, Instituicao, ItemDoacao, ItemExcedente, db)
 from Publico import _municipio_uf
 
 ns = Namespace("dashboard", description="Indicadores públicos agregados")
+
+
+RAIZ = Path(__file__).resolve().parent
+KG_POR_REFEICAO = Decimal("0.5")  # premissa declarada; não mede refeições servidas
+MACROREGIOES = {
+    "Norte": "AC AP AM PA RO RR TO".split(),
+    "Nordeste": "AL BA CE MA PB PE PI RN SE".split(),
+    "Centro-Oeste": "DF GO MT MS".split(),
+    "Sudeste": "ES MG RJ SP".split(),
+    "Sul": "PR RS SC".split(),
+}
+REGIAO_UF = {uf: regiao for regiao, ufs in MACROREGIOES.items() for uf in ufs}
+_DEMO_APP = None
+_DEMO_DIA = None
+_DEMO_LOCK = RLock()
+
+
+def conversoes_kg(caminho=None):
+    caminho = caminho or RAIZ / "data" / "conversao_kg.csv"
+    with open(caminho, encoding="utf-8", newline="") as arquivo:
+        return {(r["categoria"], r["unidade_medida"]):
+                (Decimal(r["kg_por_unidade"]), r["tipo"])
+                for r in csv.DictReader(arquivo)}
+
+
+def converter_kg(quantidade, categoria, unidade, tabela):
+    regra = tabela.get((categoria, unidade)) or tabela.get(("*", unidade))
+    if regra is None:
+        return None
+    return Decimal(str(quantidade)) * regra[0], regra[1]
+
+
+def _uf(endereco):
+    municipio = _municipio_uf(endereco)
+    uf = municipio.rsplit("/", 1)[-1].upper() if municipio else None
+    return uf if uf in REGIAO_UF else "Não informada"
+
+
+def _minutos_sql(fim, inicio):
+    """Diferença em minutos nos dois bancos suportados pelo projeto."""
+    if db.session.get_bind().dialect.name == "sqlite":
+        return (func.julianday(fim) - func.julianday(inicio)) * 1440
+    return extract("epoch", fim - inicio) / 60
+
+
+def _media_sql(media, amostras):
+    return round(float(media), 2) if amostras else None
+
+
+def _ler_json(caminho):
+    try:
+        return json.loads(caminho.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def _resumo_sast():
+    return (_ler_json(RAIZ / "relatorios" / "sast" / "resumo.json") or
+            _ler_json(RAIZ / "data" / "resumo_sast.json"))
+
+
+def montar_impacto():
+    """Conta somente entregas e retiradas; ofertas abertas não são impacto."""
+    tabela = conversoes_kg()
+    total = defaultdict(Decimal)
+    por_uf = defaultdict(lambda: defaultdict(Decimal))
+    sem_conversao = 0
+    calor = [[0] * 24 for _ in range(7)]
+
+    tempos_pedido = (db.session.query(
+        func.avg(_minutos_sql(Contribuicao.criado_em, Doacao.data_cadastro)),
+        func.count(Contribuicao.id))
+        .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+        .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")),
+                Contribuicao.criado_em >= Doacao.data_cadastro).one())
+    tempos_excedente = (db.session.query(
+        func.avg(_minutos_sql(Excedente.reservado_em, Excedente.criado_em)),
+        func.count(Excedente.id))
+        .filter(Excedente.status.in_(("RESERVADO", "RETIRADO")),
+                Excedente.reservado_em >= Excedente.criado_em).one())
+
+    ano = extract("year", Contribuicao.criado_em)
+    mes = extract("month", Contribuicao.criado_em)
+    dia = extract("day", Contribuicao.criado_em)
+    hora = extract("hour", Contribuicao.criado_em)
+    horarios = (db.session.query(ano, mes, dia, hora, func.count(Contribuicao.id))
+                .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")),
+                        Contribuicao.criado_em.isnot(None))
+                .group_by(ano, mes, dia, hora).all())
+    for ano_utc, mes_utc, dia_utc, hora_utc, contagem in horarios:
+        local = utc_para_brasilia(datetime(ano_utc, mes_utc, dia_utc, hora_utc))
+        calor[local.weekday()][local.hour] += contagem
+
+    contribuicoes = (db.session.query(
+        Contribuicao.categoria, Contribuicao.unidade_medida,
+        Estabelecimento.endereco,
+        func.sum(Contribuicao.quantidade).label("quantidade"),
+        func.count(Contribuicao.id).label("itens"))
+        .join(Doacao, Doacao.id == Contribuicao.doacao_id)
+        .join(Estabelecimento, Estabelecimento.id == Doacao.estabelecimento_id)
+        .filter(Contribuicao.status == "ENTREGUE")
+        .group_by(Contribuicao.categoria, Contribuicao.unidade_medida,
+                  Estabelecimento.id, Estabelecimento.endereco).all())
+    for c in contribuicoes:
+        peso = converter_kg(c.quantidade, c.categoria, c.unidade_medida, tabela)
+        if peso is None:
+            sem_conversao += c.itens
+            continue
+        kg, tipo = peso
+        total[tipo] += kg
+        por_uf[_uf(c.endereco)][tipo] += kg
+
+    retirados = (db.session.query(ItemExcedente.categoria,
+                 ItemExcedente.unidade_medida, Estabelecimento.endereco,
+                 func.sum(ItemExcedente.quantidade).label("quantidade"),
+                 func.count(ItemExcedente.id).label("itens"))
+                 .join(Excedente, Excedente.id == ItemExcedente.excedente_id)
+                 .join(Estabelecimento, Estabelecimento.id == Excedente.reservado_por_id)
+                 .filter(Excedente.status == "RETIRADO")
+                 .group_by(ItemExcedente.categoria, ItemExcedente.unidade_medida,
+                           Estabelecimento.id, Estabelecimento.endereco).all())
+    for item in retirados:
+        peso = converter_kg(item.quantidade, item.categoria, item.unidade_medida, tabela)
+        if peso is None:
+            sem_conversao += item.itens
+            continue
+        kg, tipo = peso
+        total[tipo] += kg
+        por_uf[_uf(item.endereco)][tipo] += kg
+
+    def resumo_peso(valores):
+        medido = valores.get("medido", Decimal(0))
+        estimado = valores.get("estimado", Decimal(0))
+        return {"kg_medido": round(float(medido), 3),
+                "kg_estimado": round(float(estimado), 3),
+                "refeicoes_estimadas": round(float((medido + estimado) / KG_POR_REFEICAO))}
+
+    regioes = defaultdict(lambda: defaultdict(Decimal))
+    for uf, valores in por_uf.items():
+        for tipo, kg in valores.items():
+            regioes[REGIAO_UF.get(uf, "Não informada")][tipo] += kg
+    pedido_media, pedido_amostras = tempos_pedido
+    excedente_media, excedente_amostras = tempos_excedente
+    combinado_amostras = pedido_amostras + excedente_amostras
+    combinado_media = ((pedido_media or 0) * pedido_amostras +
+                       (excedente_media or 0) * excedente_amostras)
+    combinado_media = combinado_media / combinado_amostras if combinado_amostras else None
+    return {
+        "peso": resumo_peso(total) | {"itens_sem_conversao": sem_conversao},
+        "refeicoes": {"kg_por_refeicao": float(KG_POR_REFEICAO),
+                       "premissa": "0,5 kg de alimento por refeição; projeção, não refeições servidas",
+                       "por_uf": [{"uf": uf} | resumo_peso(v) for uf, v in sorted(por_uf.items())],
+                       "por_regiao": [{"regiao": regiao} | resumo_peso(v)
+                                      for regiao, v in sorted(regioes.items())]},
+        "match": {"pedido_min": _media_sql(pedido_media, pedido_amostras),
+                  "pedido_amostras": pedido_amostras,
+                  "excedente_min": _media_sql(excedente_media, excedente_amostras),
+                  "excedente_amostras": excedente_amostras,
+                  "combinado_min": _media_sql(combinado_media, combinado_amostras),
+                  "combinado_amostras": combinado_amostras},
+        "calor_doacoes": {"periodo": "todo o histórico", "fuso": "America/Sao_Paulo",
+                           "dias": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+                           "horas": list(range(24)), "valores": calor},
+        "ia": {"metricas": _ler_json(RAIZ / "modelo" / "metricas.json"),
+               "limiares": _ler_json(RAIZ / "modelo" / "limiares.json")},
+    }
+
+
+def montar_seguranca():
+    """Configuração comprovável e relatórios estáticos, nunca telemetria simulada."""
+    return {
+        "sast": _resumo_sast(),
+        "controles": {
+            "cabecalhos": ["Content-Security-Policy", "X-Content-Type-Options",
+                           "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"],
+            "hsts_condicional": bool(current_app.config["SESSION_COOKIE_SECURE"]),
+            "cotas": "Login, IA, doações, excedentes e reservas: limites em memória por processo.",
+            "falhas_login": "Não medidas em contador persistente; eventos apenas no log de auditoria.",
+            "bloqueios_login": "Não medidos em contador persistente."},
+    }
 
 
 def montar_dashboard() -> dict:
@@ -48,8 +235,8 @@ def montar_dashboard() -> dict:
              .filter(*abertas).all())
 
     categorias = defaultdict(lambda: [Decimal(0), Decimal(0)])
-    meta_total = Decimal(0)
-    atendido_total = Decimal(0)
+    cobertura_total = Decimal(0)
+    itens_com_meta = 0
     itens_atendidos = 0
     alertas = []
     for pedido in pedidos:
@@ -67,8 +254,8 @@ def montar_dashboard() -> dict:
         categorias[item.categoria][0] += meta
         categorias[item.categoria][1] += recebido
         if meta > 0:
-            meta_total += meta
-            atendido_total += min(recebido, meta)
+            itens_com_meta += 1
+            cobertura_total += min(recebido / meta, Decimal(1))
             if recebido >= meta:
                 itens_atendidos += 1
                 tipo = "META_ATINGIDA"
@@ -172,8 +359,8 @@ def montar_dashboard() -> dict:
             "empresas_alimentos": novos.empresas_alimentos,
             "tempo_medio_reserva_min": round(float(novos.tempo_reserva), 2) if novos.tempo_reserva is not None else None,
             "itens_pedidos": len(itens), "itens_atendidos": itens_atendidos,
-            "percentual_atendimento": round(float(atendido_total / meta_total * 100), 2)
-            if meta_total else 0.0,
+            "percentual_atendimento": round(float(cobertura_total / itens_com_meta * 100), 2)
+            if itens_com_meta else 0.0,
         },
         "por_categoria": [{"categoria": nome, "pedido": float(valores[0]),
                            "recebido": float(valores[1])}
@@ -194,7 +381,147 @@ def montar_dashboard() -> dict:
     }
 
 
+def _semear_demonstracao(dados, dia):
+    """Cria fatos fictícios de forma reprodutível no app SQLite isolado."""
+    sorteio = random.Random(dados["semente"])
+    agora = datetime.combine(dia, time.min, BRASILIA)
+    agora_utc = agora.astimezone(timezone.utc).replace(tzinfo=None)
+    prazo_atual = (agora + timedelta(days=7)).replace(tzinfo=None)
+    validade = agora.date() + timedelta(days=14)
+    ongs = []
+    for numero, local in enumerate(dados["organizacoes_ficticias"], 1):
+        ong = Estabelecimento(
+            nome=f"ONG Exemplo {local['cidade']} {numero} (fictícia)",
+            cnpj=f"DEMO-CNPJ-{numero:05d}", email=f"ong{numero}@example.invalid",
+            telefone="00000000000",
+            endereco=f"Rua Demonstração, {numero} - Centro, {local['cidade']}/{local['uf']} - 00000000",
+            sem_fins_lucrativos=True, atividade_alimentar=False)
+        db.session.add(ong)
+        ongs.append(ong)
+    empresas = []
+    for numero in range(1, dados["empresas_ficticias"] + 1):
+        empresa = Estabelecimento(
+            nome=f"Mercado Exemplo {numero} (fictício)", cnpj=f"DEMO-MERC-{numero:05d}",
+            email=f"mercado{numero}@example.invalid", telefone="00000000000",
+            endereco=f"Rua Demonstração, {numero} - Centro, Cidade Exemplo/SP - 00000000",
+            sem_fins_lucrativos=False, atividade_alimentar=True)
+        db.session.add(empresa)
+        empresas.append(empresa)
+    doadores = []
+    for numero in range(1, dados["doadores_ficticios"] + 1):
+        doador = Doador(nome=f"Pessoa Exemplo {numero} (fictícia)",
+                       cpf=f"DEMO{numero:07d}", email=f"pessoa{numero}@example.invalid",
+                       telefone="00000000000")
+        db.session.add(doador)
+        doadores.append(doador)
+    db.session.flush()
+
+    catalogo = dados["alimentos_ficticios"]
+    periodo = dados["dias_historico"]
+    for indice in range(dados["pedidos"]):
+        ong = ongs[indice % len(ongs)]
+        alimento = catalogo[sorteio.randrange(len(catalogo))]
+        criado = agora_utc - timedelta(days=1 + indice % periodo,
+                                        hours=sorteio.randrange(24))
+        pedido = Doacao(estabelecimento_id=ong.id, data_cadastro=criado,
+                        data_limite_retirada=prazo_atual,
+                        status="DISPONIVEL" if indice % periodo < 5 else "RETIRADA")
+        db.session.add(pedido)
+        db.session.flush()
+        quantidade = sorteio.randrange(8, 65)
+        item = ItemDoacao(doacao_id=pedido.id, nome=alimento["nome"],
+                          categoria=alimento["categoria"], quantidade=quantidade,
+                          unidade_medida=alimento["unidade"], validade=validade)
+        db.session.add(item)
+        db.session.flush()
+        status = ("ENTREGUE" if indice % 10 < 7 else
+                  "ACEITA" if indice % 10 < 9 else "CANCELADA")
+        db.session.add(Contribuicao(
+            doacao_id=pedido.id, item_doacao_id=item.id,
+            doador_id=doadores[indice % len(doadores)].id,
+            alimento=alimento["nome"], categoria=alimento["categoria"],
+            quantidade=sorteio.randrange(2, quantidade + 1),
+            unidade_medida=alimento["unidade"], validade=validade,
+            respostas="{}", foto_arquivo="exemplo-sem-foto.jpg", status=status,
+            criado_em=criado + timedelta(minutes=sorteio.randrange(10, 600))))
+
+    for indice in range(dados["excedentes"]):
+        ong = ongs[(indice * 7) % len(ongs)]
+        empresa = empresas[indice % len(empresas)]
+        alimento = catalogo[sorteio.randrange(len(catalogo))]
+        criado = agora_utc - timedelta(days=1 + indice % periodo,
+                                        hours=sorteio.randrange(24))
+        status = "RETIRADO" if indice % 10 < 7 else "RESERVADO" if indice % 10 < 9 else "DISPONIVEL"
+        reservado = status in ("RETIRADO", "RESERVADO")
+        excedente = Excedente(
+            estabelecimento_id=empresa.id, reservado_por_id=ong.id if reservado else None,
+            retirar_ate=prazo_atual, status=status, criado_em=criado,
+            reservado_em=criado + timedelta(minutes=sorteio.randrange(5, 360)) if reservado else None,
+            retirado_em=criado + timedelta(hours=8) if status == "RETIRADO" else None)
+        excedente.itens = [ItemExcedente(
+            nome=alimento["nome"], categoria=alimento["categoria"],
+            quantidade=sorteio.randrange(2, 30), unidade_medida=alimento["unidade"],
+            validade=validade)]
+        db.session.add(excedente)
+    db.session.commit()
+
+
+def _aplicacao_demonstracao():
+    global _DEMO_APP, _DEMO_DIA
+    dia = agora_brasilia().date()
+    if _DEMO_APP is None or _DEMO_DIA != dia:
+        dados = _ler_json(RAIZ / "data" / "demonstracao.json")
+        app_demo = Flask("reconecta_dashboard_demonstracao")
+        app_demo.config.update(
+            SQLALCHEMY_DATABASE_URI="sqlite://",
+            SQLALCHEMY_TRACK_MODIFICATIONS=False,
+            SQLALCHEMY_ENGINE_OPTIONS={"poolclass": StaticPool,
+                                       "connect_args": {"check_same_thread": False}},
+        )
+        db.init_app(app_demo)
+        with app_demo.app_context():
+            db.create_all()
+            _semear_demonstracao(dados, dia)
+        _DEMO_APP, _DEMO_DIA = app_demo, dia
+    return _DEMO_APP
+
+
+def _consultar_demonstracao(calcular):
+    # O bloqueio serializa o acesso à conexão SQLite compartilhada em memória.
+    with _DEMO_LOCK:
+        app_demo = _aplicacao_demonstracao()
+        with app_demo.app_context():
+            resposta = calcular()
+        return resposta | {"modo": "demonstracao"}
+
+
+def _modo_demonstracao():
+    return request.args.get("modo") == "demonstracao"
+
+
 @ns.route("")
 class Dashboard(Resource):
+    @ns.param("modo", "demonstracao: indicadores simulados em SQLite isolado", _in="query")
     def get(self):
-        return montar_dashboard(), 200
+        return (_consultar_demonstracao(montar_dashboard)
+                if _modo_demonstracao() else montar_dashboard()), 200
+
+
+@ns.route("/impacto")
+class Impacto(Resource):
+    @ns.response(200, "Kg medidos/estimados, refeições projetadas por região, match, IA e calor")
+    @ns.param("modo", "demonstracao: impacto simulado em SQLite isolado", _in="query")
+    def get(self):
+        return (_consultar_demonstracao(montar_impacto)
+                if _modo_demonstracao() else montar_impacto()), 200
+
+
+@ns.route("/seguranca")
+class Seguranca(Resource):
+    @ns.response(200, "Relatórios SAST/STRIDE e controles verificáveis, sem dados pessoais")
+    @ns.param("modo", "demonstracao: mesmo SAST e controles reais; origem sinalizada", _in="query")
+    def get(self):
+        resposta = montar_seguranca()
+        if _modo_demonstracao():
+            resposta["modo"] = "demonstracao"
+        return resposta, 200

@@ -1,0 +1,72 @@
+{
+  "ferramentas": {
+    "bandit": {
+      "disponivel": true,
+      "varredura_em": "2026-10-14T02:29:52Z",
+      "severidades": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "trivy-fs": {
+      "disponivel": true,
+      "varredura_em": "2026-10-13T23:30:00.0494494-03:00",
+      "severidades": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "segredos": 0,
+      "configuracoes": 0
+    },
+    "trivy-config": {
+      "disponivel": true,
+      "varredura_em": "2026-10-13T23:30:01.268683-03:00",
+      "severidades": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "segredos": 0,
+      "configuracoes": 0
+    },
+    "trivy-image": {
+      "disponivel": true,
+      "varredura_em": "2026-10-13T17:58:09.3533664-03:00",
+      "severidades": {
+        "CRITICAL": 0,
+        "HIGH": 44,
+        "MEDIUM": 58,
+        "LOW": 61,
+        "UNKNOWN": 3
+      },
+      "segredos": 0,
+      "configuracoes": 0
+    }
+  },
+  "stride": {
+    "residuais": 31,
+    "mitigados": 23,
+    "fonte": "docs/stride.md; estado declarado por risco"
+  },
+  "correcoes_documentadas": {
+    "cves_corrigidas": 4,
+    "cves": [
+      "CVE-2025-71176",
+      "CVE-2026-102598",
+      "CVE-2026-25645",
+      "CVE-2026-28684"
+    ],
+    "bandit_b104_corrigido": true,
+    "bandit_b608_justificado": true,
+    "fonte": "docs/sast.md; correções históricas documentadas, distintas dos achados atuais"
+  },
+  "nota": "Cada ferramenta mantém sua própria data; a imagem pode ser anterior ao código atual."
+}
