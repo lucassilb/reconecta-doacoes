@@ -1,4 +1,4 @@
-/* ReConecta — cadastro de empresa (CNPJ) e doador (CPF).
+/* ReConecta — cadastro de organização (CNPJ: ONG e/ou empresa de alimentos) e doador (CPF).
    A validação aqui é só para a experiência; o servidor é a fonte da verdade. */
 (function () {
   "use strict";
@@ -72,6 +72,18 @@
     var d = digitos(codigo).padStart(7, "0");
     return d.slice(0, 4) + "-" + d.slice(4, 5) + "/" + d.slice(5, 7);
   }
+
+  /* natureza jurídica CONCLA: 4 dígitos exibidos como "399-9" */
+  function formatarNatureza(codigo) {
+    var d = digitos(codigo).padStart(4, "0");
+    return d.slice(0, 3) + "-" + d.slice(3);
+  }
+
+  var PERFIS_ROTULO = {
+    ong: "ONG · sem fins lucrativos",
+    empresa_alimentos: "Empresa de alimentos"
+  };
+  var PERFIS_NOME = { ong: "ONG", empresa_alimentos: "empresa de alimentos" };
 
   /* Reaplica a máscara preservando a posição do cursor relativa aos dígitos. */
   function aplicarMascara(input, mascara) {
@@ -276,7 +288,7 @@
   function irParaFormulario() {
     var perfil = perfilEscolhido();
     if (!perfil) {
-      dicaPerfil.textContent = "Escolha se você é empresa ou doador para continuar.";
+      dicaPerfil.textContent = "Escolha se você participa como organização ou como doador para continuar.";
       dicaPerfil.classList.add("dica-perfil--alerta");
       radiosPerfil[0].focus();
       return;
@@ -303,7 +315,7 @@
       if (!radio.checked) return;
       dicaPerfil.classList.remove("dica-perfil--alerta");
       dicaPerfil.textContent = radio.value === "empresa"
-        ? "Empresa selecionada. Na próxima etapa conferimos o CNPJ na Receita Federal."
+        ? "ONG ou empresa selecionada. Na próxima etapa conferimos o CNPJ na Receita Federal."
         : "Doador selecionado. Na próxima etapa você informa nome, CPF e contato.";
     });
     // Enter no radio avança, como o botão Continuar
@@ -406,8 +418,29 @@
 
     var cartao = el("article", {
       classe: "empresa " + (apta ? "empresa--apta" : "empresa--recusada"),
-      "aria-label": apta ? "Empresa verificada" : "Empresa não pode ser cadastrada"
+      "aria-label": apta ? "Organização verificada" : "Organização não pode ser cadastrada"
     }, [topo]);
+
+    var perfis = (d.perfis || []).filter(function (p) { return PERFIS_ROTULO[p]; });
+    var natureza = d.natureza_juridica || {};
+    if (perfis.length || natureza.descricao) {
+      var secaoPerfil = el("div", { classe: "empresa__secao" }, [
+        el("p", { classe: "empresa__secao-titulo", texto: "Como participa no ReConecta" })
+      ]);
+      if (perfis.length) {
+        secaoPerfil.appendChild(el("ul", { classe: "perfis-org" }, perfis.map(function (p) {
+          return el("li", { classe: "perfil-org perfil-org--" + p, texto: PERFIS_ROTULO[p] });
+        })));
+      }
+      if (natureza.descricao) {
+        secaoPerfil.appendChild(el("p", { classe: "empresa__natureza" }, [
+          "Natureza jurídica na Receita: ",
+          el("strong", { texto: natureza.descricao }),
+          natureza.codigo ? " (" + formatarNatureza(natureza.codigo) + ")" : null
+        ]));
+      }
+      cartao.appendChild(secaoPerfil);
+    }
 
     var atividades = d.atividades_alimentares || [];
     if (apta && atividades.length) {
@@ -423,7 +456,7 @@
     }
 
     if (!apta) {
-      var motivos = (d.motivos && d.motivos.length) ? d.motivos : [{ codigo: "", mensagem: "Esta empresa não atende aos requisitos de cadastro." }];
+      var motivos = (d.motivos && d.motivos.length) ? d.motivos : [{ codigo: "", mensagem: "Esta organização não atende aos requisitos de cadastro." }];
       cartao.appendChild(el("div", { classe: "empresa__secao" }, [
         el("p", { classe: "empresa__secao-titulo", texto: "Por que não podemos seguir" }),
         el("ul", { classe: "motivos" }, motivos.map(function (m) { return itemMotivo(m, d); }))
@@ -434,21 +467,29 @@
 
   function itemMotivo(m, d) {
     var extra = null;
-    if (m.codigo === "SEM_RELACAO_ALIMENTAR") {
+    if (m.codigo === "SEM_PERFIL_ACEITO" || m.codigo === "SEM_RELACAO_ALIMENTAR") {
       extra = el("p", { classe: "motivo__extra" }, [
-        "O ReConecta é exclusivo para quem produz, vende ou serve alimentos. "
+        "O ReConecta cadastra ONGs (natureza jurídica sem fins lucrativos) e organizações ligadas a alimentos. "
       ]);
-      if (d.cnae_principal && d.cnae_principal.descricao) {
-        extra.append("Atividade principal na Receita: ",
-          el("strong", { texto: d.cnae_principal.descricao }), " ",
-          el("span", { classe: "motivo__cnae", texto: "(" + formatarCNAE(d.cnae_principal.codigo) + ")" }), ".");
+      var partes = [];
+      if (d.natureza_juridica && d.natureza_juridica.descricao) {
+        partes.push(el("span", null, ["Natureza na Receita: ",
+          el("strong", { texto: d.natureza_juridica.descricao }),
+          d.natureza_juridica.codigo ? el("span", { classe: "motivo__cnae", texto: " (" + formatarNatureza(d.natureza_juridica.codigo) + ")" }) : null]));
       }
+      if (d.cnae_principal && d.cnae_principal.descricao) {
+        partes.push(el("span", null, ["Atividade principal: ",
+          el("strong", { texto: d.cnae_principal.descricao }), " ",
+          el("span", { classe: "motivo__cnae", texto: "(" + formatarCNAE(d.cnae_principal.codigo) + ")" })]));
+      }
+      partes.forEach(function (p, i) { if (i) extra.append("; "); extra.appendChild(p); });
+      if (partes.length) extra.append(".");
     } else if (m.codigo === "CNPJ_INATIVO") {
       extra = el("p", { classe: "motivo__extra", texto: "Só aceitamos CNPJ com situação ATIVA. Se a situação mudou há pouco, a Receita pode levar alguns dias para atualizar." });
     } else if (m.codigo === "CNPJ_JA_CADASTRADO") {
       extra = el("p", { classe: "motivo__extra", texto: "Se a empresa é sua e você não fez esse cadastro, fale com a equipe do ReConecta." });
     }
-    var ic = icone(m.codigo === "SEM_RELACAO_ALIMENTAR" ? "bloqueio" : "alerta");
+    var ic = icone(m.codigo === "SEM_PERFIL_ACEITO" || m.codigo === "SEM_RELACAO_ALIMENTAR" ? "bloqueio" : "alerta");
     ic.setAttribute("class", "motivo__icone");
     return el("li", { classe: "motivo" }, [ic, el("div", null, [el("p", { classe: "motivo__msg", texto: m.mensagem }), extra])]);
   }
@@ -512,7 +553,7 @@
       cnpjInput.classList.toggle("is-valido", !!c.apto);
       resultado.replaceChildren(cartaoEmpresa(c, !!c.apto));
       if (c.apto) liberarEmpresa(c);
-      else travarEmpresa("Esta empresa não pode ser cadastrada.");
+      else travarEmpresa("Esta organização não pode ser cadastrada.");
       return;
     }
     travarEmpresa();
@@ -600,11 +641,11 @@
           motivos: [{ codigo: "CNPJ_JA_CADASTRADO", mensagem: c.mensagem || "Este CNPJ já está cadastrado no ReConecta." }]
         });
         resultado.replaceChildren(cartaoEmpresa(dados, false));
-        travarEmpresa("Esta empresa não pode ser cadastrada.");
+        travarEmpresa("Esta organização não pode ser cadastrada.");
       } else if (r.status === 422) {
         var recusada = Object.assign({}, empresaVerificada, { apto: false, motivos: c.motivos || [] });
         resultado.replaceChildren(cartaoEmpresa(recusada, false));
-        travarEmpresa("Esta empresa não pode ser cadastrada.");
+        travarEmpresa("Esta organização não pode ser cadastrada.");
       } else if (r.status === 404) {
         mostrarAviso(avisoEmpresa, "CNPJ não encontrado na Receita Federal", c.mensagem, { erro: true });
       } else if (r.status === 503) {
@@ -725,14 +766,28 @@
 
   function mostrarSucesso(c) {
     var empresa = c.tipo === "empresa";
-    $("sucesso-tipo").textContent = empresa ? "Empresa doadora" : "Doador";
-    $("sucesso-texto").textContent = empresa
-      ? "Sua empresa já faz parte da rede. Agora é só publicar os excedentes quando tiver alimento para doar."
-      : "Obrigado por fazer parte. Avisaremos você por e-mail sobre as próximas ações de doação.";
+    var perfis = empresa ? (c.perfis || []).filter(function (p) { return PERFIS_NOME[p]; }) : [];
+    var temOng = perfis.indexOf("ong") >= 0;
+    var temEmp = perfis.indexOf("empresa_alimentos") >= 0;
+
+    $("sucesso-tipo").textContent = empresa
+      ? (perfis.length ? perfis.map(function (p) { return PERFIS_NOME[p]; }).join(" e ") : "Organização")
+      : "Doador";
+    $("sucesso-texto").textContent = !empresa
+      ? "Obrigado por fazer parte. Avisaremos você por e-mail sobre as próximas ações de doação."
+      : temOng && temEmp
+        ? "Sua organização já faz parte da rede: publique pedidos, reserve excedentes e doe o que sobrar."
+        : temOng
+          ? "Sua ONG já faz parte da rede: publique pedidos e reserve os excedentes que as empresas oferecem."
+          : "Sua empresa já faz parte da rede: publique excedentes e doe para os pedidos das ONGs.";
 
     var linhas = [["Nome", c.nome]];
     if (empresa) {
       linhas.push(["CNPJ", c.cnpj_formatado || mascaraCNPJ(c.cnpj)]);
+      if (perfis.length) {
+        linhas.push(["Perfil" + (perfis.length > 1 ? "s" : ""),
+          perfis.map(function (p) { return PERFIS_ROTULO[p]; }).join(" e ")]);
+      }
       if (c.endereco) linhas.push(["Endereço", c.endereco]);
     } else {
       linhas.push(["CPF", c.cpf_formatado]);
