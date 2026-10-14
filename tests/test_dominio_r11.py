@@ -275,8 +275,10 @@ def test_dono_confirma_doacao_e_progresso_preserva_compromisso():
     assert detalhe["itens"][0]["recebido"] == 4
     assert detalhe["itens"][0]["entregue"] == 4
     with app.app_context():
-        aviso = Evento.query.filter_by(tipo="doacao.entregue").one()
-        assert aviso.publico is False
+        aviso = Evento.query.filter_by(tipo="doacao.entregue", publico=False).one()
+        publico = Evento.query.filter_by(tipo="doacao.entregue", publico=True).one()
+        assert publico.dest_tipo is None
+        assert json.loads(publico.dados) == {"pedido_id": ids[2], "item": "Pão"}
         assert (aviso.dest_tipo, aviso.dest_id) == ("empresa", ids[5])
         assert json.loads(aviso.dados) == {"pedido_id": ids[2], "item": "Pão"}
     assert cliente.get("/reconecta/dashboard").json["indicadores"]["doacoes_entregues"] == 1
