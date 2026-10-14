@@ -1312,6 +1312,27 @@
           "auth"
         ]
       }
+    },
+    "/reconecta/publico/ongs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "ONGs ativas da rede",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OngPublica"
+              }
+            }
+          }
+        },
+        "summary": "Lista as ONGs cadastradas para a aba \"ONGs na rede\" da Home",
+        "description": "Só nome, município/UF e quantos pedidos estão abertos — nunca e-mail,\ntelefone, CNPJ ou endereço completo. ONG sem pedido aparece com zero.",
+        "operationId": "get_ongs_publicas",
+        "tags": [
+          "publico"
+        ]
+      }
     }
   },
   "info": {
@@ -2349,6 +2370,20 @@
         },
         "link_osm": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "OngPublica": {
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "municipio_uf": {
+          "type": "string"
+        },
+        "pedidos_abertos": {
+          "type": "integer"
         }
       },
       "type": "object"
