@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:5005:5000"
+    environment:
+      DATABASE_URL: sqlite:////tmp/reconecta-dast.sqlite
+      SECRET_KEY: chave-ficticia-apenas-para-dast-local
+      GROQ_API_KEY: ""
+      OLLAMA_URL: ""
+      GEO_EXTERNO: "0"
+      RECONECTA_IAST: "1"
+      RECONECTA_IAST_REPORT_DIR: /tmp/iast
+      RECONECTA_DAST: "1"
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    user: "0:0"
+    working_dir: /zap/wrk
+    volumes:
+      - ${DAST_WORK_DIR:?DAST_WORK_DIR obrigatorio}:/zap/wrk
+    depends_on:
+      app:
+        condition: service_healthy

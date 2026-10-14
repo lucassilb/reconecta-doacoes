@@ -60,6 +60,12 @@ def cabecalhos_seguranca(resposta):
     resposta.headers["X-Content-Type-Options"] = "nosniff"
     resposta.headers["X-Frame-Options"] = "DENY"
     resposta.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resposta.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    resposta.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+    if request.path.startswith("/reconecta/"):
+        cache = resposta.headers.get("Cache-Control", "")
+        if "no-store" not in cache.lower():
+            resposta.headers["Cache-Control"] = f"{cache}, no-store".strip(", ")
     resposta.headers["Permissions-Policy"] = (
         "camera=(self), microphone=(), geolocation=(), payment=(), usb=()")
     csp = _CSP
@@ -218,6 +224,10 @@ api.add_namespace(rotas_ns, path="/reconecta/excedentes/rota")
 with app.app_context():
     db.create_all()
     aplicar_migracoes()
+
+if os.getenv("RECONECTA_IAST") == "1":
+    from iast_sensor import instalar
+    instalar(app, db)
 
 if __name__ == "__main__":
     app.run(host=os.getenv("FLASK_RUN_HOST", "127.0.0.1"),

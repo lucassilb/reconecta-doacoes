@@ -1,0 +1,1904 @@
+{
+  "fonte": "swagger.json",
+  "banco": "SQLite em memória",
+  "contas_ficticias": 6,
+  "operacoes_swagger": 59,
+  "escritas_classificadas": 30,
+  "leituras_privadas_classificadas": 15,
+  "requisicoes_verificadas": 185,
+  "falhas": 0,
+  "classes": {
+    "admin": [
+      "DELETE /reconecta/doacoes/{id}",
+      "DELETE /reconecta/estabelecimentos/{id}",
+      "DELETE /reconecta/instituicoes/{id}",
+      "POST /reconecta/doacoes/",
+      "POST /reconecta/estabelecimentos/",
+      "POST /reconecta/instituicoes/",
+      "PUT /reconecta/doacoes/{id}",
+      "PUT /reconecta/estabelecimentos/{id}",
+      "PUT /reconecta/instituicoes/{id}"
+    ],
+    "objeto": [
+      "DELETE /reconecta/excedentes/{excedente_id}",
+      "DELETE /reconecta/painel/doacoes/{doacao_id}",
+      "POST /reconecta/excedentes/{excedente_id}/cancelar-reserva",
+      "POST /reconecta/excedentes/{excedente_id}/confirmar-retirada",
+      "POST /reconecta/painel/contribuicoes/{contribuicao_id}/nao-recebida",
+      "POST /reconecta/painel/contribuicoes/{contribuicao_id}/receber"
+    ],
+    "papel": [
+      "POST /reconecta/excedentes",
+      "POST /reconecta/excedentes/{excedente_id}/reservar",
+      "POST /reconecta/ia/interpretar-pedido",
+      "POST /reconecta/painel/doacoes",
+      "POST /reconecta/publico/doacoes/{doacao_id}/contribuicoes"
+    ],
+    "publica": [
+      "POST /reconecta/auth/login",
+      "POST /reconecta/cadastro/doador",
+      "POST /reconecta/cadastro/empresa",
+      "POST /reconecta/ia/resumo-dashboard",
+      "POST /reconecta/ia/risco-descarte"
+    ],
+    "sessao": [
+      "DELETE /reconecta/auth/me",
+      "POST /reconecta/auth/logout",
+      "POST /reconecta/ia/sugerir-destino",
+      "POST /reconecta/notificacoes/lidas",
+      "PUT /reconecta/auth/me"
+    ]
+  },
+  "matriz": [
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/minhas-doacoes",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/minhas-doacoes",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/minhas-doacoes",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/painel/minhas-doacoes",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/meus",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/meus",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/meus",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/meus",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/reservas",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/reservas",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/reservas",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/reservas",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/rota",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/rota",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/rota",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/rota",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/notificacoes",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/novidades",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/notificacoes",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/novidades",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/notificacoes",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/novidades",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/notificacoes",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/novidades",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/notificacoes/lidas",
+      "ator": "ong1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/notificacoes/lidas",
+      "ator": "ong2",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/notificacoes/lidas",
+      "ator": "doador1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/notificacoes/lidas",
+      "ator": "anonimo",
+      "classe": "sessao",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me/dados",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me/dados",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me/dados",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/auth/me/dados",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/contribuicoes/{id}/foto",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/contribuicoes/{id}/foto",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/contribuicoes/{id}/foto",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/contribuicoes/{id}/foto",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/contribuicoes/{id}/foto",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "empresa1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "empresa2",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "doador1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "empresa1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "empresa2",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "doador1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "empresa1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "empresa2",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "doador1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "empresa1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "empresa2",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "doador1",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin_leitura",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/cancelar-reserva",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/cancelar-reserva",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/cancelar-reserva",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/cancelar-reserva",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/confirmar-retirada",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/confirmar-retirada",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/confirmar-retirada",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/confirmar-retirada",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/cancelar-reserva",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/receber",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/receber",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/receber",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/receber",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/nao-recebida",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/nao-recebida",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/nao-recebida",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/contribuicoes/{id}/nao-recebida",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/painel/doacoes/{id}",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/painel/doacoes/{id}",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/painel/doacoes/{id}",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/painel/doacoes/{id}",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "ong1",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "ong2",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "doador1",
+      "classe": "papel",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/painel/doacoes",
+      "ator": "anonimo",
+      "classe": "papel",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/interpretar-pedido",
+      "ator": "ong1",
+      "classe": "papel",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/interpretar-pedido",
+      "ator": "ong2",
+      "classe": "papel",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/interpretar-pedido",
+      "ator": "doador1",
+      "classe": "papel",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/interpretar-pedido",
+      "ator": "anonimo",
+      "classe": "papel",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/sugerir-destino",
+      "ator": "empresa1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/sugerir-destino",
+      "ator": "doador1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/sugerir-destino",
+      "ator": "ong1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/ia/sugerir-destino",
+      "ator": "anonimo",
+      "classe": "sessao",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/reservar",
+      "ator": "ong1",
+      "classe": "papel",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/reservar",
+      "ator": "ong2",
+      "classe": "papel",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/reservar",
+      "ator": "empresa1",
+      "classe": "papel",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/reservar",
+      "ator": "doador1",
+      "classe": "papel",
+      "esperado": [
+        403
+      ],
+      "obtido": 403
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes/{id}/reservar",
+      "ator": "anonimo",
+      "classe": "papel",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes",
+      "ator": "empresa1",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes",
+      "ator": "empresa2",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes",
+      "ator": "doador1",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/excedentes",
+      "ator": "anonimo",
+      "classe": "papel",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/publico/doacoes/{id}/contribuicoes",
+      "ator": "doador1",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/publico/doacoes/{id}/contribuicoes",
+      "ator": "doador2",
+      "classe": "papel",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/publico/doacoes/{id}/contribuicoes",
+      "ator": "ong1",
+      "classe": "papel",
+      "esperado": [
+        409
+      ],
+      "obtido": 409
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/publico/doacoes/{id}/contribuicoes",
+      "ator": "anonimo",
+      "classe": "papel",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong2",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "empresa1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "empresa2",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "doador1",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "doador2",
+      "classe": "sessao",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/auth/me",
+      "ator": "anonimo",
+      "classe": "sessao",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/estabelecimentos/",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/estabelecimentos/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/instituicoes/",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "ong1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "ong2",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "empresa1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "doador1",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/instituicoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    },
+    {
+      "metodo": "PUT",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/doacoes/{id}",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/doacoes/",
+      "ator": "anonimo",
+      "classe": "admin",
+      "esperado": [
+        201
+      ],
+      "obtido": 201
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/auth/logout",
+      "ator": "ong1",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/auth/logout",
+      "ator": "ong2",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/auth/logout",
+      "ator": "doador1",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "POST",
+      "rota": "/reconecta/auth/logout",
+      "ator": "anonimo",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong1",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "ong2",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "empresa1",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "empresa2",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "doador1",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "doador2",
+      "classe": "sessao",
+      "esperado": [
+        204
+      ],
+      "obtido": 204
+    },
+    {
+      "metodo": "DELETE",
+      "rota": "/reconecta/auth/me",
+      "ator": "anonimo",
+      "classe": "sessao",
+      "esperado": [
+        401
+      ],
+      "obtido": 401
+    }
+  ]
+}
