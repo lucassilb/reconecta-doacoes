@@ -159,7 +159,7 @@
   }
 
   function preencherTabelas(dados) {
-    $("top-empresas").replaceChildren(tabela("Empresas com mais doações recebidas", ["Empresa", "Cidade", "Pedidos", "Doações recebidas"],
+    $("top-empresas").replaceChildren(tabela("Organizações com mais doações recebidas", ["Organização", "Cidade", "Pedidos", "Doações recebidas"],
       (dados.top_empresas || []).map(function (e) { return [nome(e.nome), local(e.municipio_uf), inteiro.format(e.pedidos), inteiro.format(e.doacoes_recebidas)]; }), [2, 3]));
     $("ultimas").replaceChildren(tabela("Últimas doações", ["Quando", "Item", "Quantidade", "Para", "Quem doou"],
       (dados.ultimas_doacoes || []).map(function (d) {
