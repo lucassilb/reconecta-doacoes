@@ -1181,8 +1181,61 @@
   "media": 0.7828
  },
  "data": "2026-10-14",
- "versao": 1,
+ "versao": 2,
  "acuracia_classificador": 0.7784,
+ "comparacao_classificador": {
+  "teste": 185,
+  "naive_bayes": {
+   "acuracia": 0.7784,
+   "f1_macro": 0.7807
+  },
+  "tfidf_linear": {
+   "acuracia": 0.7459,
+   "f1_macro": 0.747,
+   "acuracia_cv_treino": 0.7649
+  },
+  "adotado": "naive_bayes"
+ },
+ "risco_descarte": {
+  "dataset": "data/lotes_descarte.csv",
+  "origem": "simulado",
+  "linhas": 3200,
+  "treino": 2560,
+  "teste": 640,
+  "descartados": 1198,
+  "semente": 1402,
+  "validacao_cruzada": {
+   "dobras": 5,
+   "modelos": {
+    "logistica": {
+     "acuracia": 0.7094,
+     "f1": 0.5565,
+     "auc": 0.7345
+    },
+    "floresta": {
+     "acuracia": 0.7066,
+     "f1": 0.5413,
+     "auc": 0.7256
+    }
+   }
+  },
+  "modelo_escolhido": "logistica",
+  "acuracia": 0.675,
+  "precisao": 0.5889,
+  "recall": 0.4417,
+  "f1": 0.5048,
+  "auc": 0.7015,
+  "matriz_confusao": [
+   [
+    326,
+    74
+   ],
+   [
+    134,
+    106
+   ]
+  ]
+ },
  "acuracia_top1": 0.8814,
  "acuracia_top3": 0.8814,
  "taxa_sem_sugestao_correta": 1.0,
@@ -1192,6 +1245,8 @@
   "alimentos_teste": 185,
   "ofertas": 80,
   "ofertas_com_destino": 59,
-  "ofertas_sem_destino": 21
+  "ofertas_sem_destino": 21,
+  "lotes_descarte": 3200,
+  "lotes_teste": 640
  }
 }

@@ -16,6 +16,7 @@ from fuso import agora_brasilia_sem_fuso
 from llm_service import interpretar_pedido, resumir_dashboard
 from models import Doacao
 from Publico import _municipio_uf, serializar_doacao
+from risco_descarte import prever as prever_risco
 
 ns = Namespace("ia", description="Sugestões com modelo local e regras de fallback")
 
@@ -30,6 +31,13 @@ pedido_model = ns.model("PedidoSugeridoIA", {
 resumo_model = ns.model("ResumoDashboardIA", {
     "resumo": fields.String, "recomendacoes": fields.List(fields.String),
     "fonte": fields.String, "modelo": fields.String, "gerado_em": fields.String,
+})
+risco_model = ns.model("LoteRiscoDescarteIA", {
+    "categoria": fields.String(required=True), "dias_validade": fields.Integer(required=True),
+    "quantidade_kg": fields.Float(required=True), "perecivel": fields.Boolean,
+    "temperatura_c": fields.Float, "armazenamento": fields.String,
+    "dia_semana": fields.Integer, "hora_publicacao": fields.Integer,
+    "uf": fields.String, "distancia_ong_km": fields.Float,
 })
 
 _acessos = {}
@@ -90,6 +98,24 @@ class ResumoDashboard(Resource):
                 "Retry-After": "60"}
         # O corpo do cliente é ignorado: só os agregados calculados aqui seguem ao modelo.
         return resumir_dashboard(montar_dashboard()), 200
+
+
+@ns.route("/risco-descarte")
+class RiscoDescarte(Resource):
+    @ns.expect(risco_model)
+    @ns.response(200, "Probabilidade e prioridade estimadas em dados simulados")
+    @ns.response(400, "Lote inválido")
+    @ns.response(429, "Limite de 10 análises por minuto por IP")
+    def post(self):
+        if not _permitir(f"risco:{request.remote_addr or 'desconhecido'}"):
+            return {"codigo": "LIMITE_IA", "mensagem": "Limite de 10 análises por minuto atingido."}, 429, {
+                "Retry-After": "60"}
+        try:
+            return prever_risco(request.get_json(silent=True)), 200
+        except ValueError as erro:
+            return {"codigo": "DADOS_INVALIDOS", "mensagem": str(erro)}, 400
+        except OSError:
+            return {"codigo": "MODELO_INDISPONIVEL", "mensagem": "Modelo de risco indisponível."}, 503
 
 
 def _pedidos_abertos():

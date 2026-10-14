@@ -1220,6 +1220,35 @@
           "tempo_real"
         ]
       }
+    },
+    "/reconecta/ia/risco-descarte": {
+      "post": {
+        "responses": {
+          "429": {
+            "description": "Limite de 10 análises por minuto por IP"
+          },
+          "400": {
+            "description": "Lote inválido"
+          },
+          "200": {
+            "description": "Probabilidade e prioridade estimadas em dados simulados"
+          }
+        },
+        "operationId": "post_risco_descarte",
+        "parameters": [
+          {
+            "name": "payload",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/LoteRiscoDescarteIA"
+            }
+          }
+        ],
+        "tags": [
+          "ia"
+        ]
+      }
     }
   },
   "info": {
@@ -2113,6 +2142,46 @@
         "ate_id": {
           "type": "integer",
           "description": "Último id de evento lido"
+        }
+      },
+      "type": "object"
+    },
+    "LoteRiscoDescarteIA": {
+      "required": [
+        "categoria",
+        "dias_validade",
+        "quantidade_kg"
+      ],
+      "properties": {
+        "categoria": {
+          "type": "string"
+        },
+        "dias_validade": {
+          "type": "integer"
+        },
+        "quantidade_kg": {
+          "type": "number"
+        },
+        "perecivel": {
+          "type": "boolean"
+        },
+        "temperatura_c": {
+          "type": "number"
+        },
+        "armazenamento": {
+          "type": "string"
+        },
+        "dia_semana": {
+          "type": "integer"
+        },
+        "hora_publicacao": {
+          "type": "integer"
+        },
+        "uf": {
+          "type": "string"
+        },
+        "distancia_ong_km": {
+          "type": "number"
         }
       },
       "type": "object"

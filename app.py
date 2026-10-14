@@ -1,4 +1,5 @@
 import os
+import secrets
 from flask import Flask, request, send_from_directory
 from flask_restx import Api, Resource
 from sqlalchemy import text
@@ -51,6 +52,7 @@ _CSP = (
     "img-src 'self' data: blob:; connect-src 'self'; "
     "media-src 'self'; worker-src 'none'"
 )
+_SWAGGER_INLINE_SCRIPT = b'<script type="text/javascript">'
 
 
 @app.after_request
@@ -60,7 +62,18 @@ def cabecalhos_seguranca(resposta):
     resposta.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     resposta.headers["Permissions-Policy"] = (
         "camera=(self), microphone=(), geolocation=(), payment=(), usb=()")
-    resposta.headers["Content-Security-Policy"] = _CSP
+    csp = _CSP
+    if request.path == "/swagger" and resposta.status_code == 200 and resposta.mimetype == "text/html":
+        # Flask-RESTX inicializa o Swagger UI em um único script inline.
+        # O nonce autoriza só esse script nesta resposta, sem liberar inline no site.
+        corpo = resposta.get_data()
+        if corpo.count(_SWAGGER_INLINE_SCRIPT) == 1:
+            nonce = secrets.token_urlsafe(24)
+            marcado = f'<script type="text/javascript" nonce="{nonce}">'.encode("ascii")
+            resposta.set_data(corpo.replace(_SWAGGER_INLINE_SCRIPT, marcado, 1))
+            csp = _CSP.replace("script-src 'self' https://cdn.jsdelivr.net;",
+                               f"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}';")
+    resposta.headers["Content-Security-Policy"] = csp
     if app.config["SESSION_COOKIE_SECURE"]:
         resposta.headers["Strict-Transport-Security"] = "max-age=31536000"
     return resposta
