@@ -3,7 +3,7 @@ import re
 from decimal import Decimal
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from sqlalchemy import or_
+from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import selectinload
 from Auth import usuario_atual
 from fuso import agora_brasilia_sem_fuso, iso_evento, iso_prazo
@@ -185,3 +185,35 @@ class Opcoes(Resource):
     @ns.response(200, "Categorias e unidades aceitas", opcoes_model)
     def get(self):
         return {"categorias": CATEGORIAS, "unidades": UNIDADES}, 200
+
+
+ong_model = ns.model("OngPublica", {
+    "nome": fields.String, "municipio_uf": fields.String,
+    "pedidos_abertos": fields.Integer,
+})
+
+
+@ns.route("/ongs")
+class OngsPublicas(Resource):
+    @ns.response(200, "ONGs ativas da rede", [ong_model])
+    def get(self):
+        """Lista as ONGs cadastradas para a aba "ONGs na rede" da Home.
+
+        Só nome, município/UF e quantos pedidos estão abertos — nunca e-mail,
+        telefone, CNPJ ou endereço completo. ONG sem pedido aparece com zero.
+        """
+        agora = agora_brasilia_sem_fuso()
+        pedidos = func.count(Doacao.id)
+        linhas = (db.session.query(Estabelecimento.nome, Estabelecimento.endereco,
+                                   pedidos)
+                  .outerjoin(Doacao,
+                             and_(Doacao.estabelecimento_id == Estabelecimento.id,
+                                  Doacao.status == "DISPONIVEL",
+                                  Doacao.data_limite_retirada > agora))
+                  .filter(Estabelecimento.sem_fins_lucrativos.is_(True),
+                          ~Estabelecimento.email.like("%@removido.invalid"))
+                  .group_by(Estabelecimento.id, Estabelecimento.nome,
+                            Estabelecimento.endereco)
+                  .order_by(pedidos.desc(), Estabelecimento.nome).all())
+        return [{"nome": nome, "municipio_uf": _municipio_uf(endereco),
+                 "pedidos_abertos": int(total)} for nome, endereco, total in linhas], 200
