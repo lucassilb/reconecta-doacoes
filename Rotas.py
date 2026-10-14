@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 import geo
 from Auth import usuario_atual
-from Excedentes import status_efetivo
+from Excedentes import endereco_retirada, nome_publicador, status_efetivo
 from fuso import agora_brasilia_sem_fuso, iso_prazo
 from models import Excedente
 
@@ -60,7 +60,7 @@ class RotaColeta(Resource):
                     "mensagem": "Não conseguimos localizar o endereço da sua organização."}, 422
         com_ponto, sem_ponto = [], []
         for reserva in reservas:
-            ponto = geo.localizar(reserva.publicador.endereco)
+            ponto = geo.localizar(endereco_retirada(reserva))
             (com_ponto if ponto is not None else sem_ponto).append((reserva, ponto))
         ordem = geo.ordenar_rota(partida, [ponto for _, ponto in com_ponto])
         paradas, anterior, acumulado = [], partida, 0.0
@@ -70,8 +70,8 @@ class RotaColeta(Resource):
             acumulado += trecho
             paradas.append({
                 "ordem": posicao, "excedente_id": reserva.id,
-                "empresa": reserva.publicador.nome,
-                "endereco": reserva.publicador.endereco,
+                "empresa": nome_publicador(reserva),
+                "endereco": endereco_retirada(reserva),
                 "retirar_ate": iso_prazo(reserva.retirar_ate),
                 "itens": [item.nome for item in reserva.itens],
                 "distancia_km": _arredondar(trecho), "acumulado_km": _arredondar(acumulado),
@@ -83,8 +83,8 @@ class RotaColeta(Resource):
         return {
             "partida": {"nome": ong.nome, "precisao": partida.precisao},
             "paradas": paradas,
-            "sem_localizacao": [{"excedente_id": r.id, "empresa": r.publicador.nome,
-                                 "endereco": r.publicador.endereco} for r, _ in sem_ponto],
+            "sem_localizacao": [{"excedente_id": r.id, "empresa": nome_publicador(r),
+                                 "endereco": endereco_retirada(r)} for r, _ in sem_ponto],
             "retorno_km": _arredondar(retorno),
             "total_km": _arredondar(acumulado + retorno),
             "link_rota": geo.link_rota_completa(trajeto) if paradas else None,

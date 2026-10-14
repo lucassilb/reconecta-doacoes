@@ -107,12 +107,23 @@
         erros.push($("ex-retirar-ate"));
       }
     });
-    ["dentro-validade", "embalagem-ok", "armazenado-ok"].forEach(function (nome) {
+    var declaracoes = ["dentro-validade", "embalagem-ok", "armazenado-ok"].concat(pessoaFisica ? ["nao-caseiro"] : []);
+    declaracoes.forEach(function (nome) {
       if (!$("ex-" + nome).checked) {
-        $("ex-declaracoes-erro").textContent = "Confirme as três condições para publicar.";
+        $("ex-declaracoes-erro").textContent = pessoaFisica ? "Confirme as quatro condições para publicar." : "Confirme as três condições para publicar.";
         erros.push($("ex-" + nome));
       }
     });
+    if (pessoaFisica) {
+      $("ex-retirada-erro").textContent = "";
+      var cep = $("ex-ret-cep").value.replace(/\D/g, "");
+      if (!$("ex-ret-logradouro").value.trim() || !$("ex-ret-numero").value.trim() ||
+          !$("ex-ret-municipio").value.trim() || !$("ex-ret-uf").value || (cep && cep.length !== 8)) {
+        $("ex-retirada-erro").textContent = "Informe rua, número, cidade e UF (o CEP, se informar, com 8 números).";
+        erros.push(!$("ex-ret-logradouro").value.trim() ? $("ex-ret-logradouro") : !$("ex-ret-numero").value.trim() ? $("ex-ret-numero")
+          : !$("ex-ret-municipio").value.trim() ? $("ex-ret-municipio") : !$("ex-ret-uf").value ? $("ex-ret-uf") : $("ex-ret-cep"));
+      }
+    }
     if (erros.length) erros[0].focus();
     return !erros.length;
   }
@@ -134,10 +145,25 @@
         };
       })
     };
+    if (pessoaFisica) {
+      corpo.nao_caseiro = true;
+      corpo.retirada = {
+        logradouro: $("ex-ret-logradouro").value.trim(), numero: $("ex-ret-numero").value.trim(),
+        bairro: $("ex-ret-bairro").value.trim(), municipio: $("ex-ret-municipio").value.trim(),
+        uf: $("ex-ret-uf").value, cep: $("ex-ret-cep").value.replace(/\D/g, "")
+      };
+    }
     pedir("/reconecta/excedentes", { method: "POST", body: corpo }).then(function (r) {
       if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
-      if (!r.ok) { aviso(r.corpo.mensagem || "Não foi possível publicar o excedente.", true); return; }
-      aviso("Excedente publicado. ONGs já podem reservá-lo.", false);
+      if (!r.ok) {
+        var campos = r.corpo.campos || {};
+        var deRetirada = Object.keys(campos).filter(function (k) { return k.indexOf("retirada.") === 0; });
+        if (deRetirada.length) $("ex-retirada-erro").textContent = campos[deRetirada[0]];
+        aviso(deRetirada.length ? campos[deRetirada[0]] : (r.corpo.mensagem || "Não foi possível publicar o excedente."), true);
+        return;
+      }
+      aviso(pessoaFisica ? "Publicado. As ONGs perto de você são avisadas e, quando uma reservar, você recebe o aviso no sino."
+                         : "Excedente publicado. ONGs já podem reservá-lo.", false);
       $("form-excedente").reset();
       linhas = [];
       $("ex-itens").replaceChildren();
@@ -311,13 +337,28 @@
   }
 
   var iniciou = false;
+  var pessoaFisica = false;
   function iniciar(usuario) {
       if (iniciou) return;
-      if (!usuario || usuario.tipo !== "empresa") return;
+      if (!usuario) return;
       var perfis = Array.isArray(usuario.perfis) ? usuario.perfis : [];
-      var ong = perfis.indexOf("ong") !== -1;
-      var alimentos = perfis.indexOf("empresa_alimentos") !== -1;
+      // pessoa física também publica o que sobrou, informando onde a ONG retira
+      pessoaFisica = usuario.tipo === "doador";
+      var ong = !pessoaFisica && perfis.indexOf("ong") !== -1;
+      var alimentos = pessoaFisica || perfis.indexOf("empresa_alimentos") !== -1;
       if (!ong && !alimentos) return;
+      if (pessoaFisica) {
+        $("publicar-excedente-t").textContent = "Doar o que sobrou";
+        $("publicar-excedente-sub").textContent = "Sem pedido aberto para o seu alimento? Publique aqui: as ONGs perto de você são avisadas, uma reserva e retira no endereço que você informar.";
+        $("meus-excedentes-t").textContent = "Meus alimentos publicados";
+        $("ex-retirada").hidden = false;
+        $("ex-nao-caseiro-linha").hidden = false;
+        $("ex-publicar").textContent = "Publicar para as ONGs";
+        $("ex-ret-cep").addEventListener("input", function () {
+          var d = this.value.replace(/\D/g, "").slice(0, 8);
+          this.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+        });
+      }
       iniciou = true;
       $("bloco-excedentes").hidden = false;
       if (alimentos) {

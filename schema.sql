@@ -102,7 +102,9 @@ ALTER TABLE doadores ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
 
 CREATE TABLE IF NOT EXISTS excedentes (
     id SERIAL PRIMARY KEY,
-    estabelecimento_id INT NOT NULL REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+    estabelecimento_id INT REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
+    doador_id INT REFERENCES doadores(id) ON DELETE RESTRICT,
+    retirada_endereco VARCHAR(200),
     retirar_ate TIMESTAMP NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'DISPONIVEL',
     reservado_por_id INT REFERENCES estabelecimentos(id) ON DELETE RESTRICT,
@@ -114,8 +116,15 @@ CREATE TABLE IF NOT EXISTS excedentes (
     CONSTRAINT ck_excedentes_observacao CHECK (length(observacao) <= 200),
     CONSTRAINT ck_excedentes_reservante CHECK (
         (status IN ('RESERVADO', 'RETIRADO') AND reservado_por_id IS NOT NULL) OR
-        (status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL))
+        (status IN ('DISPONIVEL', 'CANCELADO', 'EXPIRADO') AND reservado_por_id IS NULL)),
+    -- quem publica: organização (CNPJ) ou pessoa física, que informa onde retirar
+    CONSTRAINT ck_excedentes_origem CHECK ((estabelecimento_id IS NOT NULL) <> (doador_id IS NOT NULL)),
+    CONSTRAINT ck_excedentes_retirada_pf CHECK (doador_id IS NULL OR retirada_endereco IS NOT NULL)
 );
+-- bancos criados antes da publicação por pessoa física
+ALTER TABLE excedentes ALTER COLUMN estabelecimento_id DROP NOT NULL;
+ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS doador_id INT REFERENCES doadores(id) ON DELETE RESTRICT;
+ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS retirada_endereco VARCHAR(200);
 
 CREATE TABLE IF NOT EXISTS itens_excedente (
     id SERIAL PRIMARY KEY,
@@ -129,6 +138,7 @@ CREATE TABLE IF NOT EXISTS itens_excedente (
 );
 CREATE INDEX IF NOT EXISTS ix_excedentes_status_prazo ON excedentes(status, retirar_ate);
 CREATE INDEX IF NOT EXISTS ix_excedentes_estabelecimento ON excedentes(estabelecimento_id);
+CREATE INDEX IF NOT EXISTS ix_excedentes_doador ON excedentes(doador_id);
 CREATE INDEX IF NOT EXISTS ix_excedentes_reservado_por ON excedentes(reservado_por_id);
 CREATE INDEX IF NOT EXISTS ix_itens_excedente_excedente ON itens_excedente(excedente_id);
 CREATE INDEX IF NOT EXISTS ix_itens_excedente_categoria ON itens_excedente(categoria);

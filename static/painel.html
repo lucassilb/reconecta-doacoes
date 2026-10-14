@@ -50,11 +50,11 @@
 
       </div>
 
-      <!-- excedentes: publicação por empresa de alimentos; reservas por ONG -->
+      <!-- excedentes: publicação por empresa de alimentos ou pessoa física; reservas por ONG -->
       <div id="bloco-excedentes" class="painel__grade" hidden>
         <section class="cartao" id="publicar-excedente" aria-labelledby="publicar-excedente-t" hidden>
           <h2 id="publicar-excedente-t" class="cartao__titulo">Publicar excedente</h2>
-          <p class="cartao__sub">Ofereça alimentos dentro da validade para uma ONG retirar antes do prazo.</p>
+          <p class="cartao__sub" id="publicar-excedente-sub">Ofereça alimentos dentro da validade para uma ONG retirar antes do prazo.</p>
           <form id="form-excedente" class="form-doacao" novalidate>
             <div class="campo campo--limite">
               <label for="ex-retirar-ate" class="campo__rotulo">Retirar até</label>
@@ -67,6 +67,23 @@
               <div id="ex-itens" class="itens__lista"></div>
               <button type="button" id="ex-add-item" class="btn btn--secundario btn--pequeno btn--add">Adicionar item</button>
             </fieldset>
+            <fieldset class="itens" id="ex-retirada" hidden>
+              <legend class="itens__legenda">Onde a ONG retira</legend>
+              <p class="campo__ajuda" id="ex-retirada-ajuda">Só a ONG que reservar vê o endereço; para as outras aparece só a cidade.</p>
+              <p id="ex-retirada-erro" class="campo__erro" data-erro></p>
+              <div class="campo"><label for="ex-ret-logradouro" class="campo__rotulo">Rua ou avenida</label>
+                <input id="ex-ret-logradouro" class="campo__entrada" maxlength="100" autocomplete="address-line1" aria-describedby="ex-retirada-ajuda ex-retirada-erro"></div>
+              <div class="campo"><label for="ex-ret-numero" class="campo__rotulo">Número</label>
+                <input id="ex-ret-numero" class="campo__entrada campo__entrada--mono" maxlength="10" placeholder="Ex.: 120 ou S/N"></div>
+              <div class="campo"><label for="ex-ret-bairro" class="campo__rotulo">Bairro (opcional)</label>
+                <input id="ex-ret-bairro" class="campo__entrada" maxlength="60" autocomplete="address-level3"></div>
+              <div class="campo"><label for="ex-ret-municipio" class="campo__rotulo">Cidade</label>
+                <input id="ex-ret-municipio" class="campo__entrada" maxlength="60" autocomplete="address-level2"></div>
+              <div class="campo"><label for="ex-ret-uf" class="campo__rotulo">UF</label>
+                <select id="ex-ret-uf" class="campo__entrada" autocomplete="address-level1"><option value="">Selecione</option><option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option></select></div>
+              <div class="campo"><label for="ex-ret-cep" class="campo__rotulo">CEP (opcional)</label>
+                <input id="ex-ret-cep" class="campo__entrada campo__entrada--mono" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div>
+            </fieldset>
             <div class="campo">
               <label for="ex-observacao" class="campo__rotulo">Observação para a ONG (opcional)</label>
               <textarea id="ex-observacao" class="campo__entrada" maxlength="200" rows="2" placeholder="Ex.: Retirada pela portaria lateral"></textarea>
@@ -76,6 +93,7 @@
               <label><input id="ex-dentro-validade" type="checkbox" required> Todos os alimentos estão dentro da validade.</label>
               <label><input id="ex-embalagem-ok" type="checkbox" required> As embalagens estão íntegras.</label>
               <label><input id="ex-armazenado-ok" type="checkbox" required> Os alimentos foram armazenados corretamente.</label>
+              <label id="ex-nao-caseiro-linha" hidden><input id="ex-nao-caseiro" type="checkbox"> Não é comida feita em casa.</label>
               <p id="ex-declaracoes-erro" class="campo__erro" data-erro></p>
             </fieldset>
             <div id="ex-aviso" class="aviso" role="status" aria-live="polite" hidden></div>

@@ -563,7 +563,7 @@
     var acoes = [];
     if (c.pode_publicar_excedente && itens.length) {
       var publicar = el("a", { classe: "btn " + (sugestoes.length ? "btn--secundario" : "btn--primario") + " btn--pequeno",
-        href: "/painel#publicar-excedente" }, ["Publicar como excedente"]);
+        href: "/painel#publicar-excedente" }, [usuarioAtual && usuarioAtual.tipo === "doador" ? "Publicar para as ONGs retirarem" : "Publicar como excedente"]);
       // o painel pode aproveitar os itens já interpretados
       publicar.addEventListener("click", function () { guardar(CHAVE_RASCUNHO, JSON.stringify({ texto: texto, itens: itens })); });
       acoes.push(publicar);

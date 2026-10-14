@@ -48,7 +48,7 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 
 - **Empresas do setor de alimentos** (restaurantes, padarias, mercados, indústrias, associações com atividade alimentar): publicam pedidos ou excedentes e também podem doar a pedidos de outras organizações.
 - **ONGs com CNPJ** e natureza jurídica sem fins lucrativos: publicam pedidos, reservam excedentes e confirmam doações recebidas. Podem acumular o perfil de empresa de alimentos.
-- **Doadores pessoa física** (CPF): doam alimentos para os pedidos abertos.
+- **Doadores pessoa física** (CPF): doam alimentos para os pedidos abertos e, quando não há pedido que combine, publicam o que sobrou como excedente, com endereço de retirada que só a ONG que reservar vê, e confirmam a retirada (comida caseira não é aceita).
 - **Instituições receptoras**: entidade mantida do CP1 (CRUD na API).
 
 ## Funcionalidades
