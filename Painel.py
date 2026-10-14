@@ -208,8 +208,9 @@ def _decidir_contribuicao(contribuicao_id, destino):
     tipo = "doacao.entregue" if destino == "ENTREGUE" else "doacao.nao_recebida"
     destinatario = (("doador", contribuicao.doador_id) if contribuicao.doador_id else
                     ("empresa", contribuicao.estabelecimento_id))
+    # A entrega também é pública (só pedido e item) para o impacto atualizar ao vivo.
     _emitir(tipo, {"pedido_id": contribuicao.doacao_id, "item": contribuicao.item_doacao.nome},
-            publico=False, destinatarios=(destinatario,))
+            publico=destino == "ENTREGUE", destinatarios=(destinatario,))
     db.session.commit()
     db.session.refresh(contribuicao)
     registrar_auditoria("doacao_entregue" if destino == "ENTREGUE" else "doacao_nao_recebida",
