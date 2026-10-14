@@ -94,6 +94,10 @@ def dashboard_page():
 def doacao_page(doacao_id):
     return send_from_directory(app.static_folder, "doacao.html")
 
+@app.get("/excedentes/<int:excedente_id>")
+def excedente_page(excedente_id):
+    return send_from_directory(app.static_folder, "excedente.html")
+
 @app.errorhandler(413)
 def arquivo_grande(_erro):
     return {"codigo": "ARQUIVO_GRANDE", "mensagem": "O envio excede o limite de 6 MB.",
@@ -175,7 +179,9 @@ from Publico import ns as publico_ns
 from Painel import ns as painel_ns
 from Contribuicoes import ns as contribuicoes_ns
 from Dashboard import ns as dashboard_ns
+from Excedentes import ns as excedentes_ns
 from IA import ns as ia_ns
+from TempoReal import ns as tempo_real_ns
 
 api.add_namespace(estabelecimentos_ns, path="/reconecta/estabelecimentos")
 api.add_namespace(instituicoes_ns, path="/reconecta/instituicoes")
@@ -186,7 +192,9 @@ api.add_namespace(publico_ns, path="/reconecta/publico")
 api.add_namespace(painel_ns, path="/reconecta/painel")
 api.add_namespace(contribuicoes_ns, path="/reconecta/contribuicoes")
 api.add_namespace(dashboard_ns, path="/reconecta/dashboard")
+api.add_namespace(excedentes_ns, path="/reconecta/excedentes")
 api.add_namespace(ia_ns, path="/reconecta/ia")
+api.add_namespace(tempo_real_ns, path="/reconecta")
 
 with app.app_context():
     db.create_all()

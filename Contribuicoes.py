@@ -15,6 +15,7 @@ from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
 from Auth import registrar_auditoria, usuario_atual
+from eventos import emitir as _emitir
 from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
 from models import Contribuicao, Doacao, ItemDoacao, db
 
@@ -195,6 +196,11 @@ def criar_contribuicao(doacao):
             foto_dados=dados_foto,
             status="ACEITA")
         db.session.add(contribuicao)
+        _emitir("doacao.aceita", {
+            "pedido_id": doacao.id, "item": item.nome,
+            "quantidade": float(quantidade), "unidade_medida": item.unidade_medida,
+            "origem": "pessoa" if tipo == "doador" else "empresa"},
+            destinatarios=(("empresa", doacao.estabelecimento_id),))
         db.session.commit()
     except SQLAlchemyError:
         db.session.rollback()

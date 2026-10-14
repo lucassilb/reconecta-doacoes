@@ -7,9 +7,15 @@ from collections import deque
 from flask import request
 from flask_restx import Namespace, Resource, fields
 
+from sqlalchemy.orm import selectinload
+
 from Auth import usuario_atual
+from conexao import casar
 from Dashboard import montar_dashboard
+from fuso import agora_brasilia_sem_fuso
 from llm_service import interpretar_pedido, resumir_dashboard
+from models import Doacao
+from Publico import _municipio_uf, serializar_doacao
 
 ns = Namespace("ia", description="Sugestões com modelo local e regras de fallback")
 
@@ -84,3 +90,51 @@ class ResumoDashboard(Resource):
                 "Retry-After": "60"}
         # O corpo do cliente é ignorado: só os agregados calculados aqui seguem ao modelo.
         return resumir_dashboard(montar_dashboard()), 200
+
+
+def _pedidos_abertos():
+    """Pedidos DISPONIVEL no prazo, serializados para o casamento."""
+    pedidos = (Doacao.query.options(
+        selectinload(Doacao.estabelecimento), selectinload(Doacao.itens),
+        selectinload(Doacao.contribuicoes))
+        .filter(Doacao.estabelecimento_id.isnot(None),
+                Doacao.status == "DISPONIVEL",
+                Doacao.data_limite_retirada > agora_brasilia_sem_fuso())
+        .order_by(Doacao.data_limite_retirada).all())
+    resultado = []
+    for pedido in pedidos:
+        dados = serializar_doacao(pedido, incluir_status=True)
+        dados["estabelecimento_id"] = pedido.estabelecimento_id
+        resultado.append(dados)
+    return resultado
+
+
+@ns.route("/sugerir-destino")
+class SugerirDestino(Resource):
+    @ns.expect(ns.model("TextoDestinoIA", {"texto": fields.String(required=True)}))
+    @ns.response(200, "Sugestões de destino para o excedente", pedido_model)
+    def post(self):
+        """Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam."""
+        atual = usuario_atual()
+        if not atual:
+            return {"codigo": "NAO_AUTENTICADO", "mensagem": "Entre para continuar."}, 401
+        tipo, usuario = atual
+        corpo = request.get_json(silent=True)
+        texto = corpo.get("texto") if isinstance(corpo, dict) else None
+        if not isinstance(texto, str) or not 5 <= len(texto.strip()) <= 600:
+            return {"codigo": "DADOS_INVALIDOS", "mensagem": "Corrija os campos indicados.",
+                    "campos": {"texto": "Descreva em 5 a 600 caracteres o que sobrou."}}, 400
+        if not _permitir(f"sugerir:{tipo}:{usuario.id}"):
+            return {"codigo": "MUITAS_TENTATIVAS",
+                    "mensagem": "Limite de 10 sugestões por minuto atingido. "
+                                "Tente de novo em instantes."}, 429, {"Retry-After": "60"}
+        interpretado = interpretar_pedido(texto.strip())
+        uf = None
+        if tipo == "empresa":
+            municipio_uf = _municipio_uf(usuario.endereco)
+            uf = municipio_uf.rsplit("/", 1)[-1] if municipio_uf else None
+        sugestoes = casar(interpretado["itens"], _pedidos_abertos(), uf)
+        return {"itens": interpretado["itens"], "sugestoes": sugestoes,
+                "pode_publicar_excedente": bool(
+                    tipo == "empresa" and getattr(usuario, "atividade_alimentar", False)),
+                "fonte": interpretado.get("fonte"), "modelo": interpretado.get("modelo")}, 200

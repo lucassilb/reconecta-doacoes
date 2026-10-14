@@ -2,6 +2,16 @@
 
 O modelo está em `models.py`; `schema.sql` descreve a instalação PostgreSQL. A aplicação aplica `migracoes.py` ao iniciar. Pedidos atuais são publicados por empresas em `doacoes` e detalhados em `itens_doacao`; pessoas e outras empresas entregam alimentos registrados em `contribuicoes`.
 
+## Rodada 11: organizações e excedentes
+
+`estabelecimentos` representa todo CNPJ cadastrado. `natureza_juridica_codigo` guarda o código consultado; `sem_fins_lucrativos` habilita o perfil ONG e `atividade_alimentar` habilita o perfil empresa de alimentos. Os dois booleanos podem ser verdadeiros. A lista de naturezas e as exclusões estão em [natureza-juridica.md](natureza-juridica.md). A migração preenche contas legadas com `sem_fins_lucrativos=false` e `atividade_alimentar=true` para preservar o acesso anterior; `scripts/atualizar_perfis.py` reconsulta a Receita antes de corrigir esses valores.
+
+`excedentes` é um anúncio de alimento já disponível, com um único `estabelecimento_id` publicador e, durante a reserva, um único `reservado_por_id` que referencia outra linha de `estabelecimentos`. `itens_excedente` guarda os alimentos, quantidades e validades; não compartilha linhas com `itens_doacao`. A reserva é uma transição atômica de `DISPONIVEL` para `RESERVADO`, condicionada ao estado, ao prazo e à ausência de outro reservante. Cancelá-la libera o anúncio antes do prazo. A confirmação do publicador muda para `RETIRADO`. O anúncio disponível pode passar a `CANCELADO`. `EXPIRADO` é calculado na leitura quando `retirar_ate` passou sem retirada; não depende de cron ou da atualização física da coluna.
+
+O prazo `retirar_ate` é a hora civil de Brasília, sem fuso no banco, como os prazos dos pedidos. `criado_em`, `reservado_em` e `retirado_em` são UTC sem fuso no banco e convertidos para Brasília na saída. A API exige prazo futuro até a primeira validade, validade desde hoje e as três declarações de conservação. O banco reforça status permitido, quantidade positiva e observação com no máximo 200 caracteres; FKs e índices (`status, retirar_ate`, publicador, reservante, item e categoria) sustentam as consultas. `reservado_por_id` nulo fora da reserva evita múltiplas reservas ativas no mesmo anúncio.
+
+Em `contribuicoes`, `ACEITA` significa compromisso ainda não confirmado, `ENTREGUE` confirma recebimento pelo dono do pedido e `CANCELADA` registra que não chegou. A contagem `recebido` inclui `ACEITA` e `ENTREGUE`, enquanto `entregue` inclui apenas `ENTREGUE`.
+
 ## Organização das entidades
 
 | Tabela | Responsabilidade |

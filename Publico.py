@@ -25,7 +25,7 @@ opcoes_model = ns.model("OpcoesDoacao", {
 item_model = ns.model("ItemPedidoPublico", {
     "id": fields.Integer, "nome": fields.String, "categoria": fields.String,
     "quantidade": fields.Float, "unidade_medida": fields.String,
-    "recebido": fields.Float, "faltam": fields.Float,
+    "recebido": fields.Float, "entregue": fields.Float, "faltam": fields.Float,
 })
 empresa_model = ns.model("EmpresaPedidoPublico", {
     "nome": fields.String, "municipio_uf": fields.String,
@@ -45,14 +45,16 @@ def _municipio_uf(endereco):
     return None
 
 def serializar_doacao(doacao, incluir_status=False, detalhe=False):
-    aceitas = [c for c in doacao.contribuicoes if c.status == "ACEITA"]
+    aceitas = [c for c in doacao.contribuicoes if c.status in ("ACEITA", "ENTREGUE")]
     itens = []
     for item in doacao.itens:
         recebido = sum((c.quantidade for c in aceitas if c.item_doacao_id == item.id), Decimal("0"))
+        entregue = sum((c.quantidade for c in aceitas if c.item_doacao_id == item.id and c.status == "ENTREGUE"), Decimal("0"))
         meta = Decimal(str(item.quantidade))
         itens.append({"id": item.id, "nome": item.nome, "categoria": item.categoria,
                       "quantidade": float(meta), "unidade_medida": item.unidade_medida,
-                      "recebido": float(recebido), "faltam": float(max(meta - recebido, 0))})
+                      "recebido": float(recebido), "entregue": float(entregue),
+                      "faltam": float(max(meta - recebido, 0))})
     dados = {
         "id": doacao.id,
         "empresa": {"nome": doacao.estabelecimento.nome,
@@ -110,7 +112,7 @@ class Resumo(Resource):
             "instituicoes": db.session.query(Instituicao.id).count(),
             "doacoes_disponiveis": len(doacoes),
             "itens_disponiveis": len(itens), "kg_disponiveis": float(peso),
-            "doacoes_recebidas": Contribuicao.query.filter_by(status="ACEITA").count(),
+            "doacoes_recebidas": Contribuicao.query.filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE"))).count(),
         }, 200
 
 @ns.route("/doacoes")

@@ -12,6 +12,10 @@ CACHE_TTL = 600
 _cache = {}
 _cache_lock = threading.Lock()
 
+# Entidades privadas aptas a atuar como ONG, segundo a TNJ 2021 do CONCLA.
+# A classe 3 inteira inclui cartórios, condomínios e outras figuras que não são ONGs.
+NATUREZAS_ONG = frozenset({"3069", "3204", "3220", "3239", "3301", "3999"})
+
 
 class ConsultaCNPJError(Exception):
     def __init__(self, codigo, mensagem, status):
@@ -50,6 +54,16 @@ def _atividade(codigo, descricao=""):
     return {"codigo": codigo, "descricao": str(descricao or "")} if codigo else None
 
 
+def _natureza(valor, descricao=""):
+    if isinstance(valor, dict):
+        descricao = valor.get("descricao") or valor.get("nome") or descricao
+        valor = valor.get("codigo") or valor.get("id")
+    codigo = re.sub(r"\D", "", str(valor or ""))
+    if len(codigo) != 4:
+        codigo = ""
+    return {"codigo": codigo, "descricao": str(descricao or "").strip()}
+
+
 def _situacao(valor, descricao=None):
     if str(valor).strip() in ("2", "02"):
         return "ATIVA"
@@ -80,6 +94,7 @@ def _normalizar_brasilapi(dados):
         "situacao": _situacao(dados.get("situacao_cadastral"), dados.get("descricao_situacao_cadastral")),
         "cnae_principal": principal,
         "cnaes": [item for item in [principal, *secundarios] if item],
+        "natureza_juridica": _natureza(dados.get("codigo_natureza_juridica"), dados.get("natureza_juridica")),
         "endereco": _endereco(dados),
         "email": dados.get("email") or None,
         "telefone": _telefone(dados.get("ddd_telefone_1")),
@@ -101,12 +116,19 @@ def _normalizar_opencnpj(dados):
         atividade = _atividade(codigo, descricao)
         if atividade:
             secundarios.append(atividade)
+    natureza_raw = dados.get("natureza_juridica")
+    if isinstance(natureza_raw, dict) or re.search(r"\d", str(natureza_raw or "")):
+        natureza = _natureza(natureza_raw, dados.get("descricao_natureza_juridica"))
+    else:
+        natureza = _natureza(dados.get("codigo_natureza_juridica"),
+                            natureza_raw or dados.get("descricao_natureza_juridica"))
     return {
         "razao_social": dados.get("razao_social") or "",
         "nome_fantasia": dados.get("nome_fantasia") or "",
         "situacao": _situacao(dados.get("situacao_cadastral")),
         "cnae_principal": principal,
         "cnaes": [item for item in [principal, *secundarios] if item],
+        "natureza_juridica": natureza,
         "endereco": _endereco(dados),
         "email": dados.get("email") or None,
         "telefone": _telefone(dados.get("telefone") or dados.get("ddd_telefone_1")),
@@ -132,6 +154,7 @@ def _normalizar_cnpjws(dados):
         "situacao": _situacao(estabelecimento.get("situacao_cadastral")),
         "cnae_principal": principal,
         "cnaes": [item for item in [principal, *secundarios] if item],
+        "natureza_juridica": _natureza(dados.get("natureza_juridica")),
         "endereco": endereco,
         "email": estabelecimento.get("email") or None,
         "telefone": _telefone(str(estabelecimento.get("ddd1") or "") + str(estabelecimento.get("telefone1") or "")),
@@ -158,6 +181,7 @@ def consultar_cnpj(valor):
             dados = fonte = None
 
     if dados is None:
+        sem_codigo = None
         for nome, url, normalizar in FONTES:
             try:
                 resposta = requests.get(url.format(digitos), timeout=TIMEOUT)
@@ -171,12 +195,17 @@ def consultar_cnpj(valor):
                 raise
             except (requests.RequestException, ValueError, TypeError, AttributeError, KeyError):
                 continue
+            if not candidato["natureza_juridica"]["codigo"]:
+                sem_codigo = sem_codigo or (candidato, nome)
+                continue
             dados, fonte = candidato, nome
-            with _cache_lock:
-                _cache[digitos] = (time.monotonic() + CACHE_TTL, dados, fonte)
             break
+        if dados is None and sem_codigo:
+            dados, fonte = sem_codigo
         if dados is None:
             raise ConsultaCNPJError("CONSULTA_INDISPONIVEL", "Consulta de CNPJ indisponível no momento. Tente novamente.", 503)
+        with _cache_lock:
+            _cache[digitos] = (time.monotonic() + CACHE_TTL, dados, fonte)
 
     try:
         from cnae_alimentos import classificar_atividades
@@ -184,6 +213,7 @@ def consultar_cnpj(valor):
         raise ConsultaCNPJError("CONSULTA_INDISPONIVEL", "Classificação de atividades indisponível no momento.", 503) from erro
     atividades = classificar_atividades(dados["cnaes"])
     situacao = dados["situacao"]
+    natureza = dados.get("natureza_juridica") or {"codigo": "", "descricao": ""}
     return {
         "cnpj": digitos,
         "cnpj_formatado": formatar_cnpj(digitos),
@@ -194,6 +224,8 @@ def consultar_cnpj(valor):
         "cnae_principal": dados["cnae_principal"],
         "atividades_alimentares": atividades,
         "relacionado_alimentacao": bool(atividades),
+        "natureza_juridica": natureza,
+        "sem_fins_lucrativos": natureza["codigo"] in NATUREZAS_ONG,
         "endereco": dados["endereco"],
         "email": dados["email"],
         "telefone": dados["telefone"],

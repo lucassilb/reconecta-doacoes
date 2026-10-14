@@ -27,9 +27,12 @@ def test_dashboard_vazio_tem_contrato_e_30_dias():
     dados = resposta.json
     assert set(dados) == {"gerado_em", "indicadores", "por_categoria", "por_dia",
                          "top_empresas", "alertas", "ultimas_doacoes"}
-    assert all(valor == 0 for valor in dados["indicadores"].values())
+    assert all(valor == 0 for chave, valor in dados["indicadores"].items()
+               if chave != "tempo_medio_reserva_min")
+    assert dados["indicadores"]["tempo_medio_reserva_min"] is None
     assert len(dados["por_dia"]) == 30
-    assert dados["por_dia"][-1] == {"data": hoje_brasilia().isoformat(), "doacoes": 0}
+    assert dados["por_dia"][-1] == {"data": hoje_brasilia().isoformat(), "doacoes": 0,
+                                   "excedentes_resgatados": 0}
     with app.app_context():
         assert montar_dashboard()["indicadores"] == dados["indicadores"]
 
@@ -75,6 +78,9 @@ def test_dashboard_agrega_doacoes_aceitas_limita_meta_e_nao_expoe_pessoas():
         "pedidos_abertos": 1, "pedidos_encerrados": 1,
         "doacoes_recebidas": 2, "itens_pedidos": 2,
         "itens_atendidos": 1, "percentual_atendimento": 90.0,
+        "doacoes_entregues": 0, "excedentes_disponiveis": 0,
+        "excedentes_resgatados": 0, "ongs": 0, "empresas_alimentos": 1,
+        "tempo_medio_reserva_min": None,
     }
     assert dados["por_categoria"] == [
         {"categoria": "Laticínios", "pedido": 100.0, "recebido": 120.0},

@@ -39,6 +39,8 @@ def empresa(cnpj=PAO, situacao="ATIVA", principal=4789099, secundarios=None):
         "situacao_cadastral": 2 if situacao == "ATIVA" else 8,
         "descricao_situacao_cadastral": situacao,
         "cnae_fiscal": principal,
+        "codigo_natureza_juridica": 2062,
+        "natureza_juridica": "Sociedade Empresária Limitada",
         "cnae_fiscal_descricao": "Comércio varejista de outros produtos",
         "cnaes_secundarios": secundarios if secundarios is not None else [
             {"codigo": 4711301, "descricao": "Hipermercados"}],
@@ -111,7 +113,7 @@ def test_inativo_e_tecnologia_recusados(cliente, monkeypatch):
     assert tecnologia.status_code == 200
     assert tecnologia.json["ativo"] is True
     assert tecnologia.json["apto"] is False
-    assert tecnologia.json["motivos"][0]["codigo"] == "SEM_RELACAO_ALIMENTAR"
+    assert tecnologia.json["motivos"][0]["codigo"] == "SEM_PERFIL_ACEITO"
 
 
 def test_atividade_alimentar_secundaria_e_cache(cliente, monkeypatch):
@@ -138,6 +140,7 @@ def test_fallback_opencnpj(cliente, monkeypatch):
             "razao_social": "MERCADO TESTE", "situacao_cadastral": "Ativa",
             "cnae_principal": "4789099", "cnaes_secundarios": ["4711301"],
             "cnaes": [{"codigo": "4711301", "descricao": "Hipermercados"}],
+            "codigo_natureza_juridica": "2062", "natureza_juridica": "Sociedade Empresária Limitada",
         })
 
     monkeypatch.setattr("cnpj_service.requests.get", get)
@@ -156,7 +159,9 @@ def test_fallback_cnpjws(cliente, monkeypatch):
         if "cnpj.ws" not in url:
             raise requests.Timeout()
         return Resposta(dados={
-            "razao_social": "MERCADO TESTE", "estabelecimento": {
+            "razao_social": "MERCADO TESTE",
+            "natureza_juridica": {"id": "2062", "descricao": "Sociedade Empresária Limitada"},
+            "estabelecimento": {
                 "situacao_cadastral": "Ativa",
                 "atividade_principal": {"id": 4789099, "descricao": "Outros"},
                 "atividades_secundarias": [{"id": 4711301, "descricao": "Hipermercados"}],
@@ -208,7 +213,7 @@ def test_empresa_nao_apta_e_email_duplicado(cliente, monkeypatch):
     nao_apta = cliente.post("/reconecta/cadastro/empresa", json=corpo)
     assert nao_apta.status_code == 422
     assert nao_apta.json["codigo"] == "EMPRESA_NAO_APTA"
-    assert nao_apta.json["motivos"][0]["codigo"] == "SEM_RELACAO_ALIMENTAR"
+    assert nao_apta.json["motivos"][0]["codigo"] == "SEM_PERFIL_ACEITO"
     with app.app_context():
         assert Estabelecimento.query.count() == 0
 

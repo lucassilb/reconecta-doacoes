@@ -5,11 +5,11 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from flask_restx import Namespace, Resource
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, select
 
 from fuso import agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
-                    Instituicao, ItemDoacao, db)
+                    Excedente, Instituicao, ItemDoacao, db)
 from Publico import _municipio_uf
 
 ns = Namespace("dashboard", description="Indicadores públicos agregados")
@@ -27,12 +27,12 @@ def montar_dashboard() -> dict:
     contagem_aceitas = (db.session.query(
         Contribuicao.doacao_id.label("pedido_id"),
         func.count(Contribuicao.id).label("total"))
-        .filter(Contribuicao.status == "ACEITA")
+        .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")))
         .group_by(Contribuicao.doacao_id).subquery())
     recebidas_item = (db.session.query(
         Contribuicao.item_doacao_id.label("item_id"),
         func.sum(Contribuicao.quantidade).label("total"))
-        .filter(Contribuicao.status == "ACEITA")
+        .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")))
         .group_by(Contribuicao.item_doacao_id).subquery())
 
     pedidos = (db.session.query(Doacao.id, Doacao.data_cadastro,
@@ -89,7 +89,7 @@ def montar_dashboard() -> dict:
     por_dia_sql = (db.session.query(ano.label("ano"), mes.label("mes"),
                     dia.label("dia"), hora.label("hora"),
                     func.count(Contribuicao.id).label("total"))
-                   .filter(Contribuicao.status == "ACEITA",
+                   .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")),
                            Contribuicao.criado_em >= inicio_dia_utc(inicio),
                            Contribuicao.criado_em < inicio_dia_utc(hoje + timedelta(days=1)))
                    .group_by(ano, mes, dia, hora).all())
@@ -99,6 +99,34 @@ def montar_dashboard() -> dict:
                                int(linha.hora), tzinfo=timezone.utc)
         contagem_dias[utc_para_brasilia(horario_utc).date().isoformat()] += linha.total
 
+    retiradas_dias = defaultdict(int)
+    retiradas = (db.session.query(Excedente.retirado_em)
+                .filter(Excedente.status == "RETIRADO",
+                        Excedente.retirado_em >= inicio_dia_utc(inicio),
+                        Excedente.retirado_em < inicio_dia_utc(hoje + timedelta(days=1))).all())
+    for linha in retiradas:
+        retiradas_dias[utc_para_brasilia(linha.retirado_em).date().isoformat()] += 1
+    if db.engine.dialect.name == "sqlite":
+        minutos = (func.julianday(Excedente.reservado_em) -
+                   func.julianday(Excedente.criado_em)) * 1440
+    else:
+        minutos = extract("epoch", Excedente.reservado_em - Excedente.criado_em) / 60
+    novos = db.session.query(
+        select(func.count(Contribuicao.id)).where(
+            Contribuicao.status == "ENTREGUE").scalar_subquery().label("doacoes_entregues"),
+        select(func.count(Excedente.id)).where(
+            Excedente.status == "DISPONIVEL",
+            Excedente.retirar_ate > agora_local).scalar_subquery().label("excedentes_disponiveis"),
+        select(func.count(Excedente.id)).where(
+            Excedente.status == "RETIRADO").scalar_subquery().label("excedentes_resgatados"),
+        select(func.count(Estabelecimento.id)).where(
+            Estabelecimento.sem_fins_lucrativos.is_(True)).scalar_subquery().label("ongs"),
+        select(func.count(Estabelecimento.id)).where(
+            Estabelecimento.atividade_alimentar.is_(True)).scalar_subquery().label("empresas_alimentos"),
+        select(func.avg(minutos)).where(
+            Excedente.reservado_em.isnot(None)).scalar_subquery().label("tempo_reserva")
+    ).one()
+
     pedidos_empresa = (db.session.query(Doacao.estabelecimento_id.label("empresa_id"),
                        func.count(Doacao.id).label("total"))
                       .filter(Doacao.estabelecimento_id.isnot(None))
@@ -106,7 +134,7 @@ def montar_dashboard() -> dict:
     recebidas_empresa = (db.session.query(Doacao.estabelecimento_id.label("empresa_id"),
                          func.count(Contribuicao.id).label("total"))
                         .join(Contribuicao, Contribuicao.doacao_id == Doacao.id)
-                        .filter(Contribuicao.status == "ACEITA")
+                        .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")))
                         .group_by(Doacao.estabelecimento_id).subquery())
     empresas = (db.session.query(Estabelecimento.nome, Estabelecimento.endereco,
                 func.coalesce(pedidos_empresa.c.total, 0).label("pedidos"),
@@ -122,7 +150,7 @@ def montar_dashboard() -> dict:
                Contribuicao.doador_id, Estabelecimento.nome)
               .join(Doacao, Doacao.id == Contribuicao.doacao_id)
               .join(Estabelecimento, Estabelecimento.id == Doacao.estabelecimento_id)
-              .filter(Contribuicao.status == "ACEITA")
+              .filter(Contribuicao.status.in_(("ACEITA", "ENTREGUE")))
               .order_by(Contribuicao.criado_em.desc(), Contribuicao.id.desc())
               .limit(10).all())
     total_pedidos = (db.session.query(func.count(Doacao.id))
@@ -136,7 +164,13 @@ def montar_dashboard() -> dict:
             "pedidos_abertos": len(pedidos),
             "pedidos_encerrados": total_pedidos - len(pedidos),
             "doacoes_recebidas": db.session.query(func.count(Contribuicao.id)).filter(
-                Contribuicao.status == "ACEITA").scalar(),
+                Contribuicao.status.in_(("ACEITA", "ENTREGUE"))).scalar(),
+            "doacoes_entregues": novos.doacoes_entregues,
+            "excedentes_disponiveis": novos.excedentes_disponiveis,
+            "excedentes_resgatados": novos.excedentes_resgatados,
+            "ongs": novos.ongs,
+            "empresas_alimentos": novos.empresas_alimentos,
+            "tempo_medio_reserva_min": round(float(novos.tempo_reserva), 2) if novos.tempo_reserva is not None else None,
             "itens_pedidos": len(itens), "itens_atendidos": itens_atendidos,
             "percentual_atendimento": round(float(atendido_total / meta_total * 100), 2)
             if meta_total else 0.0,
@@ -145,7 +179,8 @@ def montar_dashboard() -> dict:
                            "recebido": float(valores[1])}
                           for nome, valores in sorted(categorias.items())],
         "por_dia": [{"data": (inicio + timedelta(days=i)).isoformat(),
-                     "doacoes": contagem_dias.get((inicio + timedelta(days=i)).isoformat(), 0)}
+                     "doacoes": contagem_dias.get((inicio + timedelta(days=i)).isoformat(), 0),
+                     "excedentes_resgatados": retiradas_dias.get((inicio + timedelta(days=i)).isoformat(), 0)}
                     for i in range(30)],
         "top_empresas": [{"nome": e.nome, "municipio_uf": _municipio_uf(e.endereco),
                           "pedidos": e.pedidos, "doacoes_recebidas": e.recebidas}
