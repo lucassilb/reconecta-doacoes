@@ -221,9 +221,55 @@ jobs:
           name: sast-resumo
           path: relatorios/sast/resumo.json
 
+  iast:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Suíte instrumentada com SQLite temporário
+        run: |
+          mkdir -p reports/iast
+          python -m pytest -q
+        env:
+          DATABASE_URL: sqlite://
+          GROQ_API_KEY: ""
+          RECONECTA_IAST: "1"
+          RECONECTA_IAST_REPORT_DIR: reports/iast
+      - name: Resumir e bloquear achados altos
+        if: always()
+        run: python scripts/resumo_iast.py reports/iast
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iast-report
+          path: relatorios/seguranca/iast.json
+          if-no-files-found: warn
+
+  dast:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: ZAP baseline e API com sessões fictícias no Compose local
+        run: python scripts/dast.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dast-iast-report
+          path: |
+            relatorios/seguranca/zap.json
+            relatorios/seguranca/iast-dast.json
+          if-no-files-found: warn
+
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker]
+    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker, dast, iast]
     runs-on: ubuntu-24.04
     env:
       RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

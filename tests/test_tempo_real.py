@@ -149,7 +149,8 @@ def test_tempo_real_entrega_evento_em_sse():
     resposta = app.test_client().get("/reconecta/tempo-real", buffered=False)
     assert resposta.status_code == 200
     assert resposta.mimetype == "text/event-stream"
-    assert resposta.headers["Cache-Control"] == "no-cache"
+    assert "no-cache" in resposta.headers["Cache-Control"]
+    assert "no-store" in resposta.headers["Cache-Control"]
     assert resposta.headers["X-Accel-Buffering"] == "no"
     trecho = b""
     for pedaco in resposta.response:

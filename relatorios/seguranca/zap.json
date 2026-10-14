@@ -1,0 +1,226 @@
+{
+  "ferramenta": "OWASP ZAP stable",
+  "versao": "2.17.0",
+  "data": "2026-10-14T22:15:45.248904+00:00",
+  "alvo": "Compose SQLite efêmero local",
+  "escopo": "baseline público + GETs do swagger.json por papel fictício",
+  "varreduras": {
+    "baseline": {
+      "alertas": [
+        {
+          "id": "90004",
+          "nome": "Cross-Origin-Embedder-Policy Header Missing or Invalid",
+          "severidade": "BAIXA",
+          "ocorrencias": 5,
+          "rotas": [
+            "/",
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10096",
+          "nome": "Timestamp Disclosure - Unix",
+          "severidade": "BAIXA",
+          "ocorrencias": 5,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10024",
+          "nome": "Information Disclosure - Sensitive Information in URL",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 3,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10109",
+          "nome": "Modern Web Application",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 1,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Storable and Cacheable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 3,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Storable but Non-Cacheable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 5,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        }
+      ],
+      "quantidade": 6
+    },
+    "publico": {
+      "alertas": [
+        {
+          "id": "100001",
+          "nome": "Unexpected Content-Type was returned",
+          "severidade": "BAIXA",
+          "ocorrencias": 12,
+          "rotas": [
+            "/",
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "100000",
+          "nome": "A Client Error response code was returned by the server",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 22,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Non-Storable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 5,
+          "rotas": [
+            "/reconecta/dashboard/impacto",
+            "/reconecta/publico/doacoes",
+            "/reconecta/publico/ongs",
+            "/reconecta/publico/resumo",
+            "/reconecta/saude"
+          ]
+        }
+      ],
+      "quantidade": 3
+    },
+    "doador": {
+      "alertas": [
+        {
+          "id": "100001",
+          "nome": "Unexpected Content-Type was returned",
+          "severidade": "BAIXA",
+          "ocorrencias": 12,
+          "rotas": [
+            "/",
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "100000",
+          "nome": "A Client Error response code was returned by the server",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 22,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Non-Storable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 4,
+          "rotas": [
+            "/reconecta/auth/me",
+            "/reconecta/excedentes",
+            "/reconecta/notificacoes",
+            "/reconecta/painel/minhas-doacoes"
+          ]
+        }
+      ],
+      "quantidade": 3
+    },
+    "empresa": {
+      "alertas": [
+        {
+          "id": "100001",
+          "nome": "Unexpected Content-Type was returned",
+          "severidade": "BAIXA",
+          "ocorrencias": 12,
+          "rotas": [
+            "/",
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "100000",
+          "nome": "A Client Error response code was returned by the server",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 24,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Non-Storable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 4,
+          "rotas": [
+            "/reconecta/auth/me",
+            "/reconecta/excedentes/meus",
+            "/reconecta/notificacoes",
+            "/reconecta/painel/doacoes"
+          ]
+        }
+      ],
+      "quantidade": 3
+    },
+    "ong": {
+      "alertas": [
+        {
+          "id": "100001",
+          "nome": "Unexpected Content-Type was returned",
+          "severidade": "BAIXA",
+          "ocorrencias": 12,
+          "rotas": [
+            "/",
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "100000",
+          "nome": "A Client Error response code was returned by the server",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 24,
+          "rotas": [
+            "fora_do_swagger"
+          ]
+        },
+        {
+          "id": "10049",
+          "nome": "Non-Storable Content",
+          "severidade": "INFORMATIVA",
+          "ocorrencias": 4,
+          "rotas": [
+            "/reconecta/auth/me",
+            "/reconecta/excedentes/reservas",
+            "/reconecta/notificacoes",
+            "/reconecta/painel/doacoes"
+          ]
+        }
+      ],
+      "quantidade": 3
+    }
+  },
+  "por_severidade": {
+    "INFORMATIVA": 12,
+    "BAIXA": 6,
+    "MEDIA": 0,
+    "ALTA": 0,
+    "CRITICA": 0
+  },
+  "sessoes_ficticias_verificadas": [
+    "doador",
+    "empresa",
+    "ong"
+  ]
+}
