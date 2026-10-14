@@ -12,6 +12,8 @@ Estado em 2026-10-14 (rodada 14). Política publicada em `/privacidade`
 | E-mail, telefone | `doadores`/`estabelecimentos` | login e combinação da retirada | consentimento, art. 7º I | até a exclusão |
 | Senha | `*.senha_hash` | autenticação; só hash Werkzeug | consentimento, art. 7º I | até a exclusão |
 | CNPJ, razão social, endereço | `estabelecimentos` | verificar aptidão na Receita; informar local de retirada à ONG que reservou | consentimento, art. 7º I; CNPJ/endereço já são públicos na Receita | até a exclusão |
+| Endereço da organização → geocodificação | `geolocalizacoes` (chave SHA-256 + lat/lon; nunca o texto nem o dono) | localizar pedidos no mapa e na rota de coleta; endereço enviado ao Nominatim (OpenStreetMap) | consentimento, art. 7º I | cache permanente, sem vínculo com a conta |
+| CEP opcional do doador | passa só na requisição de `sugerir-destino`; consultado na BrasilAPI; cache igual por hash | ordenar sugestões por distância | consentimento, art. 7º I | não é gravado no cadastro; cache sem vínculo |
 | Consentimento | `*.consentimento_versao`, `.consentimento_em` | comprovar qual versão da política foi aceita e quando | obrigação legal, art. 7º II | enquanto a conta existir |
 | Pedidos, doações, excedentes, reservas | `doacoes`, `itens_doacao`, `contribuicoes`, `reservas`, `excedentes` | operar a rede e agregar impacto | execução do serviço, art. 7º V; legítimo interesse, art. 7º IX | persistem anonimizados após exclusão |
 | Foto da doação | `contribuicoes.foto_dados` | evidência para quem participa da doação | consentimento, art. 7º I | apagada na exclusão da conta |
@@ -28,6 +30,16 @@ Estado em 2026-10-14 (rodada 14). Política publicada em `/privacidade`
   não tem autenticação própria e não recebe consentimento.
 - O resumo com IA lê só números agregados; o classificador/LLM não recebe PII
   (`llm_service.py` remove e-mail/documento/telefone antes do prompt).
+
+## Compartilhamento com terceiros
+
+- CNPJ → BrasilAPI / OpenCNPJ / CNPJ.ws (só o número, na verificação).
+- **Endereço da organização → Nominatim (OpenStreetMap)** e **CEP do doador →
+  BrasilAPI**, para georreferenciar pedidos e montar a rota de coleta
+  (`geo.py:localizar`, `localizar_cep`). O cache `geolocalizacoes` guarda só
+  `sha256(texto) + latitude/longitude + precisão + fonte` — sem id de conta e
+  sem o texto original — então não identifica o titular e **não há o que
+  apagar por conta na exclusão**.
 
 ## Consentimento
 

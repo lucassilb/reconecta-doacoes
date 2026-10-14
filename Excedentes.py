@@ -5,6 +5,7 @@ import threading
 import time
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 
 from flask import current_app, request
 from flask_restx import Namespace, Resource, fields
@@ -12,12 +13,14 @@ from sqlalchemy import or_, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
+import geo
 from Auth import registrar_auditoria, usuario_atual
 from conexao import casar
 from eventos import emitir as _emitir
 from Publico import CATEGORIAS, UNIDADES, _inteiro_positivo, _municipio_uf
-from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo
+from fuso import agora_brasilia_sem_fuso, hoje_brasilia, iso_evento, iso_prazo, utc_para_brasilia
 from models import Estabelecimento, Excedente, ItemExcedente, _utc_naive, db
+from risco_descarte import prever as prever_risco, PERECIVEIS
 
 ns = Namespace("excedentes", description="Excedentes para reserva e retirada por ONGs")
 item_entrada = ns.model("ItemExcedenteEntrada", {
@@ -38,6 +41,7 @@ saida = ns.model("ExcedenteSaida", {
     "itens": fields.List(fields.Raw), "status": fields.String,
     "pode_reservar": fields.Boolean, "motivo_bloqueio": fields.String,
     "retirada": fields.Raw, "reservado_por": fields.Raw,
+    "prioridade": fields.Raw,
 })
 erro_model = ns.model("ExcedenteErro", {
     "codigo": fields.String, "mensagem": fields.String, "campos": fields.Raw,
@@ -53,10 +57,22 @@ def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
 
 
-def _ongs_compativeis(itens, uf, publicador_id):
-    """Usa o mesmo casamento da IA para avisar ONGs com pedido compatível."""
-    if not uf or not itens:
-        return ()
+# Avisos de excedente: ONGs com pedido compatível na mesma UF ou a até RAIO_AVISO_KM,
+# das mais próximas para as mais distantes, no máximo MAX_AVISOS.
+RAIO_AVISO_KM = 50
+MAX_AVISOS = 10
+
+
+def _ongs_compativeis(itens, uf, publicador_id, origem=None):
+    """Destinatários dos avisos, das ONGs mais próximas para as mais distantes."""
+    return tuple(("empresa", id_) for id_, _, _ in
+                 _ongs_proximas(itens, uf, publicador_id, origem))
+
+
+def _ongs_proximas(itens, uf, publicador_id, origem=None):
+    """Usa o mesmo casamento da IA; devolve [(ong_id, km ou None, aproximada)]."""
+    if not itens or not (uf or origem is not None):
+        return []
     from IA import _pedidos_abertos
     ongs = {id_ for (id_,) in db.session.query(Estabelecimento.id).filter(
         Estabelecimento.sem_fins_lucrativos.is_(True)).all()}
@@ -64,17 +80,22 @@ def _ongs_compativeis(itens, uf, publicador_id):
     ofertas = [{"nome": item["nome"], "categoria": item["categoria"],
                "quantidade": float(item["quantidade"]),
                "unidade_medida": item["unidade_medida"]} for item in itens]
-    destinatarios = set()
-    for pedido in _pedidos_abertos():
+    pedidos = [pedido for pedido in _pedidos_abertos()
+               if pedido["estabelecimento_id"] in ongs and pedido["estabelecimento_id"] != publicador_id
+               and any(item["categoria"] in categorias for item in pedido["itens"])]
+    geo.anotar_distancias(pedidos, origem)
+    achadas = {}
+    for pedido in pedidos:
         id_ = pedido["estabelecimento_id"]
         local = (pedido.get("empresa") or {}).get("municipio_uf") or ""
-        if (id_ not in ongs or id_ == publicador_id or
-                not local.upper().endswith(f"/{uf}") or
-                not any(item["categoria"] in categorias for item in pedido["itens"])):
+        km = pedido.get("distancia_km")
+        perto = km is not None and km <= RAIO_AVISO_KM
+        if not (perto or (uf and local.upper().endswith(f"/{uf}"))):
             continue
-        if casar(ofertas, [pedido], uf):
-            destinatarios.add(id_)
-    return tuple(("empresa", id_) for id_ in sorted(destinatarios))
+        if id_ not in achadas and casar(ofertas, [pedido], uf):
+            achadas[id_] = (km, pedido.get("distancia_aproximada"))
+    ordem = sorted(achadas.items(), key=lambda par: (par[1][0] is None, par[1][0] or 0, par[0]))
+    return [(id_, km, aproximada) for id_, (km, aproximada) in ordem[:MAX_AVISOS]]
 
 
 def _empresa():
@@ -186,7 +207,46 @@ def _bloqueio(excedente, atual):
     return None
 
 
-def serializar_excedente(excedente, *, detalhe=False, atual=None):
+@lru_cache(maxsize=1)
+def _tabela_conversoes():
+    from Dashboard import conversoes_kg
+    return conversoes_kg()
+
+
+def _prioridade_excedente(excedente):
+    """Usa apenas campos já publicados; temperatura e distância ficam ausentes."""
+    from Dashboard import converter_kg
+
+    itens = list(excedente.itens)
+    if not itens:
+        return {"probabilidade": None, "nivel": "indisponivel", "motivos": [],
+                "selo": None, "base": "simulacao"}
+    tabela = _tabela_conversoes()
+    kg = sum((converter_kg(item.quantidade, item.categoria,
+                           item.unidade_medida, tabela) or (0, None))[0]
+             for item in itens)
+    mais_urgente = min(itens, key=lambda item: item.validade)
+    publicado = utc_para_brasilia(excedente.criado_em)
+    municipio_uf = _municipio_uf(excedente.publicador.endereco) or ""
+    uf = municipio_uf.rsplit("/", 1)[-1] if "/" in municipio_uf else "NA"
+    lote = {"categoria": mais_urgente.categoria,
+            "perecivel": mais_urgente.categoria in PERECIVEIS,
+            "dias_validade": max(0, (mais_urgente.validade - hoje_brasilia()).days),
+            "quantidade_kg": max(.01, min(100000, float(kg))),
+            "temperatura_c": None, "armazenamento": "nao_informado",
+            "dia_semana": publicado.weekday(), "hora_publicacao": publicado.hour,
+            "uf": uf, "distancia_ong_km": None}
+    try:
+        resultado = prever_risco(lote)
+    except (OSError, ValueError):
+        return {"probabilidade": None, "nivel": "indisponivel", "motivos": [],
+                "selo": None, "base": "simulacao"}
+    resultado["selo"] = "Prioridade alta" if resultado["nivel"] == "alto" else None
+    return resultado
+
+
+def serializar_excedente(excedente, *, detalhe=False, atual=None, prioridade=None):
+    prioridade = prioridade if prioridade is not None else _prioridade_excedente(excedente)
     dados = {
         "id": excedente.id,
         "empresa": {"nome": excedente.publicador.nome,
@@ -196,6 +256,7 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None):
                    "quantidade": float(item.quantidade), "unidade_medida": item.unidade_medida,
                    "validade": item.validade.isoformat()} for item in excedente.itens],
         "status": status_efetivo(excedente),
+        "prioridade": prioridade,
     }
     if detalhe:
         motivo = _bloqueio(excedente, atual)
@@ -204,6 +265,12 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None):
                      criado_em=iso_evento(excedente.criado_em))
         dados["meu"] = bool(atual and atual[0] == "empresa" and
                             atual[1].id == excedente.estabelecimento_id)
+        if atual and atual[0] == "empresa" and not dados["meu"]:
+            km, aproximada = geo.distancia(geo.localizar(atual[1].endereco),
+                                           geo.localizar(excedente.publicador.endereco))
+            if km is not None:
+                dados["distancia_km"] = round(km, 1)
+                dados["distancia"] = geo.texto_distancia(km, aproximada)
         if atual and atual[0] == "empresa":
             usuario_id = atual[1].id
             if usuario_id == excedente.reservado_por_id:
@@ -249,9 +316,15 @@ class Excedentes(Resource):
             query = query.join(Excedente.publicador).filter(or_(
                 Estabelecimento.endereco.ilike(f"%/{uf} - %"),
                 Estabelecimento.endereco.ilike(f"%/{uf}")))
-        total = query.count()
-        anuncios = query.order_by(Excedente.criado_em.desc(), Excedente.id.desc()).offset((pagina - 1) * tamanho).limit(tamanho).all()
-        return [serializar_excedente(item) for item in anuncios], 200, {
+        pontuados = [(item, _prioridade_excedente(item)) for item in query.all()]
+        total = len(pontuados)
+        pontuados.sort(key=lambda par: (
+            par[1]["probabilidade"] if par[1]["probabilidade"] is not None else -1,
+            par[0].criado_em or datetime.min, par[0].id), reverse=True)
+        inicio = (pagina - 1) * tamanho
+        anuncios = pontuados[inicio:inicio + tamanho]
+        return [serializar_excedente(item, prioridade=prioridade)
+                for item, prioridade in anuncios], 200, {
             "X-Total-Count": str(total), "X-Pagina": str(pagina), "X-Por-Pagina": str(tamanho)}
 
     @ns.expect(entrada)
@@ -277,14 +350,20 @@ class Excedentes(Resource):
             db.session.flush()
             db.session.add_all(ItemExcedente(excedente_id=excedente.id, **item) for item in itens)
             categorias = sorted({item["categoria"] for item in itens})
-            _emitir("excedente.publicado", {
-                "excedente_id": excedente.id, "organizacao": empresa.nome,
-                "municipio_uf": _municipio_uf(empresa.endereco),
-                "categorias": categorias,
-                "retirar_ate": iso_prazo(prazo)},
-                destinatarios=_ongs_compativeis(itens,
-                                                (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
-                                                empresa.id))
+            aviso = {"excedente_id": excedente.id, "organizacao": empresa.nome,
+                     "municipio_uf": _municipio_uf(empresa.endereco),
+                     "categorias": categorias, "retirar_ate": iso_prazo(prazo)}
+            _emitir("excedente.publicado", aviso)
+            # cada ONG recebe o aviso com a própria distância, das mais próximas para as mais distantes
+            for ong_id, km, aproximada in _ongs_proximas(
+                    itens, (_municipio_uf(empresa.endereco) or "").rsplit("/", 1)[-1],
+                    empresa.id, geo.localizar(empresa.endereco)):
+                privado = dict(aviso)
+                if km is not None:
+                    privado.update(distancia_km=round(km, 1),
+                                   distancia=geo.texto_distancia(km, aproximada))
+                _emitir("excedente.publicado", privado, publico=False,
+                        destinatarios=(("empresa", ong_id),))
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()

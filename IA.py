@@ -9,6 +9,7 @@ from flask_restx import Namespace, Resource, fields
 
 from sqlalchemy.orm import selectinload
 
+import geo
 from Auth import usuario_atual
 from conexao import casar
 from Dashboard import montar_dashboard
@@ -16,6 +17,7 @@ from fuso import agora_brasilia_sem_fuso
 from llm_service import interpretar_pedido, resumir_dashboard
 from models import Doacao
 from Publico import _municipio_uf, serializar_doacao
+from risco_descarte import prever as prever_risco
 
 ns = Namespace("ia", description="Sugestões com modelo local e regras de fallback")
 
@@ -30,6 +32,13 @@ pedido_model = ns.model("PedidoSugeridoIA", {
 resumo_model = ns.model("ResumoDashboardIA", {
     "resumo": fields.String, "recomendacoes": fields.List(fields.String),
     "fonte": fields.String, "modelo": fields.String, "gerado_em": fields.String,
+})
+risco_model = ns.model("LoteRiscoDescarteIA", {
+    "categoria": fields.String(required=True), "dias_validade": fields.Integer(required=True),
+    "quantidade_kg": fields.Float(required=True), "perecivel": fields.Boolean,
+    "temperatura_c": fields.Float, "armazenamento": fields.String,
+    "dia_semana": fields.Integer, "hora_publicacao": fields.Integer,
+    "uf": fields.String, "distancia_ong_km": fields.Float,
 })
 
 _acessos = {}
@@ -92,6 +101,24 @@ class ResumoDashboard(Resource):
         return resumir_dashboard(montar_dashboard()), 200
 
 
+@ns.route("/risco-descarte")
+class RiscoDescarte(Resource):
+    @ns.expect(risco_model)
+    @ns.response(200, "Probabilidade e prioridade estimadas em dados simulados")
+    @ns.response(400, "Lote inválido")
+    @ns.response(429, "Limite de 10 análises por minuto por IP")
+    def post(self):
+        if not _permitir(f"risco:{request.remote_addr or 'desconhecido'}"):
+            return {"codigo": "LIMITE_IA", "mensagem": "Limite de 10 análises por minuto atingido."}, 429, {
+                "Retry-After": "60"}
+        try:
+            return prever_risco(request.get_json(silent=True)), 200
+        except ValueError as erro:
+            return {"codigo": "DADOS_INVALIDOS", "mensagem": str(erro)}, 400
+        except OSError:
+            return {"codigo": "MODELO_INDISPONIVEL", "mensagem": "Modelo de risco indisponível."}, 503
+
+
 def _pedidos_abertos():
     """Pedidos DISPONIVEL no prazo, serializados para o casamento."""
     pedidos = (Doacao.query.options(
@@ -111,7 +138,11 @@ def _pedidos_abertos():
 
 @ns.route("/sugerir-destino")
 class SugerirDestino(Resource):
-    @ns.expect(ns.model("TextoDestinoIA", {"texto": fields.String(required=True)}))
+    @ns.expect(ns.model("TextoDestinoIA", {
+        "texto": fields.String(required=True),
+        "cep": fields.String(description="Opcional, só pessoa física: CEP para ordenar por distância"),
+        "origem": fields.Raw(description="Opcional, só pessoa física: {latitude, longitude}; "
+                                         "usado nesta consulta e não gravado")}))
     @ns.response(200, "Sugestões de destino para o excedente", pedido_model)
     def post(self):
         """Interpreta o que a pessoa tem e sugere os pedidos abertos que combinam."""
@@ -133,8 +164,17 @@ class SugerirDestino(Resource):
         if tipo == "empresa":
             municipio_uf = _municipio_uf(usuario.endereco)
             uf = municipio_uf.rsplit("/", 1)[-1] if municipio_uf else None
-        sugestoes = casar(interpretado["itens"], _pedidos_abertos(), uf)
+            # distância a partir do endereço da organização (cache ou centróide; sem rede)
+            origem = geo.localizar(usuario.endereco)
+        else:
+            # pessoa física: CEP opcional digitado no assistente (ou coordenada enviada por
+            # outro cliente); nada fica ligado à pessoa
+            origem = (geo.localizar_cep(corpo.get("cep")) if corpo.get("cep")
+                      else geo.ponto_informado(corpo.get("origem")))
+        pedidos = geo.anotar_distancias(_pedidos_abertos(), origem)
+        sugestoes = casar(interpretado["itens"], pedidos, uf)
         return {"itens": interpretado["itens"], "sugestoes": sugestoes,
+                "origem": {"precisao": origem.precisao} if origem is not None else None,
                 "pode_publicar_excedente": bool(
                     tipo == "empresa" and getattr(usuario, "atividade_alimentar", False)),
                 "fonte": interpretado.get("fonte"), "modelo": interpretado.get("modelo")}, 200

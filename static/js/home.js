@@ -473,6 +473,17 @@
   var campoTexto = $("assistente-texto");
   var resultado = $("assistente-resultado");
   var avisoAssistente = $("assistente-aviso");
+  var campoCep = $("assistente-cep");
+  var cepDigitado = false;
+  function erroCep(mensagem) {
+    $("assistente-cep-erro").textContent = mensagem || "";
+    if (mensagem) campoCep.setAttribute("aria-invalid", "true"); else campoCep.removeAttribute("aria-invalid");
+  }
+  campoCep.addEventListener("input", function () {
+    var d = campoCep.value.replace(/\D/g, "").slice(0, 8);
+    campoCep.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+    if (campoCep.getAttribute("aria-invalid")) erroCep("");
+  });
 
   function erroTexto(mensagem) {
     $("assistente-texto-erro").textContent = mensagem || "";
@@ -508,6 +519,8 @@
   function maiuscula(t) { t = String(t || ""); return t.charAt(0).toUpperCase() + t.slice(1); }
 
   function cartaoSugestao(sg) {
+    var distancia = sg.distancia || "";
+    var onde = [sg.municipio_uf ? local(sg.municipio_uf) : "", distancia].filter(Boolean).join(" · ");
     var pontos = Math.max(0, Math.min(100, Number(sg.pontuacao) || 0));
     var qtdSugerida = Number(sg.quantidade_sugerida);
     var destino = "/doacoes/" + sg.pedido_id + "?item=" + encodeURIComponent(sg.item_id) +
@@ -516,13 +529,14 @@
       el("div", { classe: "sugestao__topo" }, [
         el("div", null, [
           el("h4", { classe: "sugestao__nome", texto: titulo(sg.organizacao) }),
-          sg.municipio_uf ? el("p", { classe: "sugestao__local", texto: local(sg.municipio_uf) }) : null
+          onde ? el("p", { classe: "sugestao__local", texto: onde }) : null
         ]),
         el("p", { classe: "sugestao__pontos" }, [el("strong", { texto: String(pontos) }), " de 100"])
       ]),
       el("span", { classe: "sugestao__barra", "aria-hidden": "true" }, [el("span", { style: "width:" + pontos + "%" })]),
       el("ul", { classe: "sugestao__motivos", "aria-label": "Por que combina" },
-        (sg.motivos || []).map(function (m) { return el("li", { texto: maiuscula(m) }); })),
+        // a distância já aparece ao lado da cidade
+        (sg.motivos || []).filter(function (m) { return m !== distancia; }).map(function (m) { return el("li", { texto: maiuscula(m) }); })),
       el("a", { classe: "btn btn--primario btn--pequeno", href: destino,
                 "aria-label": "Doar para o pedido de " + titulo(sg.organizacao) }, ["Doar para este pedido"])
     ]);
@@ -560,8 +574,15 @@
       acoes.push(ver);
     }
     if (acoes.length) blocos.push(el("div", { classe: "assistente__acoes" }, acoes));
+    var distancias = "";
+    if (sugestoes.length && c.origem) {
+      distancias = "Distâncias em linha reta a partir " + (usuarioAtual && usuarioAtual.tipo === "empresa" ? "do endereço da sua organização" : "do CEP informado") +
+        (c.origem.precisao === "municipio" ? ", localizado pela cidade (aproximadas). " : ". ");
+    } else if (sugestoes.length && cepDigitado) {
+      distancias = "Não conseguimos localizar o CEP; as sugestões não consideram a distância. ";
+    }
     blocos.push(el("p", { classe: "assistente__nota", texto:
-      "É uma recomendação: você escolhe para quem doar. " +
+      distancias + "É uma recomendação: você escolhe para quem doar. " +
       (c.fonte === "llm" ? "Interpretação feita pelo modelo local gratuito" + (c.modelo ? " " + c.modelo : "") + "."
                          : "Interpretação feita pelas regras automáticas e pelo classificador do projeto.") }));
     resultado.replaceChildren.apply(resultado, blocos);
@@ -576,13 +597,17 @@
     if (texto.length < 5) { erroTexto("Descreva o que você tem, com pelo menos 5 caracteres."); campoTexto.focus(); return; }
     erroTexto("");
     if (!usuarioAtual) { pedirEntrada(); return; }
+    var cep = usuarioAtual.tipo === "empresa" ? "" : campoCep.value.replace(/\D/g, "");
+    if (cep && cep.length !== 8) { erroCep("Informe o CEP com 8 números ou deixe em branco."); campoCep.focus(); return; }
+    erroCep("");
+    cepDigitado = !!cep;
     var btn = $("assistente-enviar");
     btn.disabled = true; btn.classList.add("is-carregando"); btn.textContent = "Procurando…";
     resultado.hidden = true;
     fetch("/reconecta/ia/sugerir-destino", {
       method: "POST", credentials: "same-origin",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ texto: texto })
+      body: JSON.stringify(cep ? { texto: texto, cep: cep } : { texto: texto })
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (c) { return { status: r.status, corpo: c || {} }; });
     }).then(function (r) {
@@ -622,6 +647,8 @@
     var mudouPerfil = !!excedentesAtuais && JSON.stringify((u && u.perfis) || []) !== JSON.stringify((usuarioAtual && usuarioAtual.perfis) || []);
     usuarioAtual = u;
     ajustarConvites();
+    // empresa usa o endereço do cadastro; pessoa física pode informar o CEP
+    $("assistente-cep-campo").hidden = !!(u && u.tipo === "empresa");
     var sec = $("hero-secundario");
     if (sec) {
       if (u && u.tipo === "empresa") { sec.href = "/painel#publicar"; sec.textContent = "Preciso de doações · publicar pedido"; }

@@ -56,6 +56,7 @@
         <li>Visitantes veem só o nome da organização e a cidade/UF nos pedidos e excedentes. E-mail, telefone e endereço completo não são públicos.</li>
         <li>O endereço de retirada do excedente aparece somente para a ONG que reservou.</li>
         <li>Consultamos o CNPJ em serviços públicos (BrasilAPI, OpenCNPJ, CNPJ.ws) enviando apenas o número do CNPJ.</li>
+        <li>Para georreferenciar pedidos e rotas de coleta, o <strong>endereço da organização</strong> é enviado ao Nominatim (OpenStreetMap). O CEP que o doador digita na sugestão de destino vai à BrasilAPI. Os resultados ficam em cache interno (`geolocalizacoes`) indexado só pelo hash do texto — sem nome ou conta associados.</li>
         <li>O resumo do dashboard usa um modelo de linguagem local que lê só números agregados; nenhum dado pessoal sai do servidor.</li>
         <li>Não vendemos dados nem usamos rastreadores de publicidade.</li>
       </ul>

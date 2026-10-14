@@ -84,8 +84,8 @@
     }
   ],
   "stride": {
-    "residuais": 31,
-    "mitigados": 23,
+    "residuais": 33,
+    "mitigados": 25,
     "fonte": "docs/stride.md; estado declarado por risco"
   },
   "correcoes_documentadas": {

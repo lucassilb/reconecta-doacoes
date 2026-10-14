@@ -1,0 +1,3201 @@
+id,categoria,perecivel,dias_validade,quantidade_kg,temperatura_c,armazenamento,dia_semana,hora_publicacao,uf,distancia_ong_km,descartado
+1,Hortifrúti,1,8,0.66,26.0,ambiente,4,21,AL,23.0,1
+2,Laticínios,1,0,1.8,-25.7,congelado,3,10,PE,,0
+3,Outros,0,27,1.53,21.4,ambiente,0,13,MG,74.6,0
+4,Bebidas não alcoólicas,0,34,2.31,21.1,ambiente,1,15,MG,,0
+5,Outros,0,24,11.21,23.1,ambiente,2,0,RJ,74.8,1
+6,Carnes e peixes,1,10,41.87,,nao_informado,3,20,RR,68.1,0
+7,Bebidas não alcoólicas,0,27,15.98,,nao_informado,0,9,MA,15.1,0
+8,Bebidas não alcoólicas,0,30,2.45,21.9,ambiente,0,12,PI,8.2,0
+9,Padaria,1,4,0.8,8.4,refrigerado,1,10,ES,58.9,0
+10,Laticínios,1,11,2.84,22.3,ambiente,6,1,TO,80.6,0
+11,Outros,0,10,136.0,27.9,ambiente,0,19,AL,27.3,0
+12,Refeições prontas,1,2,0.8,26.9,ambiente,5,15,RR,87.5,1
+13,Refeições prontas,1,5,121.93,25.6,ambiente,3,17,AC,76.2,1
+14,Padaria,1,6,22.73,5.6,refrigerado,5,4,RR,79.3,1
+15,Refeições prontas,1,12,1.57,14.1,refrigerado,0,15,RR,,0
+16,Carnes e peixes,1,5,0.73,4.4,refrigerado,0,8,AP,69.2,0
+17,Outros,0,35,16.62,20.9,ambiente,4,2,MA,16.8,0
+18,Hortifrúti,1,10,11.35,24.0,ambiente,1,5,TO,77.9,1
+19,Outros,0,18,2.43,31.6,ambiente,5,23,ES,,0
+20,Carnes e peixes,1,9,4.0,20.3,ambiente,6,14,AM,32.9,1
+21,Padaria,1,9,1.17,9.2,refrigerado,6,3,AP,82.8,0
+22,Outros,0,15,18.89,21.9,ambiente,2,7,SP,,0
+23,Padaria,1,10,104.46,31.9,ambiente,3,13,SE,36.0,1
+24,Bebidas não alcoólicas,0,12,24.85,21.9,ambiente,4,18,MG,60.0,0
+25,Hortifrúti,1,7,2.29,23.9,ambiente,6,5,RJ,7.8,0
+26,Refeições prontas,1,8,372.87,24.2,ambiente,4,5,MA,41.8,0
+27,Refeições prontas,1,3,12.86,3.7,refrigerado,5,6,PA,81.8,0
+28,Outros,0,24,185.84,25.4,ambiente,5,19,AM,80.7,0
+29,Padaria,1,0,71.46,4.2,refrigerado,6,3,SE,34.9,1
+30,Refeições prontas,1,10,4.32,6.7,refrigerado,3,17,AC,52.8,0
+31,Grãos e cereais,0,32,2.32,-18.9,congelado,0,12,MT,20.2,0
+32,Laticínios,1,9,9.02,30.4,ambiente,3,6,DF,33.7,1
+33,Hortifrúti,1,1,71.71,6.3,refrigerado,4,22,MG,45.8,1
+34,Bebidas não alcoólicas,0,33,1.06,24.3,ambiente,4,4,ES,48.0,0
+35,Hortifrúti,1,5,1.96,4.7,refrigerado,3,2,AM,83.1,0
+36,Bebidas não alcoólicas,0,15,153.82,20.2,ambiente,4,22,DF,,0
+37,Hortifrúti,1,4,110.77,-23.9,congelado,5,12,PI,,0
+38,Outros,0,8,1.1,34.5,ambiente,1,3,PI,49.2,0
+39,Laticínios,1,1,20.16,6.4,refrigerado,2,2,PI,9.6,0
+40,Padaria,1,7,4.33,-0.2,refrigerado,4,17,PB,37.4,0
+41,Grãos e cereais,0,11,95.93,24.5,ambiente,1,17,AC,51.2,0
+42,Carnes e peixes,1,9,24.54,30.4,ambiente,5,18,PR,36.8,1
+43,Carnes e peixes,1,10,269.48,,nao_informado,2,9,BA,,0
+44,Refeições prontas,1,2,236.4,2.1,refrigerado,6,4,BA,80.0,0
+45,Outros,0,23,5.73,25.8,ambiente,5,22,SC,71.1,0
+46,Carnes e peixes,1,8,0.96,0.7,refrigerado,0,3,BA,,0
+47,Hortifrúti,1,2,0.8,-5.4,refrigerado,6,23,GO,82.8,0
+48,Carnes e peixes,1,5,201.88,4.1,refrigerado,0,18,SC,39.2,0
+49,Laticínios,1,4,0.69,23.1,ambiente,0,13,RN,55.5,1
+50,Outros,0,13,80.68,,nao_informado,4,8,MG,55.3,0
+51,Padaria,1,9,14.76,30.4,ambiente,2,17,AL,62.3,0
+52,Outros,0,16,43.38,32.5,ambiente,1,0,RO,57.3,1
+53,Grãos e cereais,0,6,34.56,,nao_informado,5,16,ES,8.6,0
+54,Refeições prontas,1,1,40.24,,nao_informado,5,20,MG,30.6,0
+55,Carnes e peixes,1,9,2.35,,nao_informado,2,17,SC,27.9,1
+56,Bebidas não alcoólicas,0,7,111.98,30.6,ambiente,5,19,BA,33.5,1
+57,Laticínios,1,4,2.13,27.0,ambiente,6,4,SE,55.3,1
+58,Bebidas não alcoólicas,0,8,0.71,21.4,ambiente,4,8,CE,78.9,0
+59,Hortifrúti,1,12,4.88,9.1,refrigerado,2,2,CE,30.7,0
+60,Grãos e cereais,0,26,2.79,,nao_informado,5,8,PI,,0
+61,Padaria,1,0,4.46,10.5,refrigerado,2,6,AM,80.3,1
+62,Carnes e peixes,1,7,8.65,26.4,ambiente,3,8,TO,59.6,0
+63,Grãos e cereais,0,21,3.89,26.1,ambiente,4,15,PI,,0
+64,Grãos e cereais,0,1,0.75,23.0,ambiente,5,11,MA,,0
+65,Hortifrúti,1,3,129.94,7.8,refrigerado,4,7,PE,,1
+66,Bebidas não alcoólicas,0,43,56.1,25.8,ambiente,6,18,PE,34.6,0
+67,Refeições prontas,1,7,1.89,25.8,ambiente,1,12,PA,20.7,1
+68,Hortifrúti,1,6,16.73,24.8,ambiente,2,10,PI,78.5,1
+69,Grãos e cereais,0,15,3.11,24.2,ambiente,2,16,MG,16.4,0
+70,Refeições prontas,1,6,19.61,-0.4,refrigerado,0,19,RO,48.5,1
+71,Grãos e cereais,0,38,0.63,3.6,refrigerado,4,6,RJ,,0
+72,Laticínios,1,10,1.64,9.0,refrigerado,5,12,RN,78.0,0
+73,Refeições prontas,1,10,128.42,21.2,ambiente,5,23,BA,,0
+74,Hortifrúti,1,3,51.89,2.6,refrigerado,0,18,RO,,0
+75,Laticínios,1,9,17.23,,nao_informado,5,13,RJ,73.1,0
+76,Padaria,1,5,0.97,8.1,refrigerado,4,11,DF,,0
+77,Refeições prontas,1,7,125.3,21.4,ambiente,1,2,AM,60.3,0
+78,Padaria,1,6,17.03,28.4,ambiente,3,4,MA,16.5,1
+79,Grãos e cereais,0,11,306.3,,nao_informado,4,2,RO,45.5,0
+80,Grãos e cereais,0,3,39.4,28.6,ambiente,0,21,ES,38.4,0
+81,Padaria,1,5,1.61,,nao_informado,2,4,AL,,0
+82,Padaria,1,12,11.97,31.7,ambiente,1,19,MA,19.4,1
+83,Refeições prontas,1,10,101.57,25.2,ambiente,2,7,PE,88.7,1
+84,Laticínios,1,12,28.4,27.9,ambiente,3,17,AC,6.0,0
+85,Carnes e peixes,1,10,9.04,-1.0,refrigerado,4,21,RO,35.7,1
+86,Refeições prontas,1,6,19.86,29.1,ambiente,6,19,BA,89.1,0
+87,Carnes e peixes,1,7,90.15,,nao_informado,1,10,TO,51.3,1
+88,Laticínios,1,5,188.26,,nao_informado,6,21,AL,58.8,1
+89,Padaria,1,12,14.82,25.3,ambiente,3,6,PE,38.8,0
+90,Bebidas não alcoólicas,0,21,28.17,,nao_informado,3,7,PA,78.0,1
+91,Refeições prontas,1,10,1.87,1.7,refrigerado,1,7,SC,71.6,1
+92,Laticínios,1,3,29.04,0.7,refrigerado,2,8,AL,53.4,0
+93,Padaria,1,3,2.59,25.0,ambiente,2,14,RJ,,1
+94,Grãos e cereais,0,39,76.41,21.0,ambiente,3,18,SE,55.3,0
+95,Refeições prontas,1,5,31.05,2.9,refrigerado,6,23,PI,11.6,1
+96,Laticínios,1,4,0.67,10.9,refrigerado,5,2,CE,,0
+97,Carnes e peixes,1,2,6.28,34.5,ambiente,2,15,TO,,1
+98,Hortifrúti,1,4,0.97,4.2,refrigerado,6,3,RN,32.6,0
+99,Hortifrúti,1,11,2.46,24.3,ambiente,3,17,PI,45.8,0
+100,Outros,0,38,0.75,28.0,ambiente,0,18,AC,,0
+101,Outros,0,36,233.63,23.9,ambiente,0,16,MA,37.1,0
+102,Outros,0,19,9.73,23.2,ambiente,4,17,SP,73.2,0
+103,Refeições prontas,1,8,131.01,22.0,ambiente,0,17,DF,84.6,0
+104,Padaria,1,1,15.13,3.4,refrigerado,3,3,DF,23.7,0
+105,Hortifrúti,1,11,99.12,23.5,ambiente,4,21,MG,54.0,1
+106,Bebidas não alcoólicas,0,17,223.42,,nao_informado,0,2,RO,,1
+107,Outros,0,39,2.66,26.3,ambiente,4,1,SE,88.3,1
+108,Bebidas não alcoólicas,0,39,2.42,21.2,ambiente,0,11,PA,25.5,1
+109,Grãos e cereais,0,45,83.73,,nao_informado,4,3,AP,18.6,0
+110,Laticínios,1,10,29.89,23.3,ambiente,3,13,GO,,0
+111,Grãos e cereais,0,9,38.85,,nao_informado,2,15,RO,34.3,0
+112,Outros,0,27,132.27,24.8,ambiente,4,6,AC,24.3,0
+113,Outros,0,37,0.69,28.9,ambiente,5,16,DF,34.6,0
+114,Outros,0,29,19.06,30.3,ambiente,1,21,AM,60.8,1
+115,Grãos e cereais,0,36,12.38,3.8,refrigerado,6,22,MS,44.8,0
+116,Hortifrúti,1,11,29.21,-1.3,refrigerado,4,0,TO,,0
+117,Padaria,1,12,0.58,-18.8,congelado,0,6,SP,56.7,0
+118,Padaria,1,11,5.74,4.1,refrigerado,6,12,ES,,0
+119,Laticínios,1,7,1.16,18.6,ambiente,0,1,PI,,0
+120,Hortifrúti,1,9,1.76,12.4,refrigerado,3,0,AM,36.9,1
+121,Refeições prontas,1,7,256.82,29.6,ambiente,1,23,CE,50.1,1
+122,Refeições prontas,1,8,0.72,22.5,ambiente,3,6,MG,31.8,1
+123,Carnes e peixes,1,1,288.97,22.0,ambiente,2,20,MT,75.6,1
+124,Laticínios,1,12,133.68,2.2,refrigerado,1,22,MS,45.3,1
+125,Laticínios,1,1,1.93,23.7,ambiente,3,22,SE,40.8,1
+126,Hortifrúti,1,1,228.67,13.7,refrigerado,1,0,AP,78.2,1
+127,Laticínios,1,6,56.31,26.6,ambiente,6,15,BA,84.4,0
+128,Grãos e cereais,0,13,4.93,32.4,ambiente,6,13,MT,49.0,1
+129,Padaria,1,11,17.36,24.4,ambiente,6,6,AP,,0
+130,Bebidas não alcoólicas,0,26,279.67,17.8,ambiente,5,0,RR,36.0,0
+131,Bebidas não alcoólicas,0,45,303.36,17.6,ambiente,2,9,MS,1.2,0
+132,Hortifrúti,1,5,1.58,26.7,ambiente,2,16,SE,17.8,0
+133,Outros,0,6,60.61,,nao_informado,1,6,MG,57.2,0
+134,Grãos e cereais,0,0,100.82,20.3,ambiente,1,9,SE,76.0,0
+135,Laticínios,1,10,26.21,28.6,ambiente,2,21,AM,24.2,0
+136,Hortifrúti,1,1,1.76,26.2,ambiente,4,3,RR,21.2,0
+137,Grãos e cereais,0,25,70.54,8.4,refrigerado,3,3,DF,86.5,0
+138,Bebidas não alcoólicas,0,20,5.34,27.1,ambiente,6,18,RN,20.2,0
+139,Refeições prontas,1,5,46.76,6.2,refrigerado,4,14,PI,45.1,1
+140,Grãos e cereais,0,19,174.41,30.4,ambiente,6,8,PB,35.1,0
+141,Refeições prontas,1,3,6.26,19.6,ambiente,2,23,MT,26.6,0
+142,Refeições prontas,1,8,338.16,25.9,ambiente,5,0,TO,44.3,0
+143,Refeições prontas,1,10,14.8,22.4,ambiente,3,15,AL,63.1,0
+144,Refeições prontas,1,8,22.71,10.9,refrigerado,2,1,MG,31.8,0
+145,Bebidas não alcoólicas,0,30,61.91,,nao_informado,1,8,TO,87.9,0
+146,Hortifrúti,1,0,0.64,32.0,ambiente,3,1,BA,,0
+147,Padaria,1,0,40.84,-20.4,congelado,4,19,RO,6.5,1
+148,Grãos e cereais,0,6,202.25,34.9,ambiente,0,22,AL,72.3,1
+149,Refeições prontas,1,0,0.8,24.1,ambiente,3,6,SP,29.9,1
+150,Bebidas não alcoólicas,0,44,167.46,-13.0,congelado,0,15,MA,12.1,0
+151,Outros,0,32,237.89,,nao_informado,4,13,MA,31.4,0
+152,Hortifrúti,1,4,39.01,28.2,ambiente,2,16,RJ,44.8,1
+153,Hortifrúti,1,11,2.89,5.0,refrigerado,1,12,AC,78.6,0
+154,Carnes e peixes,1,4,15.2,6.7,refrigerado,5,7,MS,6.5,1
+155,Laticínios,1,10,13.41,28.2,ambiente,4,4,SE,81.1,1
+156,Refeições prontas,1,6,1.14,,nao_informado,1,9,RR,72.1,0
+157,Bebidas não alcoólicas,0,42,2.61,24.7,ambiente,4,12,RO,43.6,0
+158,Laticínios,1,10,5.89,22.5,ambiente,1,4,RO,31.5,0
+159,Grãos e cereais,0,30,325.01,20.5,ambiente,6,18,PE,51.4,1
+160,Laticínios,1,8,329.2,27.2,ambiente,2,22,AM,0.1,1
+161,Bebidas não alcoólicas,0,3,0.74,19.1,ambiente,5,15,BA,36.1,0
+162,Grãos e cereais,0,21,53.67,21.0,ambiente,1,1,PB,37.2,0
+163,Carnes e peixes,1,3,55.72,5.3,refrigerado,0,18,MS,62.7,1
+164,Outros,0,15,1.0,23.2,ambiente,3,9,CE,70.8,0
+165,Bebidas não alcoólicas,0,27,0.93,5.8,refrigerado,4,15,MT,,1
+166,Bebidas não alcoólicas,0,19,62.18,26.6,ambiente,2,15,AC,12.2,0
+167,Refeições prontas,1,1,14.95,14.5,refrigerado,6,11,GO,80.2,0
+168,Laticínios,1,6,117.57,3.1,refrigerado,5,7,CE,86.7,0
+169,Padaria,1,6,54.94,23.7,ambiente,4,7,SE,63.1,0
+170,Laticínios,1,2,0.77,1.8,refrigerado,4,10,MG,67.7,0
+171,Grãos e cereais,0,4,7.63,24.5,ambiente,4,0,BA,,0
+172,Refeições prontas,1,3,13.03,26.0,ambiente,5,17,AM,23.5,0
+173,Padaria,1,11,2.72,-17.2,congelado,0,8,MG,62.7,0
+174,Laticínios,1,4,67.99,3.7,refrigerado,1,23,RO,56.2,0
+175,Bebidas não alcoólicas,0,30,0.53,,nao_informado,5,21,RN,23.2,0
+176,Carnes e peixes,1,2,80.82,-22.5,congelado,3,18,RR,,1
+177,Carnes e peixes,1,2,7.82,16.9,ambiente,0,11,PR,10.1,0
+178,Hortifrúti,1,2,1.51,23.7,ambiente,5,2,ES,87.2,0
+179,Outros,0,32,33.84,-0.3,refrigerado,3,22,AP,73.3,1
+180,Refeições prontas,1,0,2.53,3.6,refrigerado,3,19,GO,63.7,0
+181,Outros,0,19,313.4,,nao_informado,4,0,GO,81.7,0
+182,Outros,0,22,2.56,26.6,ambiente,1,19,RR,19.0,1
+183,Laticínios,1,10,5.76,28.7,ambiente,0,22,PR,,0
+184,Bebidas não alcoólicas,0,8,352.48,20.0,ambiente,1,10,RN,9.9,1
+185,Hortifrúti,1,12,8.56,26.2,ambiente,6,20,PR,42.7,1
+186,Laticínios,1,3,2.83,24.5,ambiente,2,14,PB,14.0,1
+187,Outros,0,33,17.17,,nao_informado,3,5,TO,61.5,0
+188,Outros,0,41,78.59,16.4,refrigerado,6,8,RS,32.3,0
+189,Bebidas não alcoólicas,0,3,1.05,25.9,ambiente,4,4,PA,17.6,0
+190,Padaria,1,0,16.13,3.8,refrigerado,0,23,RO,58.5,1
+191,Hortifrúti,1,4,11.26,26.6,ambiente,0,2,RJ,11.5,1
+192,Outros,0,1,11.45,23.7,ambiente,2,19,BA,87.0,0
+193,Grãos e cereais,0,24,321.95,20.4,ambiente,4,10,DF,58.5,1
+194,Hortifrúti,1,1,71.24,7.4,refrigerado,3,15,GO,81.9,0
+195,Outros,0,35,338.92,,nao_informado,1,6,BA,2.3,0
+196,Outros,0,35,2.85,2.9,refrigerado,0,4,RN,72.8,0
+197,Grãos e cereais,0,2,0.83,30.9,ambiente,5,0,PE,14.5,1
+198,Outros,0,22,152.68,28.2,ambiente,6,23,PA,29.4,0
+199,Padaria,1,1,100.35,6.7,refrigerado,5,20,MT,85.4,0
+200,Hortifrúti,1,1,5.37,19.5,ambiente,4,4,PR,74.2,0
+201,Hortifrúti,1,3,100.79,8.1,refrigerado,4,1,AL,,1
+202,Grãos e cereais,0,14,357.37,31.7,ambiente,6,22,AP,86.2,0
+203,Carnes e peixes,1,2,2.55,24.7,ambiente,3,12,SC,41.8,1
+204,Padaria,1,1,12.26,7.3,refrigerado,0,16,AP,78.0,0
+205,Hortifrúti,1,9,60.89,24.7,ambiente,1,10,PI,0.8,0
+206,Carnes e peixes,1,9,53.32,24.7,ambiente,0,13,GO,12.9,1
+207,Hortifrúti,1,12,9.55,23.6,ambiente,4,15,BA,17.9,0
+208,Grãos e cereais,0,2,0.52,32.6,ambiente,1,23,SC,,1
+209,Laticínios,1,12,47.89,18.6,ambiente,0,15,GO,52.5,1
+210,Carnes e peixes,1,4,320.31,,nao_informado,4,17,RJ,88.7,0
+211,Refeições prontas,1,3,19.93,24.7,ambiente,3,18,PI,43.5,1
+212,Carnes e peixes,1,10,0.83,22.9,ambiente,2,9,AM,3.0,0
+213,Outros,0,15,3.95,14.1,ambiente,6,20,SC,57.8,0
+214,Padaria,1,0,1.28,23.2,ambiente,3,9,RS,41.6,1
+215,Laticínios,1,0,1.04,19.7,ambiente,4,4,RR,12.5,1
+216,Laticínios,1,6,17.73,23.7,ambiente,0,19,ES,44.3,0
+217,Outros,0,13,1.49,10.9,refrigerado,2,13,PB,30.1,0
+218,Grãos e cereais,0,41,8.1,20.6,ambiente,1,12,AP,,0
+219,Laticínios,1,8,2.57,-0.8,refrigerado,5,19,SC,,0
+220,Laticínios,1,7,60.49,10.7,refrigerado,1,8,MG,,1
+221,Carnes e peixes,1,0,1.07,3.5,refrigerado,4,14,RS,72.5,0
+222,Carnes e peixes,1,0,1.27,-13.6,congelado,5,9,PE,66.8,1
+223,Carnes e peixes,1,9,7.76,-21.5,congelado,4,14,AM,27.1,1
+224,Carnes e peixes,1,7,66.92,13.2,refrigerado,1,8,SC,63.6,0
+225,Outros,0,29,36.53,3.3,refrigerado,1,9,RO,,0
+226,Laticínios,1,7,9.76,2.0,refrigerado,2,17,AC,40.7,1
+227,Outros,0,32,4.37,24.7,ambiente,2,16,AL,50.5,0
+228,Hortifrúti,1,3,9.15,25.9,ambiente,4,4,RN,56.8,1
+229,Outros,0,38,253.18,28.1,ambiente,1,0,RN,86.2,1
+230,Laticínios,1,6,12.05,-0.5,refrigerado,5,15,PE,20.1,0
+231,Carnes e peixes,1,0,5.76,29.6,ambiente,4,11,RS,28.9,1
+232,Hortifrúti,1,1,1.09,11.2,refrigerado,1,8,BA,56.6,0
+233,Grãos e cereais,0,32,2.52,-19.6,congelado,4,1,PR,84.0,0
+234,Grãos e cereais,0,4,6.75,24.4,ambiente,4,15,PI,23.8,1
+235,Refeições prontas,1,3,80.03,,nao_informado,1,16,RO,41.4,1
+236,Padaria,1,8,22.38,5.7,refrigerado,2,22,SE,35.1,0
+237,Bebidas não alcoólicas,0,32,1.89,30.3,ambiente,4,9,MT,,0
+238,Refeições prontas,1,10,107.38,26.8,ambiente,0,11,RR,39.3,0
+239,Hortifrúti,1,6,76.86,25.3,ambiente,3,2,DF,62.0,0
+240,Laticínios,1,4,9.09,20.0,ambiente,6,23,CE,9.6,1
+241,Carnes e peixes,1,5,3.18,3.5,refrigerado,5,13,RJ,22.7,0
+242,Grãos e cereais,0,31,1.19,30.5,ambiente,5,14,SC,54.7,0
+243,Grãos e cereais,0,21,6.89,25.5,ambiente,2,9,PB,,0
+244,Bebidas não alcoólicas,0,34,64.2,25.5,ambiente,6,13,SC,60.9,1
+245,Carnes e peixes,1,3,2.51,5.3,refrigerado,5,16,AP,46.1,0
+246,Refeições prontas,1,1,7.99,7.3,refrigerado,3,10,AL,62.0,1
+247,Laticínios,1,3,9.72,,nao_informado,5,16,TO,64.9,0
+248,Padaria,1,12,8.16,9.8,refrigerado,6,12,RS,0.4,0
+249,Carnes e peixes,1,1,2.02,10.2,refrigerado,5,23,MS,,0
+250,Refeições prontas,1,8,117.23,10.0,refrigerado,1,12,AL,80.8,0
+251,Padaria,1,12,0.67,-14.9,congelado,3,14,ES,80.2,0
+252,Carnes e peixes,1,9,22.86,8.9,refrigerado,0,8,PI,35.8,0
+253,Padaria,1,4,82.56,23.1,ambiente,4,19,PE,12.2,1
+254,Padaria,1,8,18.9,9.1,refrigerado,0,19,RS,75.7,1
+255,Hortifrúti,1,1,239.35,-20.5,congelado,4,21,CE,,1
+256,Hortifrúti,1,5,0.63,,nao_informado,0,17,MT,,0
+257,Hortifrúti,1,5,2.17,8.6,refrigerado,1,11,PE,46.6,0
+258,Grãos e cereais,0,7,5.29,23.7,ambiente,5,0,MS,49.4,0
+259,Bebidas não alcoólicas,0,24,3.37,0.9,refrigerado,0,17,SE,17.0,0
+260,Carnes e peixes,1,10,1.86,4.9,refrigerado,2,17,RR,47.1,1
+261,Refeições prontas,1,3,0.58,-1.3,refrigerado,3,15,AP,69.8,0
+262,Bebidas não alcoólicas,0,25,177.88,25.0,ambiente,2,12,CE,32.5,1
+263,Outros,0,38,393.15,24.4,ambiente,3,16,PI,58.4,0
+264,Laticínios,1,4,246.56,,nao_informado,1,6,MA,,0
+265,Laticínios,1,0,109.05,5.2,refrigerado,6,0,BA,13.2,1
+266,Hortifrúti,1,6,201.95,8.7,refrigerado,5,16,SC,76.5,0
+267,Hortifrúti,1,6,71.27,26.9,ambiente,5,5,PB,56.7,0
+268,Bebidas não alcoólicas,0,1,1.38,0.9,refrigerado,0,22,PA,37.1,1
+269,Outros,0,42,10.02,,nao_informado,6,16,SC,87.9,0
+270,Carnes e peixes,1,11,0.92,18.8,ambiente,4,21,AM,75.1,1
+271,Hortifrúti,1,0,23.81,1.2,refrigerado,1,20,RO,27.4,0
+272,Grãos e cereais,0,35,69.57,28.3,ambiente,6,18,PB,20.6,0
+273,Refeições prontas,1,2,24.25,,nao_informado,1,13,GO,89.4,0
+274,Laticínios,1,12,128.0,21.6,ambiente,5,19,GO,79.7,1
+275,Grãos e cereais,0,43,52.51,26.0,ambiente,3,10,SP,,0
+276,Refeições prontas,1,1,62.39,,nao_informado,1,12,PI,29.4,0
+277,Refeições prontas,1,8,255.06,25.3,ambiente,2,23,SP,15.7,1
+278,Bebidas não alcoólicas,0,18,48.05,7.7,refrigerado,1,22,PR,30.1,0
+279,Grãos e cereais,0,17,36.41,24.6,ambiente,0,0,ES,52.3,0
+280,Refeições prontas,1,12,1.31,1.4,refrigerado,1,22,PR,24.5,0
+281,Carnes e peixes,1,2,20.85,4.4,refrigerado,4,19,PB,88.3,0
+282,Grãos e cereais,0,16,8.4,29.4,ambiente,4,23,RJ,47.8,0
+283,Bebidas não alcoólicas,0,29,3.78,20.1,ambiente,0,20,PR,74.8,1
+284,Carnes e peixes,1,0,9.43,25.8,ambiente,2,14,SE,2.9,1
+285,Padaria,1,10,374.64,,nao_informado,3,5,AM,15.3,0
+286,Grãos e cereais,0,22,2.92,,nao_informado,0,3,RN,13.9,0
+287,Bebidas não alcoólicas,0,13,1.53,25.5,ambiente,1,19,RN,,0
+288,Refeições prontas,1,2,233.45,24.5,ambiente,1,19,PB,68.4,1
+289,Padaria,1,12,15.26,2.1,refrigerado,0,5,CE,19.6,0
+290,Outros,0,5,6.93,10.1,refrigerado,3,16,MT,,0
+291,Laticínios,1,4,180.16,-1.5,refrigerado,2,19,PB,74.9,1
+292,Hortifrúti,1,7,3.26,28.1,ambiente,0,3,MT,71.5,0
+293,Outros,0,4,60.9,10.0,refrigerado,4,23,AL,82.5,0
+294,Outros,0,35,1.73,17.6,ambiente,2,10,MT,13.1,0
+295,Outros,0,29,85.37,36.8,ambiente,1,4,AM,72.4,0
+296,Refeições prontas,1,6,0.95,23.1,ambiente,2,4,AP,88.8,0
+297,Carnes e peixes,1,7,79.51,31.6,ambiente,2,15,RS,73.8,1
+298,Hortifrúti,1,2,52.11,26.1,ambiente,0,23,RR,12.5,0
+299,Refeições prontas,1,3,0.73,25.9,ambiente,6,14,AP,27.2,1
+300,Padaria,1,11,287.11,1.9,refrigerado,1,10,RR,27.1,0
+301,Refeições prontas,1,3,286.49,25.7,ambiente,6,20,PB,43.8,1
+302,Outros,0,37,75.17,-21.2,congelado,5,14,AL,43.5,0
+303,Outros,0,10,81.81,10.2,refrigerado,3,14,MT,50.8,0
+304,Bebidas não alcoólicas,0,20,292.54,30.6,ambiente,6,9,PR,10.3,1
+305,Refeições prontas,1,7,24.27,6.4,refrigerado,6,19,MS,33.9,1
+306,Laticínios,1,8,69.22,6.0,refrigerado,3,10,MG,15.5,0
+307,Carnes e peixes,1,8,3.1,23.0,ambiente,3,5,CE,46.5,1
+308,Grãos e cereais,0,14,102.17,,nao_informado,4,2,AC,82.8,1
+309,Outros,0,38,359.12,21.7,ambiente,4,0,ES,21.1,1
+310,Outros,0,33,3.48,28.6,ambiente,3,7,AP,3.3,0
+311,Bebidas não alcoólicas,0,14,2.46,25.4,ambiente,6,6,AM,80.1,0
+312,Padaria,1,4,1.5,,nao_informado,3,12,AM,33.4,0
+313,Carnes e peixes,1,8,20.86,28.2,ambiente,2,10,MS,5.1,0
+314,Outros,0,23,19.78,9.7,refrigerado,0,21,RJ,84.4,0
+315,Laticínios,1,11,5.47,7.4,refrigerado,5,5,SC,22.8,0
+316,Grãos e cereais,0,17,1.66,-10.5,congelado,1,4,ES,47.7,0
+317,Padaria,1,4,5.05,31.3,ambiente,1,19,BA,24.1,1
+318,Hortifrúti,1,1,49.94,24.1,ambiente,2,23,GO,82.5,0
+319,Refeições prontas,1,2,1.34,10.5,refrigerado,0,18,GO,59.6,0
+320,Hortifrúti,1,1,82.43,6.7,refrigerado,5,1,MT,17.4,0
+321,Carnes e peixes,1,2,21.0,23.1,ambiente,6,3,SP,80.6,0
+322,Carnes e peixes,1,10,0.69,22.8,ambiente,1,2,BA,28.6,1
+323,Laticínios,1,7,17.07,23.1,ambiente,6,5,PB,55.2,1
+324,Refeições prontas,1,10,179.53,25.6,ambiente,2,18,PI,21.0,1
+325,Hortifrúti,1,7,0.54,20.5,ambiente,2,15,BA,12.9,0
+326,Grãos e cereais,0,17,1.22,7.7,refrigerado,4,14,PE,7.4,0
+327,Carnes e peixes,1,6,0.75,19.2,ambiente,2,12,AC,0.6,0
+328,Grãos e cereais,0,44,185.42,25.3,ambiente,0,12,MG,29.3,0
+329,Refeições prontas,1,4,0.71,4.5,refrigerado,4,11,SP,74.6,0
+330,Outros,0,11,16.51,31.7,ambiente,5,18,MS,83.3,0
+331,Laticínios,1,11,1.3,10.7,refrigerado,5,10,PI,68.2,0
+332,Refeições prontas,1,10,55.59,-24.4,congelado,5,8,SC,12.6,0
+333,Padaria,1,11,38.79,8.7,refrigerado,1,0,PE,52.6,0
+334,Grãos e cereais,0,17,1.48,30.1,ambiente,2,17,RJ,58.4,0
+335,Outros,0,23,0.58,25.8,ambiente,0,23,ES,12.9,1
+336,Grãos e cereais,0,15,19.09,,nao_informado,3,15,RJ,59.7,0
+337,Laticínios,1,6,81.4,27.6,ambiente,1,3,PB,54.4,1
+338,Refeições prontas,1,3,4.17,-11.5,congelado,0,5,DF,46.0,0
+339,Outros,0,30,3.2,26.6,ambiente,2,13,PB,89.9,0
+340,Grãos e cereais,0,13,2.98,12.0,refrigerado,2,2,MA,3.5,1
+341,Outros,0,8,0.73,25.9,ambiente,5,9,SC,77.6,0
+342,Padaria,1,11,69.84,-21.1,congelado,0,3,MA,76.0,0
+343,Outros,0,41,2.4,1.2,refrigerado,6,4,PI,40.5,0
+344,Bebidas não alcoólicas,0,42,27.62,,nao_informado,3,6,PE,67.1,0
+345,Padaria,1,4,1.91,2.5,refrigerado,1,10,ES,30.2,1
+346,Refeições prontas,1,12,1.96,28.7,ambiente,3,17,PI,4.9,0
+347,Carnes e peixes,1,5,2.64,4.5,refrigerado,4,13,AM,81.7,1
+348,Hortifrúti,1,6,0.61,2.7,refrigerado,5,20,SE,55.9,0
+349,Grãos e cereais,0,5,5.6,34.6,ambiente,5,13,PA,0.7,0
+350,Carnes e peixes,1,5,386.6,32.2,ambiente,4,12,CE,28.4,1
+351,Carnes e peixes,1,5,200.22,23.8,ambiente,5,9,PA,52.7,1
+352,Padaria,1,11,267.86,29.0,ambiente,5,0,SP,6.4,1
+353,Carnes e peixes,1,1,25.07,28.5,ambiente,3,15,MG,8.4,1
+354,Bebidas não alcoólicas,0,31,329.65,16.2,ambiente,6,13,PR,52.3,0
+355,Grãos e cereais,0,31,51.92,21.3,ambiente,0,23,BA,31.2,0
+356,Padaria,1,8,28.51,37.5,ambiente,0,22,MA,28.4,1
+357,Grãos e cereais,0,2,1.35,25.6,ambiente,6,15,ES,8.3,0
+358,Hortifrúti,1,6,0.53,9.5,refrigerado,6,13,SP,,0
+359,Padaria,1,0,1.55,19.5,ambiente,2,22,AP,48.4,1
+360,Hortifrúti,1,8,399.11,3.5,refrigerado,6,21,BA,31.1,0
+361,Padaria,1,6,1.81,20.0,ambiente,0,15,PB,7.5,0
+362,Padaria,1,8,36.76,-3.1,refrigerado,4,17,PA,87.9,0
+363,Outros,0,19,244.17,23.5,ambiente,2,7,PA,72.8,0
+364,Padaria,1,1,8.67,26.1,ambiente,6,15,RS,,1
+365,Outros,0,34,39.93,24.1,ambiente,3,7,MG,72.4,0
+366,Padaria,1,11,18.75,19.7,ambiente,6,18,RR,32.0,0
+367,Bebidas não alcoólicas,0,4,0.87,-15.2,congelado,3,14,RS,71.5,1
+368,Refeições prontas,1,9,12.78,25.3,ambiente,5,13,PA,48.4,1
+369,Laticínios,1,5,11.12,3.8,refrigerado,4,16,RO,,1
+370,Laticínios,1,1,1.08,10.9,refrigerado,4,14,TO,81.4,1
+371,Hortifrúti,1,8,26.39,32.0,ambiente,3,21,RS,81.8,1
+372,Refeições prontas,1,4,25.73,29.7,ambiente,3,8,CE,51.6,0
+373,Padaria,1,9,0.59,31.3,ambiente,6,21,MA,5.5,1
+374,Refeições prontas,1,2,28.99,5.1,refrigerado,1,11,MS,68.0,0
+375,Laticínios,1,9,1.01,25.7,ambiente,0,12,SC,18.2,0
+376,Padaria,1,11,0.89,3.8,refrigerado,6,16,MT,13.7,0
+377,Outros,0,3,3.62,24.4,ambiente,1,10,RJ,51.3,0
+378,Padaria,1,3,0.75,19.8,ambiente,0,18,AM,40.7,0
+379,Carnes e peixes,1,0,1.97,14.5,refrigerado,0,19,MG,32.1,0
+380,Outros,0,12,2.07,,nao_informado,4,15,PA,71.6,0
+381,Refeições prontas,1,6,9.64,3.7,refrigerado,6,14,BA,2.1,0
+382,Grãos e cereais,0,9,350.29,29.6,ambiente,3,22,DF,,0
+383,Hortifrúti,1,9,7.89,23.6,ambiente,2,16,AM,28.2,0
+384,Outros,0,4,355.15,26.8,ambiente,6,22,AC,,0
+385,Laticínios,1,7,28.66,-25.6,congelado,5,7,SE,51.1,1
+386,Padaria,1,6,72.86,4.3,refrigerado,3,19,RJ,51.5,1
+387,Hortifrúti,1,11,86.14,5.1,refrigerado,6,5,RN,27.0,1
+388,Padaria,1,0,22.65,10.1,refrigerado,3,9,BA,,1
+389,Outros,0,4,16.85,24.1,ambiente,2,3,RS,39.3,1
+390,Padaria,1,3,207.68,24.2,ambiente,6,21,RS,16.1,1
+391,Grãos e cereais,0,31,199.06,27.2,ambiente,4,13,TO,80.7,0
+392,Laticínios,1,2,1.52,33.8,ambiente,3,8,RS,19.2,1
+393,Padaria,1,5,127.99,27.4,ambiente,0,1,RJ,27.8,0
+394,Outros,0,18,0.74,25.6,ambiente,5,1,RO,10.6,0
+395,Grãos e cereais,0,20,34.74,32.0,ambiente,4,8,CE,76.8,0
+396,Outros,0,27,10.28,25.2,ambiente,0,23,RR,34.7,0
+397,Bebidas não alcoólicas,0,5,1.98,29.5,ambiente,2,7,RS,86.8,0
+398,Padaria,1,1,133.58,-0.8,refrigerado,4,0,RN,21.5,0
+399,Refeições prontas,1,12,102.21,29.1,ambiente,0,15,RJ,58.3,1
+400,Outros,0,43,107.49,26.0,ambiente,5,19,RJ,87.5,0
+401,Padaria,1,11,150.32,30.8,ambiente,6,21,AM,,1
+402,Laticínios,1,12,5.37,24.8,ambiente,4,13,RR,25.9,0
+403,Refeições prontas,1,8,7.7,8.5,refrigerado,6,13,DF,,0
+404,Hortifrúti,1,6,0.98,8.7,refrigerado,2,13,MT,49.3,1
+405,Grãos e cereais,0,1,6.49,23.8,ambiente,4,23,RS,4.6,0
+406,Carnes e peixes,1,12,12.22,,nao_informado,3,19,ES,,0
+407,Hortifrúti,1,6,118.37,-8.1,congelado,6,14,AP,20.6,0
+408,Outros,0,0,2.31,19.7,ambiente,2,16,RJ,76.8,0
+409,Padaria,1,1,0.67,28.9,ambiente,1,3,PR,25.5,0
+410,Hortifrúti,1,0,18.44,29.3,ambiente,1,15,CE,47.2,1
+411,Bebidas não alcoólicas,0,13,3.64,30.1,ambiente,6,17,PA,48.0,0
+412,Refeições prontas,1,8,43.26,5.4,refrigerado,4,13,ES,47.4,0
+413,Refeições prontas,1,10,2.82,,nao_informado,1,5,AP,41.7,0
+414,Outros,0,10,24.82,,nao_informado,6,23,ES,43.3,0
+415,Hortifrúti,1,9,70.68,25.5,ambiente,6,18,MA,43.2,1
+416,Laticínios,1,10,22.67,10.1,refrigerado,0,0,SP,,0
+417,Outros,0,30,71.02,25.2,ambiente,6,21,AP,62.2,1
+418,Grãos e cereais,0,11,6.23,27.3,ambiente,1,6,CE,10.2,0
+419,Grãos e cereais,0,27,0.6,27.6,ambiente,0,1,PB,59.0,0
+420,Refeições prontas,1,9,102.87,2.9,refrigerado,5,22,GO,48.5,1
+421,Refeições prontas,1,3,135.96,21.5,ambiente,4,17,PA,17.7,1
+422,Laticínios,1,3,17.71,27.0,ambiente,4,5,RO,79.0,0
+423,Bebidas não alcoólicas,0,35,60.12,2.1,refrigerado,1,2,PI,84.6,0
+424,Bebidas não alcoólicas,0,2,18.94,34.2,ambiente,0,5,SP,42.9,1
+425,Bebidas não alcoólicas,0,44,1.96,23.3,ambiente,3,11,PE,73.7,0
+426,Hortifrúti,1,12,30.46,8.1,refrigerado,3,23,SC,75.7,1
+427,Refeições prontas,1,6,1.1,17.1,ambiente,2,23,AL,3.2,1
+428,Grãos e cereais,0,11,0.69,21.2,ambiente,3,9,DF,49.8,0
+429,Bebidas não alcoólicas,0,28,1.32,19.4,ambiente,4,17,RR,28.2,0
+430,Padaria,1,11,154.35,25.1,ambiente,2,7,AC,28.2,0
+431,Refeições prontas,1,8,107.23,17.3,ambiente,5,16,TO,36.3,1
+432,Refeições prontas,1,5,3.81,,nao_informado,2,4,PI,26.6,1
+433,Bebidas não alcoólicas,0,17,230.61,21.8,ambiente,5,19,MT,6.7,0
+434,Padaria,1,5,26.88,6.8,refrigerado,1,13,DF,59.5,1
+435,Refeições prontas,1,0,1.45,,nao_informado,5,18,AC,,1
+436,Outros,0,39,348.88,25.0,ambiente,4,5,AM,88.1,1
+437,Refeições prontas,1,11,8.58,28.7,ambiente,6,17,AC,87.5,1
+438,Hortifrúti,1,1,2.34,31.6,ambiente,0,23,AM,,1
+439,Padaria,1,9,20.02,-3.8,refrigerado,2,20,RJ,,0
+440,Laticínios,1,7,4.69,19.6,ambiente,3,7,SE,26.6,1
+441,Grãos e cereais,0,2,259.61,19.4,ambiente,2,4,AM,43.8,1
+442,Grãos e cereais,0,5,307.34,30.0,ambiente,4,18,AM,74.3,0
+443,Hortifrúti,1,2,99.01,26.1,ambiente,1,11,DF,56.7,1
+444,Grãos e cereais,0,18,41.08,29.1,ambiente,4,3,RN,52.1,0
+445,Padaria,1,11,5.03,9.1,refrigerado,5,21,RN,73.6,1
+446,Carnes e peixes,1,11,2.46,7.8,refrigerado,3,14,AL,62.8,0
+447,Outros,0,36,1.02,28.2,ambiente,6,10,MG,83.4,0
+448,Grãos e cereais,0,2,2.56,30.4,ambiente,6,6,SP,11.4,0
+449,Bebidas não alcoólicas,0,8,215.42,21.8,ambiente,0,21,DF,,0
+450,Padaria,1,7,34.75,,nao_informado,0,14,TO,22.4,0
+451,Refeições prontas,1,12,4.44,22.9,ambiente,4,5,DF,,0
+452,Grãos e cereais,0,7,18.45,0.7,refrigerado,0,10,AM,19.1,0
+453,Refeições prontas,1,0,11.82,4.0,refrigerado,1,14,PA,60.5,0
+454,Grãos e cereais,0,27,1.65,30.6,ambiente,2,20,SE,73.1,0
+455,Outros,0,19,52.07,26.0,ambiente,4,19,SE,56.6,1
+456,Refeições prontas,1,10,4.35,16.1,ambiente,5,1,AP,47.8,1
+457,Padaria,1,8,8.52,4.8,refrigerado,4,15,PB,86.7,0
+458,Outros,0,34,7.13,-16.8,congelado,3,8,MS,11.3,0
+459,Outros,0,23,18.86,30.0,ambiente,0,2,RN,35.1,1
+460,Hortifrúti,1,5,124.22,-13.2,congelado,1,16,PR,44.3,0
+461,Laticínios,1,6,328.55,23.1,ambiente,5,2,PR,18.6,1
+462,Outros,0,43,219.03,,nao_informado,5,8,SC,63.8,0
+463,Bebidas não alcoólicas,0,45,2.7,28.6,ambiente,6,0,PR,25.9,1
+464,Grãos e cereais,0,15,4.38,23.1,ambiente,5,10,SC,86.3,1
+465,Carnes e peixes,1,11,27.16,28.9,ambiente,1,0,PB,69.9,1
+466,Grãos e cereais,0,4,17.96,24.0,ambiente,0,10,SP,61.7,0
+467,Grãos e cereais,0,22,4.83,10.2,refrigerado,2,15,MS,,0
+468,Grãos e cereais,0,1,70.82,24.2,ambiente,6,1,MT,11.8,1
+469,Padaria,1,5,7.9,13.5,ambiente,1,4,MS,11.1,1
+470,Carnes e peixes,1,4,30.81,23.8,ambiente,4,6,MT,14.4,1
+471,Refeições prontas,1,10,0.54,12.2,refrigerado,2,2,SE,89.5,0
+472,Refeições prontas,1,10,9.29,,nao_informado,4,21,AM,77.7,1
+473,Carnes e peixes,1,12,2.46,22.8,ambiente,6,0,AP,78.7,0
+474,Outros,0,3,41.93,,nao_informado,2,16,MS,,0
+475,Laticínios,1,4,1.89,21.6,ambiente,6,0,PR,68.2,1
+476,Hortifrúti,1,10,1.31,,nao_informado,1,15,RR,20.4,0
+477,Outros,0,44,145.61,24.3,ambiente,3,4,RO,84.4,0
+478,Carnes e peixes,1,8,1.59,28.9,ambiente,6,3,MS,75.4,1
+479,Refeições prontas,1,12,1.26,4.9,refrigerado,0,3,MA,1.6,0
+480,Padaria,1,8,378.67,27.5,ambiente,0,8,MA,15.8,1
+481,Laticínios,1,11,135.58,-17.4,congelado,4,6,RN,84.4,0
+482,Laticínios,1,10,0.62,-1.0,refrigerado,3,23,PB,65.0,0
+483,Carnes e peixes,1,1,33.32,,nao_informado,6,23,PR,43.6,1
+484,Bebidas não alcoólicas,0,19,3.81,2.4,refrigerado,0,19,AC,,0
+485,Outros,0,29,66.65,23.2,ambiente,3,19,MS,10.9,0
+486,Refeições prontas,1,9,1.59,26.6,ambiente,3,14,RJ,0.6,0
+487,Outros,0,19,1.19,23.6,ambiente,4,10,MT,,0
+488,Laticínios,1,5,368.67,,nao_informado,0,20,ES,74.8,0
+489,Padaria,1,9,42.62,7.7,refrigerado,6,22,DF,15.3,1
+490,Carnes e peixes,1,10,9.05,25.2,ambiente,6,5,PB,63.5,1
+491,Laticínios,1,8,4.25,-19.4,congelado,1,5,PI,15.7,1
+492,Laticínios,1,4,1.63,20.4,ambiente,4,14,PI,24.4,0
+493,Outros,0,15,28.35,10.1,refrigerado,0,15,ES,88.8,0
+494,Refeições prontas,1,7,72.04,-24.1,congelado,1,11,PA,9.7,1
+495,Laticínios,1,6,6.23,1.7,refrigerado,5,12,PA,,0
+496,Hortifrúti,1,9,24.58,29.4,ambiente,6,17,SP,87.4,0
+497,Hortifrúti,1,9,4.46,,nao_informado,6,7,CE,,0
+498,Hortifrúti,1,12,9.21,18.7,ambiente,5,2,DF,20.2,1
+499,Hortifrúti,1,1,0.59,,nao_informado,6,2,MA,87.6,0
+500,Padaria,1,4,2.16,,nao_informado,5,17,RN,42.2,0
+501,Hortifrúti,1,9,8.12,4.7,refrigerado,3,2,GO,,0
+502,Bebidas não alcoólicas,0,16,1.04,5.9,refrigerado,4,18,GO,85.2,0
+503,Carnes e peixes,1,6,60.97,,nao_informado,3,16,AM,81.5,0
+504,Carnes e peixes,1,4,162.09,13.0,refrigerado,4,3,PI,,1
+505,Outros,0,30,181.68,23.4,ambiente,4,0,TO,40.8,0
+506,Laticínios,1,11,7.99,-0.8,refrigerado,2,6,AC,87.0,1
+507,Hortifrúti,1,8,2.96,3.9,refrigerado,1,11,MA,49.7,0
+508,Hortifrúti,1,3,5.63,6.3,refrigerado,6,23,SP,65.4,0
+509,Hortifrúti,1,5,78.55,10.8,refrigerado,5,4,RS,54.0,1
+510,Padaria,1,7,139.03,,nao_informado,6,13,SE,56.1,0
+511,Grãos e cereais,0,11,163.02,29.0,ambiente,5,16,TO,5.8,0
+512,Grãos e cereais,0,6,271.83,18.0,ambiente,5,6,ES,82.1,1
+513,Bebidas não alcoólicas,0,30,5.31,31.9,ambiente,0,6,BA,25.0,0
+514,Outros,0,32,194.57,19.6,ambiente,3,8,MS,3.3,1
+515,Grãos e cereais,0,1,2.23,22.5,ambiente,6,16,MA,1.0,0
+516,Bebidas não alcoólicas,0,0,29.27,25.0,ambiente,1,17,AL,20.7,0
+517,Laticínios,1,5,0.78,2.2,refrigerado,4,14,ES,,0
+518,Outros,0,28,8.82,21.0,ambiente,4,18,DF,80.5,0
+519,Grãos e cereais,0,42,56.78,2.5,refrigerado,1,8,RR,52.9,0
+520,Outros,0,13,131.24,23.5,ambiente,5,11,RS,,0
+521,Grãos e cereais,0,4,44.22,30.1,ambiente,0,8,GO,,0
+522,Carnes e peixes,1,11,3.84,28.0,ambiente,3,16,RN,28.2,0
+523,Hortifrúti,1,10,0.63,25.8,ambiente,3,9,PA,,0
+524,Bebidas não alcoólicas,0,16,11.39,,nao_informado,4,16,RJ,,0
+525,Grãos e cereais,0,43,0.51,23.1,ambiente,3,1,PE,79.1,1
+526,Refeições prontas,1,12,22.79,-19.5,congelado,3,20,PE,1.5,1
+527,Carnes e peixes,1,3,2.25,26.0,ambiente,6,9,RS,55.9,1
+528,Padaria,1,7,3.66,3.9,refrigerado,5,10,SE,39.0,0
+529,Outros,0,29,44.93,25.8,ambiente,6,3,DF,79.5,0
+530,Outros,0,15,63.04,24.0,ambiente,6,1,RS,66.6,0
+531,Outros,0,39,0.74,26.2,ambiente,0,20,DF,23.7,0
+532,Outros,0,16,31.85,21.6,ambiente,0,17,SE,,0
+533,Carnes e peixes,1,3,1.14,-16.3,congelado,6,17,MA,46.4,0
+534,Laticínios,1,7,156.34,,nao_informado,3,18,AL,87.0,0
+535,Outros,0,33,30.79,20.8,ambiente,0,21,AC,,0
+536,Grãos e cereais,0,32,208.76,,nao_informado,0,1,MS,75.5,0
+537,Bebidas não alcoólicas,0,44,26.86,33.1,ambiente,0,4,AC,,0
+538,Refeições prontas,1,9,19.6,21.3,ambiente,3,11,PI,48.4,1
+539,Bebidas não alcoólicas,0,24,55.04,22.7,ambiente,4,16,PR,40.3,0
+540,Bebidas não alcoólicas,0,2,120.83,-26.8,congelado,0,10,RS,74.9,0
+541,Refeições prontas,1,0,40.96,-23.8,congelado,5,4,AC,33.7,1
+542,Outros,0,28,1.34,22.8,ambiente,1,19,SP,74.3,0
+543,Hortifrúti,1,2,47.86,5.6,refrigerado,5,8,RS,11.9,1
+544,Padaria,1,5,0.85,1.0,refrigerado,4,10,PE,55.0,0
+545,Refeições prontas,1,2,7.31,,nao_informado,0,13,RN,9.9,1
+546,Refeições prontas,1,11,1.69,-0.4,refrigerado,5,15,RS,85.9,0
+547,Outros,0,33,63.81,23.9,ambiente,1,3,PA,77.8,0
+548,Padaria,1,9,12.55,6.8,refrigerado,5,8,PR,4.2,0
+549,Carnes e peixes,1,4,2.58,2.6,refrigerado,0,10,SE,89.3,0
+550,Laticínios,1,3,8.48,26.7,ambiente,2,3,AP,43.7,0
+551,Padaria,1,11,27.1,21.7,ambiente,3,3,MA,83.8,1
+552,Padaria,1,0,8.78,18.8,ambiente,4,14,ES,79.0,0
+553,Laticínios,1,6,18.69,23.3,ambiente,2,2,PE,35.6,1
+554,Hortifrúti,1,3,166.87,4.2,refrigerado,5,15,RS,40.9,0
+555,Refeições prontas,1,4,31.82,9.0,refrigerado,0,4,SC,32.6,1
+556,Hortifrúti,1,5,0.82,0.5,refrigerado,5,19,PA,57.8,0
+557,Hortifrúti,1,7,73.13,-0.5,refrigerado,2,22,PE,16.6,1
+558,Bebidas não alcoólicas,0,43,57.11,24.5,ambiente,6,5,TO,15.6,0
+559,Padaria,1,11,202.35,17.0,ambiente,1,23,MA,51.4,1
+560,Outros,0,5,186.4,,nao_informado,2,9,AC,85.7,1
+561,Outros,0,43,88.34,28.1,ambiente,3,13,RO,,0
+562,Laticínios,1,6,0.68,28.9,ambiente,6,23,MT,67.3,0
+563,Hortifrúti,1,12,1.3,22.5,ambiente,3,1,AP,,0
+564,Carnes e peixes,1,12,1.11,28.4,ambiente,6,14,CE,,0
+565,Hortifrúti,1,3,93.71,22.2,ambiente,3,16,ES,,1
+566,Bebidas não alcoólicas,0,31,5.59,,nao_informado,4,18,AL,19.3,0
+567,Carnes e peixes,1,4,7.22,28.7,ambiente,2,1,CE,15.1,1
+568,Carnes e peixes,1,10,2.24,-20.3,congelado,3,11,TO,64.9,0
+569,Outros,0,24,7.39,-22.6,congelado,4,13,RJ,49.1,0
+570,Grãos e cereais,0,36,30.05,28.6,ambiente,2,22,RS,53.2,0
+571,Bebidas não alcoólicas,0,6,108.38,6.0,refrigerado,1,22,TO,9.2,1
+572,Padaria,1,1,11.21,31.6,ambiente,4,11,SC,,0
+573,Grãos e cereais,0,43,74.11,,nao_informado,6,1,PI,8.2,0
+574,Padaria,1,9,12.97,28.6,ambiente,3,16,PI,75.2,1
+575,Laticínios,1,11,52.67,-4.8,refrigerado,5,11,SE,19.0,0
+576,Carnes e peixes,1,9,99.41,1.8,refrigerado,6,14,SE,,0
+577,Outros,0,13,0.63,31.4,ambiente,6,19,MT,,0
+578,Laticínios,1,1,208.76,26.7,ambiente,0,20,RO,39.3,1
+579,Grãos e cereais,0,42,13.82,-22.3,congelado,1,8,BA,,0
+580,Outros,0,28,288.36,23.9,ambiente,6,5,BA,30.6,1
+581,Carnes e peixes,1,1,130.77,3.8,refrigerado,3,14,GO,83.6,0
+582,Padaria,1,1,4.97,6.8,refrigerado,5,1,RN,65.8,0
+583,Hortifrúti,1,5,0.53,24.5,ambiente,2,6,RJ,8.3,0
+584,Bebidas não alcoólicas,0,0,246.32,26.8,ambiente,3,8,AM,43.6,1
+585,Outros,0,14,142.82,26.1,ambiente,4,13,AP,65.2,0
+586,Padaria,1,6,2.64,28.2,ambiente,4,12,PI,50.8,1
+587,Outros,0,13,10.71,27.3,ambiente,1,4,CE,0.9,0
+588,Outros,0,38,168.7,21.1,ambiente,6,15,RS,56.1,0
+589,Hortifrúti,1,2,3.14,,nao_informado,1,6,PA,51.7,1
+590,Refeições prontas,1,9,14.58,25.7,ambiente,5,13,PA,79.7,1
+591,Laticínios,1,6,0.65,8.7,refrigerado,3,2,RS,,0
+592,Grãos e cereais,0,43,0.62,,nao_informado,3,14,PI,43.4,0
+593,Outros,0,45,0.55,5.8,refrigerado,3,3,PI,61.7,0
+594,Outros,0,14,0.54,7.4,refrigerado,1,13,BA,66.6,0
+595,Laticínios,1,6,2.66,30.6,ambiente,3,19,DF,43.1,1
+596,Grãos e cereais,0,11,8.7,25.3,ambiente,0,9,TO,57.7,0
+597,Laticínios,1,5,16.39,7.2,refrigerado,3,7,RS,1.1,0
+598,Carnes e peixes,1,6,2.24,28.4,ambiente,6,15,SP,52.9,0
+599,Outros,0,41,170.01,21.5,ambiente,2,12,RR,,0
+600,Laticínios,1,5,6.2,7.3,refrigerado,1,7,MS,13.9,1
+601,Padaria,1,3,3.57,25.2,ambiente,0,10,PI,34.1,1
+602,Outros,0,10,0.57,31.8,ambiente,2,8,MA,26.2,0
+603,Carnes e peixes,1,3,86.38,30.6,ambiente,6,5,SP,32.7,1
+604,Bebidas não alcoólicas,0,12,35.9,6.4,refrigerado,3,23,ES,81.1,0
+605,Outros,0,0,8.71,22.9,ambiente,1,11,PB,37.6,1
+606,Bebidas não alcoólicas,0,3,14.25,,nao_informado,6,17,MT,59.4,1
+607,Carnes e peixes,1,5,46.81,19.9,ambiente,0,6,MA,6.4,1
+608,Grãos e cereais,0,3,4.88,24.8,ambiente,6,9,TO,43.3,0
+609,Padaria,1,7,2.15,,nao_informado,4,23,CE,19.5,0
+610,Bebidas não alcoólicas,0,8,0.54,24.4,ambiente,4,17,AM,52.0,0
+611,Hortifrúti,1,3,1.66,30.2,ambiente,3,21,MS,25.8,1
+612,Bebidas não alcoólicas,0,43,0.8,,nao_informado,4,21,AP,,0
+613,Bebidas não alcoólicas,0,34,13.28,24.4,ambiente,2,4,PI,4.3,0
+614,Hortifrúti,1,3,1.93,17.9,ambiente,4,13,MS,9.8,1
+615,Outros,0,30,0.79,23.6,ambiente,6,23,PE,61.7,0
+616,Grãos e cereais,0,40,11.86,29.7,ambiente,0,11,RR,12.6,0
+617,Outros,0,11,0.5,26.4,ambiente,1,22,TO,67.9,0
+618,Hortifrúti,1,4,3.71,,nao_informado,5,21,AM,86.6,0
+619,Laticínios,1,11,47.22,23.7,ambiente,6,5,PE,86.0,1
+620,Outros,0,4,23.31,24.8,ambiente,0,2,TO,70.5,0
+621,Carnes e peixes,1,9,1.98,15.9,refrigerado,2,17,RS,86.8,1
+622,Outros,0,16,141.14,21.3,ambiente,1,11,AM,2.7,0
+623,Laticínios,1,4,1.22,-19.7,congelado,2,5,RR,,0
+624,Laticínios,1,7,52.43,29.2,ambiente,6,21,BA,33.8,1
+625,Bebidas não alcoólicas,0,21,3.69,24.5,ambiente,6,20,CE,,0
+626,Padaria,1,2,164.62,21.1,ambiente,4,11,ES,,0
+627,Laticínios,1,2,22.57,7.1,refrigerado,2,8,CE,,0
+628,Bebidas não alcoólicas,0,20,33.43,6.5,refrigerado,1,15,AP,15.4,0
+629,Padaria,1,5,105.73,17.5,ambiente,6,1,BA,63.9,0
+630,Laticínios,1,9,225.12,24.6,ambiente,6,13,ES,55.3,1
+631,Carnes e peixes,1,4,65.58,25.2,ambiente,0,13,PI,65.2,1
+632,Carnes e peixes,1,9,9.09,28.3,ambiente,0,16,PE,60.6,0
+633,Laticínios,1,9,0.58,,nao_informado,2,11,AP,10.6,0
+634,Outros,0,28,2.81,23.6,ambiente,3,0,SE,33.8,0
+635,Padaria,1,10,13.15,19.8,ambiente,1,0,TO,59.0,1
+636,Refeições prontas,1,4,11.63,2.6,refrigerado,5,9,PE,10.9,0
+637,Grãos e cereais,0,15,398.21,23.7,ambiente,0,10,AL,45.7,1
+638,Grãos e cereais,0,4,2.54,26.2,ambiente,1,0,MT,78.9,0
+639,Laticínios,1,9,26.48,1.1,refrigerado,2,13,RO,24.8,1
+640,Carnes e peixes,1,6,4.28,27.0,ambiente,3,1,PE,59.4,1
+641,Refeições prontas,1,0,18.2,13.5,refrigerado,0,8,AP,60.4,1
+642,Carnes e peixes,1,9,3.41,5.4,refrigerado,4,21,DF,43.4,0
+643,Laticínios,1,8,27.43,26.4,ambiente,1,18,RN,89.4,1
+644,Refeições prontas,1,2,2.64,29.3,ambiente,4,16,AL,86.7,1
+645,Bebidas não alcoólicas,0,23,95.08,24.8,ambiente,1,7,AM,41.7,0
+646,Outros,0,30,2.62,24.4,ambiente,1,18,RO,62.9,0
+647,Carnes e peixes,1,6,1.17,11.4,refrigerado,5,7,GO,55.4,0
+648,Padaria,1,7,133.8,9.4,refrigerado,6,8,RR,44.1,0
+649,Padaria,1,2,1.1,,nao_informado,1,1,SC,37.1,0
+650,Refeições prontas,1,11,61.18,23.0,ambiente,3,19,RN,,0
+651,Hortifrúti,1,1,6.55,-3.6,refrigerado,1,22,ES,,0
+652,Carnes e peixes,1,10,1.48,-22.2,congelado,4,18,PA,,0
+653,Hortifrúti,1,4,0.84,,nao_informado,4,5,AM,69.8,1
+654,Refeições prontas,1,11,79.42,26.6,ambiente,0,22,PE,15.9,1
+655,Bebidas não alcoólicas,0,15,2.62,30.4,ambiente,6,9,AM,66.3,0
+656,Bebidas não alcoólicas,0,18,3.44,0.6,refrigerado,5,11,MG,74.4,0
+657,Refeições prontas,1,11,73.01,,nao_informado,5,0,MS,4.8,1
+658,Padaria,1,8,11.05,-17.3,congelado,0,20,RR,7.4,1
+659,Bebidas não alcoólicas,0,5,4.03,25.8,ambiente,2,4,PE,,0
+660,Hortifrúti,1,2,23.32,18.8,ambiente,3,19,CE,16.5,1
+661,Outros,0,10,2.46,26.7,ambiente,4,9,DF,65.7,1
+662,Grãos e cereais,0,20,226.28,20.5,ambiente,6,22,RO,63.2,1
+663,Laticínios,1,7,89.72,9.0,refrigerado,6,2,CE,26.2,1
+664,Refeições prontas,1,2,30.8,29.9,ambiente,3,0,PA,53.9,0
+665,Refeições prontas,1,8,185.73,26.1,ambiente,2,18,PA,,0
+666,Laticínios,1,7,3.91,22.8,ambiente,0,7,PA,75.2,0
+667,Refeições prontas,1,11,0.72,,nao_informado,3,10,PA,38.1,0
+668,Outros,0,34,20.39,27.3,ambiente,2,8,MA,23.3,0
+669,Hortifrúti,1,2,1.86,-5.3,refrigerado,2,16,MG,36.0,0
+670,Laticínios,1,3,0.87,22.8,ambiente,4,15,AL,58.2,1
+671,Grãos e cereais,0,44,35.77,25.5,ambiente,2,20,AL,,0
+672,Bebidas não alcoólicas,0,45,282.47,27.3,ambiente,6,10,MT,22.9,0
+673,Hortifrúti,1,4,11.73,24.7,ambiente,1,11,SP,,1
+674,Grãos e cereais,0,39,210.16,26.6,ambiente,2,11,GO,28.5,0
+675,Laticínios,1,1,28.48,30.3,ambiente,2,13,PR,51.1,1
+676,Grãos e cereais,0,45,1.56,30.0,ambiente,0,8,SP,75.5,0
+677,Outros,0,25,1.31,25.0,ambiente,2,7,TO,63.6,0
+678,Outros,0,9,66.74,,nao_informado,6,3,SC,39.2,1
+679,Grãos e cereais,0,45,51.3,27.4,ambiente,6,8,RR,8.4,0
+680,Bebidas não alcoólicas,0,24,2.21,26.0,ambiente,1,1,SE,13.7,0
+681,Padaria,1,8,9.02,,nao_informado,6,22,RN,,0
+682,Grãos e cereais,0,17,9.03,22.8,ambiente,1,14,ES,24.0,0
+683,Grãos e cereais,0,8,1.13,26.0,ambiente,0,23,AM,17.8,0
+684,Refeições prontas,1,10,10.18,-4.5,refrigerado,6,11,AM,87.8,0
+685,Refeições prontas,1,12,2.81,22.0,ambiente,6,17,GO,23.5,1
+686,Carnes e peixes,1,3,9.39,23.1,ambiente,6,3,AC,26.2,1
+687,Outros,0,31,5.69,20.9,ambiente,4,3,AC,87.4,0
+688,Laticínios,1,6,64.36,,nao_informado,6,7,RJ,55.2,1
+689,Outros,0,28,22.67,16.9,ambiente,1,1,RN,9.4,0
+690,Outros,0,41,0.86,28.7,ambiente,1,12,PB,49.9,0
+691,Outros,0,4,13.44,24.2,ambiente,5,4,PB,65.1,1
+692,Laticínios,1,9,3.22,3.8,refrigerado,2,11,SC,66.5,0
+693,Refeições prontas,1,12,3.88,27.3,ambiente,5,22,SP,41.3,1
+694,Grãos e cereais,0,34,5.8,29.8,ambiente,0,5,SE,78.4,0
+695,Outros,0,5,6.56,24.4,ambiente,2,20,AM,37.4,0
+696,Grãos e cereais,0,44,9.47,2.8,refrigerado,5,8,GO,7.3,0
+697,Laticínios,1,0,81.75,19.7,ambiente,2,12,AP,,1
+698,Outros,0,23,127.84,24.6,ambiente,1,8,MT,85.3,1
+699,Laticínios,1,6,1.04,21.8,ambiente,4,12,TO,84.7,1
+700,Bebidas não alcoólicas,0,5,195.35,0.3,refrigerado,1,9,BA,59.3,0
+701,Bebidas não alcoólicas,0,17,23.19,30.0,ambiente,0,18,GO,7.7,0
+702,Laticínios,1,4,21.94,29.3,ambiente,0,7,MG,12.0,1
+703,Padaria,1,5,93.09,22.5,ambiente,1,21,MS,51.2,1
+704,Outros,0,10,217.85,30.4,ambiente,5,15,RR,,0
+705,Refeições prontas,1,9,5.18,26.3,ambiente,3,18,BA,,0
+706,Padaria,1,0,0.62,-21.0,congelado,5,15,GO,74.3,0
+707,Grãos e cereais,0,5,14.7,27.6,ambiente,4,10,RJ,17.4,0
+708,Refeições prontas,1,5,25.34,25.7,ambiente,2,4,MA,67.2,1
+709,Laticínios,1,2,49.87,4.6,refrigerado,4,13,PB,,0
+710,Padaria,1,5,1.51,29.1,ambiente,2,15,AL,58.6,1
+711,Carnes e peixes,1,3,1.5,,nao_informado,6,22,ES,55.1,0
+712,Laticínios,1,4,0.76,27.5,ambiente,2,4,PB,41.7,1
+713,Outros,0,0,4.48,,nao_informado,4,0,AM,2.8,0
+714,Refeições prontas,1,11,23.69,24.5,ambiente,4,10,CE,56.5,1
+715,Refeições prontas,1,0,243.99,26.9,ambiente,3,22,RN,78.7,1
+716,Bebidas não alcoólicas,0,17,5.86,27.6,ambiente,6,18,RN,,0
+717,Refeições prontas,1,3,141.73,0.7,refrigerado,6,15,AP,8.0,1
+718,Outros,0,12,0.86,,nao_informado,0,0,ES,50.2,0
+719,Bebidas não alcoólicas,0,14,125.14,25.0,ambiente,6,7,BA,36.8,0
+720,Padaria,1,2,10.03,20.7,ambiente,0,7,CE,75.2,1
+721,Laticínios,1,11,3.5,10.0,refrigerado,0,0,AC,,0
+722,Bebidas não alcoólicas,0,16,85.82,5.5,refrigerado,0,23,TO,,1
+723,Hortifrúti,1,4,229.85,16.0,ambiente,2,10,MG,56.8,0
+724,Grãos e cereais,0,36,49.06,17.8,ambiente,4,16,RS,11.8,0
+725,Laticínios,1,4,1.89,16.2,ambiente,1,23,PR,35.6,0
+726,Padaria,1,8,0.79,,nao_informado,2,12,MA,25.2,0
+727,Bebidas não alcoólicas,0,23,7.39,21.7,ambiente,3,8,RN,11.9,0
+728,Hortifrúti,1,9,314.27,3.8,refrigerado,4,1,SP,5.8,0
+729,Bebidas não alcoólicas,0,34,0.96,17.1,ambiente,4,16,SP,88.9,0
+730,Outros,0,5,37.94,33.5,ambiente,5,20,RR,47.4,0
+731,Outros,0,33,9.17,26.6,ambiente,4,5,MG,29.3,0
+732,Bebidas não alcoólicas,0,18,1.7,24.1,ambiente,5,10,RJ,55.7,0
+733,Refeições prontas,1,8,15.11,19.8,ambiente,3,22,PI,76.2,1
+734,Bebidas não alcoólicas,0,7,3.23,20.9,ambiente,2,22,SC,26.0,0
+735,Hortifrúti,1,11,79.83,-16.6,congelado,1,11,PR,6.3,0
+736,Outros,0,17,2.01,20.0,ambiente,5,13,SP,21.8,0
+737,Padaria,1,3,1.22,30.2,ambiente,5,21,RJ,8.6,1
+738,Carnes e peixes,1,2,0.67,3.7,refrigerado,3,0,BA,59.3,1
+739,Carnes e peixes,1,2,70.39,4.9,refrigerado,6,23,PA,53.2,1
+740,Grãos e cereais,0,21,2.13,27.0,ambiente,3,23,SE,36.4,0
+741,Bebidas não alcoólicas,0,25,18.6,23.5,ambiente,4,2,AC,81.2,0
+742,Hortifrúti,1,3,2.75,20.2,ambiente,1,11,SC,63.2,1
+743,Outros,0,40,10.64,8.4,refrigerado,5,10,AM,,0
+744,Grãos e cereais,0,27,27.03,20.0,ambiente,1,1,SC,,0
+745,Outros,0,2,4.59,-2.6,refrigerado,4,18,CE,59.4,0
+746,Refeições prontas,1,12,62.31,,nao_informado,1,23,TO,63.9,1
+747,Hortifrúti,1,5,84.06,4.8,refrigerado,4,17,AC,83.8,0
+748,Refeições prontas,1,11,0.82,2.5,refrigerado,5,21,MS,,0
+749,Outros,0,18,16.28,,nao_informado,4,23,TO,77.8,0
+750,Padaria,1,8,60.33,24.1,ambiente,2,16,ES,72.7,1
+751,Carnes e peixes,1,8,49.81,8.7,refrigerado,3,18,CE,,1
+752,Bebidas não alcoólicas,0,43,17.59,27.5,ambiente,2,16,MT,69.5,0
+753,Refeições prontas,1,4,80.49,,nao_informado,5,0,PB,,0
+754,Laticínios,1,4,11.32,0.6,refrigerado,3,19,SP,0.3,0
+755,Grãos e cereais,0,9,4.28,25.7,ambiente,2,8,DF,79.0,0
+756,Bebidas não alcoólicas,0,4,87.54,20.6,ambiente,0,18,SC,78.1,0
+757,Carnes e peixes,1,9,14.8,20.9,ambiente,6,9,AC,23.8,0
+758,Hortifrúti,1,5,3.41,17.8,ambiente,4,11,AM,59.1,0
+759,Refeições prontas,1,7,2.97,7.3,refrigerado,3,0,TO,89.0,0
+760,Padaria,1,4,146.2,,nao_informado,4,6,CE,64.9,1
+761,Bebidas não alcoólicas,0,16,192.74,15.0,ambiente,0,14,SP,81.7,0
+762,Grãos e cereais,0,24,0.6,21.5,ambiente,2,16,RR,,0
+763,Padaria,1,12,0.93,4.9,refrigerado,4,5,RN,10.4,0
+764,Outros,0,9,3.96,9.1,refrigerado,0,4,RO,22.8,1
+765,Hortifrúti,1,3,90.62,-23.0,congelado,6,21,RJ,56.2,0
+766,Carnes e peixes,1,0,32.11,,nao_informado,6,20,SE,10.6,1
+767,Carnes e peixes,1,6,21.17,26.7,ambiente,2,20,PE,70.8,1
+768,Laticínios,1,0,1.38,,nao_informado,2,0,SE,87.3,0
+769,Refeições prontas,1,2,125.87,21.5,ambiente,1,6,AC,11.5,1
+770,Bebidas não alcoólicas,0,6,386.26,28.1,ambiente,0,18,MS,68.6,1
+771,Padaria,1,11,20.99,25.7,ambiente,1,4,RR,88.9,1
+772,Grãos e cereais,0,40,11.03,2.3,refrigerado,3,23,PI,22.4,1
+773,Laticínios,1,3,55.94,5.3,refrigerado,0,1,ES,20.6,1
+774,Carnes e peixes,1,12,4.68,23.8,ambiente,6,9,RN,44.8,0
+775,Laticínios,1,3,0.69,23.4,ambiente,3,7,TO,55.8,1
+776,Outros,0,32,1.37,1.2,refrigerado,4,15,MG,64.1,0
+777,Laticínios,1,2,0.95,20.2,ambiente,1,11,RR,52.1,0
+778,Grãos e cereais,0,11,0.71,19.6,ambiente,5,5,GO,62.2,0
+779,Carnes e peixes,1,10,4.51,27.4,ambiente,2,22,SC,57.3,1
+780,Bebidas não alcoólicas,0,37,2.13,24.8,ambiente,5,11,SE,73.1,0
+781,Grãos e cereais,0,40,1.02,,nao_informado,2,7,AP,87.1,0
+782,Grãos e cereais,0,11,1.63,24.2,ambiente,1,10,SE,,0
+783,Bebidas não alcoólicas,0,27,0.91,23.8,ambiente,2,14,PI,12.1,0
+784,Carnes e peixes,1,4,26.8,,nao_informado,4,10,RN,77.7,1
+785,Bebidas não alcoólicas,0,35,105.6,,nao_informado,6,10,SC,39.1,0
+786,Carnes e peixes,1,1,43.42,30.8,ambiente,4,4,AC,1.4,1
+787,Hortifrúti,1,10,5.68,9.3,refrigerado,1,11,BA,45.3,0
+788,Padaria,1,6,49.96,-15.3,congelado,4,5,AL,,1
+789,Outros,0,8,167.22,6.8,refrigerado,6,13,AP,66.4,0
+790,Hortifrúti,1,10,6.02,8.2,refrigerado,2,3,RJ,68.6,0
+791,Carnes e peixes,1,3,61.74,20.8,ambiente,1,11,GO,12.3,0
+792,Hortifrúti,1,1,3.64,-18.3,congelado,0,6,RR,35.0,0
+793,Carnes e peixes,1,8,34.99,-12.7,congelado,6,14,AM,1.4,0
+794,Grãos e cereais,0,14,6.81,22.8,ambiente,5,17,PA,86.2,0
+795,Padaria,1,1,12.81,-18.4,congelado,5,23,RN,64.4,1
+796,Refeições prontas,1,3,14.52,-21.6,congelado,0,1,ES,26.8,1
+797,Outros,0,30,8.67,28.9,ambiente,1,19,AC,17.2,0
+798,Carnes e peixes,1,7,61.77,26.1,ambiente,1,20,MG,63.2,0
+799,Bebidas não alcoólicas,0,9,7.63,19.9,ambiente,4,3,PE,9.3,0
+800,Hortifrúti,1,2,3.01,2.2,refrigerado,6,11,GO,,0
+801,Hortifrúti,1,4,0.7,4.6,refrigerado,4,10,BA,81.4,0
+802,Grãos e cereais,0,34,1.35,9.2,refrigerado,0,3,SE,38.0,0
+803,Grãos e cereais,0,0,1.08,21.3,ambiente,1,9,GO,34.0,0
+804,Padaria,1,10,14.29,1.5,refrigerado,1,11,PB,42.5,1
+805,Refeições prontas,1,9,46.19,30.5,ambiente,6,4,BA,81.3,0
+806,Refeições prontas,1,11,115.21,10.2,refrigerado,5,4,MG,,0
+807,Outros,0,12,121.79,31.8,ambiente,3,21,BA,70.6,0
+808,Bebidas não alcoólicas,0,0,13.34,21.5,ambiente,0,22,SE,53.5,0
+809,Carnes e peixes,1,3,0.73,,nao_informado,5,10,PR,64.9,0
+810,Outros,0,8,0.69,,nao_informado,2,4,MT,81.3,0
+811,Hortifrúti,1,6,45.16,25.4,ambiente,4,20,AP,82.6,1
+812,Laticínios,1,1,1.54,3.4,refrigerado,2,13,PR,84.0,1
+813,Grãos e cereais,0,9,308.44,26.2,ambiente,6,23,GO,,0
+814,Refeições prontas,1,4,2.16,29.2,ambiente,3,15,RS,58.9,1
+815,Carnes e peixes,1,3,279.22,27.7,ambiente,6,19,PE,45.3,1
+816,Laticínios,1,5,3.74,21.3,ambiente,6,23,AC,31.2,1
+817,Outros,0,8,0.56,,nao_informado,0,6,GO,,0
+818,Outros,0,40,52.63,29.2,ambiente,5,6,PE,31.1,0
+819,Grãos e cereais,0,9,80.63,17.8,ambiente,2,22,MG,30.5,0
+820,Grãos e cereais,0,29,75.39,21.4,ambiente,0,17,PB,,0
+821,Laticínios,1,12,0.81,4.2,refrigerado,2,22,MS,88.8,1
+822,Outros,0,31,12.98,,nao_informado,4,16,MS,13.3,0
+823,Laticínios,1,5,1.88,-13.9,congelado,2,14,RJ,51.7,1
+824,Carnes e peixes,1,10,0.52,-0.7,refrigerado,1,3,RR,30.8,0
+825,Grãos e cereais,0,14,0.69,28.3,ambiente,3,18,PR,63.4,0
+826,Padaria,1,10,0.57,7.3,refrigerado,1,23,MS,4.1,1
+827,Carnes e peixes,1,12,6.96,,nao_informado,0,8,MS,,0
+828,Laticínios,1,4,70.02,21.6,ambiente,3,19,PI,43.4,0
+829,Grãos e cereais,0,4,11.82,26.1,ambiente,4,23,MG,46.1,0
+830,Refeições prontas,1,8,146.26,5.7,refrigerado,1,3,RO,41.3,0
+831,Padaria,1,7,3.12,1.8,refrigerado,1,6,PB,45.5,0
+832,Refeições prontas,1,8,0.79,24.8,ambiente,6,20,PR,51.5,1
+833,Laticínios,1,5,258.18,6.8,refrigerado,5,18,SP,6.2,0
+834,Carnes e peixes,1,10,45.1,2.2,refrigerado,6,22,RN,44.6,0
+835,Carnes e peixes,1,5,35.85,,nao_informado,3,13,AL,60.7,0
+836,Hortifrúti,1,12,39.22,19.7,ambiente,6,23,AM,35.0,1
+837,Hortifrúti,1,10,70.41,27.0,ambiente,6,21,MT,7.2,1
+838,Hortifrúti,1,11,1.57,3.8,refrigerado,5,22,MA,,0
+839,Outros,0,21,32.92,26.4,ambiente,6,18,PR,81.1,0
+840,Hortifrúti,1,10,39.42,-14.9,congelado,5,21,PR,42.8,1
+841,Padaria,1,12,187.33,6.7,refrigerado,1,12,CE,43.5,0
+842,Refeições prontas,1,0,82.48,27.0,ambiente,4,13,TO,50.7,1
+843,Outros,0,30,359.14,31.4,ambiente,5,10,SP,62.2,0
+844,Carnes e peixes,1,12,22.31,13.1,refrigerado,1,9,MS,,0
+845,Padaria,1,9,0.51,6.4,refrigerado,0,7,RR,,1
+846,Bebidas não alcoólicas,0,32,17.29,-16.8,congelado,5,8,AC,,0
+847,Bebidas não alcoólicas,0,8,0.84,18.1,ambiente,1,1,SE,66.9,0
+848,Bebidas não alcoólicas,0,12,389.79,28.7,ambiente,4,15,CE,81.7,0
+849,Bebidas não alcoólicas,0,19,0.77,24.2,ambiente,2,14,RR,27.5,1
+850,Padaria,1,4,36.18,29.9,ambiente,2,11,TO,,0
+851,Laticínios,1,12,0.72,-2.7,refrigerado,6,0,MT,,1
+852,Carnes e peixes,1,6,0.82,16.3,ambiente,5,10,ES,1.9,1
+853,Laticínios,1,2,29.89,,nao_informado,5,18,SE,,0
+854,Laticínios,1,4,7.44,26.4,ambiente,2,8,AM,,0
+855,Bebidas não alcoólicas,0,17,385.24,24.0,ambiente,4,8,ES,71.0,0
+856,Refeições prontas,1,4,3.43,-15.4,congelado,3,20,RO,32.0,0
+857,Bebidas não alcoólicas,0,39,30.62,19.8,ambiente,1,18,RN,27.5,0
+858,Grãos e cereais,0,6,11.51,24.0,ambiente,3,9,SE,37.6,0
+859,Hortifrúti,1,4,57.24,18.8,ambiente,3,19,AM,27.3,0
+860,Outros,0,0,37.64,27.5,ambiente,4,18,MG,,0
+861,Refeições prontas,1,2,5.52,23.1,ambiente,1,5,MA,49.8,0
+862,Outros,0,3,140.15,25.2,ambiente,4,7,DF,57.6,0
+863,Refeições prontas,1,1,10.75,26.5,ambiente,0,2,PB,,0
+864,Laticínios,1,11,3.72,7.0,refrigerado,2,15,PB,55.1,1
+865,Grãos e cereais,0,31,101.54,24.0,ambiente,0,21,TO,,0
+866,Outros,0,10,75.86,,nao_informado,6,14,BA,0.7,1
+867,Refeições prontas,1,5,172.21,22.5,ambiente,1,16,TO,45.5,1
+868,Bebidas não alcoólicas,0,7,2.37,,nao_informado,2,10,PA,,0
+869,Laticínios,1,11,1.51,8.4,refrigerado,4,21,PB,56.8,0
+870,Hortifrúti,1,6,23.2,,nao_informado,5,16,AP,61.9,0
+871,Outros,0,5,0.9,17.1,ambiente,2,0,RS,32.6,0
+872,Padaria,1,6,358.89,5.2,refrigerado,6,23,BA,53.1,0
+873,Refeições prontas,1,2,0.63,12.2,refrigerado,2,3,PA,39.8,1
+874,Carnes e peixes,1,11,13.48,26.6,ambiente,6,10,RO,56.6,1
+875,Padaria,1,1,5.13,-17.4,congelado,0,14,PB,38.6,1
+876,Outros,0,29,35.27,28.7,ambiente,6,0,BA,,0
+877,Hortifrúti,1,10,1.27,3.8,refrigerado,4,16,SE,34.2,0
+878,Carnes e peixes,1,7,260.68,,nao_informado,2,18,PE,79.5,1
+879,Refeições prontas,1,10,27.25,33.4,ambiente,6,12,PR,44.7,1
+880,Padaria,1,8,3.54,32.0,ambiente,5,18,PA,,0
+881,Outros,0,27,232.78,20.4,ambiente,4,12,RR,35.6,0
+882,Padaria,1,0,5.53,-12.2,congelado,1,5,GO,16.7,1
+883,Refeições prontas,1,11,178.94,8.9,refrigerado,4,18,RJ,83.6,0
+884,Outros,0,30,1.1,33.1,ambiente,5,10,SE,89.1,0
+885,Hortifrúti,1,9,0.72,34.6,ambiente,6,12,PR,,1
+886,Hortifrúti,1,10,148.77,17.7,ambiente,6,9,TO,20.8,0
+887,Laticínios,1,11,205.68,3.1,refrigerado,5,19,TO,47.8,1
+888,Outros,0,22,4.98,25.9,ambiente,0,9,RS,76.2,0
+889,Grãos e cereais,0,17,168.05,-26.7,congelado,2,1,PI,8.8,0
+890,Carnes e peixes,1,0,83.95,5.1,refrigerado,6,16,RO,83.7,0
+891,Carnes e peixes,1,3,6.9,10.9,refrigerado,4,19,PA,46.4,0
+892,Grãos e cereais,0,8,75.61,23.6,ambiente,6,8,RR,,0
+893,Hortifrúti,1,6,1.68,10.3,refrigerado,4,14,SP,73.8,1
+894,Carnes e peixes,1,12,5.36,8.0,refrigerado,5,20,ES,9.1,1
+895,Bebidas não alcoólicas,0,41,2.22,23.7,ambiente,5,22,DF,12.7,0
+896,Refeições prontas,1,3,105.25,20.4,ambiente,4,20,PI,89.7,1
+897,Outros,0,23,33.23,24.1,ambiente,6,3,PI,6.3,0
+898,Outros,0,39,93.16,26.3,ambiente,4,14,SC,59.5,0
+899,Laticínios,1,8,20.38,25.9,ambiente,3,20,PB,,0
+900,Outros,0,34,3.21,1.1,refrigerado,0,7,PB,82.1,0
+901,Refeições prontas,1,2,1.16,2.7,refrigerado,2,4,MA,39.4,0
+902,Laticínios,1,6,57.14,29.3,ambiente,1,0,MS,70.3,1
+903,Padaria,1,11,59.28,9.8,refrigerado,2,2,TO,17.8,1
+904,Hortifrúti,1,7,10.59,-19.7,congelado,1,19,ES,70.2,0
+905,Grãos e cereais,0,8,20.33,33.1,ambiente,4,16,RJ,68.8,0
+906,Carnes e peixes,1,4,6.39,11.8,refrigerado,1,11,SC,4.7,0
+907,Laticínios,1,12,6.4,23.0,ambiente,2,9,MA,,0
+908,Bebidas não alcoólicas,0,13,1.08,21.0,ambiente,4,9,ES,,0
+909,Carnes e peixes,1,10,1.53,24.8,ambiente,5,9,PI,74.5,0
+910,Laticínios,1,1,2.01,25.9,ambiente,6,8,RR,68.5,1
+911,Carnes e peixes,1,4,20.33,21.0,ambiente,4,9,AP,46.1,1
+912,Carnes e peixes,1,1,142.77,21.9,ambiente,6,20,DF,47.8,1
+913,Carnes e peixes,1,12,248.67,3.7,refrigerado,4,7,ES,21.7,0
+914,Grãos e cereais,0,41,4.25,,nao_informado,2,6,RJ,13.9,0
+915,Hortifrúti,1,10,10.81,22.1,ambiente,0,22,RJ,74.8,0
+916,Carnes e peixes,1,1,22.76,5.8,refrigerado,2,22,MT,60.8,0
+917,Refeições prontas,1,0,116.61,3.5,refrigerado,6,22,DF,63.7,1
+918,Hortifrúti,1,0,29.31,27.9,ambiente,4,9,AL,3.1,1
+919,Padaria,1,0,0.5,21.4,ambiente,6,11,SC,,1
+920,Grãos e cereais,0,35,173.25,23.7,ambiente,4,14,RR,53.4,0
+921,Carnes e peixes,1,6,2.75,,nao_informado,0,20,GO,86.0,1
+922,Hortifrúti,1,0,317.11,2.6,refrigerado,2,3,ES,45.2,1
+923,Padaria,1,6,58.7,,nao_informado,2,20,DF,,0
+924,Laticínios,1,12,222.51,-0.9,refrigerado,4,8,AP,,0
+925,Padaria,1,9,157.4,,nao_informado,6,1,RJ,41.9,1
+926,Outros,0,21,13.86,20.2,ambiente,6,15,MT,2.9,0
+927,Padaria,1,10,126.75,33.5,ambiente,3,16,MG,87.8,0
+928,Bebidas não alcoólicas,0,43,147.61,5.7,refrigerado,0,5,SP,5.8,0
+929,Hortifrúti,1,8,0.63,25.0,ambiente,3,23,PB,25.3,0
+930,Grãos e cereais,0,28,12.73,24.3,ambiente,3,12,RR,,0
+931,Hortifrúti,1,0,248.12,25.3,ambiente,1,18,DF,82.9,1
+932,Bebidas não alcoólicas,0,38,299.72,20.1,ambiente,1,4,RO,18.9,0
+933,Carnes e peixes,1,9,29.58,2.0,refrigerado,1,17,ES,11.6,0
+934,Carnes e peixes,1,10,11.64,5.2,refrigerado,5,7,PB,39.3,0
+935,Outros,0,0,15.25,27.5,ambiente,1,23,TO,,0
+936,Laticínios,1,3,2.96,10.7,refrigerado,6,0,RO,77.2,1
+937,Bebidas não alcoólicas,0,3,4.78,24.2,ambiente,6,1,SP,76.1,1
+938,Outros,0,13,0.88,22.4,ambiente,4,2,BA,39.2,0
+939,Laticínios,1,10,4.66,20.8,ambiente,6,5,RN,21.9,1
+940,Outros,0,13,3.78,-15.2,congelado,4,20,MA,,0
+941,Padaria,1,5,219.52,2.0,refrigerado,5,10,PI,80.2,1
+942,Grãos e cereais,0,11,0.61,,nao_informado,4,6,RJ,89.6,0
+943,Carnes e peixes,1,3,53.44,17.4,ambiente,5,12,AP,14.2,0
+944,Hortifrúti,1,4,3.98,4.3,refrigerado,3,3,BA,76.0,1
+945,Grãos e cereais,0,12,10.82,22.5,ambiente,5,4,TO,12.7,0
+946,Carnes e peixes,1,9,10.28,-20.7,congelado,3,2,RS,59.4,1
+947,Bebidas não alcoólicas,0,6,2.28,16.9,refrigerado,4,16,PR,80.8,0
+948,Laticínios,1,5,4.71,-1.3,refrigerado,6,9,PB,15.4,0
+949,Grãos e cereais,0,42,259.36,21.5,ambiente,2,3,RO,62.7,0
+950,Carnes e peixes,1,8,26.14,7.6,refrigerado,6,5,AP,57.4,0
+951,Outros,0,36,145.55,19.2,ambiente,6,19,MA,,0
+952,Padaria,1,7,280.21,6.0,refrigerado,5,2,RS,24.4,0
+953,Hortifrúti,1,1,2.41,2.7,refrigerado,2,14,TO,16.8,0
+954,Carnes e peixes,1,6,0.68,23.6,ambiente,4,2,ES,45.8,1
+955,Bebidas não alcoólicas,0,12,3.3,2.2,refrigerado,6,23,MS,,0
+956,Carnes e peixes,1,11,6.76,26.7,ambiente,0,4,DF,63.8,0
+957,Laticínios,1,10,1.4,32.2,ambiente,5,19,TO,20.0,1
+958,Carnes e peixes,1,8,1.33,1.0,refrigerado,4,21,PE,,0
+959,Refeições prontas,1,2,62.52,-1.1,refrigerado,6,22,RJ,,1
+960,Grãos e cereais,0,41,0.62,22.9,ambiente,2,7,SP,,0
+961,Outros,0,37,276.84,29.9,ambiente,5,9,AM,82.8,1
+962,Outros,0,22,24.21,28.9,ambiente,3,10,MS,67.6,0
+963,Refeições prontas,1,2,55.06,,nao_informado,3,18,RO,22.0,1
+964,Grãos e cereais,0,11,259.77,25.5,ambiente,6,16,PI,,0
+965,Bebidas não alcoólicas,0,17,85.77,22.2,ambiente,5,4,PI,88.2,0
+966,Carnes e peixes,1,9,4.97,-26.7,congelado,6,23,PB,23.8,1
+967,Carnes e peixes,1,7,178.89,,nao_informado,4,5,SE,6.2,0
+968,Laticínios,1,8,313.86,3.3,refrigerado,1,13,PB,67.9,0
+969,Grãos e cereais,0,35,21.95,25.8,ambiente,6,14,AP,,0
+970,Bebidas não alcoólicas,0,8,0.69,15.3,ambiente,5,21,GO,84.8,0
+971,Padaria,1,8,35.12,27.1,ambiente,0,22,DF,,0
+972,Refeições prontas,1,10,1.08,-1.0,refrigerado,1,22,PB,1.5,1
+973,Bebidas não alcoólicas,0,44,13.93,22.8,ambiente,1,19,AP,63.1,0
+974,Carnes e peixes,1,9,4.53,24.3,ambiente,0,22,MS,27.1,1
+975,Outros,0,12,1.94,26.8,ambiente,1,11,TO,76.7,0
+976,Carnes e peixes,1,2,120.99,,nao_informado,1,13,DF,68.3,0
+977,Laticínios,1,3,2.72,25.0,ambiente,6,8,MT,51.0,1
+978,Refeições prontas,1,0,55.92,32.0,ambiente,6,12,DF,30.7,1
+979,Hortifrúti,1,5,52.34,25.5,ambiente,6,15,RN,39.4,1
+980,Grãos e cereais,0,21,21.02,26.1,ambiente,5,2,RO,5.4,0
+981,Hortifrúti,1,9,139.18,30.4,ambiente,6,20,BA,44.3,0
+982,Hortifrúti,1,0,2.34,7.6,refrigerado,4,20,RJ,48.3,1
+983,Laticínios,1,10,11.14,2.8,refrigerado,0,14,AP,6.6,0
+984,Outros,0,13,264.29,20.4,ambiente,5,16,MG,4.8,1
+985,Hortifrúti,1,5,301.76,23.4,ambiente,1,23,MT,28.2,1
+986,Refeições prontas,1,6,1.94,,nao_informado,0,19,MT,27.7,0
+987,Laticínios,1,6,18.69,21.3,ambiente,4,18,TO,,0
+988,Bebidas não alcoólicas,0,28,102.75,29.9,ambiente,0,7,PI,78.4,0
+989,Padaria,1,0,16.71,10.2,refrigerado,0,13,MT,15.7,1
+990,Bebidas não alcoólicas,0,37,42.83,19.9,ambiente,6,8,SC,12.2,0
+991,Carnes e peixes,1,3,1.48,26.3,ambiente,4,2,RS,36.6,0
+992,Padaria,1,10,77.72,6.0,refrigerado,5,3,AC,1.9,0
+993,Outros,0,11,6.25,-15.5,congelado,1,3,SE,82.7,0
+994,Bebidas não alcoólicas,0,1,12.21,,nao_informado,5,13,PA,61.0,0
+995,Refeições prontas,1,10,7.19,4.6,refrigerado,4,2,RN,47.0,1
+996,Outros,0,2,228.31,24.4,ambiente,1,0,MA,37.3,1
+997,Laticínios,1,12,34.85,-9.7,congelado,3,15,PA,76.1,0
+998,Outros,0,14,67.42,26.2,ambiente,1,2,BA,,1
+999,Laticínios,1,8,1.74,24.6,ambiente,6,19,MS,16.7,0
+1000,Refeições prontas,1,11,4.54,23.0,ambiente,3,16,MA,58.9,1
+1001,Hortifrúti,1,3,3.28,23.0,ambiente,2,2,SE,60.8,1
+1002,Carnes e peixes,1,0,105.63,7.5,refrigerado,4,0,BA,8.1,1
+1003,Carnes e peixes,1,0,0.79,7.6,refrigerado,3,19,PA,,1
+1004,Carnes e peixes,1,4,166.17,4.3,refrigerado,5,13,AC,87.3,1
+1005,Hortifrúti,1,3,33.01,12.5,refrigerado,2,13,TO,57.7,1
+1006,Grãos e cereais,0,1,52.47,28.6,ambiente,1,11,TO,77.5,0
+1007,Outros,0,12,382.5,19.5,ambiente,6,4,SE,18.1,1
+1008,Outros,0,17,20.9,22.7,ambiente,6,18,PI,60.1,0
+1009,Bebidas não alcoólicas,0,17,3.74,,nao_informado,1,9,SP,7.3,1
+1010,Hortifrúti,1,6,47.72,26.3,ambiente,0,10,SE,64.2,1
+1011,Laticínios,1,8,44.61,21.5,ambiente,4,0,MG,14.6,0
+1012,Hortifrúti,1,8,24.63,29.6,ambiente,3,7,AM,1.8,1
+1013,Outros,0,16,33.07,-18.5,congelado,4,11,RO,89.0,0
+1014,Grãos e cereais,0,35,35.11,30.4,ambiente,6,23,DF,,0
+1015,Outros,0,19,1.12,27.1,ambiente,5,10,PR,,0
+1016,Hortifrúti,1,1,3.26,22.1,ambiente,0,20,CE,38.7,0
+1017,Laticínios,1,2,7.24,-1.2,refrigerado,2,7,CE,44.0,0
+1018,Carnes e peixes,1,12,195.69,-17.1,congelado,3,20,AL,69.7,0
+1019,Hortifrúti,1,6,140.35,6.1,refrigerado,4,22,SC,83.4,0
+1020,Padaria,1,2,8.77,,nao_informado,0,5,AL,42.8,1
+1021,Grãos e cereais,0,27,13.72,-17.7,congelado,5,22,MT,47.5,0
+1022,Carnes e peixes,1,2,7.97,9.4,refrigerado,1,4,AL,29.7,1
+1023,Hortifrúti,1,7,4.47,3.4,refrigerado,6,9,GO,51.9,0
+1024,Carnes e peixes,1,4,2.38,-14.0,congelado,3,3,CE,64.2,1
+1025,Hortifrúti,1,11,1.48,20.2,ambiente,5,23,DF,51.8,1
+1026,Grãos e cereais,0,31,2.08,9.6,refrigerado,5,2,MT,7.7,0
+1027,Grãos e cereais,0,35,26.63,30.6,ambiente,5,13,AM,59.5,1
+1028,Laticínios,1,7,0.9,5.2,refrigerado,5,8,SC,78.5,1
+1029,Padaria,1,3,233.44,15.4,ambiente,5,9,SE,12.4,0
+1030,Hortifrúti,1,2,9.6,2.1,refrigerado,1,10,ES,76.8,0
+1031,Bebidas não alcoólicas,0,16,28.49,21.1,ambiente,6,0,AC,21.5,0
+1032,Outros,0,38,38.55,22.7,ambiente,0,22,RO,,0
+1033,Hortifrúti,1,5,14.2,30.9,ambiente,6,16,GO,51.8,1
+1034,Refeições prontas,1,11,75.99,-21.9,congelado,0,16,PI,79.6,1
+1035,Laticínios,1,9,1.53,-22.7,congelado,0,19,DF,,1
+1036,Grãos e cereais,0,16,198.38,26.3,ambiente,0,4,PA,,0
+1037,Refeições prontas,1,0,74.85,24.0,ambiente,3,17,RS,54.0,1
+1038,Grãos e cereais,0,10,15.16,24.1,ambiente,4,20,PE,27.0,1
+1039,Outros,0,12,11.0,18.4,ambiente,4,9,PR,76.0,0
+1040,Bebidas não alcoólicas,0,19,74.82,26.2,ambiente,4,3,MG,27.7,1
+1041,Bebidas não alcoólicas,0,10,25.55,-22.2,congelado,2,0,RJ,,0
+1042,Padaria,1,6,2.81,,nao_informado,3,6,CE,,0
+1043,Laticínios,1,1,1.52,26.0,ambiente,0,17,BA,28.4,1
+1044,Outros,0,42,132.61,18.7,ambiente,5,10,MG,,0
+1045,Bebidas não alcoólicas,0,15,289.99,27.6,ambiente,2,18,PB,22.0,0
+1046,Outros,0,21,180.08,20.4,ambiente,2,9,PI,46.5,0
+1047,Carnes e peixes,1,8,90.08,25.8,ambiente,2,12,MA,9.1,1
+1048,Padaria,1,9,0.72,29.2,ambiente,5,22,AP,30.3,1
+1049,Grãos e cereais,0,2,15.91,,nao_informado,4,18,RR,54.5,0
+1050,Carnes e peixes,1,3,43.58,4.8,refrigerado,1,8,SC,,0
+1051,Grãos e cereais,0,34,134.29,,nao_informado,2,22,DF,,0
+1052,Outros,0,14,4.36,25.2,ambiente,5,17,RN,,0
+1053,Grãos e cereais,0,23,2.53,,nao_informado,4,13,AL,88.9,1
+1054,Hortifrúti,1,9,166.51,,nao_informado,5,9,MG,62.7,1
+1055,Padaria,1,6,29.18,-2.2,refrigerado,3,10,MS,83.1,1
+1056,Carnes e peixes,1,6,3.06,3.9,refrigerado,0,8,PB,79.1,1
+1057,Padaria,1,9,29.43,,nao_informado,3,1,MG,35.3,0
+1058,Laticínios,1,10,303.91,28.4,ambiente,2,7,BA,81.6,1
+1059,Hortifrúti,1,4,108.1,24.0,ambiente,1,9,TO,28.5,1
+1060,Grãos e cereais,0,21,8.83,28.1,ambiente,1,6,GO,82.7,0
+1061,Grãos e cereais,0,7,1.31,,nao_informado,1,7,PB,51.8,0
+1062,Refeições prontas,1,12,0.53,29.4,ambiente,2,15,SC,,1
+1063,Grãos e cereais,0,14,0.9,10.6,refrigerado,4,10,RO,53.5,0
+1064,Padaria,1,11,1.98,25.5,ambiente,1,6,RO,41.3,0
+1065,Refeições prontas,1,1,0.93,23.4,ambiente,6,0,ES,64.9,1
+1066,Grãos e cereais,0,5,90.36,19.7,ambiente,6,3,PE,27.8,0
+1067,Outros,0,37,6.97,23.1,ambiente,6,10,AL,50.4,0
+1068,Carnes e peixes,1,9,201.3,0.9,refrigerado,2,9,SP,53.8,1
+1069,Bebidas não alcoólicas,0,35,267.31,22.2,ambiente,5,20,AP,31.9,1
+1070,Grãos e cereais,0,39,1.17,-19.8,congelado,5,0,MS,48.9,0
+1071,Grãos e cereais,0,24,3.93,23.9,ambiente,6,9,CE,51.9,1
+1072,Outros,0,45,26.57,8.6,refrigerado,2,21,RJ,2.7,0
+1073,Refeições prontas,1,7,2.53,25.4,ambiente,2,13,MG,24.4,1
+1074,Hortifrúti,1,5,330.15,3.4,refrigerado,0,10,AL,89.3,0
+1075,Outros,0,9,0.67,25.7,ambiente,0,20,DF,36.6,1
+1076,Grãos e cereais,0,4,3.44,25.9,ambiente,3,14,PE,89.2,1
+1077,Laticínios,1,0,0.55,22.3,ambiente,6,3,ES,,1
+1078,Laticínios,1,2,5.6,,nao_informado,3,0,SC,41.3,0
+1079,Laticínios,1,3,0.83,26.5,ambiente,2,2,AL,,1
+1080,Padaria,1,12,1.94,9.5,refrigerado,3,5,RJ,82.5,0
+1081,Carnes e peixes,1,8,0.65,16.6,ambiente,5,1,BA,84.7,1
+1082,Hortifrúti,1,1,0.86,6.0,refrigerado,3,8,RJ,4.9,1
+1083,Laticínios,1,7,57.95,4.2,refrigerado,2,14,AC,,0
+1084,Carnes e peixes,1,0,137.37,-21.9,congelado,2,21,MT,68.6,1
+1085,Padaria,1,2,12.2,7.8,refrigerado,3,3,BA,,1
+1086,Grãos e cereais,0,14,320.99,,nao_informado,5,2,AC,70.3,0
+1087,Laticínios,1,6,0.6,,nao_informado,0,16,MT,9.6,0
+1088,Carnes e peixes,1,4,108.08,2.7,refrigerado,6,14,RO,,1
+1089,Padaria,1,8,130.25,23.8,ambiente,4,16,TO,26.2,1
+1090,Laticínios,1,3,3.72,,nao_informado,5,1,SE,26.6,1
+1091,Laticínios,1,3,4.01,9.5,refrigerado,2,15,MA,,0
+1092,Padaria,1,11,190.42,6.0,refrigerado,2,11,SC,40.4,0
+1093,Grãos e cereais,0,2,9.22,23.2,ambiente,1,7,CE,38.1,0
+1094,Bebidas não alcoólicas,0,31,4.8,17.4,ambiente,1,16,GO,20.9,0
+1095,Outros,0,43,20.42,,nao_informado,3,3,CE,55.8,0
+1096,Laticínios,1,4,0.6,26.8,ambiente,3,15,RS,,1
+1097,Laticínios,1,8,7.56,29.6,ambiente,0,0,RJ,70.7,0
+1098,Hortifrúti,1,11,6.07,27.2,ambiente,3,15,MA,60.3,0
+1099,Hortifrúti,1,1,10.84,22.0,ambiente,2,5,RR,88.4,1
+1100,Hortifrúti,1,9,240.86,33.7,ambiente,2,18,CE,27.3,1
+1101,Laticínios,1,10,125.8,22.5,ambiente,4,18,MA,,0
+1102,Hortifrúti,1,0,120.17,35.0,ambiente,4,10,AC,9.2,1
+1103,Outros,0,14,8.16,29.4,ambiente,3,17,MS,49.8,0
+1104,Grãos e cereais,0,23,11.31,2.3,refrigerado,0,4,RJ,29.0,0
+1105,Refeições prontas,1,0,6.1,21.8,ambiente,6,10,AL,74.6,1
+1106,Outros,0,32,144.09,26.9,ambiente,6,21,RO,38.2,1
+1107,Hortifrúti,1,2,5.51,27.2,ambiente,3,7,SP,36.5,1
+1108,Bebidas não alcoólicas,0,30,4.94,20.9,ambiente,6,23,PE,,1
+1109,Refeições prontas,1,2,395.33,11.2,refrigerado,4,22,SE,7.5,1
+1110,Grãos e cereais,0,10,4.54,5.3,refrigerado,3,7,AC,61.1,0
+1111,Hortifrúti,1,11,3.91,,nao_informado,0,1,PR,17.2,0
+1112,Laticínios,1,12,125.81,28.6,ambiente,6,7,PB,,1
+1113,Bebidas não alcoólicas,0,32,2.63,26.8,ambiente,4,13,PA,65.4,0
+1114,Carnes e peixes,1,2,138.43,26.7,ambiente,4,14,GO,36.4,1
+1115,Grãos e cereais,0,39,15.82,26.6,ambiente,2,0,RN,63.2,0
+1116,Grãos e cereais,0,38,1.1,28.3,ambiente,3,16,SP,,0
+1117,Refeições prontas,1,4,81.62,0.7,refrigerado,4,3,BA,89.2,1
+1118,Hortifrúti,1,8,0.97,26.8,ambiente,0,0,MT,52.4,0
+1119,Padaria,1,11,5.62,8.4,refrigerado,6,8,RS,,0
+1120,Hortifrúti,1,12,145.15,25.8,ambiente,4,20,AC,14.3,1
+1121,Laticínios,1,12,71.37,-15.8,congelado,3,10,TO,55.2,0
+1122,Outros,0,18,0.52,26.1,ambiente,5,18,ES,,0
+1123,Carnes e peixes,1,12,178.42,19.3,ambiente,6,19,DF,17.4,0
+1124,Laticínios,1,10,145.16,,nao_informado,0,17,MS,86.1,1
+1125,Bebidas não alcoólicas,0,16,8.71,31.6,ambiente,6,7,AM,56.9,0
+1126,Laticínios,1,3,37.12,2.7,refrigerado,1,1,RN,26.4,1
+1127,Carnes e peixes,1,7,12.86,8.6,refrigerado,6,23,PR,6.6,1
+1128,Grãos e cereais,0,45,262.85,29.6,ambiente,3,18,TO,16.8,1
+1129,Laticínios,1,9,42.02,,nao_informado,1,22,PA,6.1,0
+1130,Padaria,1,2,86.49,22.7,ambiente,1,17,RJ,66.2,1
+1131,Outros,0,13,1.1,26.4,ambiente,5,2,MT,59.2,0
+1132,Grãos e cereais,0,5,36.94,22.8,ambiente,4,6,SP,,0
+1133,Refeições prontas,1,11,1.77,2.4,refrigerado,4,7,SC,43.4,0
+1134,Carnes e peixes,1,5,36.07,,nao_informado,4,8,AL,30.7,1
+1135,Carnes e peixes,1,2,20.5,5.2,refrigerado,1,18,MS,76.5,0
+1136,Grãos e cereais,0,22,7.53,-14.6,congelado,5,11,AL,,0
+1137,Hortifrúti,1,5,3.08,,nao_informado,2,16,CE,76.7,0
+1138,Grãos e cereais,0,35,36.3,26.3,ambiente,6,11,PR,59.3,0
+1139,Bebidas não alcoólicas,0,44,5.24,23.7,ambiente,4,8,SE,44.3,0
+1140,Grãos e cereais,0,32,10.4,21.1,ambiente,2,3,SE,,0
+1141,Padaria,1,8,11.71,10.4,refrigerado,3,14,CE,41.7,1
+1142,Padaria,1,8,5.26,10.1,refrigerado,1,22,PE,74.5,0
+1143,Outros,0,24,15.23,27.8,ambiente,5,15,SE,73.2,0
+1144,Grãos e cereais,0,42,1.84,24.7,ambiente,5,10,PI,36.5,0
+1145,Hortifrúti,1,9,3.12,,nao_informado,1,6,AP,,0
+1146,Refeições prontas,1,11,16.04,4.1,refrigerado,5,8,SC,87.3,0
+1147,Laticínios,1,4,1.55,8.0,refrigerado,0,10,SE,57.4,0
+1148,Outros,0,45,1.08,25.1,ambiente,6,20,MS,29.3,1
+1149,Grãos e cereais,0,29,131.04,23.5,ambiente,1,15,RS,46.7,1
+1150,Padaria,1,8,44.19,27.8,ambiente,3,15,DF,,0
+1151,Carnes e peixes,1,3,51.05,29.8,ambiente,3,1,CE,,1
+1152,Grãos e cereais,0,35,0.82,27.4,ambiente,5,11,MS,16.6,0
+1153,Carnes e peixes,1,0,2.04,-19.5,congelado,0,13,SC,44.5,0
+1154,Bebidas não alcoólicas,0,11,3.4,,nao_informado,6,20,CE,52.4,0
+1155,Hortifrúti,1,8,199.76,27.2,ambiente,2,8,AM,75.3,1
+1156,Refeições prontas,1,11,2.63,9.9,refrigerado,3,11,AM,22.2,1
+1157,Refeições prontas,1,7,42.15,23.5,ambiente,2,21,RJ,84.3,0
+1158,Outros,0,9,41.97,1.0,refrigerado,6,4,RJ,,0
+1159,Grãos e cereais,0,0,14.09,0.5,refrigerado,4,11,AL,75.3,0
+1160,Hortifrúti,1,3,52.74,,nao_informado,5,19,MG,66.4,0
+1161,Carnes e peixes,1,7,0.73,25.6,ambiente,4,10,PR,38.2,0
+1162,Refeições prontas,1,0,82.09,26.8,ambiente,0,1,AL,42.8,0
+1163,Carnes e peixes,1,10,27.65,,nao_informado,6,18,AL,1.1,0
+1164,Laticínios,1,9,391.51,6.9,refrigerado,4,21,PR,68.9,0
+1165,Hortifrúti,1,12,0.64,30.0,ambiente,3,1,AL,17.3,1
+1166,Laticínios,1,2,12.13,24.3,ambiente,1,10,AL,,1
+1167,Outros,0,13,9.28,17.4,ambiente,1,20,AP,36.9,1
+1168,Bebidas não alcoólicas,0,18,3.85,28.2,ambiente,5,16,PE,60.1,0
+1169,Outros,0,18,5.71,27.3,ambiente,1,14,CE,79.7,0
+1170,Carnes e peixes,1,2,18.92,23.3,ambiente,6,11,PR,33.7,0
+1171,Laticínios,1,4,1.03,25.3,ambiente,2,12,SC,85.5,0
+1172,Refeições prontas,1,9,10.06,11.2,refrigerado,3,5,PB,34.8,0
+1173,Outros,0,12,5.1,22.3,ambiente,0,13,DF,15.0,1
+1174,Grãos e cereais,0,33,0.51,26.4,ambiente,6,3,MT,26.9,0
+1175,Outros,0,37,1.05,26.2,ambiente,6,8,BA,29.9,0
+1176,Refeições prontas,1,4,1.54,23.4,ambiente,1,23,PI,68.6,1
+1177,Refeições prontas,1,11,46.45,-14.3,congelado,3,0,SE,56.7,1
+1178,Grãos e cereais,0,21,26.22,35.1,ambiente,5,15,MT,,0
+1179,Hortifrúti,1,8,237.43,27.8,ambiente,6,14,SC,,1
+1180,Bebidas não alcoólicas,0,15,0.94,22.5,ambiente,1,2,AM,37.1,1
+1181,Outros,0,35,135.1,21.6,ambiente,2,2,RO,66.9,1
+1182,Hortifrúti,1,10,7.64,19.1,ambiente,3,9,AC,88.4,0
+1183,Carnes e peixes,1,7,26.39,21.1,ambiente,2,9,GO,76.4,0
+1184,Laticínios,1,3,3.05,19.3,ambiente,6,13,RR,81.0,1
+1185,Grãos e cereais,0,32,172.86,23.4,ambiente,6,22,MT,32.0,0
+1186,Padaria,1,11,4.21,17.1,ambiente,5,9,AM,36.5,0
+1187,Bebidas não alcoólicas,0,24,247.2,30.5,ambiente,0,23,RJ,19.7,0
+1188,Outros,0,34,78.2,23.2,ambiente,4,0,AC,66.5,0
+1189,Carnes e peixes,1,10,381.01,24.0,ambiente,1,17,PA,56.6,0
+1190,Laticínios,1,9,322.63,5.9,refrigerado,3,22,RS,68.5,1
+1191,Carnes e peixes,1,5,5.11,-0.7,refrigerado,1,12,AP,20.9,0
+1192,Bebidas não alcoólicas,0,40,4.75,25.3,ambiente,2,0,SC,35.8,0
+1193,Laticínios,1,4,5.57,8.4,refrigerado,5,22,AP,,0
+1194,Padaria,1,8,2.26,23.4,ambiente,2,18,AP,39.1,0
+1195,Outros,0,16,41.07,28.7,ambiente,2,5,RN,,1
+1196,Bebidas não alcoólicas,0,23,7.36,27.6,ambiente,0,22,AP,40.8,0
+1197,Outros,0,18,39.07,30.3,ambiente,0,7,SC,,0
+1198,Hortifrúti,1,5,0.6,,nao_informado,1,10,MT,83.3,0
+1199,Outros,0,29,83.82,23.4,ambiente,3,2,ES,28.0,0
+1200,Hortifrúti,1,3,142.02,22.5,ambiente,3,2,MA,59.2,0
+1201,Grãos e cereais,0,34,1.28,23.0,ambiente,0,10,PR,9.8,0
+1202,Bebidas não alcoólicas,0,5,3.3,30.4,ambiente,3,12,CE,,0
+1203,Outros,0,23,281.7,28.8,ambiente,2,11,DF,0.1,1
+1204,Outros,0,23,153.64,,nao_informado,2,4,SP,74.9,0
+1205,Refeições prontas,1,5,2.34,1.3,refrigerado,5,6,RS,45.0,1
+1206,Laticínios,1,11,14.58,2.9,refrigerado,1,11,AM,,0
+1207,Padaria,1,0,31.41,,nao_informado,0,11,RO,80.8,1
+1208,Refeições prontas,1,1,1.17,21.9,ambiente,5,1,RJ,89.9,1
+1209,Bebidas não alcoólicas,0,39,81.36,27.5,ambiente,6,18,RS,6.4,0
+1210,Bebidas não alcoólicas,0,4,1.0,,nao_informado,4,17,RR,67.6,0
+1211,Hortifrúti,1,5,249.1,22.3,ambiente,6,7,AM,48.2,0
+1212,Bebidas não alcoólicas,0,20,35.51,26.6,ambiente,1,9,SP,9.3,1
+1213,Grãos e cereais,0,2,2.03,25.9,ambiente,4,18,DF,,0
+1214,Grãos e cereais,0,43,18.95,27.8,ambiente,1,20,PB,80.8,0
+1215,Padaria,1,5,111.16,27.2,ambiente,2,15,CE,85.1,1
+1216,Grãos e cereais,0,34,5.79,31.4,ambiente,1,22,ES,46.1,1
+1217,Carnes e peixes,1,4,0.51,,nao_informado,3,1,SC,29.0,0
+1218,Carnes e peixes,1,5,0.59,,nao_informado,5,15,PB,35.0,0
+1219,Bebidas não alcoólicas,0,13,0.52,5.6,refrigerado,0,6,DF,37.4,0
+1220,Carnes e peixes,1,11,345.68,18.3,ambiente,0,14,PI,88.7,1
+1221,Outros,0,12,3.71,31.5,ambiente,6,12,PR,52.1,0
+1222,Hortifrúti,1,7,1.12,30.1,ambiente,1,19,RN,10.6,0
+1223,Laticínios,1,1,120.39,33.0,ambiente,5,3,MS,65.1,1
+1224,Padaria,1,0,43.68,17.2,ambiente,1,7,SC,50.5,1
+1225,Carnes e peixes,1,6,3.6,0.5,refrigerado,1,18,BA,82.5,1
+1226,Refeições prontas,1,5,241.97,27.7,ambiente,6,10,AL,13.7,0
+1227,Refeições prontas,1,8,11.05,8.5,refrigerado,0,0,DF,59.7,1
+1228,Hortifrúti,1,0,7.58,-18.9,congelado,4,0,PI,25.5,1
+1229,Laticínios,1,3,0.59,2.8,refrigerado,6,19,ES,45.6,0
+1230,Carnes e peixes,1,4,9.16,-3.3,refrigerado,1,5,PB,89.0,0
+1231,Bebidas não alcoólicas,0,0,21.84,27.1,ambiente,0,3,MA,,1
+1232,Bebidas não alcoólicas,0,0,21.82,,nao_informado,4,13,PE,71.5,1
+1233,Hortifrúti,1,4,38.42,26.6,ambiente,3,13,DF,71.9,1
+1234,Hortifrúti,1,10,16.34,,nao_informado,6,16,DF,17.7,0
+1235,Outros,0,37,10.58,24.6,ambiente,5,16,MG,12.8,0
+1236,Laticínios,1,3,81.56,29.5,ambiente,6,5,TO,1.4,1
+1237,Refeições prontas,1,10,14.13,22.2,ambiente,0,21,AM,55.1,1
+1238,Refeições prontas,1,9,180.66,,nao_informado,6,1,TO,69.3,0
+1239,Carnes e peixes,1,2,20.72,25.3,ambiente,0,15,PR,30.0,1
+1240,Carnes e peixes,1,11,2.53,1.4,refrigerado,2,2,BA,38.1,0
+1241,Padaria,1,6,15.84,,nao_informado,2,18,SP,12.5,0
+1242,Hortifrúti,1,3,8.77,9.1,refrigerado,4,0,SE,87.8,0
+1243,Bebidas não alcoólicas,0,2,132.01,-15.7,congelado,2,13,ES,73.9,0
+1244,Outros,0,2,33.19,22.5,ambiente,2,21,CE,,0
+1245,Refeições prontas,1,12,296.43,,nao_informado,3,20,BA,,1
+1246,Carnes e peixes,1,4,0.95,6.3,refrigerado,6,10,AC,,1
+1247,Carnes e peixes,1,8,2.59,2.2,refrigerado,5,7,PR,70.3,0
+1248,Refeições prontas,1,12,10.67,,nao_informado,4,6,DF,,1
+1249,Refeições prontas,1,5,2.73,29.0,ambiente,0,18,AL,10.4,1
+1250,Outros,0,12,3.48,6.8,refrigerado,5,15,ES,50.7,0
+1251,Laticínios,1,6,2.41,,nao_informado,2,21,RJ,34.5,1
+1252,Padaria,1,9,89.94,24.0,ambiente,5,23,PE,14.8,1
+1253,Laticínios,1,8,22.8,10.1,refrigerado,4,15,CE,75.4,1
+1254,Carnes e peixes,1,6,2.72,25.5,ambiente,0,19,PE,66.8,1
+1255,Grãos e cereais,0,5,63.39,,nao_informado,5,14,AP,24.2,0
+1256,Refeições prontas,1,2,12.11,,nao_informado,1,13,PA,,0
+1257,Refeições prontas,1,3,175.26,-2.6,refrigerado,3,13,PA,12.8,1
+1258,Hortifrúti,1,12,1.8,,nao_informado,5,4,ES,77.3,1
+1259,Carnes e peixes,1,6,243.43,4.0,refrigerado,1,4,MS,29.2,1
+1260,Laticínios,1,0,6.72,29.8,ambiente,2,8,RS,84.9,1
+1261,Grãos e cereais,0,7,0.54,27.7,ambiente,6,18,TO,52.6,0
+1262,Grãos e cereais,0,14,63.84,27.6,ambiente,3,21,PA,53.6,0
+1263,Carnes e peixes,1,12,2.8,-0.1,refrigerado,5,23,PB,61.7,1
+1264,Grãos e cereais,0,11,3.48,19.9,ambiente,6,3,RJ,34.3,0
+1265,Refeições prontas,1,4,2.82,22.1,ambiente,2,4,RO,15.8,1
+1266,Bebidas não alcoólicas,0,10,1.75,26.9,ambiente,4,23,PE,0.0,0
+1267,Padaria,1,6,1.52,24.3,ambiente,2,20,SE,69.3,1
+1268,Hortifrúti,1,5,37.04,22.2,ambiente,3,21,PB,50.7,1
+1269,Carnes e peixes,1,6,16.88,-18.0,congelado,0,2,SE,42.1,1
+1270,Outros,0,10,65.13,28.4,ambiente,4,13,TO,80.5,0
+1271,Hortifrúti,1,1,8.54,,nao_informado,6,23,SP,,0
+1272,Bebidas não alcoólicas,0,15,106.2,27.2,ambiente,0,14,AL,86.5,0
+1273,Outros,0,16,5.84,19.1,ambiente,5,12,AP,,0
+1274,Carnes e peixes,1,12,1.85,-18.8,congelado,6,20,PE,81.6,0
+1275,Grãos e cereais,0,35,19.97,21.6,ambiente,6,0,RN,56.4,0
+1276,Laticínios,1,11,237.46,28.1,ambiente,1,19,PI,,1
+1277,Padaria,1,9,124.05,28.7,ambiente,5,4,MS,45.9,1
+1278,Bebidas não alcoólicas,0,17,10.28,-12.7,congelado,3,14,AP,42.5,0
+1279,Refeições prontas,1,12,49.08,23.6,ambiente,6,15,SE,66.3,0
+1280,Bebidas não alcoólicas,0,16,175.09,24.7,ambiente,3,5,SP,44.7,0
+1281,Refeições prontas,1,4,1.49,32.7,ambiente,6,17,AC,50.6,1
+1282,Grãos e cereais,0,29,6.94,25.6,ambiente,3,11,PB,8.9,0
+1283,Carnes e peixes,1,7,47.52,9.4,refrigerado,1,5,SC,86.4,0
+1284,Laticínios,1,4,21.44,1.9,refrigerado,3,13,RN,9.8,0
+1285,Laticínios,1,8,3.0,3.0,refrigerado,0,0,AM,74.1,0
+1286,Outros,0,44,32.7,25.8,ambiente,1,14,GO,15.8,0
+1287,Padaria,1,3,13.39,23.2,ambiente,2,20,MS,72.1,1
+1288,Bebidas não alcoólicas,0,32,41.37,24.9,ambiente,0,9,CE,84.8,0
+1289,Laticínios,1,8,47.23,-24.2,congelado,5,9,MS,62.3,0
+1290,Hortifrúti,1,2,1.35,7.9,refrigerado,3,21,PB,4.9,0
+1291,Bebidas não alcoólicas,0,39,279.24,14.5,ambiente,6,16,AP,61.7,0
+1292,Refeições prontas,1,8,1.41,4.3,refrigerado,0,21,PA,45.7,0
+1293,Grãos e cereais,0,18,4.86,33.1,ambiente,2,17,RO,44.6,0
+1294,Hortifrúti,1,9,0.55,7.1,refrigerado,4,20,SP,22.5,0
+1295,Outros,0,30,0.67,32.5,ambiente,6,4,MT,50.4,0
+1296,Outros,0,34,2.41,31.4,ambiente,4,1,AC,,0
+1297,Hortifrúti,1,9,7.19,17.9,ambiente,2,0,BA,70.7,0
+1298,Bebidas não alcoólicas,0,3,162.26,28.6,ambiente,6,6,PI,,0
+1299,Bebidas não alcoólicas,0,2,39.94,24.9,ambiente,4,22,RS,76.3,0
+1300,Bebidas não alcoólicas,0,16,1.88,24.7,ambiente,0,4,SE,8.4,0
+1301,Grãos e cereais,0,28,26.0,,nao_informado,1,14,RS,78.9,1
+1302,Grãos e cereais,0,39,331.08,20.4,ambiente,5,10,AP,20.2,0
+1303,Padaria,1,9,183.83,23.3,ambiente,4,0,MG,16.4,1
+1304,Bebidas não alcoólicas,0,4,3.67,21.5,ambiente,3,11,ES,,1
+1305,Carnes e peixes,1,1,125.64,30.2,ambiente,5,3,SP,43.2,1
+1306,Grãos e cereais,0,23,140.15,34.9,ambiente,3,9,PE,16.2,1
+1307,Laticínios,1,3,101.3,17.0,ambiente,0,1,ES,5.0,0
+1308,Hortifrúti,1,10,0.95,20.1,ambiente,5,13,TO,50.9,0
+1309,Grãos e cereais,0,14,2.81,5.3,refrigerado,1,3,RO,65.7,0
+1310,Bebidas não alcoólicas,0,40,1.65,20.7,ambiente,4,8,RS,81.0,0
+1311,Outros,0,43,17.84,27.9,ambiente,6,10,BA,20.0,0
+1312,Outros,0,34,38.63,25.7,ambiente,5,23,CE,36.4,0
+1313,Outros,0,36,1.39,0.1,refrigerado,6,18,PE,67.2,0
+1314,Outros,0,12,0.79,29.8,ambiente,0,7,BA,52.4,0
+1315,Bebidas não alcoólicas,0,12,37.21,27.8,ambiente,2,5,AC,53.1,0
+1316,Refeições prontas,1,7,2.71,24.9,ambiente,2,1,DF,39.8,0
+1317,Carnes e peixes,1,7,12.07,24.6,ambiente,2,8,DF,10.1,0
+1318,Grãos e cereais,0,2,135.11,31.5,ambiente,5,9,DF,32.3,1
+1319,Padaria,1,9,36.43,3.7,refrigerado,3,4,RO,89.9,0
+1320,Outros,0,28,2.04,,nao_informado,2,10,TO,,0
+1321,Laticínios,1,7,58.95,24.8,ambiente,3,15,AL,86.8,1
+1322,Refeições prontas,1,11,363.84,3.6,refrigerado,6,3,AM,,1
+1323,Carnes e peixes,1,6,22.97,22.2,ambiente,2,8,AL,37.4,0
+1324,Hortifrúti,1,12,30.63,24.5,ambiente,4,17,PR,86.3,0
+1325,Hortifrúti,1,5,30.38,25.9,ambiente,3,11,MG,,1
+1326,Laticínios,1,7,1.24,,nao_informado,6,9,MG,8.6,0
+1327,Bebidas não alcoólicas,0,45,189.23,22.2,ambiente,3,16,SE,85.0,1
+1328,Hortifrúti,1,12,40.66,,nao_informado,4,19,MS,35.6,0
+1329,Hortifrúti,1,4,3.64,3.1,refrigerado,0,23,AM,25.8,0
+1330,Padaria,1,10,37.28,6.2,refrigerado,0,10,RN,55.9,0
+1331,Bebidas não alcoólicas,0,13,9.11,25.8,ambiente,4,20,PR,12.7,0
+1332,Refeições prontas,1,5,4.06,29.3,ambiente,3,8,RN,60.6,1
+1333,Bebidas não alcoólicas,0,41,157.63,24.1,ambiente,6,11,CE,68.1,0
+1334,Hortifrúti,1,0,245.15,33.2,ambiente,0,2,BA,76.8,1
+1335,Padaria,1,7,65.36,,nao_informado,2,12,RO,50.2,0
+1336,Refeições prontas,1,0,11.42,26.0,ambiente,4,5,RN,58.1,1
+1337,Laticínios,1,5,3.32,22.3,ambiente,6,8,PI,59.2,0
+1338,Outros,0,39,161.9,30.5,ambiente,3,17,BA,39.6,0
+1339,Outros,0,10,1.07,29.7,ambiente,4,22,AP,58.0,0
+1340,Carnes e peixes,1,12,4.56,8.6,refrigerado,2,12,RJ,48.4,0
+1341,Padaria,1,3,90.22,1.5,refrigerado,6,21,PB,6.0,0
+1342,Refeições prontas,1,1,124.7,,nao_informado,4,19,AP,1.6,1
+1343,Bebidas não alcoólicas,0,18,73.21,21.2,ambiente,2,15,SC,,0
+1344,Bebidas não alcoólicas,0,17,33.17,28.7,ambiente,5,16,MS,56.5,0
+1345,Bebidas não alcoólicas,0,27,294.95,16.9,refrigerado,6,2,AM,78.5,1
+1346,Grãos e cereais,0,4,12.35,28.3,ambiente,6,19,AM,22.2,0
+1347,Bebidas não alcoólicas,0,11,207.74,26.6,ambiente,3,14,SE,39.3,1
+1348,Hortifrúti,1,6,7.84,24.6,ambiente,4,3,SC,51.1,0
+1349,Laticínios,1,7,1.99,4.7,refrigerado,4,18,SC,71.0,1
+1350,Grãos e cereais,0,36,1.54,,nao_informado,1,11,PR,54.0,1
+1351,Refeições prontas,1,2,15.89,,nao_informado,4,20,AL,89.0,0
+1352,Outros,0,40,1.6,26.7,ambiente,1,1,PE,89.2,0
+1353,Grãos e cereais,0,15,11.04,20.0,ambiente,4,14,AC,51.2,1
+1354,Hortifrúti,1,11,17.51,24.0,ambiente,2,22,RJ,69.4,1
+1355,Refeições prontas,1,4,0.9,-17.1,congelado,3,12,MT,,0
+1356,Bebidas não alcoólicas,0,29,6.19,32.6,ambiente,1,11,CE,66.8,0
+1357,Outros,0,12,155.45,32.3,ambiente,2,8,RN,42.8,0
+1358,Carnes e peixes,1,11,108.57,,nao_informado,1,16,ES,,0
+1359,Padaria,1,7,21.79,6.7,refrigerado,2,1,AM,76.6,1
+1360,Outros,0,1,3.25,27.7,ambiente,6,12,ES,72.7,0
+1361,Padaria,1,2,1.89,20.4,ambiente,6,10,TO,,0
+1362,Bebidas não alcoólicas,0,5,19.0,21.4,ambiente,3,20,SP,26.2,0
+1363,Padaria,1,0,28.87,28.3,ambiente,3,16,RR,14.9,1
+1364,Laticínios,1,11,0.79,0.8,refrigerado,6,11,DF,12.1,0
+1365,Hortifrúti,1,10,137.47,4.6,refrigerado,4,20,CE,46.5,0
+1366,Outros,0,23,81.31,33.1,ambiente,4,21,DF,87.1,1
+1367,Hortifrúti,1,12,3.88,1.4,refrigerado,5,17,SP,16.9,0
+1368,Grãos e cereais,0,3,14.02,27.5,ambiente,5,18,SP,51.7,0
+1369,Carnes e peixes,1,6,8.95,23.8,ambiente,2,8,DF,,0
+1370,Bebidas não alcoólicas,0,30,1.44,,nao_informado,1,4,AM,22.8,1
+1371,Bebidas não alcoólicas,0,11,55.12,20.9,ambiente,1,8,MT,26.1,0
+1372,Laticínios,1,4,0.53,29.9,ambiente,0,21,AM,29.8,0
+1373,Grãos e cereais,0,28,0.9,,nao_informado,6,20,GO,83.7,0
+1374,Refeições prontas,1,5,28.37,,nao_informado,6,22,PE,73.7,1
+1375,Padaria,1,4,6.07,21.6,ambiente,2,23,RS,25.4,0
+1376,Carnes e peixes,1,0,5.56,2.5,refrigerado,6,12,AP,30.8,0
+1377,Hortifrúti,1,7,4.35,-21.5,congelado,2,4,CE,,0
+1378,Bebidas não alcoólicas,0,38,146.65,24.8,ambiente,1,11,ES,14.5,1
+1379,Outros,0,15,55.86,30.1,ambiente,4,19,RR,53.3,0
+1380,Padaria,1,2,210.51,30.1,ambiente,1,23,CE,24.4,1
+1381,Outros,0,19,328.48,22.1,ambiente,5,9,MG,,1
+1382,Outros,0,5,1.31,31.3,ambiente,4,2,MA,16.9,0
+1383,Laticínios,1,8,14.33,23.5,ambiente,0,17,MG,21.9,0
+1384,Laticínios,1,2,6.95,,nao_informado,4,0,MT,60.2,0
+1385,Outros,0,22,1.19,22.7,ambiente,6,3,TO,27.1,0
+1386,Refeições prontas,1,6,3.86,,nao_informado,1,17,GO,,0
+1387,Grãos e cereais,0,32,222.45,,nao_informado,0,5,MG,,1
+1388,Grãos e cereais,0,16,7.67,26.2,ambiente,5,13,PA,7.2,0
+1389,Laticínios,1,12,57.29,-1.9,refrigerado,4,1,TO,24.1,1
+1390,Carnes e peixes,1,2,24.16,26.3,ambiente,0,4,SP,34.6,1
+1391,Grãos e cereais,0,3,0.68,25.1,ambiente,1,1,ES,70.5,0
+1392,Refeições prontas,1,6,193.06,,nao_informado,4,8,PA,56.7,0
+1393,Padaria,1,7,44.71,2.0,refrigerado,0,9,RN,35.8,1
+1394,Grãos e cereais,0,19,33.71,27.0,ambiente,5,0,MS,22.4,0
+1395,Padaria,1,5,183.98,,nao_informado,4,4,PI,28.9,0
+1396,Laticínios,1,9,1.96,7.3,refrigerado,1,20,CE,,0
+1397,Outros,0,4,6.94,27.2,ambiente,6,10,GO,85.2,1
+1398,Grãos e cereais,0,28,3.6,24.4,ambiente,2,19,AL,5.1,1
+1399,Outros,0,3,172.49,22.3,ambiente,0,1,PI,81.0,0
+1400,Hortifrúti,1,6,20.9,4.0,refrigerado,2,10,RJ,,1
+1401,Outros,0,19,162.17,28.2,ambiente,5,7,AM,23.4,0
+1402,Padaria,1,10,106.56,31.4,ambiente,3,22,SC,9.7,1
+1403,Refeições prontas,1,10,4.35,25.8,ambiente,4,1,SC,74.5,1
+1404,Grãos e cereais,0,18,3.65,14.6,ambiente,4,0,RN,53.0,0
+1405,Hortifrúti,1,6,282.64,4.1,refrigerado,0,6,RR,66.2,1
+1406,Laticínios,1,7,57.47,1.8,refrigerado,2,13,AP,62.8,1
+1407,Carnes e peixes,1,10,0.71,7.0,refrigerado,3,1,RS,,0
+1408,Hortifrúti,1,2,90.57,12.0,refrigerado,3,11,SC,48.2,0
+1409,Grãos e cereais,0,29,9.1,16.5,ambiente,0,14,AP,87.3,0
+1410,Carnes e peixes,1,10,0.63,7.3,refrigerado,3,19,SP,53.7,0
+1411,Laticínios,1,9,2.32,,nao_informado,0,18,MS,48.8,1
+1412,Laticínios,1,3,0.89,3.4,refrigerado,6,2,RR,65.9,0
+1413,Outros,0,42,3.72,24.0,ambiente,0,15,PB,11.8,0
+1414,Outros,0,11,3.04,29.1,ambiente,4,11,SC,7.1,0
+1415,Laticínios,1,2,40.64,6.1,refrigerado,6,1,GO,41.9,1
+1416,Laticínios,1,3,141.86,29.5,ambiente,0,2,MA,48.0,1
+1417,Padaria,1,5,61.02,3.8,refrigerado,0,22,PI,67.5,1
+1418,Carnes e peixes,1,3,0.59,31.9,ambiente,2,15,RS,55.2,1
+1419,Refeições prontas,1,2,8.12,6.6,refrigerado,5,17,BA,28.3,0
+1420,Padaria,1,8,12.34,6.8,refrigerado,0,2,GO,60.4,1
+1421,Refeições prontas,1,12,75.05,6.3,refrigerado,0,0,PE,7.5,1
+1422,Grãos e cereais,0,7,296.25,,nao_informado,3,1,PI,11.6,1
+1423,Bebidas não alcoólicas,0,35,3.06,31.7,ambiente,4,7,SC,,0
+1424,Outros,0,7,378.69,4.6,refrigerado,6,6,PR,84.7,0
+1425,Padaria,1,8,0.56,,nao_informado,3,4,SE,39.2,1
+1426,Padaria,1,12,8.86,5.0,refrigerado,1,16,PI,16.4,0
+1427,Refeições prontas,1,8,55.42,20.4,ambiente,1,7,PB,9.6,1
+1428,Refeições prontas,1,7,353.11,22.9,ambiente,1,13,AP,18.9,0
+1429,Bebidas não alcoólicas,0,31,136.25,25.8,ambiente,3,21,PI,65.3,0
+1430,Outros,0,26,2.42,-16.0,congelado,5,11,SP,,1
+1431,Outros,0,44,0.86,33.9,ambiente,2,13,PE,25.8,0
+1432,Bebidas não alcoólicas,0,42,82.49,,nao_informado,4,22,RJ,63.7,0
+1433,Carnes e peixes,1,2,7.16,3.2,refrigerado,2,13,AP,38.7,1
+1434,Outros,0,45,14.85,30.2,ambiente,1,23,MT,14.7,1
+1435,Bebidas não alcoólicas,0,43,7.93,7.7,refrigerado,1,2,RO,15.4,0
+1436,Grãos e cereais,0,17,7.77,,nao_informado,0,3,SP,64.5,0
+1437,Refeições prontas,1,7,116.3,23.1,ambiente,3,2,DF,45.5,1
+1438,Carnes e peixes,1,0,17.84,31.9,ambiente,0,13,TO,10.7,1
+1439,Grãos e cereais,0,3,0.56,29.8,ambiente,5,19,DF,22.3,0
+1440,Bebidas não alcoólicas,0,37,26.1,,nao_informado,3,16,MT,49.7,0
+1441,Padaria,1,2,22.48,3.3,refrigerado,0,5,PA,,0
+1442,Padaria,1,1,133.91,8.5,refrigerado,3,8,MS,26.4,1
+1443,Bebidas não alcoólicas,0,13,8.31,21.8,ambiente,0,3,AC,46.7,1
+1444,Padaria,1,9,0.88,,nao_informado,0,16,ES,60.9,0
+1445,Outros,0,30,5.0,25.8,ambiente,0,12,SP,69.1,1
+1446,Padaria,1,5,2.72,2.9,refrigerado,1,15,MS,45.8,0
+1447,Bebidas não alcoólicas,0,2,23.28,22.2,ambiente,3,0,MT,,0
+1448,Hortifrúti,1,4,9.82,2.4,refrigerado,1,3,PI,,0
+1449,Laticínios,1,12,32.87,11.5,refrigerado,1,11,RN,74.0,0
+1450,Bebidas não alcoólicas,0,41,122.21,27.0,ambiente,6,8,RN,,0
+1451,Laticínios,1,1,25.04,4.9,refrigerado,1,23,AL,57.7,0
+1452,Outros,0,34,145.36,3.0,refrigerado,6,10,RR,,0
+1453,Grãos e cereais,0,30,2.04,23.3,ambiente,6,5,RN,,0
+1454,Bebidas não alcoólicas,0,35,2.9,,nao_informado,2,21,PE,34.7,0
+1455,Bebidas não alcoólicas,0,3,0.89,29.3,ambiente,5,23,AM,67.7,0
+1456,Hortifrúti,1,3,1.67,-19.0,congelado,6,14,PI,68.7,0
+1457,Outros,0,3,2.95,27.6,ambiente,1,22,RJ,,0
+1458,Laticínios,1,11,146.37,31.2,ambiente,6,21,AC,60.1,1
+1459,Grãos e cereais,0,40,1.87,25.7,ambiente,0,17,MG,88.6,0
+1460,Refeições prontas,1,0,189.93,,nao_informado,3,0,SE,5.9,1
+1461,Hortifrúti,1,5,25.12,29.2,ambiente,5,8,PA,33.7,1
+1462,Hortifrúti,1,4,105.82,-0.9,refrigerado,5,19,RJ,33.0,0
+1463,Laticínios,1,10,162.53,,nao_informado,0,7,PR,23.7,1
+1464,Carnes e peixes,1,10,130.04,31.0,ambiente,3,7,AC,64.6,1
+1465,Bebidas não alcoólicas,0,2,0.68,-16.1,congelado,2,16,BA,79.3,0
+1466,Carnes e peixes,1,11,22.25,-17.5,congelado,0,22,SE,9.9,0
+1467,Laticínios,1,11,260.59,,nao_informado,4,0,DF,69.9,1
+1468,Laticínios,1,0,80.7,25.1,ambiente,5,15,CE,77.3,1
+1469,Outros,0,14,15.16,,nao_informado,6,19,ES,,0
+1470,Grãos e cereais,0,31,2.58,28.7,ambiente,0,5,GO,14.8,0
+1471,Bebidas não alcoólicas,0,17,99.56,23.8,ambiente,3,4,PR,,0
+1472,Hortifrúti,1,11,113.41,26.5,ambiente,5,14,AC,,1
+1473,Carnes e peixes,1,10,16.21,23.3,ambiente,4,20,MG,48.0,1
+1474,Carnes e peixes,1,7,68.46,5.2,refrigerado,3,12,RO,74.3,1
+1475,Padaria,1,6,5.21,,nao_informado,6,10,MS,,0
+1476,Grãos e cereais,0,42,37.88,29.8,ambiente,1,7,MA,56.2,0
+1477,Laticínios,1,1,17.95,32.9,ambiente,0,5,RN,60.1,1
+1478,Bebidas não alcoólicas,0,27,1.95,24.6,ambiente,4,17,AL,,0
+1479,Grãos e cereais,0,8,51.91,19.4,ambiente,6,11,TO,,0
+1480,Carnes e peixes,1,10,337.56,30.2,ambiente,0,18,SP,32.0,1
+1481,Padaria,1,8,1.61,24.8,ambiente,1,19,MA,49.5,1
+1482,Outros,0,6,1.68,9.1,refrigerado,1,17,SP,30.3,1
+1483,Padaria,1,7,18.63,7.6,refrigerado,4,11,BA,,0
+1484,Grãos e cereais,0,20,44.15,28.7,ambiente,4,0,PA,55.4,0
+1485,Grãos e cereais,0,36,134.85,27.3,ambiente,0,23,PE,56.2,1
+1486,Laticínios,1,2,314.66,29.5,ambiente,6,3,RN,51.6,1
+1487,Laticínios,1,3,19.02,,nao_informado,5,20,BA,0.1,0
+1488,Hortifrúti,1,2,346.03,7.1,refrigerado,2,10,PB,,0
+1489,Carnes e peixes,1,5,10.03,24.1,ambiente,0,3,GO,10.1,1
+1490,Carnes e peixes,1,12,5.24,,nao_informado,3,3,MT,,0
+1491,Carnes e peixes,1,3,4.67,,nao_informado,6,2,DF,57.8,0
+1492,Refeições prontas,1,0,1.86,31.2,ambiente,3,9,GO,4.4,0
+1493,Padaria,1,10,214.87,,nao_informado,2,20,BA,,1
+1494,Laticínios,1,9,29.84,1.4,refrigerado,0,12,MG,17.8,0
+1495,Carnes e peixes,1,12,0.72,13.0,refrigerado,1,1,SC,54.7,1
+1496,Outros,0,16,0.59,17.9,ambiente,3,13,RN,7.1,0
+1497,Grãos e cereais,0,27,41.92,22.7,ambiente,4,0,DF,23.7,0
+1498,Padaria,1,4,158.16,5.2,refrigerado,1,19,MA,36.8,0
+1499,Outros,0,15,0.79,21.5,ambiente,1,1,PI,64.5,0
+1500,Hortifrúti,1,10,1.33,30.7,ambiente,0,2,CE,2.0,1
+1501,Refeições prontas,1,3,1.55,24.2,ambiente,6,20,RN,15.9,1
+1502,Hortifrúti,1,1,15.67,4.5,refrigerado,2,9,AM,73.8,0
+1503,Refeições prontas,1,6,9.12,14.2,refrigerado,4,12,SE,68.4,0
+1504,Carnes e peixes,1,8,7.1,28.1,ambiente,6,8,RR,4.2,1
+1505,Refeições prontas,1,10,2.89,7.0,refrigerado,5,3,MS,0.0,0
+1506,Laticínios,1,8,20.67,24.4,ambiente,4,4,AP,,1
+1507,Bebidas não alcoólicas,0,39,89.19,26.9,ambiente,6,8,RS,46.7,1
+1508,Hortifrúti,1,3,16.18,24.2,ambiente,0,0,MS,10.2,0
+1509,Carnes e peixes,1,9,4.86,32.0,ambiente,2,19,RJ,21.9,0
+1510,Outros,0,41,7.3,23.4,ambiente,0,17,AL,79.8,0
+1511,Padaria,1,10,2.0,22.7,ambiente,6,21,MA,75.2,1
+1512,Hortifrúti,1,9,195.52,6.6,refrigerado,2,13,TO,25.7,0
+1513,Outros,0,1,0.54,26.7,ambiente,4,16,RN,19.7,1
+1514,Carnes e peixes,1,5,1.3,22.4,ambiente,1,4,RS,12.9,0
+1515,Hortifrúti,1,11,192.35,-4.7,refrigerado,6,8,ES,,0
+1516,Grãos e cereais,0,27,116.62,21.9,ambiente,3,6,RJ,83.1,0
+1517,Hortifrúti,1,1,57.46,16.1,ambiente,2,20,SC,,1
+1518,Grãos e cereais,0,24,1.09,31.9,ambiente,5,10,AC,,1
+1519,Hortifrúti,1,11,2.74,2.8,refrigerado,5,14,AC,82.8,0
+1520,Bebidas não alcoólicas,0,28,0.58,,nao_informado,6,6,PA,26.4,1
+1521,Hortifrúti,1,12,4.66,,nao_informado,0,11,MT,40.8,0
+1522,Outros,0,7,55.48,27.6,ambiente,4,15,SC,31.4,0
+1523,Padaria,1,2,18.66,23.4,ambiente,1,23,PE,38.3,0
+1524,Bebidas não alcoólicas,0,43,8.47,30.0,ambiente,3,12,RJ,29.6,0
+1525,Carnes e peixes,1,12,0.98,1.6,refrigerado,1,1,RS,35.9,0
+1526,Padaria,1,9,149.99,-12.1,congelado,4,13,CE,8.5,1
+1527,Bebidas não alcoólicas,0,3,65.65,29.5,ambiente,4,10,RS,58.7,0
+1528,Bebidas não alcoólicas,0,10,273.38,30.1,ambiente,2,15,AL,6.1,0
+1529,Laticínios,1,0,164.19,9.8,refrigerado,6,19,PB,,1
+1530,Padaria,1,12,95.79,25.7,ambiente,1,10,SC,81.6,1
+1531,Grãos e cereais,0,40,3.28,9.3,refrigerado,0,15,AL,54.3,0
+1532,Hortifrúti,1,3,54.41,31.0,ambiente,1,9,AL,39.4,1
+1533,Laticínios,1,7,308.63,-0.7,refrigerado,3,5,MS,,0
+1534,Hortifrúti,1,4,390.63,27.2,ambiente,1,23,CE,53.8,1
+1535,Laticínios,1,8,2.42,-15.3,congelado,1,20,MA,6.6,0
+1536,Laticínios,1,8,208.29,26.0,ambiente,6,16,AC,,1
+1537,Refeições prontas,1,12,346.07,,nao_informado,5,23,MT,25.6,0
+1538,Outros,0,0,184.26,30.7,ambiente,6,13,AC,,1
+1539,Grãos e cereais,0,33,85.27,27.4,ambiente,0,19,PR,74.7,0
+1540,Grãos e cereais,0,10,2.95,21.0,ambiente,5,18,BA,12.5,1
+1541,Refeições prontas,1,5,2.05,-17.7,congelado,1,18,AP,16.1,0
+1542,Carnes e peixes,1,8,1.97,-16.0,congelado,4,0,RJ,12.6,1
+1543,Hortifrúti,1,5,7.12,23.4,ambiente,1,23,TO,64.4,0
+1544,Refeições prontas,1,8,69.22,-2.3,refrigerado,6,4,AM,62.1,0
+1545,Laticínios,1,9,3.09,23.2,ambiente,0,18,SC,27.1,0
+1546,Bebidas não alcoólicas,0,35,8.2,-21.8,congelado,6,2,AC,72.2,0
+1547,Padaria,1,11,95.4,24.6,ambiente,1,3,PR,,0
+1548,Padaria,1,2,79.97,8.2,refrigerado,3,21,SC,63.2,0
+1549,Hortifrúti,1,1,1.36,10.4,refrigerado,0,5,MA,47.7,1
+1550,Refeições prontas,1,3,2.27,14.6,refrigerado,2,3,AM,62.8,1
+1551,Grãos e cereais,0,28,34.29,,nao_informado,6,14,PA,35.8,0
+1552,Padaria,1,0,1.52,25.8,ambiente,5,10,AM,39.8,1
+1553,Outros,0,14,10.29,22.6,ambiente,5,10,DF,86.1,1
+1554,Refeições prontas,1,0,147.49,27.4,ambiente,3,19,AM,2.4,1
+1555,Bebidas não alcoólicas,0,26,2.01,20.6,ambiente,1,20,PR,26.0,0
+1556,Carnes e peixes,1,12,341.68,,nao_informado,3,16,RN,37.9,0
+1557,Refeições prontas,1,5,0.92,10.5,refrigerado,3,3,TO,23.8,0
+1558,Padaria,1,5,74.92,27.8,ambiente,3,13,TO,42.3,0
+1559,Padaria,1,2,1.29,1.1,refrigerado,0,20,PA,53.9,0
+1560,Padaria,1,10,2.63,23.4,ambiente,2,19,SE,74.1,1
+1561,Refeições prontas,1,3,11.51,-20.8,congelado,3,6,AP,57.4,0
+1562,Refeições prontas,1,2,42.02,6.1,refrigerado,3,12,RN,31.6,1
+1563,Hortifrúti,1,2,13.13,11.6,refrigerado,3,6,RN,26.0,1
+1564,Refeições prontas,1,4,0.82,7.4,refrigerado,2,22,RR,9.2,0
+1565,Bebidas não alcoólicas,0,3,8.5,23.0,ambiente,2,13,PB,26.0,0
+1566,Grãos e cereais,0,15,3.03,19.7,ambiente,2,12,DF,14.1,1
+1567,Hortifrúti,1,9,0.84,30.4,ambiente,3,15,SC,70.5,1
+1568,Hortifrúti,1,0,2.05,22.4,ambiente,0,10,MS,25.4,1
+1569,Hortifrúti,1,8,1.34,22.5,ambiente,2,15,SC,51.4,1
+1570,Laticínios,1,3,9.05,,nao_informado,2,20,PI,,1
+1571,Bebidas não alcoólicas,0,39,86.58,,nao_informado,3,7,DF,78.5,0
+1572,Grãos e cereais,0,3,361.29,30.8,ambiente,0,11,PA,62.0,0
+1573,Padaria,1,7,29.39,5.2,refrigerado,2,10,AM,48.7,0
+1574,Outros,0,14,2.41,28.0,ambiente,3,15,RS,48.4,0
+1575,Refeições prontas,1,10,210.36,-0.3,refrigerado,4,11,AL,28.5,1
+1576,Carnes e peixes,1,10,5.82,24.0,ambiente,4,17,RJ,6.2,1
+1577,Refeições prontas,1,11,0.68,22.9,ambiente,0,5,RO,85.4,1
+1578,Laticínios,1,11,182.79,3.1,refrigerado,3,19,RO,,0
+1579,Grãos e cereais,0,44,25.39,32.6,ambiente,1,3,AL,63.8,0
+1580,Grãos e cereais,0,13,1.02,21.4,ambiente,0,4,ES,22.8,1
+1581,Refeições prontas,1,0,25.42,17.8,ambiente,1,20,RR,26.4,0
+1582,Grãos e cereais,0,15,4.63,25.0,ambiente,0,6,MT,12.4,1
+1583,Padaria,1,11,4.07,-19.1,congelado,4,2,RR,41.4,1
+1584,Bebidas não alcoólicas,0,2,193.46,29.5,ambiente,5,20,GO,52.6,1
+1585,Carnes e peixes,1,1,149.91,0.6,refrigerado,1,3,GO,6.7,0
+1586,Grãos e cereais,0,3,2.74,26.7,ambiente,6,20,AL,70.5,0
+1587,Laticínios,1,6,69.02,18.3,ambiente,6,22,SE,82.2,1
+1588,Outros,0,18,355.07,28.5,ambiente,3,1,RN,17.9,0
+1589,Hortifrúti,1,11,12.0,23.2,ambiente,6,5,MG,85.5,1
+1590,Refeições prontas,1,8,29.22,29.6,ambiente,2,15,BA,,0
+1591,Carnes e peixes,1,11,0.55,4.0,refrigerado,2,22,BA,67.3,0
+1592,Outros,0,33,18.82,4.7,refrigerado,3,16,MS,,0
+1593,Carnes e peixes,1,0,1.67,7.1,refrigerado,0,8,RN,,0
+1594,Grãos e cereais,0,9,28.33,,nao_informado,4,22,AC,,0
+1595,Padaria,1,6,36.31,3.8,refrigerado,6,20,RS,27.2,1
+1596,Hortifrúti,1,8,23.53,26.6,ambiente,0,4,MT,41.1,1
+1597,Hortifrúti,1,8,6.46,23.2,ambiente,3,14,RJ,34.8,0
+1598,Hortifrúti,1,1,1.15,-3.5,refrigerado,0,8,RO,46.7,0
+1599,Padaria,1,1,1.94,-10.5,congelado,3,19,DF,54.2,0
+1600,Bebidas não alcoólicas,0,3,178.25,24.7,ambiente,0,16,AL,74.8,1
+1601,Laticínios,1,11,7.99,-2.0,refrigerado,0,1,GO,12.5,1
+1602,Carnes e peixes,1,9,15.48,5.1,refrigerado,0,5,SC,28.9,1
+1603,Laticínios,1,4,2.36,6.0,refrigerado,0,14,BA,,0
+1604,Carnes e peixes,1,4,38.37,23.9,ambiente,0,18,RS,72.8,1
+1605,Padaria,1,3,42.7,25.5,ambiente,4,2,AL,44.8,0
+1606,Outros,0,30,1.9,25.9,ambiente,2,20,PI,1.7,0
+1607,Outros,0,21,261.72,,nao_informado,3,5,CE,74.5,0
+1608,Refeições prontas,1,8,3.1,22.1,ambiente,1,22,RO,,0
+1609,Laticínios,1,4,1.05,-19.4,congelado,3,16,GO,84.7,0
+1610,Padaria,1,1,181.76,6.8,refrigerado,5,17,RO,37.9,1
+1611,Grãos e cereais,0,4,2.12,23.2,ambiente,0,7,MA,52.9,0
+1612,Refeições prontas,1,4,130.9,5.9,refrigerado,1,3,PE,29.4,0
+1613,Laticínios,1,3,396.49,10.1,refrigerado,4,22,RR,64.3,1
+1614,Hortifrúti,1,3,7.13,23.8,ambiente,0,22,BA,70.3,1
+1615,Refeições prontas,1,4,376.06,10.8,refrigerado,6,17,PA,30.0,1
+1616,Refeições prontas,1,4,42.15,31.3,ambiente,4,20,PR,37.3,1
+1617,Refeições prontas,1,8,11.3,-14.5,congelado,3,6,GO,74.2,1
+1618,Laticínios,1,11,1.52,1.1,refrigerado,4,9,MT,4.9,0
+1619,Carnes e peixes,1,2,0.61,,nao_informado,5,13,CE,10.9,0
+1620,Bebidas não alcoólicas,0,44,64.41,29.5,ambiente,4,23,AM,56.8,0
+1621,Outros,0,41,16.03,24.0,ambiente,2,21,MG,45.0,0
+1622,Padaria,1,12,6.98,21.0,ambiente,3,9,ES,88.9,1
+1623,Outros,0,5,1.84,20.8,ambiente,5,13,PB,3.2,0
+1624,Grãos e cereais,0,10,11.35,26.7,ambiente,3,0,RO,10.8,0
+1625,Grãos e cereais,0,10,175.29,27.2,ambiente,5,4,RN,77.5,0
+1626,Hortifrúti,1,8,237.39,23.8,ambiente,0,3,SE,,1
+1627,Hortifrúti,1,8,14.15,,nao_informado,3,0,SE,80.4,0
+1628,Padaria,1,4,164.76,7.5,refrigerado,4,16,RO,51.1,0
+1629,Carnes e peixes,1,0,1.56,23.5,ambiente,1,5,BA,,1
+1630,Laticínios,1,1,21.32,6.5,refrigerado,3,19,MA,77.9,0
+1631,Bebidas não alcoólicas,0,10,6.45,,nao_informado,1,4,PI,30.3,0
+1632,Refeições prontas,1,10,1.98,20.5,ambiente,1,6,GO,,1
+1633,Padaria,1,5,44.5,27.7,ambiente,4,17,RO,,1
+1634,Carnes e peixes,1,0,96.97,24.3,ambiente,3,23,BA,33.1,1
+1635,Outros,0,26,1.15,24.0,ambiente,1,12,AP,61.9,1
+1636,Padaria,1,9,3.16,26.4,ambiente,1,0,MS,2.1,0
+1637,Refeições prontas,1,6,18.65,-19.4,congelado,6,1,PB,45.8,0
+1638,Hortifrúti,1,0,29.25,4.0,refrigerado,1,22,MA,,0
+1639,Carnes e peixes,1,3,2.22,21.6,ambiente,0,20,SC,83.7,1
+1640,Laticínios,1,4,2.32,,nao_informado,5,21,AP,26.5,1
+1641,Bebidas não alcoólicas,0,24,3.9,27.6,ambiente,6,14,MG,87.7,1
+1642,Grãos e cereais,0,22,2.08,24.4,ambiente,3,21,PA,86.9,0
+1643,Padaria,1,8,266.3,2.8,refrigerado,6,20,MG,39.5,1
+1644,Outros,0,13,0.65,18.9,ambiente,2,8,RS,18.3,0
+1645,Padaria,1,0,3.76,,nao_informado,4,20,TO,85.4,1
+1646,Hortifrúti,1,5,5.18,30.5,ambiente,4,5,BA,,0
+1647,Refeições prontas,1,3,6.61,21.9,ambiente,6,0,RO,,0
+1648,Hortifrúti,1,9,15.26,8.3,refrigerado,0,1,MT,42.6,0
+1649,Bebidas não alcoólicas,0,16,1.24,9.1,refrigerado,5,17,RR,51.9,0
+1650,Hortifrúti,1,11,0.82,24.0,ambiente,1,3,AC,39.1,0
+1651,Hortifrúti,1,8,118.42,25.9,ambiente,4,16,ES,,1
+1652,Grãos e cereais,0,8,4.15,15.5,ambiente,6,2,RO,69.7,1
+1653,Carnes e peixes,1,8,1.4,,nao_informado,5,14,AL,51.4,1
+1654,Grãos e cereais,0,5,8.78,22.6,ambiente,5,13,SC,51.9,0
+1655,Carnes e peixes,1,2,0.86,25.3,ambiente,5,18,TO,64.8,0
+1656,Laticínios,1,11,3.27,5.2,refrigerado,1,1,GO,3.3,1
+1657,Refeições prontas,1,3,39.54,29.3,ambiente,2,0,SP,10.3,0
+1658,Bebidas não alcoólicas,0,10,0.86,25.9,ambiente,0,10,MS,9.1,0
+1659,Padaria,1,0,105.32,2.6,refrigerado,3,17,SC,72.3,0
+1660,Hortifrúti,1,9,97.68,,nao_informado,3,6,RJ,86.3,0
+1661,Hortifrúti,1,12,1.55,26.5,ambiente,5,2,RJ,69.5,1
+1662,Refeições prontas,1,9,24.09,23.2,ambiente,3,6,DF,74.5,1
+1663,Grãos e cereais,0,3,13.98,27.4,ambiente,3,22,MS,,1
+1664,Refeições prontas,1,12,8.23,,nao_informado,1,15,BA,,0
+1665,Hortifrúti,1,12,160.5,21.6,ambiente,2,21,RJ,,0
+1666,Padaria,1,3,12.54,26.9,ambiente,6,16,RJ,,0
+1667,Carnes e peixes,1,8,0.89,28.3,ambiente,5,13,BA,7.9,0
+1668,Grãos e cereais,0,12,3.06,19.2,ambiente,2,16,RJ,61.2,1
+1669,Carnes e peixes,1,2,47.98,1.7,refrigerado,0,19,PA,7.2,0
+1670,Laticínios,1,8,0.6,33.3,ambiente,4,5,SE,76.3,0
+1671,Padaria,1,3,1.1,,nao_informado,3,13,SP,1.6,0
+1672,Bebidas não alcoólicas,0,3,56.72,,nao_informado,4,12,MA,78.9,0
+1673,Padaria,1,0,1.03,-18.4,congelado,4,5,MT,27.7,0
+1674,Refeições prontas,1,7,237.99,7.5,refrigerado,0,13,AM,2.1,0
+1675,Padaria,1,2,27.26,,nao_informado,4,6,SC,25.9,0
+1676,Carnes e peixes,1,7,2.61,26.4,ambiente,6,3,RO,15.4,1
+1677,Grãos e cereais,0,22,3.97,26.4,ambiente,5,21,PA,,0
+1678,Padaria,1,2,135.46,29.1,ambiente,6,9,PA,89.5,1
+1679,Padaria,1,12,26.56,,nao_informado,0,15,PR,,0
+1680,Carnes e peixes,1,11,5.22,33.6,ambiente,2,16,MT,35.4,1
+1681,Grãos e cereais,0,31,37.41,27.0,ambiente,1,19,RS,47.8,1
+1682,Carnes e peixes,1,5,70.2,2.6,refrigerado,1,5,SE,35.5,0
+1683,Hortifrúti,1,6,189.56,29.8,ambiente,3,6,GO,67.2,1
+1684,Carnes e peixes,1,9,13.57,5.3,refrigerado,5,10,PR,3.9,0
+1685,Refeições prontas,1,5,80.18,3.8,refrigerado,2,11,PI,43.0,0
+1686,Hortifrúti,1,5,0.87,20.8,ambiente,0,20,BA,38.3,0
+1687,Bebidas não alcoólicas,0,16,84.96,26.9,ambiente,3,19,DF,,0
+1688,Laticínios,1,2,6.07,30.6,ambiente,3,1,PB,32.2,0
+1689,Grãos e cereais,0,20,19.99,26.4,ambiente,5,0,MS,1.2,0
+1690,Refeições prontas,1,2,1.97,6.3,refrigerado,5,16,AL,57.9,0
+1691,Hortifrúti,1,11,4.72,22.9,ambiente,0,6,MT,58.6,1
+1692,Refeições prontas,1,7,145.04,7.9,refrigerado,3,19,BA,4.9,0
+1693,Outros,0,45,27.03,23.7,ambiente,0,21,RS,10.7,0
+1694,Laticínios,1,9,3.64,25.3,ambiente,2,8,MA,21.9,1
+1695,Grãos e cereais,0,9,150.05,22.6,ambiente,4,18,RJ,,0
+1696,Outros,0,16,1.12,28.6,ambiente,1,12,SC,22.7,0
+1697,Laticínios,1,10,15.97,-13.7,congelado,2,6,PA,,0
+1698,Grãos e cereais,0,14,7.21,24.6,ambiente,3,15,SE,67.6,0
+1699,Bebidas não alcoólicas,0,34,1.1,,nao_informado,6,0,MT,60.0,0
+1700,Carnes e peixes,1,8,0.72,8.1,refrigerado,3,8,PI,2.6,0
+1701,Bebidas não alcoólicas,0,13,101.77,29.0,ambiente,1,5,MG,2.0,0
+1702,Hortifrúti,1,4,112.47,22.6,ambiente,3,5,MT,52.6,1
+1703,Laticínios,1,12,28.98,2.7,refrigerado,4,15,DF,21.2,0
+1704,Bebidas não alcoólicas,0,17,156.29,25.5,ambiente,2,9,SE,85.1,0
+1705,Outros,0,34,10.01,,nao_informado,2,10,AL,67.1,0
+1706,Carnes e peixes,1,8,93.28,21.6,ambiente,3,15,RJ,3.7,1
+1707,Refeições prontas,1,9,0.86,6.2,refrigerado,1,14,PR,74.3,1
+1708,Grãos e cereais,0,5,50.67,27.0,ambiente,6,9,PR,,1
+1709,Bebidas não alcoólicas,0,18,195.92,22.3,ambiente,5,8,PI,8.6,0
+1710,Outros,0,5,1.02,24.3,ambiente,4,3,RN,9.3,1
+1711,Bebidas não alcoólicas,0,21,41.01,19.2,ambiente,1,3,RR,32.0,0
+1712,Carnes e peixes,1,8,17.52,6.1,refrigerado,0,9,AM,64.5,0
+1713,Padaria,1,2,11.65,22.1,ambiente,5,15,PI,17.3,0
+1714,Grãos e cereais,0,27,35.41,30.8,ambiente,4,21,MG,54.9,1
+1715,Laticínios,1,10,15.96,-16.0,congelado,4,12,GO,,0
+1716,Bebidas não alcoólicas,0,21,0.57,26.2,ambiente,3,23,PE,26.6,0
+1717,Hortifrúti,1,3,21.84,33.2,ambiente,3,17,MA,20.8,1
+1718,Outros,0,39,35.67,24.7,ambiente,3,19,MG,,0
+1719,Refeições prontas,1,4,188.6,14.7,ambiente,4,19,SP,14.8,0
+1720,Grãos e cereais,0,37,38.86,20.9,ambiente,4,10,PE,89.3,1
+1721,Carnes e peixes,1,9,208.41,27.7,ambiente,6,4,PB,79.0,0
+1722,Padaria,1,1,37.48,34.5,ambiente,0,7,PR,76.1,1
+1723,Hortifrúti,1,5,232.3,-15.2,congelado,4,11,BA,,0
+1724,Refeições prontas,1,6,283.38,19.9,ambiente,6,18,PB,20.6,1
+1725,Carnes e peixes,1,9,7.31,,nao_informado,0,18,MA,0.9,1
+1726,Outros,0,35,2.91,25.4,ambiente,2,5,PB,51.2,0
+1727,Bebidas não alcoólicas,0,31,23.54,22.6,ambiente,1,14,CE,54.2,0
+1728,Hortifrúti,1,9,30.16,24.0,ambiente,1,12,PE,,1
+1729,Carnes e peixes,1,10,1.87,3.2,refrigerado,5,20,BA,88.5,0
+1730,Laticínios,1,12,22.62,8.5,refrigerado,0,17,AL,44.2,0
+1731,Laticínios,1,5,362.14,27.1,ambiente,5,5,RR,77.5,1
+1732,Outros,0,42,35.06,7.7,refrigerado,5,6,GO,5.4,0
+1733,Laticínios,1,2,2.71,12.6,ambiente,6,2,RR,26.4,1
+1734,Hortifrúti,1,7,10.25,10.2,refrigerado,6,5,AC,8.3,0
+1735,Hortifrúti,1,1,11.24,1.9,refrigerado,0,8,RO,,1
+1736,Carnes e peixes,1,6,242.58,24.1,ambiente,4,3,PE,87.3,1
+1737,Refeições prontas,1,11,1.93,33.1,ambiente,2,18,PE,17.6,0
+1738,Carnes e peixes,1,7,26.42,4.8,refrigerado,0,2,PA,,1
+1739,Padaria,1,7,13.93,27.9,ambiente,2,1,AC,16.6,1
+1740,Bebidas não alcoólicas,0,35,89.74,21.9,ambiente,5,16,AC,52.6,0
+1741,Bebidas não alcoólicas,0,22,4.21,20.0,ambiente,0,6,TO,46.8,0
+1742,Bebidas não alcoólicas,0,24,7.07,-19.1,congelado,0,17,RR,79.6,0
+1743,Grãos e cereais,0,14,6.07,15.2,ambiente,6,7,AM,83.6,0
+1744,Laticínios,1,8,303.39,22.4,ambiente,3,20,RS,4.2,1
+1745,Padaria,1,12,122.16,,nao_informado,3,17,RR,,1
+1746,Outros,0,3,0.95,31.0,ambiente,5,0,MG,59.6,0
+1747,Bebidas não alcoólicas,0,33,2.01,23.9,ambiente,5,7,SC,19.8,0
+1748,Refeições prontas,1,7,19.98,26.4,ambiente,6,16,RS,62.1,0
+1749,Laticínios,1,10,1.36,19.0,ambiente,3,18,BA,74.1,1
+1750,Padaria,1,10,14.17,6.7,refrigerado,2,13,AM,20.8,1
+1751,Padaria,1,11,0.74,25.7,ambiente,2,2,RJ,,0
+1752,Grãos e cereais,0,6,6.0,25.2,ambiente,0,9,ES,0.2,0
+1753,Laticínios,1,2,65.43,,nao_informado,1,15,MG,28.8,0
+1754,Laticínios,1,7,35.44,24.9,ambiente,3,20,RN,39.8,1
+1755,Bebidas não alcoólicas,0,34,253.63,,nao_informado,5,7,RN,22.3,0
+1756,Laticínios,1,4,227.19,31.5,ambiente,0,7,AC,38.3,1
+1757,Refeições prontas,1,5,2.64,19.6,ambiente,4,14,SP,68.9,0
+1758,Grãos e cereais,0,2,3.85,21.2,ambiente,1,18,RR,74.2,1
+1759,Carnes e peixes,1,3,380.78,24.5,ambiente,2,3,PR,,0
+1760,Carnes e peixes,1,5,212.21,26.0,ambiente,0,3,GO,85.8,1
+1761,Carnes e peixes,1,7,359.72,27.1,ambiente,2,7,TO,22.1,0
+1762,Hortifrúti,1,9,243.13,8.0,refrigerado,1,23,AP,66.7,0
+1763,Grãos e cereais,0,10,168.7,22.9,ambiente,6,13,CE,22.4,1
+1764,Outros,0,22,2.13,,nao_informado,6,21,PA,29.4,0
+1765,Outros,0,6,7.11,21.5,ambiente,6,23,BA,74.3,1
+1766,Refeições prontas,1,3,64.97,24.7,ambiente,5,20,SP,27.9,1
+1767,Refeições prontas,1,4,182.73,23.9,ambiente,1,11,CE,81.9,0
+1768,Outros,0,3,15.64,31.9,ambiente,5,23,MS,19.8,0
+1769,Bebidas não alcoólicas,0,26,29.45,23.6,ambiente,3,21,AL,43.1,0
+1770,Bebidas não alcoólicas,0,1,6.04,8.8,refrigerado,2,12,RO,81.9,0
+1771,Carnes e peixes,1,2,21.56,21.8,ambiente,1,11,MA,50.0,1
+1772,Bebidas não alcoólicas,0,36,88.51,23.2,ambiente,3,6,TO,26.2,0
+1773,Refeições prontas,1,9,0.68,26.7,ambiente,4,14,MS,,0
+1774,Padaria,1,11,1.05,25.1,ambiente,0,10,SE,2.1,0
+1775,Laticínios,1,8,280.02,31.8,ambiente,2,19,SP,,0
+1776,Padaria,1,8,1.14,19.9,ambiente,4,14,PI,69.4,0
+1777,Padaria,1,4,4.76,21.7,ambiente,2,3,PA,0.1,0
+1778,Padaria,1,1,10.04,11.9,refrigerado,0,12,PA,4.7,0
+1779,Grãos e cereais,0,28,214.66,,nao_informado,5,4,RN,74.7,0
+1780,Laticínios,1,1,64.14,8.7,refrigerado,1,16,DF,47.4,1
+1781,Bebidas não alcoólicas,0,2,2.17,25.1,ambiente,1,13,CE,31.6,0
+1782,Hortifrúti,1,6,58.08,23.7,ambiente,6,15,MT,5.4,0
+1783,Carnes e peixes,1,5,3.92,22.5,ambiente,1,11,BA,82.3,1
+1784,Laticínios,1,9,195.13,4.0,refrigerado,1,21,MA,41.0,1
+1785,Padaria,1,2,0.56,31.5,ambiente,4,4,AC,,0
+1786,Hortifrúti,1,2,108.1,,nao_informado,3,0,PA,,0
+1787,Grãos e cereais,0,2,120.24,26.1,ambiente,1,21,RN,81.8,1
+1788,Hortifrúti,1,7,0.66,35.8,ambiente,2,15,MG,84.5,1
+1789,Laticínios,1,12,56.76,23.6,ambiente,4,13,PE,73.6,1
+1790,Carnes e peixes,1,8,16.71,25.0,ambiente,4,21,RO,35.9,0
+1791,Grãos e cereais,0,15,139.49,27.2,ambiente,3,15,RN,51.4,1
+1792,Laticínios,1,8,181.22,,nao_informado,6,8,AP,44.0,1
+1793,Hortifrúti,1,10,67.36,25.8,ambiente,2,10,AM,45.9,0
+1794,Bebidas não alcoólicas,0,20,34.1,27.2,ambiente,3,13,RS,9.9,0
+1795,Bebidas não alcoólicas,0,24,7.61,28.3,ambiente,1,6,RO,86.3,0
+1796,Hortifrúti,1,4,9.8,3.7,refrigerado,1,15,MA,75.2,0
+1797,Outros,0,0,14.51,21.0,ambiente,2,9,ES,,0
+1798,Outros,0,43,8.73,24.9,ambiente,3,5,PA,76.9,0
+1799,Hortifrúti,1,11,3.79,27.6,ambiente,4,15,RN,73.7,1
+1800,Bebidas não alcoólicas,0,24,158.39,24.4,ambiente,5,14,PR,,0
+1801,Laticínios,1,0,14.08,9.4,refrigerado,3,11,MA,78.6,1
+1802,Hortifrúti,1,7,2.5,,nao_informado,1,21,MG,47.2,1
+1803,Hortifrúti,1,1,1.86,6.0,refrigerado,3,16,SC,21.7,0
+1804,Bebidas não alcoólicas,0,13,2.23,21.8,ambiente,5,14,SE,28.7,0
+1805,Hortifrúti,1,9,106.28,6.3,refrigerado,1,13,TO,11.1,0
+1806,Padaria,1,6,9.76,-13.5,congelado,0,4,PR,26.9,0
+1807,Carnes e peixes,1,1,5.52,1.8,refrigerado,6,14,PA,27.5,0
+1808,Refeições prontas,1,0,90.85,23.3,ambiente,0,22,RO,37.0,1
+1809,Carnes e peixes,1,10,44.27,30.3,ambiente,4,19,SC,2.0,0
+1810,Padaria,1,9,9.66,21.5,ambiente,2,1,RR,5.8,1
+1811,Padaria,1,3,46.95,,nao_informado,1,15,CE,77.4,1
+1812,Hortifrúti,1,2,86.49,3.5,refrigerado,1,4,MT,23.1,1
+1813,Grãos e cereais,0,0,8.02,27.6,ambiente,5,11,PB,58.4,1
+1814,Carnes e peixes,1,8,53.56,25.3,ambiente,2,21,AC,2.6,1
+1815,Refeições prontas,1,12,0.85,,nao_informado,2,19,SE,8.1,0
+1816,Refeições prontas,1,4,278.98,0.9,refrigerado,4,2,SC,45.2,1
+1817,Padaria,1,8,2.34,,nao_informado,3,3,SP,38.2,0
+1818,Outros,0,24,16.38,21.9,ambiente,1,10,RR,73.1,0
+1819,Grãos e cereais,0,2,63.73,28.6,ambiente,2,5,BA,64.9,0
+1820,Grãos e cereais,0,17,32.98,28.9,ambiente,1,23,MA,74.6,0
+1821,Bebidas não alcoólicas,0,37,5.47,29.4,ambiente,6,20,AP,,0
+1822,Padaria,1,6,171.23,0.6,refrigerado,4,0,PA,56.0,1
+1823,Bebidas não alcoólicas,0,42,120.72,10.6,refrigerado,0,19,AM,60.1,1
+1824,Grãos e cereais,0,32,278.43,29.0,ambiente,1,2,AL,77.4,0
+1825,Outros,0,4,0.69,,nao_informado,6,6,TO,87.4,0
+1826,Refeições prontas,1,2,3.74,27.1,ambiente,0,4,RO,45.7,0
+1827,Hortifrúti,1,2,0.86,26.2,ambiente,4,19,MA,46.0,0
+1828,Bebidas não alcoólicas,0,40,32.18,31.2,ambiente,2,4,ES,23.0,0
+1829,Outros,0,8,1.99,28.2,ambiente,2,18,SP,46.0,0
+1830,Hortifrúti,1,3,22.93,29.5,ambiente,6,17,BA,,1
+1831,Refeições prontas,1,5,89.45,22.8,ambiente,4,20,PI,46.3,1
+1832,Outros,0,14,10.52,27.3,ambiente,6,5,AC,2.8,0
+1833,Bebidas não alcoólicas,0,28,79.61,26.2,ambiente,5,6,RN,23.7,0
+1834,Hortifrúti,1,4,161.44,,nao_informado,0,5,TO,,0
+1835,Grãos e cereais,0,26,1.67,24.5,ambiente,5,16,PI,67.8,0
+1836,Hortifrúti,1,12,47.46,29.6,ambiente,2,0,SC,,1
+1837,Outros,0,4,0.78,21.2,ambiente,5,10,AC,34.7,1
+1838,Laticínios,1,12,56.24,6.7,refrigerado,1,12,SP,19.7,1
+1839,Refeições prontas,1,3,38.99,26.0,ambiente,2,13,AM,0.2,1
+1840,Laticínios,1,6,28.53,6.2,refrigerado,1,5,AC,37.1,0
+1841,Refeições prontas,1,10,232.83,1.6,refrigerado,4,0,PI,78.5,0
+1842,Bebidas não alcoólicas,0,25,145.24,21.1,ambiente,4,1,MA,,1
+1843,Bebidas não alcoólicas,0,12,75.32,28.7,ambiente,5,2,PB,30.6,0
+1844,Carnes e peixes,1,6,118.42,27.8,ambiente,0,10,SC,43.0,1
+1845,Laticínios,1,5,30.33,,nao_informado,2,17,TO,32.1,1
+1846,Grãos e cereais,0,21,232.81,24.5,ambiente,3,8,SC,47.3,0
+1847,Padaria,1,2,31.0,17.4,ambiente,2,15,MA,,1
+1848,Bebidas não alcoólicas,0,43,0.54,,nao_informado,4,9,ES,45.7,1
+1849,Bebidas não alcoólicas,0,9,0.66,27.3,ambiente,2,7,MS,43.5,1
+1850,Grãos e cereais,0,6,30.27,28.5,ambiente,5,15,DF,,0
+1851,Padaria,1,1,3.3,26.4,ambiente,5,0,RJ,23.0,1
+1852,Laticínios,1,2,116.57,26.5,ambiente,4,3,PE,,0
+1853,Outros,0,37,1.63,23.3,ambiente,0,3,BA,10.7,0
+1854,Padaria,1,9,1.03,3.4,refrigerado,1,22,PB,32.9,0
+1855,Padaria,1,1,199.77,7.8,refrigerado,3,16,AC,,0
+1856,Grãos e cereais,0,39,5.34,27.1,ambiente,1,14,AL,45.9,0
+1857,Padaria,1,12,3.82,21.2,ambiente,0,4,AP,73.5,1
+1858,Padaria,1,10,2.38,-1.2,refrigerado,6,22,AP,,0
+1859,Padaria,1,12,6.0,1.6,refrigerado,4,8,AC,77.2,1
+1860,Laticínios,1,3,19.4,21.4,ambiente,4,5,AM,,1
+1861,Hortifrúti,1,1,25.84,0.5,refrigerado,0,0,DF,24.5,0
+1862,Grãos e cereais,0,27,1.01,,nao_informado,3,3,SP,77.3,0
+1863,Hortifrúti,1,1,0.67,5.0,refrigerado,0,9,SC,,0
+1864,Padaria,1,0,9.38,-1.2,refrigerado,2,19,PI,,1
+1865,Outros,0,29,21.92,24.8,ambiente,5,14,TO,78.0,0
+1866,Outros,0,29,0.67,-20.1,congelado,2,6,MG,72.5,0
+1867,Laticínios,1,6,37.6,26.3,ambiente,1,5,PA,40.6,1
+1868,Hortifrúti,1,10,14.15,-1.8,refrigerado,2,12,MS,70.0,0
+1869,Padaria,1,6,80.21,8.8,refrigerado,6,10,PA,,0
+1870,Refeições prontas,1,0,11.86,8.4,refrigerado,3,10,ES,64.7,0
+1871,Hortifrúti,1,9,30.83,29.1,ambiente,1,2,SC,88.9,1
+1872,Laticínios,1,7,348.75,17.9,ambiente,1,9,RO,30.7,0
+1873,Outros,0,1,2.21,23.3,ambiente,1,19,AL,49.8,0
+1874,Refeições prontas,1,8,202.22,18.8,ambiente,6,8,PE,65.5,1
+1875,Padaria,1,5,39.29,26.9,ambiente,4,21,SC,52.6,0
+1876,Bebidas não alcoólicas,0,0,324.27,27.9,ambiente,2,14,MS,40.9,0
+1877,Outros,0,7,49.87,27.1,ambiente,3,2,SP,22.7,0
+1878,Laticínios,1,8,129.19,-24.3,congelado,5,10,RJ,66.8,1
+1879,Grãos e cereais,0,9,12.68,26.3,ambiente,3,23,RR,24.7,0
+1880,Grãos e cereais,0,6,102.68,32.0,ambiente,2,16,RO,46.2,0
+1881,Outros,0,14,7.96,27.7,ambiente,6,13,AL,54.5,0
+1882,Outros,0,40,19.78,19.7,ambiente,3,11,BA,53.5,0
+1883,Laticínios,1,0,3.26,14.2,ambiente,0,16,PI,70.7,1
+1884,Bebidas não alcoólicas,0,8,3.49,21.8,ambiente,1,19,ES,18.1,0
+1885,Refeições prontas,1,1,4.27,14.4,refrigerado,2,5,AP,83.5,0
+1886,Padaria,1,9,45.28,,nao_informado,4,15,MT,,0
+1887,Carnes e peixes,1,8,60.95,,nao_informado,0,4,MS,,1
+1888,Hortifrúti,1,11,20.88,12.6,refrigerado,2,16,CE,1.4,0
+1889,Padaria,1,11,61.84,25.4,ambiente,2,18,PI,72.9,0
+1890,Outros,0,3,0.69,28.6,ambiente,2,6,MG,,0
+1891,Hortifrúti,1,4,35.57,16.3,ambiente,0,15,PB,12.9,0
+1892,Grãos e cereais,0,41,0.76,24.2,ambiente,6,0,RO,,0
+1893,Carnes e peixes,1,7,7.17,,nao_informado,6,13,AM,,0
+1894,Bebidas não alcoólicas,0,11,372.45,17.0,ambiente,1,3,AL,64.1,0
+1895,Refeições prontas,1,5,169.47,3.2,refrigerado,5,23,SP,18.3,0
+1896,Outros,0,7,374.01,,nao_informado,4,19,SC,23.2,0
+1897,Laticínios,1,10,149.52,,nao_informado,3,1,RO,,0
+1898,Grãos e cereais,0,7,177.06,28.3,ambiente,0,9,AP,,0
+1899,Outros,0,7,16.99,24.9,ambiente,6,19,SP,43.5,1
+1900,Grãos e cereais,0,1,1.72,30.9,ambiente,6,1,MG,63.9,1
+1901,Laticínios,1,9,186.75,-13.2,congelado,4,0,MA,14.6,0
+1902,Grãos e cereais,0,17,1.06,28.1,ambiente,5,0,PE,4.6,0
+1903,Hortifrúti,1,8,1.28,19.1,ambiente,2,15,RS,71.2,1
+1904,Padaria,1,7,1.37,13.1,refrigerado,6,9,PB,42.5,0
+1905,Laticínios,1,12,46.84,9.0,refrigerado,3,2,SC,27.4,0
+1906,Padaria,1,9,0.93,,nao_informado,5,23,RO,73.4,0
+1907,Hortifrúti,1,3,3.65,4.0,refrigerado,0,5,MT,47.1,0
+1908,Hortifrúti,1,7,12.87,26.6,ambiente,5,0,SC,46.5,0
+1909,Refeições prontas,1,5,155.12,24.9,ambiente,2,17,RS,89.2,1
+1910,Laticínios,1,10,1.92,5.1,refrigerado,2,4,GO,9.3,0
+1911,Bebidas não alcoólicas,0,7,0.69,6.0,refrigerado,0,5,RR,,0
+1912,Hortifrúti,1,2,3.28,31.7,ambiente,2,18,SP,,1
+1913,Refeições prontas,1,2,6.35,21.9,ambiente,2,7,PR,67.6,1
+1914,Hortifrúti,1,4,86.19,9.1,refrigerado,6,23,CE,56.1,0
+1915,Hortifrúti,1,12,53.89,19.4,ambiente,4,16,RO,27.7,0
+1916,Carnes e peixes,1,4,0.67,3.4,refrigerado,5,14,RR,75.5,1
+1917,Grãos e cereais,0,0,141.73,25.9,ambiente,5,12,MT,65.1,0
+1918,Hortifrúti,1,1,2.99,-1.0,refrigerado,6,13,DF,44.6,1
+1919,Grãos e cereais,0,39,56.47,29.2,ambiente,1,19,PA,39.6,0
+1920,Outros,0,15,0.54,27.3,ambiente,2,0,AP,58.4,0
+1921,Grãos e cereais,0,34,8.05,7.2,refrigerado,6,7,BA,2.6,0
+1922,Bebidas não alcoólicas,0,30,34.48,3.7,refrigerado,0,12,SE,43.0,1
+1923,Bebidas não alcoólicas,0,38,2.45,25.9,ambiente,3,4,SC,56.2,0
+1924,Grãos e cereais,0,10,0.82,22.2,ambiente,4,5,SE,42.6,0
+1925,Hortifrúti,1,2,78.1,27.3,ambiente,0,18,SP,86.5,1
+1926,Grãos e cereais,0,27,0.92,24.2,ambiente,2,20,ES,66.2,0
+1927,Carnes e peixes,1,7,8.89,,nao_informado,0,18,MG,,0
+1928,Bebidas não alcoólicas,0,28,88.33,25.9,ambiente,3,23,AC,37.2,0
+1929,Carnes e peixes,1,6,138.25,25.4,ambiente,2,16,SC,40.8,1
+1930,Bebidas não alcoólicas,0,16,8.73,24.2,ambiente,2,14,ES,,0
+1931,Carnes e peixes,1,6,1.65,27.2,ambiente,6,23,PA,3.2,1
+1932,Carnes e peixes,1,12,234.97,23.9,ambiente,4,3,TO,82.0,0
+1933,Refeições prontas,1,11,0.98,,nao_informado,1,2,PI,76.5,1
+1934,Padaria,1,9,36.03,17.9,refrigerado,3,4,PE,79.9,0
+1935,Refeições prontas,1,0,0.91,,nao_informado,3,11,PB,74.7,1
+1936,Refeições prontas,1,9,6.77,-15.0,congelado,3,12,RS,69.8,0
+1937,Carnes e peixes,1,4,4.76,,nao_informado,2,5,TO,54.3,0
+1938,Grãos e cereais,0,10,122.37,-21.4,congelado,0,21,MA,35.2,1
+1939,Hortifrúti,1,1,28.95,26.4,ambiente,5,12,MT,36.3,1
+1940,Refeições prontas,1,0,0.51,5.6,refrigerado,5,14,SC,68.3,1
+1941,Outros,0,25,4.18,23.1,ambiente,2,19,RJ,24.5,0
+1942,Outros,0,25,25.84,26.2,ambiente,5,16,GO,84.0,1
+1943,Outros,0,40,65.61,1.8,refrigerado,3,1,MA,81.8,0
+1944,Bebidas não alcoólicas,0,32,1.81,23.0,ambiente,5,2,PB,23.6,0
+1945,Outros,0,1,150.5,25.0,ambiente,1,9,AP,80.1,0
+1946,Hortifrúti,1,11,1.91,7.8,refrigerado,0,17,AC,5.5,0
+1947,Laticínios,1,1,4.27,10.4,refrigerado,6,7,GO,,1
+1948,Laticínios,1,10,13.25,25.6,ambiente,1,8,CE,24.2,0
+1949,Outros,0,43,313.07,3.2,refrigerado,0,2,PE,66.7,1
+1950,Outros,0,32,3.93,24.4,ambiente,4,19,DF,35.8,1
+1951,Padaria,1,12,106.3,8.5,refrigerado,2,10,RS,30.8,0
+1952,Outros,0,31,173.92,24.8,ambiente,4,10,BA,76.4,0
+1953,Grãos e cereais,0,25,262.78,24.6,ambiente,5,14,RN,8.1,1
+1954,Padaria,1,7,1.72,,nao_informado,4,2,PE,42.5,0
+1955,Padaria,1,4,28.24,,nao_informado,3,2,SP,23.1,0
+1956,Refeições prontas,1,0,90.68,-1.2,refrigerado,3,23,AP,10.7,1
+1957,Laticínios,1,10,10.22,20.9,ambiente,3,22,MS,20.2,1
+1958,Bebidas não alcoólicas,0,35,24.49,7.3,refrigerado,6,6,RS,,0
+1959,Refeições prontas,1,7,7.88,-2.6,refrigerado,0,18,GO,46.2,0
+1960,Grãos e cereais,0,33,235.29,35.9,ambiente,0,4,PE,,0
+1961,Outros,0,9,2.06,25.9,ambiente,5,19,ES,27.8,1
+1962,Refeições prontas,1,10,2.13,4.2,refrigerado,3,0,BA,59.7,1
+1963,Grãos e cereais,0,5,11.45,27.4,ambiente,6,21,RS,85.9,0
+1964,Laticínios,1,3,53.88,4.0,refrigerado,2,21,MA,13.1,1
+1965,Laticínios,1,2,95.33,32.8,ambiente,2,14,PE,,1
+1966,Carnes e peixes,1,1,236.76,-27.9,congelado,4,6,TO,46.3,1
+1967,Bebidas não alcoólicas,0,1,2.63,29.4,ambiente,4,18,AC,72.4,0
+1968,Padaria,1,9,1.76,19.9,ambiente,3,6,PI,31.1,0
+1969,Refeições prontas,1,8,1.42,24.2,ambiente,5,18,GO,79.4,0
+1970,Grãos e cereais,0,23,139.6,30.3,ambiente,1,20,BA,,0
+1971,Refeições prontas,1,1,9.45,28.0,ambiente,5,18,PI,,1
+1972,Padaria,1,2,69.28,30.4,ambiente,6,22,TO,42.0,0
+1973,Carnes e peixes,1,9,14.4,-18.8,congelado,5,8,PB,75.5,1
+1974,Hortifrúti,1,4,0.73,,nao_informado,4,19,MA,,0
+1975,Laticínios,1,6,12.88,25.5,ambiente,2,17,MA,55.6,0
+1976,Laticínios,1,3,145.33,7.7,refrigerado,4,6,RS,21.7,0
+1977,Grãos e cereais,0,42,300.24,,nao_informado,2,20,BA,65.0,0
+1978,Carnes e peixes,1,6,30.33,25.4,ambiente,3,18,SP,87.5,1
+1979,Carnes e peixes,1,1,20.39,25.1,ambiente,5,23,SC,,1
+1980,Grãos e cereais,0,37,201.85,34.3,ambiente,6,7,MT,46.4,1
+1981,Hortifrúti,1,11,4.69,22.2,ambiente,5,9,SC,41.2,0
+1982,Padaria,1,7,1.54,26.1,ambiente,2,6,GO,51.4,0
+1983,Bebidas não alcoólicas,0,16,14.39,27.4,ambiente,3,9,SP,24.2,0
+1984,Grãos e cereais,0,14,1.9,-20.3,congelado,5,7,CE,70.9,0
+1985,Outros,0,31,2.75,24.1,ambiente,1,9,AM,,0
+1986,Refeições prontas,1,3,1.82,0.4,refrigerado,5,15,BA,40.4,1
+1987,Padaria,1,3,3.65,28.5,ambiente,0,5,PR,48.2,0
+1988,Refeições prontas,1,12,205.43,30.9,ambiente,5,18,AP,41.3,0
+1989,Grãos e cereais,0,34,1.99,35.7,ambiente,0,14,AM,73.0,0
+1990,Bebidas não alcoólicas,0,29,91.14,27.2,ambiente,3,1,RS,11.2,0
+1991,Carnes e peixes,1,0,5.35,-18.8,congelado,1,0,PA,,1
+1992,Bebidas não alcoólicas,0,32,66.34,26.6,ambiente,5,17,PA,39.3,0
+1993,Hortifrúti,1,6,0.59,29.5,ambiente,1,22,MA,89.5,0
+1994,Laticínios,1,10,55.23,28.7,ambiente,6,1,SC,19.5,1
+1995,Refeições prontas,1,4,2.39,-1.3,refrigerado,6,19,AM,,0
+1996,Refeições prontas,1,3,14.67,3.0,refrigerado,3,11,PE,,0
+1997,Hortifrúti,1,10,0.61,,nao_informado,1,8,PI,11.0,1
+1998,Grãos e cereais,0,18,113.22,25.7,ambiente,2,8,PB,32.7,0
+1999,Refeições prontas,1,9,2.65,28.4,ambiente,5,17,BA,73.9,0
+2000,Padaria,1,6,271.99,-13.5,congelado,4,2,TO,72.0,1
+2001,Bebidas não alcoólicas,0,3,197.59,,nao_informado,5,18,PA,40.9,0
+2002,Padaria,1,6,13.99,3.6,refrigerado,4,17,SC,,0
+2003,Refeições prontas,1,2,3.78,22.4,ambiente,6,19,PR,72.6,0
+2004,Laticínios,1,12,236.43,-17.1,congelado,6,13,MA,,0
+2005,Laticínios,1,2,0.79,6.2,refrigerado,4,2,CE,73.1,1
+2006,Bebidas não alcoólicas,0,10,3.9,10.0,refrigerado,0,1,AL,34.9,0
+2007,Outros,0,25,123.26,23.6,ambiente,4,18,RS,1.4,0
+2008,Laticínios,1,11,28.57,6.8,refrigerado,4,19,BA,,0
+2009,Carnes e peixes,1,11,183.48,23.4,ambiente,0,11,MS,68.6,1
+2010,Padaria,1,1,33.18,1.7,refrigerado,3,16,PE,,0
+2011,Hortifrúti,1,4,106.33,28.0,ambiente,3,6,CE,47.2,0
+2012,Grãos e cereais,0,31,33.61,19.6,ambiente,0,6,BA,73.4,0
+2013,Carnes e peixes,1,6,1.39,25.4,ambiente,5,7,SE,,0
+2014,Refeições prontas,1,9,40.23,25.0,ambiente,2,6,PE,81.0,0
+2015,Laticínios,1,8,1.69,4.6,refrigerado,1,13,PB,12.2,0
+2016,Bebidas não alcoólicas,0,17,0.51,21.0,ambiente,2,9,PI,72.2,0
+2017,Refeições prontas,1,5,1.23,29.4,ambiente,0,1,TO,1.2,1
+2018,Outros,0,24,12.28,11.9,refrigerado,0,20,CE,,0
+2019,Refeições prontas,1,10,58.17,7.8,refrigerado,4,3,PA,63.1,1
+2020,Laticínios,1,4,11.65,25.0,ambiente,2,20,PR,81.1,1
+2021,Carnes e peixes,1,6,2.43,8.6,refrigerado,2,2,RR,30.1,0
+2022,Outros,0,27,240.39,6.1,refrigerado,6,9,SC,51.6,0
+2023,Refeições prontas,1,1,33.37,,nao_informado,2,9,GO,58.5,1
+2024,Hortifrúti,1,0,5.64,,nao_informado,4,22,MA,,0
+2025,Refeições prontas,1,7,5.72,-21.4,congelado,4,10,RO,17.3,0
+2026,Laticínios,1,2,3.36,26.7,ambiente,4,1,ES,,1
+2027,Hortifrúti,1,5,91.54,25.1,ambiente,4,13,SP,30.5,1
+2028,Laticínios,1,6,3.86,-2.1,refrigerado,3,22,PI,58.5,0
+2029,Carnes e peixes,1,6,151.08,1.9,refrigerado,2,5,SP,,0
+2030,Laticínios,1,5,1.66,3.8,refrigerado,3,19,TO,71.6,1
+2031,Grãos e cereais,0,28,0.86,36.7,ambiente,3,9,DF,25.5,0
+2032,Outros,0,37,4.36,28.3,ambiente,5,18,ES,45.6,1
+2033,Hortifrúti,1,8,52.41,-4.8,congelado,5,16,GO,,0
+2034,Refeições prontas,1,7,25.2,8.2,refrigerado,2,23,MS,51.8,0
+2035,Hortifrúti,1,9,3.01,8.5,refrigerado,5,8,AM,6.3,1
+2036,Refeições prontas,1,12,7.36,32.2,ambiente,0,19,PR,,0
+2037,Refeições prontas,1,3,70.54,-18.4,congelado,0,12,AL,45.6,0
+2038,Hortifrúti,1,3,32.98,-0.3,refrigerado,5,1,RN,32.9,1
+2039,Grãos e cereais,0,18,0.58,31.6,ambiente,4,21,ES,39.3,1
+2040,Laticínios,1,4,77.25,15.9,ambiente,6,1,AM,32.6,0
+2041,Bebidas não alcoólicas,0,12,2.06,22.6,ambiente,0,14,AL,51.9,0
+2042,Outros,0,39,81.1,32.1,ambiente,2,23,DF,,0
+2043,Padaria,1,12,2.69,6.0,refrigerado,0,5,DF,34.7,0
+2044,Grãos e cereais,0,7,0.91,25.2,ambiente,0,18,PA,48.6,0
+2045,Bebidas não alcoólicas,0,8,0.69,27.3,ambiente,4,10,GO,27.5,0
+2046,Padaria,1,11,21.64,19.6,ambiente,1,19,RR,76.9,1
+2047,Padaria,1,0,132.89,,nao_informado,4,18,RO,9.6,1
+2048,Padaria,1,9,150.84,-15.2,congelado,6,8,SE,53.0,0
+2049,Refeições prontas,1,8,1.24,3.2,refrigerado,0,9,AC,51.1,0
+2050,Carnes e peixes,1,5,3.09,5.2,refrigerado,3,13,AC,49.0,0
+2051,Grãos e cereais,0,11,8.26,22.5,ambiente,5,8,GO,,0
+2052,Hortifrúti,1,1,104.8,28.6,ambiente,5,14,PE,79.6,0
+2053,Hortifrúti,1,7,36.66,25.7,ambiente,5,14,SP,53.9,0
+2054,Hortifrúti,1,11,139.47,25.0,ambiente,3,2,PE,84.5,1
+2055,Carnes e peixes,1,2,236.92,24.2,ambiente,5,5,MT,44.5,1
+2056,Refeições prontas,1,5,206.99,5.8,refrigerado,5,22,RR,45.7,1
+2057,Grãos e cereais,0,11,58.43,,nao_informado,3,11,AC,89.9,1
+2058,Hortifrúti,1,1,8.74,12.0,refrigerado,3,13,PE,88.5,1
+2059,Grãos e cereais,0,32,12.89,20.7,ambiente,5,16,TO,36.0,0
+2060,Laticínios,1,11,7.52,24.7,ambiente,2,6,AM,63.5,1
+2061,Carnes e peixes,1,9,11.25,27.4,ambiente,1,14,RO,49.8,1
+2062,Hortifrúti,1,9,25.77,-12.6,congelado,0,15,RN,7.7,1
+2063,Grãos e cereais,0,33,122.93,3.7,refrigerado,3,13,MG,11.5,0
+2064,Laticínios,1,11,61.85,,nao_informado,6,7,PE,15.4,0
+2065,Laticínios,1,7,97.01,29.2,ambiente,3,23,PB,,0
+2066,Laticínios,1,4,4.42,5.8,refrigerado,1,9,RR,49.6,1
+2067,Hortifrúti,1,3,0.7,-23.9,congelado,1,23,AP,,1
+2068,Carnes e peixes,1,0,1.14,-23.8,congelado,3,18,PR,,0
+2069,Carnes e peixes,1,11,20.19,,nao_informado,0,2,RS,57.7,1
+2070,Grãos e cereais,0,2,1.23,,nao_informado,1,0,BA,16.3,1
+2071,Hortifrúti,1,6,4.66,29.7,ambiente,6,18,RO,50.8,1
+2072,Carnes e peixes,1,10,12.42,,nao_informado,5,7,MG,6.8,0
+2073,Grãos e cereais,0,6,2.06,-18.8,congelado,1,1,CE,70.6,1
+2074,Grãos e cereais,0,38,0.56,21.6,ambiente,6,10,PB,17.4,0
+2075,Laticínios,1,5,137.76,-21.5,congelado,0,12,AL,47.1,0
+2076,Outros,0,40,3.45,24.2,ambiente,3,0,AM,10.8,0
+2077,Carnes e peixes,1,9,381.71,,nao_informado,5,16,AM,,1
+2078,Carnes e peixes,1,0,222.53,22.3,ambiente,4,4,MT,13.8,1
+2079,Outros,0,27,65.16,18.2,ambiente,5,23,ES,15.9,1
+2080,Outros,0,19,145.18,27.0,ambiente,1,15,AL,43.4,0
+2081,Padaria,1,7,76.96,22.7,ambiente,2,13,RN,,1
+2082,Bebidas não alcoólicas,0,13,2.67,,nao_informado,4,6,RR,34.2,0
+2083,Laticínios,1,4,4.08,-26.4,congelado,2,11,GO,52.7,0
+2084,Carnes e peixes,1,2,6.73,3.7,refrigerado,3,9,BA,67.4,1
+2085,Padaria,1,9,0.79,3.3,refrigerado,2,4,AL,22.4,1
+2086,Outros,0,39,23.47,19.8,ambiente,4,12,RS,,0
+2087,Hortifrúti,1,11,19.66,22.9,ambiente,3,22,GO,,0
+2088,Laticínios,1,5,42.08,10.1,refrigerado,5,14,GO,9.3,0
+2089,Carnes e peixes,1,4,103.29,28.6,ambiente,4,14,PB,,0
+2090,Laticínios,1,6,39.24,,nao_informado,0,15,MS,,1
+2091,Hortifrúti,1,3,1.83,23.5,ambiente,3,1,AP,48.7,1
+2092,Carnes e peixes,1,11,1.6,,nao_informado,6,5,RR,,0
+2093,Refeições prontas,1,3,0.56,2.9,refrigerado,0,0,SP,48.9,0
+2094,Grãos e cereais,0,37,1.69,22.8,ambiente,3,8,PI,,0
+2095,Carnes e peixes,1,12,40.08,16.2,ambiente,4,15,PB,6.7,0
+2096,Padaria,1,4,12.97,24.3,ambiente,4,5,MA,58.6,1
+2097,Laticínios,1,0,269.71,22.5,ambiente,6,20,RR,14.1,1
+2098,Padaria,1,7,1.35,29.5,ambiente,3,14,SC,30.1,1
+2099,Hortifrúti,1,9,89.4,12.5,refrigerado,4,18,PA,78.2,0
+2100,Bebidas não alcoólicas,0,42,8.48,14.7,ambiente,5,11,PA,45.4,0
+2101,Refeições prontas,1,6,131.74,21.2,ambiente,0,5,AC,32.8,1
+2102,Bebidas não alcoólicas,0,17,44.36,31.1,ambiente,0,15,MG,23.1,0
+2103,Refeições prontas,1,8,50.39,25.8,ambiente,4,16,SE,11.1,1
+2104,Hortifrúti,1,4,3.82,-13.1,congelado,4,1,RO,60.2,0
+2105,Laticínios,1,5,60.95,29.9,ambiente,5,19,RN,37.0,1
+2106,Refeições prontas,1,11,73.5,29.3,ambiente,5,11,SC,58.7,0
+2107,Outros,0,9,110.13,15.4,ambiente,5,18,AL,24.0,0
+2108,Grãos e cereais,0,41,4.64,,nao_informado,1,15,CE,9.2,0
+2109,Laticínios,1,3,29.01,4.8,refrigerado,1,22,PB,8.9,0
+2110,Outros,0,30,3.13,26.1,ambiente,2,2,BA,78.5,0
+2111,Laticínios,1,2,44.0,26.6,ambiente,6,16,RR,,0
+2112,Bebidas não alcoólicas,0,22,261.07,20.6,ambiente,0,7,GO,74.8,0
+2113,Refeições prontas,1,6,310.68,14.0,refrigerado,4,18,TO,31.2,1
+2114,Refeições prontas,1,3,7.16,1.0,refrigerado,0,21,CE,36.2,0
+2115,Grãos e cereais,0,1,249.35,18.6,ambiente,4,5,RR,,0
+2116,Outros,0,24,0.72,24.0,ambiente,4,1,MS,49.2,0
+2117,Outros,0,27,146.76,26.7,ambiente,3,10,MS,78.2,0
+2118,Hortifrúti,1,10,325.61,22.4,ambiente,1,22,BA,89.2,0
+2119,Outros,0,42,13.33,28.9,ambiente,4,8,PB,56.3,1
+2120,Laticínios,1,4,4.86,3.7,refrigerado,2,22,GO,,0
+2121,Grãos e cereais,0,16,49.82,,nao_informado,3,2,SE,,0
+2122,Grãos e cereais,0,12,17.37,23.9,ambiente,2,3,AL,12.4,0
+2123,Refeições prontas,1,12,7.13,27.7,ambiente,0,9,PR,28.5,1
+2124,Carnes e peixes,1,7,1.36,,nao_informado,5,14,SE,44.9,0
+2125,Padaria,1,1,118.73,-15.0,congelado,3,10,AL,69.8,1
+2126,Outros,0,21,4.6,19.3,ambiente,6,8,RJ,9.1,0
+2127,Carnes e peixes,1,8,59.72,8.5,refrigerado,1,1,PE,31.9,1
+2128,Outros,0,16,52.23,-14.5,congelado,4,20,RO,27.0,0
+2129,Refeições prontas,1,11,18.55,21.5,ambiente,1,5,AL,11.2,1
+2130,Refeições prontas,1,6,0.84,8.9,refrigerado,6,6,RO,44.0,1
+2131,Laticínios,1,11,110.99,-16.4,congelado,5,7,AP,31.7,0
+2132,Carnes e peixes,1,12,3.9,34.9,ambiente,3,14,PR,,0
+2133,Hortifrúti,1,3,3.54,26.0,ambiente,0,7,RO,,0
+2134,Padaria,1,8,13.32,5.5,refrigerado,1,15,SE,32.5,0
+2135,Laticínios,1,6,221.92,16.9,ambiente,3,23,MS,42.5,0
+2136,Refeições prontas,1,1,1.74,4.3,refrigerado,6,18,AL,21.3,1
+2137,Carnes e peixes,1,5,181.85,5.5,refrigerado,5,3,PB,31.6,0
+2138,Refeições prontas,1,9,1.59,28.9,ambiente,5,5,AC,,1
+2139,Laticínios,1,11,1.6,5.1,refrigerado,5,20,PI,36.8,1
+2140,Outros,0,11,0.55,26.7,ambiente,6,20,AL,71.7,0
+2141,Laticínios,1,11,19.66,29.0,ambiente,0,15,AM,58.8,0
+2142,Laticínios,1,1,1.53,-2.4,refrigerado,3,4,RR,15.3,0
+2143,Bebidas não alcoólicas,0,13,6.4,,nao_informado,3,9,BA,21.3,0
+2144,Hortifrúti,1,4,22.18,31.8,ambiente,3,10,AC,,0
+2145,Hortifrúti,1,5,1.05,-22.4,congelado,6,21,RR,12.9,0
+2146,Outros,0,33,5.73,19.6,ambiente,6,10,AP,60.1,1
+2147,Outros,0,6,17.67,26.6,ambiente,5,6,BA,19.9,0
+2148,Hortifrúti,1,0,127.11,1.4,refrigerado,0,13,PI,79.3,1
+2149,Laticínios,1,0,18.31,,nao_informado,2,19,SC,16.5,1
+2150,Carnes e peixes,1,10,313.4,-0.9,refrigerado,5,3,ES,71.6,0
+2151,Grãos e cereais,0,8,3.81,19.5,ambiente,4,9,SE,41.9,0
+2152,Carnes e peixes,1,1,29.67,21.4,ambiente,4,1,PB,28.5,1
+2153,Outros,0,4,48.73,0.1,refrigerado,1,20,RR,1.9,0
+2154,Bebidas não alcoólicas,0,14,14.89,28.1,ambiente,3,11,MS,,0
+2155,Padaria,1,1,11.26,2.6,refrigerado,6,14,AP,84.6,0
+2156,Hortifrúti,1,11,51.9,7.1,refrigerado,6,15,MT,54.3,1
+2157,Hortifrúti,1,1,3.9,21.1,ambiente,0,8,PB,41.3,1
+2158,Carnes e peixes,1,9,1.07,-21.1,congelado,1,19,MA,79.5,0
+2159,Hortifrúti,1,0,0.54,1.3,refrigerado,3,12,MA,58.5,0
+2160,Hortifrúti,1,8,1.17,27.0,ambiente,6,10,AP,0.2,1
+2161,Grãos e cereais,0,9,203.4,17.2,ambiente,6,17,PI,80.1,1
+2162,Refeições prontas,1,8,84.83,26.7,ambiente,3,6,AL,60.7,0
+2163,Grãos e cereais,0,8,9.43,24.9,ambiente,6,7,MS,62.7,0
+2164,Refeições prontas,1,2,6.92,21.4,ambiente,3,1,MA,72.7,0
+2165,Bebidas não alcoólicas,0,8,3.04,5.4,refrigerado,0,8,RJ,79.0,0
+2166,Carnes e peixes,1,1,1.26,2.0,refrigerado,0,15,TO,70.3,0
+2167,Carnes e peixes,1,7,50.08,24.4,ambiente,3,3,MT,83.1,0
+2168,Grãos e cereais,0,30,2.95,23.9,ambiente,2,10,GO,63.4,0
+2169,Outros,0,12,0.86,22.1,ambiente,4,5,AC,10.1,0
+2170,Hortifrúti,1,1,57.02,25.3,ambiente,6,10,RS,7.4,1
+2171,Outros,0,1,1.01,,nao_informado,3,3,MT,,0
+2172,Grãos e cereais,0,44,12.9,13.2,refrigerado,3,17,TO,43.5,0
+2173,Bebidas não alcoólicas,0,37,36.79,28.7,ambiente,2,6,PR,63.6,0
+2174,Padaria,1,3,31.69,27.9,ambiente,0,21,DF,0.6,0
+2175,Grãos e cereais,0,7,182.32,25.0,ambiente,5,23,RN,,0
+2176,Carnes e peixes,1,3,26.01,28.2,ambiente,2,16,CE,66.4,0
+2177,Grãos e cereais,0,23,114.75,25.2,ambiente,4,16,PE,67.5,0
+2178,Laticínios,1,11,117.37,3.2,refrigerado,0,8,RO,44.2,0
+2179,Grãos e cereais,0,21,6.23,20.0,ambiente,3,23,MT,45.5,0
+2180,Refeições prontas,1,8,0.52,27.6,ambiente,3,18,PI,3.0,1
+2181,Outros,0,30,7.43,24.3,ambiente,2,13,PI,16.0,0
+2182,Carnes e peixes,1,1,42.77,28.5,ambiente,5,9,PB,42.0,1
+2183,Laticínios,1,3,4.02,6.2,refrigerado,0,16,ES,45.3,0
+2184,Outros,0,25,206.52,27.5,ambiente,4,21,PR,5.3,0
+2185,Refeições prontas,1,10,0.62,4.5,refrigerado,2,11,SE,80.1,0
+2186,Bebidas não alcoólicas,0,10,294.46,,nao_informado,6,3,AM,,0
+2187,Grãos e cereais,0,8,65.88,,nao_informado,6,2,MG,49.3,1
+2188,Padaria,1,2,308.12,26.9,ambiente,4,16,PI,54.6,0
+2189,Bebidas não alcoólicas,0,45,1.24,33.7,ambiente,0,19,SE,82.4,0
+2190,Padaria,1,7,271.62,26.2,ambiente,6,8,ES,83.1,1
+2191,Padaria,1,4,2.87,5.2,refrigerado,1,19,PB,84.1,0
+2192,Hortifrúti,1,2,149.58,27.4,ambiente,6,12,MS,32.5,0
+2193,Hortifrúti,1,2,212.69,27.6,ambiente,6,12,RS,84.1,1
+2194,Carnes e peixes,1,2,295.62,-20.5,congelado,5,7,AM,81.3,1
+2195,Laticínios,1,10,17.52,,nao_informado,6,16,RN,21.8,0
+2196,Bebidas não alcoólicas,0,1,1.83,27.6,ambiente,4,1,PE,40.0,0
+2197,Hortifrúti,1,8,215.37,20.2,ambiente,0,9,MG,85.5,1
+2198,Padaria,1,9,0.8,19.6,ambiente,6,7,MT,32.6,0
+2199,Padaria,1,0,0.6,18.2,ambiente,2,5,PI,56.2,1
+2200,Outros,0,28,5.52,13.2,refrigerado,4,12,GO,38.0,0
+2201,Carnes e peixes,1,0,6.01,3.6,refrigerado,5,21,CE,84.5,1
+2202,Outros,0,9,15.94,24.0,ambiente,5,6,AL,19.9,0
+2203,Carnes e peixes,1,3,0.6,,nao_informado,4,19,SC,73.3,0
+2204,Refeições prontas,1,10,124.72,8.0,refrigerado,0,15,ES,27.6,1
+2205,Laticínios,1,9,1.87,27.2,ambiente,0,20,RS,,1
+2206,Laticínios,1,0,44.24,8.9,refrigerado,2,15,SP,84.7,1
+2207,Laticínios,1,5,1.08,6.0,refrigerado,6,18,PA,,0
+2208,Hortifrúti,1,11,229.32,4.5,refrigerado,6,19,SC,,0
+2209,Hortifrúti,1,3,81.38,8.3,refrigerado,0,4,RN,29.5,0
+2210,Refeições prontas,1,1,110.58,26.4,ambiente,2,8,RO,,0
+2211,Grãos e cereais,0,45,159.02,14.7,refrigerado,4,22,MS,3.8,0
+2212,Grãos e cereais,0,24,1.35,4.6,refrigerado,4,10,AC,56.0,0
+2213,Grãos e cereais,0,20,251.21,24.5,ambiente,6,1,TO,23.1,0
+2214,Carnes e peixes,1,10,1.45,,nao_informado,6,5,PE,,0
+2215,Bebidas não alcoólicas,0,44,33.81,22.0,ambiente,3,13,BA,7.1,0
+2216,Bebidas não alcoólicas,0,2,14.91,22.8,ambiente,5,0,PI,70.0,0
+2217,Carnes e peixes,1,7,72.66,21.6,ambiente,3,13,PI,,0
+2218,Laticínios,1,5,3.24,22.6,ambiente,4,20,DF,59.4,1
+2219,Hortifrúti,1,4,2.66,25.4,ambiente,3,16,MS,52.3,1
+2220,Laticínios,1,11,369.98,18.3,ambiente,6,16,AC,18.3,1
+2221,Grãos e cereais,0,14,1.2,,nao_informado,0,9,PI,81.9,0
+2222,Hortifrúti,1,6,25.46,-22.9,congelado,3,13,SE,5.4,0
+2223,Bebidas não alcoólicas,0,27,3.79,25.0,ambiente,5,7,PE,,0
+2224,Bebidas não alcoólicas,0,3,13.29,24.1,ambiente,2,19,PB,,0
+2225,Padaria,1,11,90.81,28.8,ambiente,2,10,PB,,1
+2226,Grãos e cereais,0,35,23.64,29.9,ambiente,2,23,ES,23.2,0
+2227,Grãos e cereais,0,28,24.24,25.8,ambiente,4,15,PB,,0
+2228,Grãos e cereais,0,40,36.86,32.6,ambiente,5,18,PI,5.0,0
+2229,Laticínios,1,1,2.01,35.4,ambiente,1,18,PI,62.9,1
+2230,Refeições prontas,1,1,0.83,11.2,refrigerado,6,21,GO,71.2,0
+2231,Refeições prontas,1,12,35.19,-18.2,congelado,4,4,PI,0.0,0
+2232,Outros,0,15,360.38,28.7,ambiente,4,12,RR,56.1,1
+2233,Grãos e cereais,0,39,51.9,23.9,ambiente,2,6,RO,74.4,0
+2234,Grãos e cereais,0,40,56.36,33.2,ambiente,6,23,ES,66.9,0
+2235,Outros,0,32,1.24,25.9,ambiente,3,1,MT,74.5,0
+2236,Hortifrúti,1,8,102.77,25.1,ambiente,2,19,PR,,0
+2237,Grãos e cereais,0,9,116.55,10.2,refrigerado,2,6,AL,89.9,0
+2238,Laticínios,1,0,1.44,22.0,ambiente,2,21,PR,87.3,1
+2239,Carnes e peixes,1,7,1.1,28.0,ambiente,5,19,ES,55.0,1
+2240,Bebidas não alcoólicas,0,18,18.16,,nao_informado,2,1,PB,5.4,1
+2241,Hortifrúti,1,3,11.9,27.3,ambiente,0,9,BA,34.8,1
+2242,Carnes e peixes,1,2,9.28,14.2,ambiente,1,0,PI,,1
+2243,Refeições prontas,1,1,129.31,27.0,ambiente,5,11,DF,82.4,1
+2244,Laticínios,1,5,2.57,28.7,ambiente,5,10,RO,32.4,0
+2245,Outros,0,10,1.03,30.2,ambiente,3,0,PI,26.6,0
+2246,Bebidas não alcoólicas,0,31,11.48,26.0,ambiente,6,3,PI,,0
+2247,Refeições prontas,1,2,3.98,20.4,ambiente,0,7,MS,44.5,1
+2248,Bebidas não alcoólicas,0,28,5.0,4.8,refrigerado,0,5,PI,21.3,0
+2249,Carnes e peixes,1,9,33.35,,nao_informado,4,23,SE,59.2,1
+2250,Refeições prontas,1,9,12.76,22.4,ambiente,5,14,MG,,1
+2251,Grãos e cereais,0,43,0.54,17.1,ambiente,1,8,RS,84.4,1
+2252,Outros,0,3,0.8,23.0,ambiente,6,6,DF,,0
+2253,Refeições prontas,1,7,58.77,15.5,ambiente,0,5,ES,15.8,0
+2254,Padaria,1,8,0.51,28.5,ambiente,0,13,RN,12.8,1
+2255,Grãos e cereais,0,34,122.79,33.1,ambiente,2,12,MG,65.3,0
+2256,Hortifrúti,1,2,46.88,28.4,ambiente,4,21,PA,10.5,1
+2257,Hortifrúti,1,7,12.11,5.9,refrigerado,3,2,PR,51.0,1
+2258,Hortifrúti,1,0,52.28,16.2,ambiente,3,11,MG,74.3,1
+2259,Bebidas não alcoólicas,0,18,4.53,23.6,ambiente,2,14,AC,84.4,0
+2260,Grãos e cereais,0,17,0.61,23.6,ambiente,0,11,MS,59.4,0
+2261,Padaria,1,8,49.47,,nao_informado,0,16,RR,53.4,1
+2262,Outros,0,43,11.26,26.5,ambiente,2,17,MT,42.6,1
+2263,Bebidas não alcoólicas,0,12,94.11,19.7,ambiente,1,15,AL,,1
+2264,Outros,0,44,16.01,20.5,ambiente,5,0,MT,16.3,0
+2265,Hortifrúti,1,6,1.34,5.3,refrigerado,4,7,PE,,1
+2266,Hortifrúti,1,4,0.64,7.8,refrigerado,6,5,SP,27.5,0
+2267,Padaria,1,6,143.38,26.5,ambiente,0,8,AL,11.3,1
+2268,Laticínios,1,9,9.65,-4.1,refrigerado,3,9,MG,63.3,0
+2269,Bebidas não alcoólicas,0,42,204.23,4.0,refrigerado,2,17,PB,0.8,1
+2270,Grãos e cereais,0,9,88.87,22.8,ambiente,3,2,GO,80.7,0
+2271,Padaria,1,10,18.88,6.7,refrigerado,2,4,SP,80.5,1
+2272,Grãos e cereais,0,26,1.03,31.8,ambiente,4,20,ES,76.8,0
+2273,Outros,0,3,21.11,27.3,ambiente,5,15,CE,72.1,0
+2274,Grãos e cereais,0,18,4.81,16.8,ambiente,0,5,RS,,0
+2275,Hortifrúti,1,10,31.68,27.6,ambiente,6,6,AM,,0
+2276,Hortifrúti,1,10,0.6,-23.4,congelado,1,7,RN,3.8,0
+2277,Laticínios,1,9,2.26,8.6,refrigerado,6,20,SE,0.8,0
+2278,Hortifrúti,1,0,2.54,7.0,refrigerado,4,20,PA,,0
+2279,Refeições prontas,1,3,249.41,23.7,ambiente,1,22,AP,51.6,1
+2280,Outros,0,10,1.73,26.9,ambiente,0,13,PA,31.3,0
+2281,Grãos e cereais,0,19,258.5,27.5,ambiente,2,8,RR,1.7,0
+2282,Refeições prontas,1,4,6.53,8.3,refrigerado,1,23,PI,5.3,1
+2283,Hortifrúti,1,10,1.23,21.7,ambiente,5,20,TO,43.8,1
+2284,Bebidas não alcoólicas,0,14,249.14,-18.3,congelado,6,15,RR,28.3,0
+2285,Outros,0,25,5.46,26.6,ambiente,1,3,AP,79.8,0
+2286,Refeições prontas,1,7,18.16,20.7,ambiente,1,7,SP,74.3,1
+2287,Carnes e peixes,1,4,15.9,6.1,refrigerado,6,3,MS,50.4,0
+2288,Outros,0,11,27.16,18.8,ambiente,1,8,AP,,0
+2289,Grãos e cereais,0,4,102.25,25.8,ambiente,1,8,MS,36.3,1
+2290,Grãos e cereais,0,22,144.94,27.3,ambiente,3,21,RR,,1
+2291,Padaria,1,4,2.61,10.0,refrigerado,3,2,PI,39.0,0
+2292,Refeições prontas,1,7,28.27,5.5,refrigerado,3,14,RR,,0
+2293,Refeições prontas,1,3,19.64,-25.3,congelado,5,3,RS,35.2,0
+2294,Carnes e peixes,1,7,9.88,19.2,ambiente,1,2,PA,74.3,1
+2295,Hortifrúti,1,7,14.28,3.7,refrigerado,6,10,AL,,0
+2296,Outros,0,3,51.25,25.9,ambiente,2,13,GO,85.7,1
+2297,Padaria,1,9,93.7,,nao_informado,2,8,PB,61.9,0
+2298,Bebidas não alcoólicas,0,7,17.5,,nao_informado,2,19,AL,33.2,0
+2299,Refeições prontas,1,10,10.16,8.1,refrigerado,2,23,RS,27.1,0
+2300,Outros,0,38,34.53,25.6,ambiente,1,10,RO,36.4,0
+2301,Padaria,1,5,393.86,11.4,refrigerado,6,0,SP,25.3,1
+2302,Laticínios,1,7,351.15,9.8,refrigerado,4,7,CE,17.6,1
+2303,Bebidas não alcoólicas,0,29,7.84,23.5,ambiente,0,15,PA,0.0,0
+2304,Laticínios,1,4,382.53,4.3,refrigerado,5,1,PR,5.2,0
+2305,Grãos e cereais,0,7,1.42,,nao_informado,3,8,DF,8.4,0
+2306,Bebidas não alcoólicas,0,4,1.28,5.7,refrigerado,5,13,PB,57.5,0
+2307,Grãos e cereais,0,43,0.57,24.6,ambiente,5,9,RR,83.8,1
+2308,Bebidas não alcoólicas,0,30,379.12,4.9,refrigerado,2,0,BA,28.5,1
+2309,Carnes e peixes,1,9,98.46,25.5,ambiente,5,19,RR,21.7,0
+2310,Grãos e cereais,0,44,278.93,31.5,ambiente,1,11,PB,68.3,1
+2311,Padaria,1,4,0.86,27.3,ambiente,1,2,SC,82.3,1
+2312,Carnes e peixes,1,12,161.08,-15.3,congelado,0,22,RJ,76.6,1
+2313,Laticínios,1,12,2.22,1.0,refrigerado,3,13,MT,34.8,0
+2314,Bebidas não alcoólicas,0,23,1.04,28.9,ambiente,4,1,MA,,0
+2315,Padaria,1,12,1.35,,nao_informado,3,23,SE,76.4,1
+2316,Refeições prontas,1,2,18.42,27.5,ambiente,1,21,PB,33.1,1
+2317,Padaria,1,0,1.74,6.3,refrigerado,6,14,PE,62.5,0
+2318,Hortifrúti,1,11,2.18,5.6,refrigerado,5,8,AP,,0
+2319,Bebidas não alcoólicas,0,7,42.66,26.2,ambiente,5,6,PR,79.1,0
+2320,Bebidas não alcoólicas,0,1,37.54,25.8,ambiente,0,20,AP,,0
+2321,Bebidas não alcoólicas,0,19,21.32,23.6,ambiente,2,7,RN,68.9,0
+2322,Padaria,1,7,26.15,16.5,ambiente,2,20,MA,57.5,1
+2323,Grãos e cereais,0,18,59.76,22.5,ambiente,6,19,MS,25.7,0
+2324,Grãos e cereais,0,41,146.8,27.7,ambiente,0,7,GO,82.4,1
+2325,Hortifrúti,1,2,14.46,-22.7,congelado,0,8,PR,7.0,0
+2326,Grãos e cereais,0,39,60.23,28.3,ambiente,6,21,AP,28.0,0
+2327,Refeições prontas,1,10,316.79,12.6,refrigerado,5,16,AC,54.5,1
+2328,Bebidas não alcoólicas,0,38,58.01,31.2,ambiente,3,16,AP,69.1,0
+2329,Carnes e peixes,1,2,23.55,,nao_informado,4,15,AC,81.7,1
+2330,Grãos e cereais,0,18,4.42,22.3,ambiente,3,21,AC,15.3,0
+2331,Hortifrúti,1,2,73.05,-1.6,refrigerado,2,7,PE,88.6,1
+2332,Grãos e cereais,0,28,3.78,29.7,ambiente,4,8,MT,,0
+2333,Hortifrúti,1,11,1.82,29.0,ambiente,2,14,SE,40.9,1
+2334,Outros,0,0,229.24,28.8,ambiente,0,8,DF,5.1,1
+2335,Padaria,1,0,11.18,5.8,refrigerado,5,11,ES,23.1,1
+2336,Carnes e peixes,1,9,1.53,0.8,refrigerado,0,18,BA,58.0,0
+2337,Carnes e peixes,1,5,336.23,-15.0,congelado,4,10,MT,78.8,1
+2338,Grãos e cereais,0,5,52.32,26.0,ambiente,5,13,SP,84.7,1
+2339,Padaria,1,7,14.43,0.5,refrigerado,0,4,AP,28.5,0
+2340,Grãos e cereais,0,19,21.48,24.7,ambiente,1,11,RN,22.9,1
+2341,Outros,0,12,2.02,19.9,ambiente,0,20,MA,42.5,0
+2342,Refeições prontas,1,6,37.25,23.7,ambiente,5,7,GO,,1
+2343,Bebidas não alcoólicas,0,36,14.1,23.2,ambiente,1,10,MS,2.2,1
+2344,Outros,0,4,1.14,24.8,ambiente,3,18,PI,47.2,0
+2345,Padaria,1,6,183.74,27.5,ambiente,0,14,RJ,62.4,1
+2346,Refeições prontas,1,6,11.12,22.3,ambiente,4,23,MG,6.6,1
+2347,Bebidas não alcoólicas,0,23,7.03,-18.6,congelado,4,5,MS,72.8,0
+2348,Carnes e peixes,1,3,1.55,29.3,ambiente,2,5,ES,2.2,0
+2349,Carnes e peixes,1,6,0.77,24.5,ambiente,0,10,CE,31.6,0
+2350,Grãos e cereais,0,36,152.84,29.3,ambiente,6,0,AP,,0
+2351,Bebidas não alcoólicas,0,15,14.69,3.3,refrigerado,5,6,AM,26.5,1
+2352,Grãos e cereais,0,7,1.21,,nao_informado,6,13,PI,35.8,0
+2353,Grãos e cereais,0,41,2.15,8.3,refrigerado,1,22,SP,78.7,0
+2354,Padaria,1,1,181.28,5.8,refrigerado,4,19,MS,15.9,1
+2355,Grãos e cereais,0,5,34.98,-5.0,refrigerado,6,2,RS,58.5,1
+2356,Carnes e peixes,1,3,0.98,1.9,refrigerado,3,8,DF,33.1,0
+2357,Hortifrúti,1,10,249.06,33.6,ambiente,0,4,RO,,1
+2358,Outros,0,12,179.38,28.8,ambiente,5,8,MT,86.0,0
+2359,Grãos e cereais,0,29,197.26,27.2,ambiente,5,15,RN,75.4,0
+2360,Bebidas não alcoólicas,0,36,300.7,23.7,ambiente,6,16,DF,,0
+2361,Refeições prontas,1,3,362.42,28.9,ambiente,0,1,SC,28.2,1
+2362,Bebidas não alcoólicas,0,28,1.57,19.7,ambiente,4,7,ES,28.5,0
+2363,Grãos e cereais,0,4,18.47,25.8,ambiente,2,12,AM,2.7,0
+2364,Hortifrúti,1,7,5.65,,nao_informado,2,4,DF,,0
+2365,Carnes e peixes,1,8,0.56,3.6,refrigerado,1,11,AC,54.1,0
+2366,Hortifrúti,1,7,27.91,24.8,ambiente,6,4,PB,,1
+2367,Carnes e peixes,1,10,44.68,24.9,ambiente,3,21,AM,83.5,0
+2368,Laticínios,1,4,331.54,5.0,refrigerado,4,10,PI,30.8,0
+2369,Grãos e cereais,0,22,0.82,24.8,ambiente,1,4,CE,83.6,0
+2370,Laticínios,1,1,63.39,,nao_informado,1,3,RJ,66.4,1
+2371,Refeições prontas,1,12,1.61,24.0,ambiente,0,1,PA,85.9,0
+2372,Outros,0,14,4.14,26.5,ambiente,3,22,GO,55.7,1
+2373,Outros,0,39,10.48,-21.3,congelado,6,12,MG,19.0,1
+2374,Carnes e peixes,1,12,15.63,,nao_informado,4,1,DF,62.5,1
+2375,Padaria,1,12,145.94,27.2,ambiente,1,17,AC,0.5,1
+2376,Laticínios,1,2,2.27,4.0,refrigerado,6,4,PR,85.2,0
+2377,Bebidas não alcoólicas,0,1,5.57,25.3,ambiente,4,23,GO,22.2,0
+2378,Padaria,1,11,339.3,22.0,ambiente,5,3,MS,30.5,1
+2379,Carnes e peixes,1,4,190.54,13.5,refrigerado,6,19,SP,34.8,0
+2380,Bebidas não alcoólicas,0,26,319.86,22.0,ambiente,5,0,ES,42.0,1
+2381,Padaria,1,10,77.06,,nao_informado,2,23,AL,36.0,0
+2382,Grãos e cereais,0,19,9.37,5.1,refrigerado,5,8,RR,48.7,0
+2383,Laticínios,1,5,9.87,19.8,ambiente,2,7,AC,78.9,0
+2384,Outros,0,31,8.87,21.2,ambiente,4,22,MS,53.8,0
+2385,Outros,0,32,2.08,26.7,ambiente,0,17,RN,52.8,0
+2386,Laticínios,1,9,284.27,9.5,refrigerado,4,4,GO,,0
+2387,Bebidas não alcoólicas,0,10,11.04,30.3,ambiente,3,4,SC,,0
+2388,Carnes e peixes,1,11,89.64,26.4,ambiente,6,19,AC,25.4,0
+2389,Grãos e cereais,0,2,270.87,1.2,refrigerado,5,4,SE,,0
+2390,Refeições prontas,1,1,383.27,29.6,ambiente,4,6,AL,31.4,1
+2391,Hortifrúti,1,9,51.78,-0.6,refrigerado,5,21,DF,37.8,0
+2392,Refeições prontas,1,10,1.22,29.3,ambiente,0,21,DF,,0
+2393,Grãos e cereais,0,23,52.73,6.0,refrigerado,3,13,SC,3.5,0
+2394,Bebidas não alcoólicas,0,43,143.65,-15.6,congelado,3,1,BA,55.5,0
+2395,Hortifrúti,1,8,29.85,,nao_informado,6,17,SE,60.0,0
+2396,Refeições prontas,1,1,147.25,27.5,ambiente,0,23,AP,,0
+2397,Carnes e peixes,1,1,5.25,27.2,ambiente,5,18,DF,32.2,1
+2398,Padaria,1,7,2.92,4.7,refrigerado,6,21,BA,,0
+2399,Laticínios,1,0,3.82,24.1,ambiente,6,23,MT,64.0,1
+2400,Hortifrúti,1,8,109.18,28.9,ambiente,4,7,AC,86.6,0
+2401,Hortifrúti,1,9,160.08,,nao_informado,3,23,RJ,60.1,1
+2402,Bebidas não alcoólicas,0,32,4.87,,nao_informado,6,18,RJ,89.6,1
+2403,Hortifrúti,1,12,107.24,-15.5,congelado,5,11,MS,0.4,0
+2404,Bebidas não alcoólicas,0,30,42.66,32.1,ambiente,4,14,AC,5.9,0
+2405,Grãos e cereais,0,28,6.25,27.8,ambiente,2,23,AP,1.8,0
+2406,Carnes e peixes,1,6,22.2,-15.3,congelado,0,20,RO,55.8,1
+2407,Carnes e peixes,1,0,10.92,-21.0,congelado,5,4,SP,60.6,1
+2408,Laticínios,1,11,61.26,,nao_informado,6,8,MS,,0
+2409,Padaria,1,10,44.05,,nao_informado,1,9,MT,57.7,1
+2410,Carnes e peixes,1,3,39.18,28.0,ambiente,4,7,PI,51.9,1
+2411,Bebidas não alcoólicas,0,15,219.32,28.9,ambiente,3,5,RR,74.3,0
+2412,Outros,0,40,13.41,23.1,ambiente,6,15,RS,80.5,0
+2413,Laticínios,1,5,3.29,28.9,ambiente,1,1,RR,31.6,0
+2414,Outros,0,30,0.71,5.4,refrigerado,6,23,CE,7.0,0
+2415,Outros,0,42,108.47,31.0,ambiente,1,23,ES,53.3,0
+2416,Outros,0,32,15.93,33.5,ambiente,2,5,MS,,0
+2417,Laticínios,1,12,1.17,25.9,ambiente,3,16,CE,38.8,1
+2418,Laticínios,1,6,60.11,19.9,ambiente,5,21,TO,74.5,0
+2419,Refeições prontas,1,1,1.64,3.3,refrigerado,4,1,SC,3.1,1
+2420,Grãos e cereais,0,9,377.05,,nao_informado,6,9,GO,66.6,1
+2421,Outros,0,34,57.64,,nao_informado,0,6,MT,77.4,1
+2422,Carnes e peixes,1,0,13.69,,nao_informado,6,17,MT,2.9,1
+2423,Hortifrúti,1,11,2.93,24.1,ambiente,3,2,CE,37.0,0
+2424,Carnes e peixes,1,3,1.45,37.6,ambiente,0,23,DF,88.6,1
+2425,Grãos e cereais,0,11,91.75,21.1,ambiente,6,19,AL,39.0,0
+2426,Outros,0,41,75.58,,nao_informado,6,0,MS,12.9,0
+2427,Laticínios,1,7,11.24,9.9,refrigerado,1,13,PI,20.9,0
+2428,Laticínios,1,8,297.22,23.2,ambiente,0,15,SE,71.3,0
+2429,Refeições prontas,1,10,253.07,4.2,refrigerado,0,18,MT,,0
+2430,Refeições prontas,1,7,316.68,7.1,refrigerado,3,1,GO,83.9,1
+2431,Hortifrúti,1,3,90.44,24.5,ambiente,3,16,PE,85.5,1
+2432,Bebidas não alcoólicas,0,35,31.71,29.0,ambiente,2,2,GO,26.7,1
+2433,Hortifrúti,1,2,23.93,25.6,ambiente,3,18,CE,80.4,1
+2434,Hortifrúti,1,0,1.97,26.1,ambiente,0,11,MT,,0
+2435,Bebidas não alcoólicas,0,23,3.36,23.2,ambiente,1,8,AP,,0
+2436,Hortifrúti,1,8,1.11,11.2,refrigerado,5,18,RJ,,0
+2437,Carnes e peixes,1,7,3.7,7.2,refrigerado,3,0,DF,28.6,1
+2438,Grãos e cereais,0,38,27.53,,nao_informado,2,21,AL,56.9,0
+2439,Bebidas não alcoólicas,0,26,17.14,27.0,ambiente,0,16,RS,19.8,0
+2440,Laticínios,1,3,5.18,30.1,ambiente,6,0,SE,38.7,1
+2441,Carnes e peixes,1,8,26.66,-22.9,congelado,3,21,PB,86.4,0
+2442,Carnes e peixes,1,7,8.24,21.2,ambiente,4,1,RJ,9.1,1
+2443,Hortifrúti,1,5,9.32,6.4,refrigerado,0,7,AC,56.2,0
+2444,Hortifrúti,1,7,24.81,8.1,refrigerado,6,11,PI,82.4,0
+2445,Padaria,1,11,1.51,,nao_informado,6,2,SE,,0
+2446,Refeições prontas,1,11,18.94,,nao_informado,6,21,AP,,0
+2447,Refeições prontas,1,10,40.52,,nao_informado,5,12,PE,56.3,0
+2448,Bebidas não alcoólicas,0,22,1.91,29.4,ambiente,1,5,RN,15.3,0
+2449,Outros,0,7,25.43,19.4,ambiente,0,7,RS,78.0,0
+2450,Outros,0,33,279.92,24.2,ambiente,1,23,PE,33.1,0
+2451,Hortifrúti,1,1,392.35,20.6,ambiente,1,1,TO,,1
+2452,Laticínios,1,8,44.66,28.4,ambiente,3,10,RS,32.0,0
+2453,Grãos e cereais,0,10,14.96,27.7,ambiente,6,21,AP,57.6,0
+2454,Outros,0,43,1.52,8.0,refrigerado,2,0,ES,22.7,0
+2455,Refeições prontas,1,3,3.46,23.9,ambiente,3,15,AP,15.2,1
+2456,Padaria,1,0,0.84,,nao_informado,2,22,AL,70.9,1
+2457,Padaria,1,7,14.61,21.1,ambiente,0,2,AM,4.4,0
+2458,Laticínios,1,8,0.92,-15.8,congelado,1,11,PI,,0
+2459,Bebidas não alcoólicas,0,0,9.72,16.7,ambiente,2,20,PR,69.2,1
+2460,Hortifrúti,1,11,109.23,,nao_informado,1,9,PR,,0
+2461,Hortifrúti,1,3,397.98,3.0,refrigerado,2,14,PR,82.1,0
+2462,Bebidas não alcoólicas,0,6,15.63,17.3,ambiente,3,15,MG,86.2,1
+2463,Bebidas não alcoólicas,0,15,17.61,24.1,ambiente,0,8,RJ,83.0,0
+2464,Grãos e cereais,0,19,42.18,-19.8,congelado,4,22,SP,9.2,0
+2465,Laticínios,1,9,393.76,-2.7,refrigerado,1,2,MG,84.7,0
+2466,Grãos e cereais,0,24,101.86,20.9,ambiente,0,18,GO,89.7,0
+2467,Grãos e cereais,0,2,159.18,22.3,ambiente,4,14,PB,14.3,0
+2468,Padaria,1,2,123.23,20.6,ambiente,1,11,PA,42.8,1
+2469,Padaria,1,7,15.87,25.0,ambiente,4,1,MA,55.4,1
+2470,Carnes e peixes,1,9,1.63,6.2,refrigerado,1,23,PE,75.2,0
+2471,Padaria,1,9,1.28,1.1,refrigerado,6,1,PB,28.0,0
+2472,Outros,0,17,30.17,7.3,refrigerado,1,13,MT,53.2,1
+2473,Hortifrúti,1,10,61.2,29.8,ambiente,6,18,RN,29.7,0
+2474,Hortifrúti,1,11,1.08,,nao_informado,0,9,RS,51.6,1
+2475,Padaria,1,6,0.78,25.9,ambiente,5,6,MA,18.9,1
+2476,Bebidas não alcoólicas,0,22,0.82,23.4,ambiente,6,1,BA,,0
+2477,Grãos e cereais,0,34,58.49,20.8,ambiente,2,3,RS,,0
+2478,Laticínios,1,11,164.03,10.0,refrigerado,6,15,SC,,0
+2479,Padaria,1,6,0.94,,nao_informado,5,21,ES,60.6,1
+2480,Laticínios,1,3,1.91,32.4,ambiente,3,23,ES,71.5,1
+2481,Laticínios,1,10,55.91,28.9,ambiente,5,16,PE,23.6,1
+2482,Refeições prontas,1,3,19.07,0.6,refrigerado,2,17,RO,17.9,0
+2483,Refeições prontas,1,10,0.94,,nao_informado,4,3,DF,13.5,0
+2484,Laticínios,1,6,155.08,22.2,ambiente,0,19,ES,86.4,1
+2485,Laticínios,1,6,5.14,-15.0,congelado,0,18,MA,3.5,0
+2486,Padaria,1,2,57.83,3.3,refrigerado,0,1,AL,54.3,0
+2487,Grãos e cereais,0,29,170.54,26.7,ambiente,0,19,MT,47.0,1
+2488,Refeições prontas,1,11,21.05,24.7,ambiente,0,7,RR,24.0,1
+2489,Grãos e cereais,0,35,3.96,33.6,ambiente,1,7,PA,,0
+2490,Laticínios,1,10,119.53,1.4,refrigerado,4,12,PA,,0
+2491,Grãos e cereais,0,10,25.84,23.9,ambiente,5,3,MS,54.4,0
+2492,Bebidas não alcoólicas,0,19,207.75,28.2,ambiente,4,15,RJ,,0
+2493,Bebidas não alcoólicas,0,23,122.62,25.3,ambiente,4,7,MS,,1
+2494,Carnes e peixes,1,9,6.69,31.7,ambiente,1,1,SC,,1
+2495,Carnes e peixes,1,1,239.65,,nao_informado,3,19,AL,,1
+2496,Outros,0,40,37.29,22.7,ambiente,3,17,BA,20.9,1
+2497,Carnes e peixes,1,10,72.66,0.2,refrigerado,5,9,RO,8.7,0
+2498,Grãos e cereais,0,45,5.62,19.3,ambiente,5,11,RS,81.7,0
+2499,Refeições prontas,1,7,7.31,27.5,ambiente,0,8,PI,0.9,0
+2500,Hortifrúti,1,4,2.67,25.4,ambiente,6,12,RO,,0
+2501,Carnes e peixes,1,12,1.12,5.9,refrigerado,3,7,MA,69.2,1
+2502,Refeições prontas,1,7,7.66,10.2,refrigerado,4,13,BA,65.9,0
+2503,Laticínios,1,1,51.23,24.7,ambiente,5,22,DF,14.7,1
+2504,Carnes e peixes,1,6,29.31,6.3,refrigerado,3,2,PE,89.8,1
+2505,Laticínios,1,2,1.67,2.6,refrigerado,6,8,AM,,0
+2506,Padaria,1,5,6.7,7.1,refrigerado,1,16,SE,,1
+2507,Padaria,1,1,1.2,8.5,refrigerado,2,1,SE,9.3,1
+2508,Outros,0,14,1.74,27.5,ambiente,6,3,SP,59.9,1
+2509,Outros,0,40,5.54,27.4,ambiente,0,23,AP,,1
+2510,Padaria,1,5,0.85,27.5,ambiente,0,10,DF,53.5,0
+2511,Hortifrúti,1,7,38.6,24.4,ambiente,0,21,SE,82.9,0
+2512,Outros,0,29,2.06,22.7,ambiente,6,18,SP,68.1,1
+2513,Laticínios,1,4,0.72,26.2,ambiente,3,3,GO,71.2,1
+2514,Laticínios,1,8,20.54,7.2,refrigerado,3,8,MT,28.4,0
+2515,Grãos e cereais,0,17,231.65,27.7,ambiente,5,6,RJ,71.1,0
+2516,Refeições prontas,1,12,239.19,11.1,refrigerado,4,23,ES,8.0,0
+2517,Outros,0,4,45.2,,nao_informado,4,7,ES,57.0,0
+2518,Padaria,1,1,33.11,,nao_informado,2,11,RO,0.1,0
+2519,Outros,0,5,92.98,26.4,ambiente,0,6,SC,19.2,0
+2520,Hortifrúti,1,1,1.09,-4.0,refrigerado,3,23,SE,22.2,0
+2521,Padaria,1,3,0.64,9.2,refrigerado,2,17,GO,74.6,0
+2522,Laticínios,1,7,5.64,,nao_informado,4,2,AM,88.3,1
+2523,Carnes e peixes,1,12,0.73,24.1,ambiente,1,12,MS,66.4,0
+2524,Laticínios,1,10,0.56,-22.0,congelado,0,14,PI,36.1,0
+2525,Bebidas não alcoólicas,0,35,356.59,-19.3,congelado,3,5,PR,,0
+2526,Outros,0,5,130.53,22.2,ambiente,3,11,AM,,0
+2527,Grãos e cereais,0,19,7.94,-15.1,congelado,4,15,AP,90.0,0
+2528,Refeições prontas,1,0,4.84,25.7,ambiente,1,11,RN,63.3,1
+2529,Grãos e cereais,0,38,156.82,1.0,refrigerado,6,7,ES,31.5,0
+2530,Hortifrúti,1,9,2.83,6.1,refrigerado,5,3,PR,2.7,0
+2531,Grãos e cereais,0,21,1.44,26.3,ambiente,3,2,MS,8.6,0
+2532,Carnes e peixes,1,12,3.78,27.1,ambiente,0,13,TO,52.6,1
+2533,Hortifrúti,1,12,1.55,0.6,refrigerado,5,11,CE,,1
+2534,Grãos e cereais,0,17,190.15,28.5,ambiente,4,1,PR,41.4,1
+2535,Bebidas não alcoólicas,0,32,10.28,22.0,ambiente,2,6,PE,54.0,0
+2536,Laticínios,1,11,373.47,9.4,refrigerado,0,17,MG,86.3,1
+2537,Carnes e peixes,1,12,7.73,32.2,ambiente,3,9,BA,,0
+2538,Bebidas não alcoólicas,0,4,13.36,29.0,ambiente,2,23,RN,,0
+2539,Carnes e peixes,1,4,88.35,0.8,refrigerado,4,8,TO,21.0,0
+2540,Grãos e cereais,0,23,96.09,26.3,ambiente,4,14,GO,52.6,0
+2541,Refeições prontas,1,3,31.17,-15.3,congelado,5,15,GO,48.9,0
+2542,Outros,0,33,1.02,28.0,ambiente,2,7,MS,22.8,0
+2543,Carnes e peixes,1,7,98.48,26.9,ambiente,5,13,DF,,1
+2544,Outros,0,24,4.01,27.2,ambiente,2,20,AP,67.6,0
+2545,Laticínios,1,12,42.91,-3.6,refrigerado,4,4,CE,,0
+2546,Grãos e cereais,0,11,4.18,27.8,ambiente,2,8,SP,5.0,1
+2547,Outros,0,22,23.34,21.9,ambiente,0,2,SC,,1
+2548,Outros,0,38,4.6,27.0,ambiente,2,23,AC,6.8,0
+2549,Grãos e cereais,0,6,160.67,28.8,ambiente,1,0,SC,63.4,0
+2550,Bebidas não alcoólicas,0,19,0.95,24.2,ambiente,3,1,AP,13.8,1
+2551,Padaria,1,3,0.9,21.7,ambiente,2,20,RR,22.8,1
+2552,Laticínios,1,5,157.44,9.6,refrigerado,5,6,RS,4.4,1
+2553,Padaria,1,8,92.44,8.7,refrigerado,3,21,PB,43.8,0
+2554,Bebidas não alcoólicas,0,0,27.36,22.2,ambiente,3,5,SP,18.0,1
+2555,Padaria,1,0,71.85,24.4,ambiente,5,5,BA,18.0,1
+2556,Padaria,1,7,1.49,13.0,ambiente,2,19,CE,52.0,0
+2557,Outros,0,10,3.59,21.0,ambiente,3,0,PE,14.4,0
+2558,Padaria,1,6,6.87,1.0,refrigerado,3,9,MG,,0
+2559,Hortifrúti,1,5,13.31,26.3,ambiente,0,8,MT,4.5,1
+2560,Refeições prontas,1,11,0.85,33.7,ambiente,3,7,MG,,0
+2561,Hortifrúti,1,6,13.68,2.2,refrigerado,3,12,RJ,41.5,0
+2562,Grãos e cereais,0,28,22.09,5.3,refrigerado,5,0,CE,55.4,1
+2563,Outros,0,25,3.94,22.9,ambiente,4,4,AP,86.1,0
+2564,Laticínios,1,11,21.52,31.4,ambiente,5,22,RJ,45.9,0
+2565,Padaria,1,10,71.61,4.0,refrigerado,5,22,BA,,0
+2566,Outros,0,11,2.04,28.2,ambiente,4,17,PA,42.7,0
+2567,Bebidas não alcoólicas,0,35,1.49,,nao_informado,3,21,RN,20.6,0
+2568,Refeições prontas,1,2,42.31,2.2,refrigerado,3,19,MS,68.6,0
+2569,Carnes e peixes,1,11,28.08,28.4,ambiente,3,7,MG,82.1,0
+2570,Hortifrúti,1,12,57.61,2.5,refrigerado,2,16,ES,81.4,0
+2571,Padaria,1,12,0.59,19.8,ambiente,2,2,AM,75.0,0
+2572,Outros,0,40,285.41,25.4,ambiente,4,0,BA,,0
+2573,Padaria,1,0,8.75,25.3,ambiente,2,11,BA,75.6,1
+2574,Grãos e cereais,0,3,8.85,17.4,ambiente,2,16,AL,12.9,0
+2575,Bebidas não alcoólicas,0,27,101.82,26.2,ambiente,1,14,PA,75.4,0
+2576,Hortifrúti,1,8,155.7,-14.1,congelado,5,13,PE,41.1,0
+2577,Refeições prontas,1,4,11.8,3.7,refrigerado,6,6,PA,4.3,0
+2578,Hortifrúti,1,11,144.38,11.5,refrigerado,6,15,MS,11.2,0
+2579,Padaria,1,0,5.19,25.4,ambiente,0,0,AM,80.5,1
+2580,Outros,0,13,102.4,,nao_informado,3,8,PA,,0
+2581,Refeições prontas,1,7,35.45,11.7,ambiente,2,1,DF,,0
+2582,Outros,0,0,11.85,27.4,ambiente,5,17,RN,75.3,1
+2583,Padaria,1,7,169.47,20.9,ambiente,0,7,PB,23.2,1
+2584,Hortifrúti,1,3,178.58,11.2,refrigerado,0,2,AC,17.7,0
+2585,Hortifrúti,1,7,145.33,,nao_informado,4,19,AM,51.2,0
+2586,Refeições prontas,1,10,31.22,25.8,ambiente,1,13,DF,78.0,1
+2587,Refeições prontas,1,11,0.68,,nao_informado,2,10,GO,4.5,0
+2588,Padaria,1,9,11.2,7.2,refrigerado,0,15,PR,26.4,0
+2589,Outros,0,15,107.67,23.4,ambiente,3,5,RJ,,1
+2590,Bebidas não alcoólicas,0,18,381.97,21.7,ambiente,0,19,AC,,0
+2591,Laticínios,1,11,223.94,30.5,ambiente,4,20,SP,27.8,1
+2592,Outros,0,15,0.78,,nao_informado,1,9,PR,25.2,0
+2593,Hortifrúti,1,0,29.51,27.2,ambiente,1,3,PB,11.0,1
+2594,Grãos e cereais,0,25,287.63,18.7,ambiente,3,4,CE,77.6,0
+2595,Hortifrúti,1,5,61.82,28.7,ambiente,5,23,PA,32.5,0
+2596,Grãos e cereais,0,5,167.73,24.1,ambiente,6,17,MS,35.6,0
+2597,Carnes e peixes,1,5,1.76,-5.5,refrigerado,6,13,SE,69.0,0
+2598,Laticínios,1,5,2.39,-19.4,congelado,5,13,RN,,0
+2599,Padaria,1,0,117.65,22.4,ambiente,1,19,CE,64.4,0
+2600,Carnes e peixes,1,7,3.27,5.5,refrigerado,3,2,MA,6.4,0
+2601,Padaria,1,3,7.59,29.3,ambiente,6,7,RO,64.6,0
+2602,Outros,0,41,2.36,,nao_informado,1,1,PB,7.4,0
+2603,Hortifrúti,1,12,4.21,-21.7,congelado,1,6,AC,43.7,0
+2604,Laticínios,1,6,53.97,7.6,refrigerado,3,17,CE,16.5,0
+2605,Carnes e peixes,1,0,6.15,-2.0,refrigerado,1,13,RO,82.8,0
+2606,Padaria,1,7,59.35,6.1,refrigerado,2,19,PI,80.7,0
+2607,Hortifrúti,1,1,8.64,20.8,ambiente,4,15,RN,57.7,0
+2608,Refeições prontas,1,7,3.61,,nao_informado,5,5,RO,,1
+2609,Hortifrúti,1,12,81.06,24.9,ambiente,2,1,AP,53.6,1
+2610,Grãos e cereais,0,44,93.1,7.7,refrigerado,4,18,AC,21.7,0
+2611,Hortifrúti,1,10,26.59,1.9,refrigerado,1,16,PA,,1
+2612,Outros,0,17,155.0,30.9,ambiente,5,9,AP,,1
+2613,Refeições prontas,1,8,46.05,30.5,ambiente,2,9,RR,80.3,1
+2614,Hortifrúti,1,2,12.73,,nao_informado,6,1,MG,70.0,1
+2615,Laticínios,1,2,0.58,-1.7,refrigerado,2,18,PE,16.9,0
+2616,Outros,0,16,88.36,8.2,refrigerado,3,15,MA,43.6,0
+2617,Bebidas não alcoólicas,0,5,0.59,23.1,ambiente,4,16,AL,4.5,0
+2618,Refeições prontas,1,2,77.19,-17.7,congelado,6,20,RN,28.5,0
+2619,Grãos e cereais,0,39,1.48,-23.7,congelado,6,23,PA,56.9,0
+2620,Grãos e cereais,0,37,120.5,28.9,ambiente,1,2,GO,62.9,1
+2621,Outros,0,22,352.05,22.4,ambiente,2,18,SC,82.0,1
+2622,Laticínios,1,7,0.6,-1.4,refrigerado,6,15,MS,61.3,0
+2623,Grãos e cereais,0,17,2.65,33.4,ambiente,1,3,AC,73.1,0
+2624,Hortifrúti,1,1,6.44,9.7,refrigerado,0,6,RS,4.2,0
+2625,Carnes e peixes,1,7,156.66,-19.3,congelado,4,7,RJ,,0
+2626,Laticínios,1,10,95.34,26.9,ambiente,5,11,AM,10.3,0
+2627,Carnes e peixes,1,7,18.14,20.3,ambiente,3,16,RR,46.1,0
+2628,Laticínios,1,10,40.04,24.6,ambiente,3,22,PB,37.8,0
+2629,Hortifrúti,1,11,4.67,23.6,ambiente,2,9,RN,86.7,1
+2630,Laticínios,1,10,13.67,,nao_informado,5,3,DF,26.7,0
+2631,Grãos e cereais,0,9,2.22,-16.1,congelado,1,5,PE,18.9,0
+2632,Hortifrúti,1,8,4.67,8.9,refrigerado,2,10,RN,81.5,0
+2633,Laticínios,1,12,113.2,26.6,ambiente,0,19,RR,9.2,1
+2634,Hortifrúti,1,6,23.11,26.8,ambiente,1,14,SC,18.5,1
+2635,Bebidas não alcoólicas,0,43,97.57,25.9,ambiente,4,23,SE,,0
+2636,Hortifrúti,1,3,7.99,5.7,refrigerado,3,16,MT,,1
+2637,Bebidas não alcoólicas,0,21,26.8,28.0,ambiente,4,12,MG,28.9,0
+2638,Refeições prontas,1,5,330.42,29.0,ambiente,3,0,AM,23.4,1
+2639,Grãos e cereais,0,31,14.71,23.7,ambiente,1,2,SE,27.8,0
+2640,Outros,0,29,4.79,19.2,ambiente,3,17,PI,52.1,0
+2641,Bebidas não alcoólicas,0,15,39.48,,nao_informado,3,10,CE,12.8,0
+2642,Laticínios,1,8,119.11,-1.7,refrigerado,1,1,RN,71.9,1
+2643,Bebidas não alcoólicas,0,32,7.09,30.4,ambiente,6,21,PB,29.9,0
+2644,Carnes e peixes,1,8,316.48,34.7,ambiente,2,2,RJ,,0
+2645,Refeições prontas,1,11,134.98,30.9,ambiente,4,9,PR,12.2,1
+2646,Hortifrúti,1,12,270.52,10.8,refrigerado,2,20,PE,49.3,0
+2647,Grãos e cereais,0,18,341.36,,nao_informado,4,20,DF,45.4,1
+2648,Bebidas não alcoólicas,0,17,111.62,9.3,refrigerado,0,23,BA,72.6,0
+2649,Bebidas não alcoólicas,0,0,2.18,4.1,refrigerado,3,9,TO,41.8,1
+2650,Bebidas não alcoólicas,0,38,53.24,25.1,ambiente,0,14,SC,13.4,0
+2651,Refeições prontas,1,5,9.48,21.0,ambiente,6,0,CE,65.7,1
+2652,Padaria,1,2,1.02,21.8,ambiente,2,10,GO,,0
+2653,Laticínios,1,10,88.31,7.2,refrigerado,2,19,PA,17.5,1
+2654,Outros,0,29,11.22,21.3,ambiente,3,23,CE,57.4,0
+2655,Grãos e cereais,0,43,15.09,20.4,ambiente,1,17,MG,80.0,0
+2656,Laticínios,1,8,2.87,25.2,ambiente,0,19,SE,,0
+2657,Outros,0,28,2.86,20.9,ambiente,0,12,ES,35.8,0
+2658,Carnes e peixes,1,10,1.9,-17.2,congelado,6,17,MS,17.9,0
+2659,Refeições prontas,1,3,17.17,24.4,ambiente,5,19,MA,46.7,0
+2660,Outros,0,27,289.33,23.6,ambiente,4,7,AP,75.8,1
+2661,Bebidas não alcoólicas,0,7,178.94,7.4,refrigerado,0,11,MT,51.0,1
+2662,Hortifrúti,1,1,25.48,26.5,ambiente,1,3,ES,,0
+2663,Padaria,1,1,7.4,20.1,ambiente,3,22,SC,77.6,1
+2664,Bebidas não alcoólicas,0,28,1.64,0.0,refrigerado,1,21,RO,88.0,0
+2665,Refeições prontas,1,11,394.51,31.3,ambiente,4,13,SP,63.5,1
+2666,Refeições prontas,1,8,0.81,-22.1,congelado,1,22,MG,87.6,0
+2667,Hortifrúti,1,1,10.33,26.4,ambiente,0,13,MA,83.5,0
+2668,Hortifrúti,1,11,0.84,22.5,ambiente,6,22,MS,39.5,0
+2669,Laticínios,1,6,6.77,2.9,refrigerado,2,10,PA,66.0,0
+2670,Refeições prontas,1,11,3.3,7.7,refrigerado,4,16,MG,73.6,0
+2671,Padaria,1,3,2.2,28.7,ambiente,5,20,TO,83.1,1
+2672,Laticínios,1,8,0.81,,nao_informado,2,8,BA,80.5,0
+2673,Padaria,1,5,33.63,22.3,ambiente,0,6,AP,28.5,1
+2674,Grãos e cereais,0,27,0.67,21.5,ambiente,4,14,AP,,0
+2675,Grãos e cereais,0,29,46.73,6.9,refrigerado,0,12,PR,36.5,0
+2676,Hortifrúti,1,11,23.04,25.2,ambiente,0,8,SC,51.5,0
+2677,Laticínios,1,1,3.23,5.5,refrigerado,3,2,CE,24.9,0
+2678,Refeições prontas,1,11,96.93,20.8,ambiente,3,12,PA,15.6,0
+2679,Bebidas não alcoólicas,0,7,214.47,27.5,ambiente,0,21,MS,3.2,0
+2680,Carnes e peixes,1,3,321.14,33.0,ambiente,0,4,RJ,,0
+2681,Outros,0,30,4.62,22.7,ambiente,6,1,DF,,1
+2682,Grãos e cereais,0,37,6.96,27.2,ambiente,4,7,RS,48.6,0
+2683,Carnes e peixes,1,10,0.51,6.9,refrigerado,6,11,BA,81.9,0
+2684,Carnes e peixes,1,12,126.53,,nao_informado,1,6,AP,46.7,0
+2685,Refeições prontas,1,6,39.88,,nao_informado,1,16,AC,15.9,0
+2686,Bebidas não alcoólicas,0,16,0.58,26.9,ambiente,3,6,SP,43.1,0
+2687,Bebidas não alcoólicas,0,8,4.13,5.8,refrigerado,2,13,SP,59.8,0
+2688,Outros,0,44,0.95,31.0,ambiente,4,11,RR,,0
+2689,Laticínios,1,8,1.63,,nao_informado,3,2,BA,34.0,0
+2690,Bebidas não alcoólicas,0,35,8.6,22.2,ambiente,1,20,AC,,0
+2691,Bebidas não alcoólicas,0,37,12.29,28.6,ambiente,3,4,AL,,0
+2692,Bebidas não alcoólicas,0,3,193.98,,nao_informado,6,1,SE,40.1,0
+2693,Outros,0,15,160.09,,nao_informado,0,2,GO,24.3,1
+2694,Padaria,1,11,315.72,25.2,ambiente,0,0,MT,10.4,1
+2695,Padaria,1,0,0.51,6.2,refrigerado,6,11,ES,,0
+2696,Padaria,1,2,96.99,28.4,ambiente,4,12,AP,40.8,1
+2697,Refeições prontas,1,11,1.06,-19.8,congelado,6,1,SE,5.5,1
+2698,Bebidas não alcoólicas,0,37,373.6,22.4,ambiente,1,12,BA,20.5,0
+2699,Grãos e cereais,0,24,198.42,23.3,ambiente,4,5,RS,60.0,0
+2700,Carnes e peixes,1,12,8.42,3.5,refrigerado,0,13,CE,29.3,0
+2701,Laticínios,1,0,3.54,20.3,ambiente,5,0,SC,8.9,1
+2702,Bebidas não alcoólicas,0,31,1.51,,nao_informado,5,8,AC,28.7,1
+2703,Carnes e peixes,1,6,99.87,27.2,ambiente,6,1,SP,15.7,1
+2704,Hortifrúti,1,1,90.42,7.1,refrigerado,6,11,MS,17.1,1
+2705,Hortifrúti,1,4,249.22,10.2,refrigerado,1,21,BA,40.2,1
+2706,Laticínios,1,3,309.46,20.6,ambiente,0,20,SE,70.9,1
+2707,Refeições prontas,1,0,105.17,-0.9,refrigerado,3,3,TO,,1
+2708,Grãos e cereais,0,12,2.68,4.7,refrigerado,5,11,SP,88.8,1
+2709,Outros,0,24,14.78,,nao_informado,3,11,MA,62.6,1
+2710,Padaria,1,12,17.87,19.4,ambiente,4,18,AC,54.8,1
+2711,Refeições prontas,1,5,22.84,3.5,refrigerado,3,13,PI,,1
+2712,Bebidas não alcoólicas,0,40,23.03,,nao_informado,4,14,RR,17.9,0
+2713,Laticínios,1,2,19.83,30.3,ambiente,3,1,SE,14.8,0
+2714,Refeições prontas,1,3,0.84,-12.3,congelado,6,9,CE,33.3,1
+2715,Grãos e cereais,0,35,0.64,22.7,ambiente,2,13,PE,73.7,0
+2716,Grãos e cereais,0,40,252.42,32.8,ambiente,2,5,PI,53.7,0
+2717,Bebidas não alcoólicas,0,14,0.96,14.4,ambiente,2,16,ES,,0
+2718,Refeições prontas,1,2,8.6,27.3,ambiente,6,15,AL,69.4,0
+2719,Grãos e cereais,0,28,64.74,,nao_informado,4,16,MS,,0
+2720,Carnes e peixes,1,10,1.04,23.0,ambiente,2,17,PA,25.1,1
+2721,Outros,0,30,106.1,26.0,ambiente,5,15,MS,35.4,0
+2722,Grãos e cereais,0,18,15.06,24.2,ambiente,4,11,PE,77.6,0
+2723,Padaria,1,8,192.59,5.6,refrigerado,2,19,RN,,0
+2724,Refeições prontas,1,3,5.07,25.5,ambiente,5,15,SE,9.1,0
+2725,Hortifrúti,1,6,120.22,4.2,refrigerado,3,16,BA,15.8,0
+2726,Carnes e peixes,1,0,23.17,-8.4,congelado,3,5,PE,,1
+2727,Bebidas não alcoólicas,0,11,1.34,31.2,ambiente,0,14,RO,80.2,0
+2728,Padaria,1,1,0.59,23.7,ambiente,1,13,RJ,89.2,1
+2729,Hortifrúti,1,11,3.51,-2.5,refrigerado,1,4,PE,74.2,1
+2730,Padaria,1,12,0.84,-16.5,congelado,2,7,SP,68.9,0
+2731,Bebidas não alcoólicas,0,31,21.99,29.6,ambiente,2,21,SE,65.1,0
+2732,Hortifrúti,1,0,154.96,-15.7,congelado,1,15,SP,15.5,0
+2733,Refeições prontas,1,5,124.99,0.0,refrigerado,0,21,MS,74.2,1
+2734,Grãos e cereais,0,16,66.36,26.2,ambiente,2,0,PI,55.7,0
+2735,Refeições prontas,1,7,3.13,27.6,ambiente,0,3,AC,51.7,0
+2736,Outros,0,0,1.81,24.1,ambiente,5,1,PI,19.6,1
+2737,Laticínios,1,12,0.57,19.9,ambiente,3,1,RJ,87.4,1
+2738,Hortifrúti,1,1,39.45,26.5,ambiente,5,16,RJ,76.4,1
+2739,Bebidas não alcoólicas,0,45,0.63,30.0,ambiente,4,17,SC,64.3,0
+2740,Laticínios,1,5,0.65,7.6,refrigerado,4,14,RO,46.7,0
+2741,Laticínios,1,8,0.91,2.6,refrigerado,1,4,DF,59.1,1
+2742,Bebidas não alcoólicas,0,10,195.29,,nao_informado,3,9,PR,43.3,1
+2743,Refeições prontas,1,0,6.35,20.9,ambiente,5,5,MS,13.8,1
+2744,Laticínios,1,11,350.65,29.6,ambiente,2,2,AP,,0
+2745,Carnes e peixes,1,6,1.05,22.9,ambiente,1,3,SP,,0
+2746,Outros,0,17,0.64,17.0,ambiente,2,11,MA,13.4,0
+2747,Carnes e peixes,1,1,3.78,21.9,ambiente,0,20,TO,,1
+2748,Bebidas não alcoólicas,0,19,1.84,24.7,ambiente,4,18,BA,80.0,0
+2749,Carnes e peixes,1,12,3.1,,nao_informado,5,0,MA,46.6,1
+2750,Padaria,1,8,181.61,27.5,ambiente,1,20,CE,88.5,1
+2751,Laticínios,1,8,32.15,5.0,refrigerado,6,10,RS,4.8,1
+2752,Padaria,1,8,5.51,31.5,ambiente,3,16,SP,75.3,1
+2753,Refeições prontas,1,1,14.49,24.1,ambiente,3,13,AC,23.9,1
+2754,Padaria,1,10,7.14,26.5,ambiente,3,6,MG,,1
+2755,Grãos e cereais,0,34,41.18,29.5,ambiente,2,5,DF,55.6,0
+2756,Laticínios,1,0,215.56,1.2,refrigerado,4,11,RJ,60.8,1
+2757,Carnes e peixes,1,8,28.21,2.8,refrigerado,2,14,MA,73.7,0
+2758,Carnes e peixes,1,12,186.34,30.1,ambiente,3,11,SP,1.1,1
+2759,Hortifrúti,1,5,178.25,14.9,ambiente,0,0,AM,,0
+2760,Refeições prontas,1,11,237.29,6.2,refrigerado,2,16,RJ,71.9,1
+2761,Refeições prontas,1,7,18.89,,nao_informado,4,15,PA,,0
+2762,Padaria,1,12,3.19,,nao_informado,1,8,PR,34.2,0
+2763,Hortifrúti,1,9,102.91,23.3,ambiente,2,0,AL,81.3,1
+2764,Padaria,1,12,15.09,23.3,ambiente,2,3,SC,,0
+2765,Laticínios,1,5,27.71,24.6,ambiente,4,6,AC,58.7,1
+2766,Hortifrúti,1,7,6.42,28.6,ambiente,0,20,GO,29.4,1
+2767,Refeições prontas,1,4,18.19,23.4,ambiente,6,1,PE,61.0,1
+2768,Refeições prontas,1,2,7.24,27.5,ambiente,5,20,MT,46.1,1
+2769,Laticínios,1,4,103.97,27.0,ambiente,0,7,AP,58.7,1
+2770,Outros,0,31,5.66,23.9,ambiente,4,19,SP,10.5,0
+2771,Bebidas não alcoólicas,0,41,247.38,27.0,ambiente,5,19,AP,54.7,1
+2772,Grãos e cereais,0,36,122.53,23.7,ambiente,5,9,AL,71.2,0
+2773,Carnes e peixes,1,0,145.83,22.2,ambiente,5,3,PA,33.9,1
+2774,Carnes e peixes,1,7,17.62,21.5,ambiente,2,15,PA,35.8,0
+2775,Bebidas não alcoólicas,0,6,18.32,25.3,ambiente,3,13,MG,54.9,0
+2776,Padaria,1,12,16.76,5.7,refrigerado,2,9,PI,12.8,0
+2777,Padaria,1,1,299.4,4.1,refrigerado,3,6,AP,59.8,0
+2778,Carnes e peixes,1,2,36.89,22.5,ambiente,1,20,AL,45.4,1
+2779,Padaria,1,6,5.61,27.9,ambiente,2,14,AC,35.5,0
+2780,Laticínios,1,0,5.17,13.3,refrigerado,3,5,PI,17.5,1
+2781,Bebidas não alcoólicas,0,24,2.05,18.9,ambiente,4,20,MT,,0
+2782,Bebidas não alcoólicas,0,29,77.79,19.3,ambiente,2,16,GO,2.2,0
+2783,Refeições prontas,1,0,2.02,10.8,refrigerado,2,13,TO,41.8,0
+2784,Laticínios,1,4,3.9,,nao_informado,4,17,CE,,0
+2785,Outros,0,31,8.19,28.8,ambiente,3,14,MG,,0
+2786,Padaria,1,9,139.67,3.8,refrigerado,4,9,RJ,52.7,0
+2787,Carnes e peixes,1,10,136.28,19.4,ambiente,6,3,RS,88.1,1
+2788,Refeições prontas,1,6,30.05,27.7,ambiente,1,22,AL,16.3,0
+2789,Outros,0,16,396.87,22.1,ambiente,3,23,GO,41.4,0
+2790,Bebidas não alcoólicas,0,3,54.79,19.6,ambiente,5,14,AC,54.8,0
+2791,Carnes e peixes,1,12,2.18,31.9,ambiente,0,11,ES,52.1,1
+2792,Padaria,1,5,1.12,-1.5,refrigerado,2,17,MT,46.5,1
+2793,Refeições prontas,1,2,62.22,26.0,ambiente,6,15,PI,,0
+2794,Laticínios,1,4,47.36,9.6,refrigerado,3,14,AC,65.6,1
+2795,Refeições prontas,1,3,1.99,30.0,ambiente,1,9,MS,20.0,1
+2796,Carnes e peixes,1,6,22.85,6.7,refrigerado,1,20,SC,,0
+2797,Grãos e cereais,0,27,1.06,32.9,ambiente,1,7,RO,43.5,0
+2798,Hortifrúti,1,5,0.64,-0.2,refrigerado,2,20,PB,,1
+2799,Bebidas não alcoólicas,0,44,3.88,20.1,ambiente,5,4,SP,30.0,0
+2800,Refeições prontas,1,8,9.79,7.5,refrigerado,4,12,MG,,0
+2801,Outros,0,27,10.67,,nao_informado,0,6,CE,9.7,1
+2802,Padaria,1,6,18.13,30.8,ambiente,5,18,SP,,1
+2803,Refeições prontas,1,4,6.16,25.7,ambiente,4,17,MT,,1
+2804,Grãos e cereais,0,38,23.19,,nao_informado,2,23,TO,37.8,1
+2805,Grãos e cereais,0,20,1.09,24.6,ambiente,4,9,RS,28.6,0
+2806,Grãos e cereais,0,25,334.6,22.8,ambiente,1,22,MG,48.6,1
+2807,Bebidas não alcoólicas,0,22,25.12,13.9,ambiente,0,23,CE,16.1,0
+2808,Bebidas não alcoólicas,0,31,146.4,21.4,ambiente,5,11,MA,21.9,0
+2809,Padaria,1,8,8.59,27.1,ambiente,2,14,PA,54.9,1
+2810,Hortifrúti,1,11,0.63,20.2,ambiente,4,23,ES,76.3,0
+2811,Laticínios,1,12,0.66,-14.6,congelado,5,22,ES,27.1,0
+2812,Padaria,1,6,11.47,20.8,ambiente,6,6,PB,53.1,1
+2813,Refeições prontas,1,10,24.93,24.8,ambiente,3,11,SC,65.2,1
+2814,Bebidas não alcoólicas,0,38,110.71,-17.1,congelado,4,22,PI,8.4,0
+2815,Hortifrúti,1,1,2.29,,nao_informado,2,12,MA,49.9,0
+2816,Bebidas não alcoólicas,0,30,11.61,,nao_informado,2,16,MS,,0
+2817,Carnes e peixes,1,7,39.47,23.7,ambiente,1,4,RN,68.4,1
+2818,Bebidas não alcoólicas,0,9,3.99,25.6,ambiente,3,16,MS,15.5,0
+2819,Bebidas não alcoólicas,0,16,288.28,-24.3,congelado,0,13,RO,79.2,0
+2820,Grãos e cereais,0,22,235.17,27.6,ambiente,6,5,RR,25.7,1
+2821,Hortifrúti,1,8,68.43,27.2,ambiente,3,13,RS,62.5,0
+2822,Grãos e cereais,0,25,46.57,3.9,refrigerado,5,17,TO,,1
+2823,Hortifrúti,1,4,14.42,,nao_informado,5,21,RS,45.8,1
+2824,Outros,0,17,40.18,31.8,ambiente,6,22,SE,,0
+2825,Hortifrúti,1,12,11.11,-18.4,congelado,2,2,TO,0.2,1
+2826,Outros,0,14,45.21,27.3,ambiente,0,1,PE,4.5,0
+2827,Padaria,1,8,6.49,5.8,refrigerado,4,16,PB,,0
+2828,Hortifrúti,1,4,14.12,8.7,refrigerado,1,23,PB,,1
+2829,Hortifrúti,1,11,75.91,10.0,refrigerado,6,12,AC,77.9,1
+2830,Carnes e peixes,1,8,65.47,,nao_informado,6,6,PA,17.9,0
+2831,Refeições prontas,1,9,106.0,,nao_informado,6,10,PR,23.9,1
+2832,Bebidas não alcoólicas,0,26,149.67,,nao_informado,4,4,SP,,1
+2833,Carnes e peixes,1,2,3.37,,nao_informado,1,8,DF,14.2,0
+2834,Bebidas não alcoólicas,0,12,3.65,25.1,ambiente,2,11,MA,20.1,0
+2835,Hortifrúti,1,3,17.41,31.2,ambiente,5,3,MA,54.2,1
+2836,Carnes e peixes,1,12,163.1,,nao_informado,1,23,AC,56.0,0
+2837,Laticínios,1,7,6.16,23.5,ambiente,2,6,RJ,36.4,0
+2838,Padaria,1,0,10.96,31.0,ambiente,2,6,PE,,0
+2839,Refeições prontas,1,6,309.6,24.8,ambiente,1,23,MG,53.6,1
+2840,Bebidas não alcoólicas,0,19,315.26,20.7,ambiente,5,6,PA,26.4,0
+2841,Laticínios,1,11,20.89,,nao_informado,2,9,PB,88.8,0
+2842,Grãos e cereais,0,6,1.59,9.1,refrigerado,6,11,MT,,0
+2843,Hortifrúti,1,3,2.1,2.6,refrigerado,3,8,BA,,0
+2844,Padaria,1,8,1.84,31.3,ambiente,3,19,AM,15.4,0
+2845,Padaria,1,12,15.45,8.3,refrigerado,5,19,MG,,1
+2846,Padaria,1,0,324.68,21.8,ambiente,0,15,GO,70.7,1
+2847,Hortifrúti,1,10,0.66,24.4,ambiente,4,19,RR,71.7,1
+2848,Padaria,1,8,99.19,10.7,refrigerado,3,16,TO,,0
+2849,Outros,0,15,53.36,3.1,refrigerado,1,6,PR,10.8,0
+2850,Grãos e cereais,0,18,3.77,23.6,ambiente,5,7,BA,46.4,1
+2851,Bebidas não alcoólicas,0,40,25.53,27.0,ambiente,6,19,SE,68.0,0
+2852,Bebidas não alcoólicas,0,21,169.68,,nao_informado,0,18,ES,48.9,0
+2853,Hortifrúti,1,10,7.49,3.1,refrigerado,1,11,ES,,0
+2854,Padaria,1,1,0.72,34.5,ambiente,3,3,PA,47.9,1
+2855,Carnes e peixes,1,12,39.01,30.4,ambiente,2,10,PB,47.7,1
+2856,Laticínios,1,9,5.24,-14.0,congelado,3,12,AL,6.1,0
+2857,Carnes e peixes,1,7,41.69,5.8,refrigerado,0,3,RO,,0
+2858,Carnes e peixes,1,10,227.39,-1.7,refrigerado,0,9,PE,65.3,0
+2859,Carnes e peixes,1,4,1.94,4.6,refrigerado,5,11,SP,16.1,1
+2860,Padaria,1,4,2.67,24.4,ambiente,5,15,SC,,0
+2861,Bebidas não alcoólicas,0,14,2.32,26.2,ambiente,1,18,BA,49.9,1
+2862,Bebidas não alcoólicas,0,6,1.77,22.8,ambiente,2,17,MS,53.4,0
+2863,Refeições prontas,1,8,384.67,10.3,refrigerado,1,0,PE,32.8,1
+2864,Outros,0,32,53.3,19.1,ambiente,3,23,AP,23.0,0
+2865,Bebidas não alcoólicas,0,16,148.92,30.6,ambiente,5,0,MT,32.6,0
+2866,Laticínios,1,2,1.25,6.7,refrigerado,5,13,RJ,40.2,0
+2867,Hortifrúti,1,6,29.45,-14.0,congelado,5,9,DF,,1
+2868,Hortifrúti,1,8,4.46,22.5,ambiente,5,10,MG,4.3,1
+2869,Outros,0,37,12.53,30.8,ambiente,4,1,TO,43.9,0
+2870,Hortifrúti,1,3,49.97,4.4,refrigerado,0,13,ES,3.1,1
+2871,Outros,0,27,247.41,17.8,ambiente,1,20,AL,18.9,1
+2872,Grãos e cereais,0,5,29.38,,nao_informado,6,1,PA,6.9,0
+2873,Bebidas não alcoólicas,0,40,96.94,23.7,ambiente,2,10,RJ,6.5,1
+2874,Grãos e cereais,0,19,329.71,,nao_informado,2,13,TO,,1
+2875,Hortifrúti,1,1,181.14,13.9,ambiente,3,17,MG,5.0,0
+2876,Hortifrúti,1,5,3.72,22.7,ambiente,5,19,AP,17.1,1
+2877,Padaria,1,5,42.3,29.3,ambiente,6,23,GO,55.0,1
+2878,Refeições prontas,1,10,1.29,24.3,ambiente,5,4,CE,,1
+2879,Refeições prontas,1,3,0.61,9.7,refrigerado,1,20,PA,31.1,1
+2880,Laticínios,1,3,26.25,22.8,ambiente,3,0,PA,1.9,1
+2881,Grãos e cereais,0,11,23.49,30.2,ambiente,1,1,PE,,0
+2882,Grãos e cereais,0,9,40.19,26.9,ambiente,6,4,RR,71.3,0
+2883,Refeições prontas,1,5,2.78,3.0,refrigerado,1,17,SC,38.5,0
+2884,Grãos e cereais,0,45,83.81,17.8,ambiente,6,4,DF,37.9,0
+2885,Outros,0,37,1.14,20.4,ambiente,5,23,MG,32.8,0
+2886,Padaria,1,6,0.85,12.1,refrigerado,5,20,MS,39.2,1
+2887,Outros,0,42,185.72,27.3,ambiente,0,20,MA,38.0,1
+2888,Carnes e peixes,1,2,0.55,32.4,ambiente,1,6,PR,,1
+2889,Hortifrúti,1,7,128.06,24.3,ambiente,4,23,SP,47.8,1
+2890,Bebidas não alcoólicas,0,0,8.24,20.7,ambiente,5,21,PE,,0
+2891,Carnes e peixes,1,4,0.63,25.9,ambiente,5,10,MS,33.6,0
+2892,Hortifrúti,1,11,14.86,19.5,ambiente,0,16,BA,6.4,1
+2893,Carnes e peixes,1,4,43.31,4.7,refrigerado,0,1,AC,33.9,1
+2894,Hortifrúti,1,10,74.16,28.5,ambiente,6,13,AP,18.3,1
+2895,Grãos e cereais,0,45,151.66,23.9,ambiente,5,20,RJ,33.2,0
+2896,Outros,0,33,30.19,-19.0,congelado,2,3,PB,65.0,0
+2897,Laticínios,1,9,360.65,11.6,refrigerado,6,19,RR,49.8,1
+2898,Grãos e cereais,0,31,27.45,21.1,ambiente,1,0,SC,57.7,0
+2899,Laticínios,1,10,90.32,,nao_informado,0,5,CE,6.1,1
+2900,Bebidas não alcoólicas,0,0,62.07,23.0,ambiente,4,9,SE,70.3,1
+2901,Grãos e cereais,0,26,6.5,26.1,ambiente,0,3,RJ,23.9,0
+2902,Bebidas não alcoólicas,0,37,19.62,30.0,ambiente,5,20,SE,,0
+2903,Carnes e peixes,1,10,18.85,20.3,ambiente,4,21,RR,,0
+2904,Hortifrúti,1,2,112.99,-13.8,congelado,4,14,AM,,0
+2905,Grãos e cereais,0,16,10.93,28.6,ambiente,6,7,RO,33.1,0
+2906,Padaria,1,0,391.81,24.1,ambiente,6,10,SP,79.0,1
+2907,Refeições prontas,1,11,99.89,28.6,ambiente,6,12,MA,89.4,1
+2908,Refeições prontas,1,3,0.92,24.7,ambiente,2,3,SC,12.2,1
+2909,Hortifrúti,1,11,239.99,20.2,ambiente,6,15,MT,57.9,0
+2910,Outros,0,4,50.52,28.1,ambiente,3,15,AC,12.0,1
+2911,Carnes e peixes,1,9,9.65,15.3,ambiente,4,18,AC,57.2,0
+2912,Bebidas não alcoólicas,0,16,116.59,20.2,ambiente,3,12,TO,57.9,1
+2913,Grãos e cereais,0,15,49.02,9.8,refrigerado,2,13,RN,21.4,1
+2914,Padaria,1,2,9.15,,nao_informado,3,23,MS,19.7,1
+2915,Hortifrúti,1,11,95.21,3.0,refrigerado,6,1,SC,,0
+2916,Bebidas não alcoólicas,0,34,0.55,,nao_informado,4,15,MA,11.5,0
+2917,Grãos e cereais,0,11,2.94,,nao_informado,6,8,CE,,0
+2918,Refeições prontas,1,2,166.01,-14.2,congelado,3,22,RJ,42.9,1
+2919,Padaria,1,8,39.96,19.5,ambiente,4,14,PA,,0
+2920,Bebidas não alcoólicas,0,16,140.45,8.0,refrigerado,0,19,MA,84.1,0
+2921,Laticínios,1,3,1.07,22.5,ambiente,6,14,MS,64.2,1
+2922,Bebidas não alcoólicas,0,43,31.59,22.5,ambiente,3,8,AC,72.2,0
+2923,Outros,0,12,118.67,5.7,refrigerado,5,5,AL,6.5,0
+2924,Carnes e peixes,1,3,10.02,25.3,ambiente,6,1,CE,39.9,0
+2925,Outros,0,32,93.1,26.1,ambiente,3,17,MS,23.9,0
+2926,Hortifrúti,1,12,119.18,28.8,ambiente,2,22,RJ,22.5,0
+2927,Laticínios,1,3,8.04,20.0,ambiente,6,18,AL,53.1,1
+2928,Carnes e peixes,1,9,65.74,25.3,ambiente,4,6,RS,33.8,0
+2929,Grãos e cereais,0,2,0.6,,nao_informado,2,8,AP,69.1,0
+2930,Grãos e cereais,0,28,63.58,20.1,ambiente,4,14,RO,54.0,0
+2931,Hortifrúti,1,1,8.49,-16.8,congelado,1,19,SC,26.7,1
+2932,Padaria,1,5,158.29,-20.1,congelado,5,7,PR,73.9,0
+2933,Grãos e cereais,0,35,3.71,25.1,ambiente,2,9,MS,88.5,0
+2934,Bebidas não alcoólicas,0,24,13.65,27.1,ambiente,2,11,PR,62.7,0
+2935,Laticínios,1,12,2.37,3.6,refrigerado,0,17,RO,46.2,1
+2936,Carnes e peixes,1,10,26.37,26.8,ambiente,4,3,PA,77.9,1
+2937,Outros,0,1,51.94,31.4,ambiente,2,17,AP,,1
+2938,Hortifrúti,1,8,59.41,7.2,refrigerado,2,21,MG,18.9,0
+2939,Refeições prontas,1,12,0.98,28.0,ambiente,5,19,RR,78.2,0
+2940,Laticínios,1,5,19.31,26.0,ambiente,5,12,CE,53.9,1
+2941,Padaria,1,4,113.11,20.7,ambiente,2,10,MA,31.5,0
+2942,Padaria,1,12,74.18,20.0,ambiente,1,12,RS,3.6,0
+2943,Outros,0,39,63.46,15.8,ambiente,1,13,PE,69.8,1
+2944,Refeições prontas,1,0,3.52,-12.0,congelado,4,10,PR,64.3,0
+2945,Bebidas não alcoólicas,0,41,0.66,21.0,ambiente,1,19,BA,,0
+2946,Padaria,1,5,191.61,-19.0,congelado,5,5,PI,,0
+2947,Carnes e peixes,1,2,39.27,28.8,ambiente,3,7,AM,87.2,1
+2948,Laticínios,1,8,0.93,-0.3,refrigerado,3,18,AP,86.9,0
+2949,Carnes e peixes,1,10,8.32,21.0,ambiente,6,21,CE,43.0,1
+2950,Outros,0,17,258.28,26.8,ambiente,6,9,PR,,0
+2951,Grãos e cereais,0,19,2.82,26.3,ambiente,6,2,CE,54.1,0
+2952,Refeições prontas,1,0,1.14,23.7,ambiente,0,11,SP,75.7,1
+2953,Carnes e peixes,1,11,1.06,-18.3,congelado,6,2,DF,32.2,0
+2954,Padaria,1,5,7.67,30.7,ambiente,6,9,GO,27.0,1
+2955,Grãos e cereais,0,1,143.19,19.3,ambiente,5,10,RR,23.5,1
+2956,Hortifrúti,1,8,1.05,,nao_informado,6,17,MA,,1
+2957,Bebidas não alcoólicas,0,28,3.39,27.8,ambiente,6,23,RR,64.7,0
+2958,Laticínios,1,5,1.45,8.1,refrigerado,2,8,AC,39.0,1
+2959,Carnes e peixes,1,9,4.68,24.4,ambiente,6,23,AL,46.2,1
+2960,Outros,0,5,3.69,28.2,ambiente,0,16,AM,83.2,0
+2961,Laticínios,1,6,36.89,0.2,refrigerado,6,12,SE,71.3,0
+2962,Laticínios,1,12,6.77,,nao_informado,3,23,MG,87.8,0
+2963,Padaria,1,6,215.8,27.2,ambiente,3,5,RR,54.4,0
+2964,Carnes e peixes,1,9,9.91,4.6,refrigerado,1,16,SC,41.1,1
+2965,Grãos e cereais,0,8,6.41,2.2,refrigerado,3,22,SC,83.5,1
+2966,Refeições prontas,1,8,98.73,20.7,ambiente,2,13,AM,87.6,1
+2967,Carnes e peixes,1,7,2.92,21.4,ambiente,3,22,AC,73.1,1
+2968,Refeições prontas,1,7,3.06,-13.0,congelado,4,15,MA,40.6,0
+2969,Bebidas não alcoólicas,0,14,1.7,26.7,ambiente,6,8,DF,,0
+2970,Grãos e cereais,0,11,2.39,21.0,ambiente,0,10,MT,4.6,0
+2971,Carnes e peixes,1,0,2.64,-14.0,congelado,4,18,TO,59.3,1
+2972,Refeições prontas,1,12,0.92,9.2,refrigerado,1,2,PA,,0
+2973,Hortifrúti,1,6,39.65,,nao_informado,6,12,AL,12.2,0
+2974,Carnes e peixes,1,3,243.93,,nao_informado,6,12,RS,70.1,1
+2975,Outros,0,43,2.66,23.9,ambiente,5,15,ES,3.2,0
+2976,Carnes e peixes,1,4,54.24,23.8,ambiente,4,3,PI,,0
+2977,Bebidas não alcoólicas,0,20,38.35,30.3,ambiente,5,20,SE,,0
+2978,Bebidas não alcoólicas,0,21,0.69,26.7,ambiente,4,16,SE,30.8,1
+2979,Hortifrúti,1,8,67.76,5.3,refrigerado,6,21,GO,86.9,1
+2980,Carnes e peixes,1,4,327.21,,nao_informado,3,17,AC,51.4,0
+2981,Hortifrúti,1,4,20.02,19.4,ambiente,5,14,RJ,43.5,1
+2982,Refeições prontas,1,9,136.62,23.1,ambiente,3,13,MA,33.1,1
+2983,Padaria,1,2,32.93,15.8,ambiente,1,22,AM,24.5,0
+2984,Padaria,1,0,195.9,,nao_informado,5,8,GO,14.3,0
+2985,Bebidas não alcoólicas,0,31,1.45,17.5,ambiente,6,23,TO,2.9,0
+2986,Laticínios,1,6,4.97,-1.1,refrigerado,1,14,AL,53.2,0
+2987,Laticínios,1,12,2.81,25.4,ambiente,5,19,MS,9.2,1
+2988,Grãos e cereais,0,19,0.82,24.3,ambiente,5,13,RO,30.7,0
+2989,Padaria,1,2,11.68,-1.6,refrigerado,2,14,RR,27.8,0
+2990,Refeições prontas,1,9,23.51,,nao_informado,0,8,PA,26.9,0
+2991,Refeições prontas,1,9,1.69,5.2,refrigerado,0,23,MT,55.1,0
+2992,Laticínios,1,0,59.77,29.0,ambiente,2,23,RN,,1
+2993,Bebidas não alcoólicas,0,43,15.83,25.3,ambiente,5,12,PE,47.6,0
+2994,Grãos e cereais,0,3,36.65,27.8,ambiente,4,14,AL,68.4,0
+2995,Padaria,1,12,37.04,26.2,ambiente,2,9,SE,54.5,1
+2996,Outros,0,8,27.43,21.4,ambiente,1,3,BA,58.3,0
+2997,Carnes e peixes,1,11,11.18,,nao_informado,3,8,MA,7.2,0
+2998,Carnes e peixes,1,7,12.39,,nao_informado,1,11,RN,36.6,0
+2999,Carnes e peixes,1,2,91.55,19.7,ambiente,6,7,SE,55.3,0
+3000,Grãos e cereais,0,33,6.67,26.6,ambiente,0,22,MG,83.5,0
+3001,Outros,0,27,8.66,,nao_informado,5,18,RJ,87.4,1
+3002,Bebidas não alcoólicas,0,27,3.64,26.3,ambiente,0,0,AC,50.9,0
+3003,Laticínios,1,8,3.19,20.8,ambiente,3,18,PR,,0
+3004,Outros,0,37,374.7,-15.7,congelado,2,1,AC,85.2,0
+3005,Outros,0,36,45.73,26.5,ambiente,5,9,DF,50.0,1
+3006,Padaria,1,4,26.98,23.8,ambiente,0,6,CE,16.9,1
+3007,Outros,0,0,63.63,22.1,ambiente,5,8,MG,72.6,0
+3008,Carnes e peixes,1,12,399.5,4.6,refrigerado,1,21,CE,78.2,0
+3009,Laticínios,1,0,93.76,20.6,ambiente,1,2,ES,31.3,1
+3010,Laticínios,1,10,9.77,,nao_informado,6,11,AM,75.6,0
+3011,Hortifrúti,1,11,3.34,7.9,refrigerado,0,10,TO,50.3,0
+3012,Padaria,1,2,81.11,25.9,ambiente,3,22,RR,3.7,1
+3013,Bebidas não alcoólicas,0,7,0.77,29.3,ambiente,6,11,PA,62.7,0
+3014,Outros,0,26,47.28,27.9,ambiente,5,6,PE,17.5,0
+3015,Hortifrúti,1,1,0.75,8.4,refrigerado,0,10,SP,1.5,1
+3016,Padaria,1,6,18.87,11.9,refrigerado,6,0,SE,56.4,1
+3017,Hortifrúti,1,2,75.54,25.5,ambiente,4,17,AP,14.6,1
+3018,Padaria,1,1,11.98,7.0,refrigerado,0,3,GO,,1
+3019,Refeições prontas,1,5,120.88,6.0,refrigerado,0,6,ES,20.9,0
+3020,Outros,0,3,160.31,30.6,ambiente,1,6,RO,,0
+3021,Outros,0,16,41.64,26.2,ambiente,5,17,RS,83.1,0
+3022,Refeições prontas,1,3,11.29,20.9,ambiente,5,18,GO,17.6,0
+3023,Laticínios,1,5,19.82,,nao_informado,3,1,DF,65.4,0
+3024,Carnes e peixes,1,2,65.98,24.0,ambiente,6,2,MT,24.4,1
+3025,Padaria,1,4,202.19,,nao_informado,0,2,MS,87.7,0
+3026,Padaria,1,2,3.77,21.9,ambiente,6,8,CE,54.7,1
+3027,Grãos e cereais,0,30,3.25,4.7,refrigerado,2,8,BA,81.5,0
+3028,Laticínios,1,10,7.01,5.1,refrigerado,3,11,AM,,0
+3029,Hortifrúti,1,8,196.75,2.5,refrigerado,5,6,MT,,0
+3030,Outros,0,7,89.26,22.5,ambiente,6,3,MT,2.2,0
+3031,Hortifrúti,1,1,23.68,29.2,ambiente,6,14,MG,24.4,1
+3032,Refeições prontas,1,2,5.49,21.9,ambiente,3,13,RO,37.7,0
+3033,Refeições prontas,1,0,1.88,,nao_informado,1,1,RN,53.7,0
+3034,Outros,0,33,214.69,29.1,ambiente,2,21,GO,14.7,0
+3035,Refeições prontas,1,8,66.55,21.0,ambiente,4,23,ES,82.7,0
+3036,Outros,0,31,4.98,23.5,ambiente,0,19,PA,78.2,1
+3037,Carnes e peixes,1,3,4.16,9.7,refrigerado,1,2,DF,73.8,0
+3038,Carnes e peixes,1,5,19.62,22.0,ambiente,0,19,PA,40.3,1
+3039,Hortifrúti,1,3,10.1,11.5,refrigerado,2,14,MA,28.2,0
+3040,Grãos e cereais,0,7,233.96,27.7,ambiente,1,18,SE,,0
+3041,Carnes e peixes,1,9,165.46,25.1,ambiente,6,12,PB,86.6,1
+3042,Carnes e peixes,1,9,88.93,24.6,ambiente,2,1,RO,25.2,1
+3043,Hortifrúti,1,6,13.02,2.2,refrigerado,5,18,RS,,0
+3044,Grãos e cereais,0,23,63.1,17.6,ambiente,1,20,DF,8.0,0
+3045,Carnes e peixes,1,10,216.33,6.2,refrigerado,4,18,RR,21.7,0
+3046,Carnes e peixes,1,8,2.39,8.0,refrigerado,1,14,SE,29.7,0
+3047,Hortifrúti,1,1,117.38,,nao_informado,5,13,RS,,1
+3048,Laticínios,1,10,1.37,28.5,ambiente,4,6,GO,50.7,1
+3049,Carnes e peixes,1,8,76.07,30.9,ambiente,4,4,AL,21.9,1
+3050,Refeições prontas,1,1,4.51,-9.3,congelado,4,20,AM,24.4,0
+3051,Carnes e peixes,1,12,0.75,,nao_informado,1,8,AP,,0
+3052,Grãos e cereais,0,45,63.66,24.3,ambiente,1,13,CE,89.9,0
+3053,Refeições prontas,1,5,19.67,9.8,refrigerado,1,1,BA,,0
+3054,Laticínios,1,7,32.09,7.6,refrigerado,3,17,SE,75.1,0
+3055,Hortifrúti,1,3,11.77,19.0,ambiente,0,11,PA,18.7,0
+3056,Bebidas não alcoólicas,0,38,11.58,24.6,ambiente,5,0,PI,35.5,0
+3057,Laticínios,1,8,10.28,-0.4,refrigerado,5,1,SP,15.1,1
+3058,Bebidas não alcoólicas,0,7,1.89,30.1,ambiente,0,0,CE,46.6,0
+3059,Grãos e cereais,0,18,10.26,4.2,refrigerado,3,2,SP,89.7,0
+3060,Bebidas não alcoólicas,0,7,3.9,25.0,ambiente,1,2,PE,27.5,0
+3061,Laticínios,1,12,15.76,-2.7,refrigerado,3,18,DF,28.5,0
+3062,Padaria,1,7,0.57,,nao_informado,1,6,RR,70.8,0
+3063,Outros,0,34,69.54,33.4,ambiente,0,10,RR,4.3,0
+3064,Carnes e peixes,1,11,0.84,24.7,ambiente,3,16,SP,47.5,1
+3065,Refeições prontas,1,0,1.39,,nao_informado,2,14,MA,54.5,1
+3066,Laticínios,1,3,4.1,6.4,refrigerado,3,12,BA,,0
+3067,Refeições prontas,1,11,306.28,-13.7,congelado,1,20,RR,82.1,0
+3068,Refeições prontas,1,10,6.13,25.7,ambiente,3,1,SE,6.7,1
+3069,Grãos e cereais,0,26,112.93,21.2,ambiente,4,3,RR,74.7,0
+3070,Outros,0,10,47.27,1.7,refrigerado,0,2,RO,84.3,0
+3071,Carnes e peixes,1,6,351.07,,nao_informado,6,7,RO,80.5,0
+3072,Carnes e peixes,1,1,0.78,18.3,ambiente,1,16,SP,3.5,0
+3073,Outros,0,7,3.25,26.4,ambiente,0,12,AM,20.8,1
+3074,Laticínios,1,4,122.09,29.6,ambiente,2,17,GO,23.8,1
+3075,Outros,0,40,27.35,24.3,ambiente,2,20,BA,,0
+3076,Bebidas não alcoólicas,0,36,53.66,17.1,ambiente,2,20,ES,,0
+3077,Laticínios,1,5,0.64,3.1,refrigerado,2,4,DF,77.3,0
+3078,Refeições prontas,1,3,180.53,26.1,ambiente,0,8,PB,51.4,1
+3079,Grãos e cereais,0,9,2.56,26.8,ambiente,4,18,AM,29.5,0
+3080,Laticínios,1,9,5.5,26.4,ambiente,4,8,RJ,15.1,0
+3081,Outros,0,33,382.57,22.0,ambiente,6,3,MT,75.5,0
+3082,Laticínios,1,11,1.57,-25.0,congelado,0,18,ES,8.4,0
+3083,Padaria,1,0,25.82,-10.3,congelado,0,8,GO,69.2,1
+3084,Bebidas não alcoólicas,0,1,211.51,,nao_informado,5,7,SP,59.2,0
+3085,Hortifrúti,1,12,1.3,-23.0,congelado,4,8,PI,64.6,1
+3086,Padaria,1,10,383.19,24.4,ambiente,5,20,MG,33.4,1
+3087,Outros,0,45,3.22,24.4,ambiente,1,5,PI,,0
+3088,Bebidas não alcoólicas,0,22,1.18,5.7,refrigerado,3,0,PE,4.5,0
+3089,Bebidas não alcoólicas,0,10,7.27,18.8,ambiente,6,16,BA,64.8,0
+3090,Grãos e cereais,0,28,184.76,29.4,ambiente,0,11,SP,84.1,0
+3091,Bebidas não alcoólicas,0,2,352.04,20.0,ambiente,5,14,RJ,30.7,1
+3092,Carnes e peixes,1,11,0.56,21.7,ambiente,5,9,RN,,0
+3093,Carnes e peixes,1,9,5.87,7.0,refrigerado,3,9,PA,34.4,1
+3094,Refeições prontas,1,5,0.64,-18.8,congelado,1,2,TO,76.9,1
+3095,Carnes e peixes,1,2,27.25,18.3,ambiente,4,5,RO,69.8,1
+3096,Outros,0,44,23.65,17.1,ambiente,3,11,RO,60.0,0
+3097,Laticínios,1,9,10.11,-0.2,refrigerado,5,7,SC,2.9,0
+3098,Grãos e cereais,0,2,24.79,23.6,ambiente,1,16,RR,76.7,0
+3099,Grãos e cereais,0,34,56.52,30.7,ambiente,1,4,MA,56.6,0
+3100,Hortifrúti,1,1,101.73,25.4,ambiente,6,16,RS,30.7,1
+3101,Carnes e peixes,1,2,3.15,,nao_informado,6,16,BA,20.5,1
+3102,Padaria,1,3,22.39,27.6,ambiente,2,6,RO,62.5,0
+3103,Outros,0,20,1.46,26.7,ambiente,2,21,ES,18.5,0
+3104,Refeições prontas,1,7,1.92,26.4,ambiente,5,12,SE,,0
+3105,Laticínios,1,8,99.67,7.2,refrigerado,1,8,PE,16.6,1
+3106,Laticínios,1,9,162.14,21.3,ambiente,0,0,AM,33.9,1
+3107,Padaria,1,9,256.15,-19.5,congelado,2,6,RS,7.3,0
+3108,Outros,0,31,219.81,19.9,ambiente,6,17,CE,23.7,1
+3109,Carnes e peixes,1,8,33.29,0.5,refrigerado,1,2,MG,58.3,1
+3110,Padaria,1,0,27.34,,nao_informado,4,17,RR,65.7,1
+3111,Grãos e cereais,0,44,1.52,26.8,ambiente,0,13,PB,69.3,0
+3112,Outros,0,11,1.04,24.7,ambiente,4,14,RR,34.6,0
+3113,Refeições prontas,1,7,11.85,1.4,refrigerado,0,16,ES,,1
+3114,Bebidas não alcoólicas,0,30,9.19,30.1,ambiente,1,22,RN,86.1,0
+3115,Padaria,1,3,11.05,3.0,refrigerado,0,12,MT,47.1,0
+3116,Bebidas não alcoólicas,0,14,0.71,,nao_informado,4,7,SP,3.5,1
+3117,Laticínios,1,6,0.67,28.5,ambiente,5,1,RN,24.9,1
+3118,Carnes e peixes,1,3,14.3,30.8,ambiente,5,18,BA,68.1,1
+3119,Hortifrúti,1,4,176.18,3.2,refrigerado,6,11,AM,29.1,0
+3120,Outros,0,34,118.48,10.2,refrigerado,1,1,MT,64.8,0
+3121,Laticínios,1,0,33.81,9.0,refrigerado,4,15,RR,34.7,0
+3122,Laticínios,1,11,197.67,4.4,refrigerado,1,16,RJ,33.6,1
+3123,Grãos e cereais,0,13,4.26,22.1,ambiente,5,5,AC,16.5,0
+3124,Outros,0,21,9.62,22.4,ambiente,5,18,MA,17.2,0
+3125,Laticínios,1,10,141.76,18.6,ambiente,2,18,AL,81.3,1
+3126,Hortifrúti,1,9,3.77,24.5,ambiente,3,0,GO,,1
+3127,Laticínios,1,3,230.58,6.7,refrigerado,4,7,RS,3.5,0
+3128,Laticínios,1,6,20.12,4.4,refrigerado,5,23,RS,83.6,1
+3129,Carnes e peixes,1,4,278.05,31.5,ambiente,3,11,AM,70.6,1
+3130,Grãos e cereais,0,20,13.31,27.3,ambiente,1,13,AM,,0
+3131,Grãos e cereais,0,16,33.04,27.5,ambiente,4,13,RN,86.6,0
+3132,Outros,0,7,1.1,27.0,ambiente,4,16,AM,26.8,0
+3133,Outros,0,38,385.05,-17.5,congelado,5,10,AP,,0
+3134,Laticínios,1,8,2.11,25.0,ambiente,5,3,RJ,,0
+3135,Refeições prontas,1,10,5.92,9.4,refrigerado,1,8,AM,19.0,0
+3136,Padaria,1,3,2.51,29.5,ambiente,4,8,AC,,0
+3137,Padaria,1,2,72.4,9.2,refrigerado,6,10,DF,67.3,1
+3138,Laticínios,1,5,77.06,24.8,ambiente,0,5,ES,36.2,0
+3139,Bebidas não alcoólicas,0,36,142.6,28.7,ambiente,6,12,PB,41.8,0
+3140,Grãos e cereais,0,12,248.75,26.2,ambiente,5,8,PE,9.0,0
+3141,Carnes e peixes,1,11,0.52,7.8,refrigerado,3,15,RN,18.2,0
+3142,Padaria,1,0,7.52,29.1,ambiente,5,11,SP,,1
+3143,Refeições prontas,1,8,6.67,26.7,ambiente,0,14,PA,2.6,0
+3144,Grãos e cereais,0,33,0.79,,nao_informado,0,23,AC,73.4,0
+3145,Grãos e cereais,0,4,33.06,3.7,refrigerado,2,2,RN,26.4,0
+3146,Carnes e peixes,1,3,0.8,,nao_informado,2,17,PE,,0
+3147,Bebidas não alcoólicas,0,24,92.55,22.3,ambiente,5,10,SC,,1
+3148,Bebidas não alcoólicas,0,30,0.8,31.0,ambiente,4,10,MG,46.8,0
+3149,Padaria,1,1,5.42,21.2,ambiente,2,4,GO,32.8,1
+3150,Outros,0,41,25.54,19.3,ambiente,2,2,GO,14.5,0
+3151,Refeições prontas,1,3,141.21,-13.8,congelado,6,8,AM,57.3,1
+3152,Grãos e cereais,0,15,1.65,22.9,ambiente,4,7,RJ,75.1,0
+3153,Hortifrúti,1,12,7.1,9.1,refrigerado,2,13,RJ,74.0,0
+3154,Bebidas não alcoólicas,0,42,5.75,25.1,ambiente,3,3,SP,61.5,0
+3155,Hortifrúti,1,4,2.2,29.0,ambiente,6,20,MG,,1
+3156,Padaria,1,11,14.53,10.5,refrigerado,5,16,PR,74.3,0
+3157,Padaria,1,0,0.99,7.8,refrigerado,3,20,AC,,1
+3158,Outros,0,14,19.42,1.5,refrigerado,4,22,AP,53.5,0
+3159,Grãos e cereais,0,7,47.66,27.1,ambiente,4,19,ES,89.5,0
+3160,Carnes e peixes,1,6,2.45,3.0,refrigerado,1,21,RO,,0
+3161,Grãos e cereais,0,43,107.72,23.3,ambiente,4,18,ES,46.5,0
+3162,Padaria,1,10,16.59,3.7,refrigerado,1,20,RN,72.0,1
+3163,Carnes e peixes,1,12,0.62,18.4,ambiente,6,5,PB,35.7,1
+3164,Grãos e cereais,0,9,77.12,29.6,ambiente,6,17,PA,78.7,0
+3165,Laticínios,1,8,3.72,10.1,refrigerado,5,10,AC,13.0,0
+3166,Hortifrúti,1,7,4.25,-18.3,congelado,1,8,MS,31.1,0
+3167,Carnes e peixes,1,5,204.46,3.7,refrigerado,1,21,BA,,1
+3168,Padaria,1,7,79.84,5.7,refrigerado,3,8,RO,68.0,0
+3169,Bebidas não alcoólicas,0,7,110.18,-0.3,refrigerado,5,13,AM,54.2,0
+3170,Grãos e cereais,0,5,11.69,27.7,ambiente,6,11,MG,32.9,0
+3171,Bebidas não alcoólicas,0,34,75.77,19.1,ambiente,5,14,RS,78.2,0
+3172,Laticínios,1,6,9.46,22.5,ambiente,1,9,PA,22.3,0
+3173,Grãos e cereais,0,30,184.84,12.4,ambiente,6,0,AC,54.1,0
+3174,Carnes e peixes,1,12,117.93,28.4,ambiente,2,2,PR,12.3,1
+3175,Grãos e cereais,0,20,1.38,28.8,ambiente,5,20,SC,,0
+3176,Refeições prontas,1,6,118.65,7.3,refrigerado,5,1,AP,2.1,1
+3177,Bebidas não alcoólicas,0,45,136.09,-13.4,congelado,6,10,SC,46.8,0
+3178,Hortifrúti,1,6,11.6,,nao_informado,2,4,AM,5.5,0
+3179,Bebidas não alcoólicas,0,11,2.19,28.9,ambiente,6,0,PI,70.1,0
+3180,Grãos e cereais,0,1,5.0,32.6,ambiente,6,13,PA,67.1,0
+3181,Outros,0,23,6.61,18.0,ambiente,0,23,PR,,1
+3182,Bebidas não alcoólicas,0,19,1.26,26.4,ambiente,0,6,MG,2.9,0
+3183,Refeições prontas,1,6,0.51,27.3,ambiente,4,21,BA,87.6,1
+3184,Padaria,1,3,0.59,-20.2,congelado,5,12,RS,,0
+3185,Outros,0,30,22.39,21.6,ambiente,4,15,BA,18.2,0
+3186,Grãos e cereais,0,23,325.17,29.8,ambiente,0,10,PI,7.7,0
+3187,Bebidas não alcoólicas,0,8,84.83,26.0,ambiente,4,2,PE,86.8,1
+3188,Refeições prontas,1,2,53.34,19.9,ambiente,5,2,PB,,1
+3189,Outros,0,40,375.96,21.0,ambiente,1,16,RN,59.6,1
+3190,Refeições prontas,1,3,12.59,-14.1,congelado,5,15,SE,56.2,0
+3191,Grãos e cereais,0,42,152.25,33.0,ambiente,3,15,MT,21.6,0
+3192,Grãos e cereais,0,13,54.74,27.1,ambiente,0,18,AL,,0
+3193,Grãos e cereais,0,26,1.72,26.1,ambiente,6,1,ES,75.1,0
+3194,Refeições prontas,1,9,0.96,26.5,ambiente,3,22,MG,88.9,1
+3195,Bebidas não alcoólicas,0,25,2.29,26.3,ambiente,6,5,MT,5.7,0
+3196,Padaria,1,8,142.55,30.9,ambiente,4,7,AP,,0
+3197,Laticínios,1,12,32.46,23.6,ambiente,6,21,PI,,1
+3198,Carnes e peixes,1,9,5.35,,nao_informado,2,8,AL,6.7,0
+3199,Hortifrúti,1,10,6.93,23.6,ambiente,4,6,RO,20.8,0
+3200,Grãos e cereais,0,31,249.0,4.7,refrigerado,2,12,AC,42.0,0

@@ -59,6 +59,13 @@ def _metricas_ia(raiz):
         return None, "modelo/metricas.json ou limiares.json ausente"
     abaixo = []
     for chave, limiar in limiares.items():
+        if isinstance(limiar, dict):
+            medidos = metricas.get(chave) or {}
+            abaixo += [f"{chave}.{sub}={medidos.get(sub)}<{ref}"
+                       for sub, ref in limiar.items()
+                       if isinstance(medidos.get(sub), (int, float))
+                       and medidos[sub] < ref]
+            continue
         medido = metricas.get(chave)
         if isinstance(medido, dict):
             medido = medido.get("acuracia")

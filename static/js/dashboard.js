@@ -237,7 +237,7 @@
     var risco = m.risco_descarte;
     linhas.push(el("p", { texto: risco && typeof risco.acuracia === "number"
       ? "Acurácia na predição de descarte: " + decimal.format(100 * risco.acuracia) + "%"
-        + (typeof risco.roc_auc === "number" ? " · ROC-AUC " + decimal.format(risco.roc_auc) : "")
+        + (typeof risco.auc === "number" ? " · ROC-AUC " + decimal.format(risco.auc) : "")
       : "Acurácia na predição de descarte: ainda não avaliada nesta versão" }));
     $("ia-metricas").replaceChildren.apply($("ia-metricas"), linhas);
     var op = opcoesBase(); op.indexAxis = "y"; op.scales.x.max = 100;
