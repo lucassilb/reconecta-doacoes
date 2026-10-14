@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cadastro · ReConecta</title>
-  <meta name="description" content="Cadastre sua empresa do setor de alimentos ou seja um doador no ReConecta, a plataforma de redistribuição de excedentes alimentares.">
+  <meta name="description" content="Cadastre sua ONG ou empresa de alimentos, ou seja um doador pessoa física, no ReConecta: a rede que conecta excedentes a quem precisa.">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,12 +40,12 @@
         <li><a class="passo" href="/entrar" id="passo-publicar">
           <span class="passo__n" aria-hidden="true">2</span>
           <span class="passo__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9M7.8 5.5l8.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
-          <span class="passo__rotulo">Publique o pedido</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="passo__rotulo">ONG pede, empresa oferece</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a></li>
         <li><a class="passo" href="/#doacoes">
           <span class="passo__n" aria-hidden="true">3</span>
           <span class="passo__icone" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7.5" r="2.6" fill="currentColor"/><circle cx="5.8" cy="9.5" r="2" fill="currentColor"/><circle cx="18.2" cy="9.5" r="2" fill="currentColor"/><path d="M7.5 18.5c.5-3.2 2.3-5 4.5-5s4 1.8 4.5 5zM2.5 17c.3-2.2 1.5-3.4 3.3-3.4.9 0 1.6.3 2.2.8-.6.8-1 1.7-1.2 2.6zM21.5 17c-.3-2.2-1.5-3.4-3.3-3.4-.9 0-1.6.3-2.2.8.6.8 1 1.7 1.2 2.6z" fill="currentColor"/></svg></span>
-          <span class="passo__rotulo">Pessoas e empresas doam</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="passo__rotulo">Pessoas doam, ONGs recebem</span><svg class="passo__seta" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a></li>
       </ol>
     </aside>
@@ -58,7 +58,7 @@
           <div id="etapa-perfil">
           <header class="cabecalho">
             <h2 id="cadastro-titulo" tabindex="-1">Crie seu cadastro</h2>
-            <p class="cabecalho__sub">Escolha como você vai participar.</p>
+            <p class="cabecalho__sub">ONG, empresa ou pessoa: escolha como você vai participar.</p>
           </header>
 
           <fieldset class="perfis">
@@ -70,8 +70,8 @@
                 <svg viewBox="0 0 32 32" focusable="false"><path d="M5 13l2.2-6.4A2 2 0 0 1 9.1 5h13.8a2 2 0 0 1 1.9 1.4L27 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 13h22v1.5a3.7 3.7 0 0 1-7.3 0 3.7 3.7 0 0 1-7.4 0A3.7 3.7 0 0 1 5 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 18.5V27h18v-8.5M13 27v-5.5h6V27" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
               </span>
               <span class="perfil__texto">
-                <span class="perfil__titulo">Sou empresa</span>
-                <span class="perfil__desc">Restaurante, padaria, mercado, associação ou outro negócio que precisa de doações ou quer doar. Usa CNPJ.</span>
+                <span class="perfil__titulo">Sou ONG ou empresa</span>
+                <span class="perfil__desc">ONG, associação ou empresa de alimentos que precisa de doações ou tem excedente para doar. Usa CNPJ.</span>
               </span>
               <span class="perfil__marcador" aria-hidden="true"></span>
             </label>
@@ -83,7 +83,7 @@
               </span>
               <span class="perfil__texto">
                 <span class="perfil__titulo">Sou doador</span>
-                <span class="perfil__desc">Pessoa física que quer doar alimentos. Usa CPF.</span>
+                <span class="perfil__desc">Pessoa física que quer doar alimentos para os pedidos das ONGs. Usa CPF.</span>
               </span>
               <span class="perfil__marcador" aria-hidden="true"></span>
             </label>
@@ -102,10 +102,10 @@
             Voltar e trocar o perfil
           </button>
 
-          <!-- Formulário: empresa -->
+          <!-- Formulário: organização (ONG ou empresa) -->
           <form id="form-empresa" class="formulario" novalidate hidden aria-labelledby="titulo-empresa">
-            <h3 id="titulo-empresa" class="formulario__titulo" tabindex="-1">Dados da empresa</h3>
-            <p class="formulario__intro">Conferimos o CNPJ na Receita Federal: ele precisa estar <strong>ativo</strong> e ter atividade ligada a <strong>alimentação</strong>.</p>
+            <h3 id="titulo-empresa" class="formulario__titulo" tabindex="-1">Dados da organização</h3>
+            <p class="formulario__intro">Conferimos o CNPJ na Receita Federal: ele precisa estar <strong>ativo</strong> e ser de uma <strong>ONG</strong> (natureza jurídica sem fins lucrativos) ou de uma <strong>empresa ligada a alimentos</strong>.</p>
 
             <div class="campo">
               <label for="cnpj" class="campo__rotulo">CNPJ</label>
@@ -114,7 +114,7 @@
                        placeholder="00.000.000/0000-00" maxlength="18" aria-describedby="cnpj-ajuda cnpj-erro" required>
                 <button type="button" id="btn-verificar" class="botao botao--secundario">Verificar</button>
               </div>
-              <p id="cnpj-ajuda" class="campo__ajuda">A consulta começa sozinha quando os 14 dígitos estiverem completos.</p>
+              <p id="cnpj-ajuda" class="campo__ajuda">A consulta começa sozinha quando os 14 dígitos estiverem completos e já mostra o perfil da organização.</p>
               <p id="cnpj-erro" class="campo__erro" data-erro></p>
             </div>
 

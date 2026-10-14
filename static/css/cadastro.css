@@ -425,6 +425,17 @@ button, input { font: inherit; color: inherit; }
 .atividade__categoria { font-weight: 600; font-size: .88rem; color: var(--marca-texto); }
 .atividade__descricao { font-size: .8rem; color: var(--tinta-suave); overflow-wrap: anywhere; }
 
+/* selos de perfil da organização (ONG / empresa de alimentos) */
+.perfis-org { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.perfil-org {
+  padding: 7px 12px; border-radius: 999px;
+  font-size: .84rem; font-weight: 700; letter-spacing: .02em;
+}
+.perfil-org--ong { background: var(--acento-suave); color: var(--acento-texto); }
+.perfil-org--empresa_alimentos { background: var(--marca-suave); color: var(--marca-texto); }
+.empresa__natureza { font-size: .84rem; color: var(--tinta-suave); }
+.empresa__natureza strong { color: var(--tinta); font-weight: 600; }
+
 .motivos { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .motivo {
   display: grid; grid-template-columns: auto 1fr; gap: 12px;
