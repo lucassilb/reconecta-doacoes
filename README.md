@@ -1,16 +1,31 @@
 # ReConecta
 
-Plataforma de doação de alimentos que conecta empresas do setor alimentício a pessoas e outras empresas dispostas a doar.
+Plataforma de doação de alimentos que conecta empresas de alimentos, ONGs e pessoas dispostas a doar.
 
 Projeto acadêmico da disciplina **Computational Thinking with Python**. O CP1 entregou a primeira versão do backend (API REST com CRUDs e regras de doação). O **CP2** evolui o backend e acrescenta aplicação web, dashboard, otimizações, revisão do banco, testes automatizados e uma funcionalidade com LLM local e gratuita. Esta entrega acrescenta dataset estruturado, modelo treinado local, matriz de riscos STRIDE, relatórios SAST, Docker e Docker Compose, pipeline de CI/CD e publicação em nuvem com banco gerenciado, tudo com ferramentas e planos gratuitos.
+
+Na rodada 11, o código local acrescenta perfis de ONG, excedentes, confirmação de entrega, eventos em tempo real e sugestões de destino. A URL pública citada neste README pode continuar na versão anterior até a publicação dessa rodada.
 
 ## Sobre o projeto
 
 O desperdício de alimentos convive com a falta de alimento em outro lugar. O **ReConecta** organiza a ponte entre quem precisa e quem pode doar:
 
-1. Uma **empresa com CNPJ ativo e atividade ligada a alimentação** publica um **pedido de doação** (ex.: "precisamos de 100 caixas de leite e 100 pães até sexta").
+1. Uma **ONG com CNPJ ativo e natureza jurídica sem fins lucrativos** ou uma **empresa de alimentos** publica um **pedido de doação** (ex.: "precisamos de 100 caixas de leite e 100 pães até sexta").
 2. O pedido aparece em **Doações disponíveis**. Qualquer **pessoa com CPF válido** ou **outra empresa** escolhe um item e doa.
 3. Antes de confirmar, quem doa responde um **questionário curto** (4 perguntas de segurança alimentar) e envia uma **foto** do alimento. Se tudo estiver de acordo, a doação é aceita, o progresso do pedido é atualizado e a pessoa recebe o endereço e o prazo de entrega.
+4. Uma empresa de alimentos também pode publicar o **excedente do dia**; uma ONG reserva, retira e a publicadora confirma a retirada. A organização que abriu um pedido confirma se recebeu cada doação.
+
+## Objetivo da solução: IA + DevSecOps para reduzir desperdício e conectar doadores a ONGs em tempo real
+
+| Parte do objetivo | Implementação verificável |
+|---|---|
+| ONGs | O cadastro consulta a natureza jurídica do CNPJ e aceita organização sem fins lucrativos mesmo sem CNAE alimentar; um CNPJ pode ter os dois perfis. `GET /reconecta/cadastro/cnpj/{cnpj}`, `Cadastro.py`, `cnpj_service.py`, `tests/test_dominio_r11.py`. |
+| Reduzir desperdício | Empresas de alimentos publicam excedentes com validade e prazo; ONGs reservam e a publicadora confirma a retirada. `POST /reconecta/excedentes`, `POST /reconecta/excedentes/{id}/reservar`, `POST /reconecta/excedentes/{id}/confirmar-retirada`, `Excedentes.py`, tela `/painel` (`static/js/painel-excedentes.js`), `tests/test_dominio_r11.py`. O sistema registra retiradas; não mede redução total de desperdício. |
+| Conectar com IA | `POST /reconecta/ia/sugerir-destino` interpreta o alimento oferecido e ordena pedidos compatíveis com pontuação e motivos. Usa `conexao.py`, o classificador de `classificador.py` e a LLM local gratuita via `llm_service.py` quando disponível; sem Ollama, aplica classificador e regras. `tests/test_tempo_real.py` e `tests/test_ia.py`. |
+| Em tempo real | `GET /reconecta/tempo-real` transmite eventos por SSE; `GET /reconecta/novidades` sustenta a consulta periódica se a conexão cair. O sino, os avisos e a atualização do painel e do dashboard estão em `static/js/layout.js`, `static/js/painel.js`, `static/js/painel-excedentes.js` e `static/js/dashboard.js`; testes em `tests/test_tempo_real.py`. |
+| Ciclo fechado | No painel, o dono do pedido marca **Recebi** ou **Não recebi** (`POST /reconecta/painel/contribuicoes/{id}/receber` e `/nao-recebida`); o estado distingue oferta aceita de entrega confirmada. `Painel.py`, `static/js/painel.js`, `tests/test_dominio_r11.py`. |
+| Indicadores | `GET /reconecta/dashboard` apresenta doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva em `/dashboard`; `Dashboard.py`, `static/js/dashboard.js`, `tests/test_dashboard.py`. |
+| DevSecOps | Suíte `python -m pytest`, análise Bandit/Trivy em `.github/workflows/ci.yml`, riscos em `docs/stride.md`, imagem em `Dockerfile`, publicação configurada em `render.yaml` e healthcheck `GET /reconecta/saude`. |
 
 ## Critérios desta entrega
 
@@ -30,7 +45,8 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 
 ## Público-alvo
 
-- **Empresas do setor de alimentos** (restaurantes, padarias, mercados, indústrias, associações com atividade alimentar): publicam pedidos e também podem doar a pedidos de outras empresas.
+- **Empresas do setor de alimentos** (restaurantes, padarias, mercados, indústrias, associações com atividade alimentar): publicam pedidos ou excedentes e também podem doar a pedidos de outras organizações.
+- **ONGs com CNPJ** e natureza jurídica sem fins lucrativos: publicam pedidos, reservam excedentes e confirmam doações recebidas. Podem acumular o perfil de empresa de alimentos.
 - **Doadores pessoa física** (CPF): doam alimentos para os pedidos abertos.
 - **Instituições receptoras**: entidade mantida do CP1 (CRUD na API).
 
@@ -38,15 +54,16 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 
 | Área | O que faz |
 |---|---|
-| Cadastro de empresa | Valida o CNPJ (dígitos), consulta a Receita Federal em fontes públicas gratuitas (BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas), exige situação **ATIVA** e atividade econômica (CNAE principal ou secundária) ligada a alimentos. |
+| Cadastro de organização | Valida o CNPJ (dígitos), consulta fontes públicas gratuitas (BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas) e exige situação **ATIVA** e natureza jurídica sem fins lucrativos ou CNAE alimentar. Devolve os perfis ONG e/ou empresa de alimentos. |
 | Cadastro de doador | Valida o CPF pelos dígitos verificadores; CPF sempre devolvido mascarado. |
 | Login | E-mail, CNPJ ou CPF + senha (hash scrypt). Sessão em cookie HttpOnly/SameSite=Lax; 5 falhas em 15 min bloqueiam novas tentativas. |
-| Pedidos de doação | Só empresa publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
-| Doar para um pedido | Pessoa (CPF) ou outra empresa; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A foto é guardada no banco de dados, para não se perder quando o servidor da nuvem reinicia. A empresa não doa no próprio pedido. Limite de 20 envios por hora por usuário. |
-| Progresso | Cada item mostra recebido × meta e quanto falta. |
-| Painéis | Empresa: publicar pedido (com "Preencher com IA"), meus pedidos com progresso e doações recebidas com foto, minhas doações. Doador: minhas doações. |
+| Pedidos de doação | Organização com CNPJ publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
+| Doar para um pedido | Pessoa (CPF) ou outra organização; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A foto é guardada no banco de dados, para não se perder quando o servidor da nuvem reinicia. A organização não doa no próprio pedido. Limite de 20 envios por hora por usuário. |
+| Progresso e entrega | Cada item mostra recebido × meta, quanto falta e quantidade entregue; o dono do pedido confirma **Recebi** ou **Não recebi** em cada doação aceita. |
+| Excedentes | Empresa de alimentos publica itens com validade e prazo de retirada; ONG reserva, pode cancelar a reserva e a publicadora confirma a retirada. |
+| Painéis | Organização: publicar pedido (com "Preencher com IA"), acompanhar contribuições e confirmar recebimento; empresa de alimentos também publica e acompanha excedentes; ONG acompanha reservas. Doador: minhas doações e estado da entrega. |
 | Meus dados | No painel, "Editar" altera os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha informando a atual. CNPJ e CPF não mudam. |
-| Dashboard | Indicadores, gráfico pedido × recebido por categoria, doações por dia (30 dias), empresas com mais doações, alertas e últimas doações, com dados reais do banco. Botão "Gerar resumo com IA". |
+| Dashboard | Indicadores de pedidos, doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva; gráficos, alertas e últimas doações com dados do banco. Botão "Gerar resumo com IA". |
 | LLM local | `qwen2.5:3b` via Ollama (gratuito, roda no próprio PC): interpreta o texto do pedido e resume o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
 | Classificador treinado | Modelo próprio, treinado no dataset do projeto, que escolhe a categoria de cada item em "Preencher com IA". Roda dentro da aplicação, inclusive na nuvem, onde o Ollama não está disponível. Detalhes em [docs/dataset-modelo.md](docs/dataset-modelo.md). |
 | Segurança | Cabeçalhos de segurança e Content-Security-Policy em todas as respostas; trilha de auditoria em JSON (login, cadastro, edição de dados, pedidos, doações e uso do token de administrador) sem senha, documento, e-mail ou foto; limites de uso nas rotas de IA e de doação. |
@@ -57,8 +74,8 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 
 | Código | Regra |
 |---|---|
-| RN01 | Empresa só se cadastra com CNPJ válido, situação ATIVA e CNAE ligado a alimentação. |
-| RN02 | Só empresa publica pedido de doação; pessoa com CPF só doa. |
+| RN01 | Organização se cadastra com CNPJ válido, situação ATIVA e natureza jurídica sem fins lucrativos ou CNAE ligado a alimentação. |
+| RN02 | Só organização com CNPJ publica pedido de doação; pessoa com CPF só doa. |
 | RN03 | Todo item de pedido tem quantidade maior que zero; categoria e unidade vêm de listas fixas. |
 | RN04 | Só recebe doações o pedido DISPONÍVEL e dentro do prazo "receber até". |
 | RN05 | Doação só é aceita com as 4 respostas "sim" (dentro da validade, embalagem íntegra, armazenamento correto, não é comida caseira), validade não vencida e foto válida. Caso contrário nada é registrado e o motivo é exibido. |
@@ -84,9 +101,11 @@ ReConecta/
 ├── Auth.py                # /reconecta/auth      (login, logout, me) e trilha de auditoria
 ├── Publico.py             # /reconecta/publico   (resumo, opções, pedidos, detalhe)
 ├── Contribuicoes.py       # doação para um pedido (questionário + foto guardada no banco)
-├── Painel.py              # /reconecta/painel    (pedidos da empresa, minhas doações)
+├── Excedentes.py          # /reconecta/excedentes (publicação, reserva e retirada)
+├── Painel.py              # /reconecta/painel    (pedidos, confirmações, minhas doações)
 ├── Dashboard.py           # /reconecta/dashboard (agregados)
-├── IA.py, llm_service.py  # /reconecta/ia        (LLM local via Ollama; classificador e regras quando ela está fora)
+├── IA.py, llm_service.py, conexao.py  # IA local e sugestão de destino
+├── TempoReal.py, eventos.py # SSE, notificações e registro de eventos
 ├── classificador.py       # Classificador de categorias (Naive Bayes em Python puro)
 ├── modelo/                # Modelo treinado em JSON, métricas do treino e da avaliação
 ├── data/                  # Dataset de alimentos, pedidos de avaliação e gerador
@@ -104,7 +123,7 @@ ReConecta/
 └── requirements-dev.txt   # Dependências de desenvolvimento (pytest, bandit, playwright)
 ```
 
-Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`.
+Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`. A rota `/excedentes/<id>` está registrada em `app.py`; a página de detalhe ainda está em integração.
 
 ## Frontend (critério 2 do CP2)
 
@@ -126,9 +145,9 @@ Página `/dashboard` (`static/dashboard.html` + `static/js/dashboard.js`), ligad
 
 | Item do critério | Onde aparece na página | Campo do `GET /reconecta/dashboard` |
 |---|---|---|
-| Indicadores | Cartões: pedidos abertos, pedidos encerrados, doações recebidas, empresas, doadores (CPF) e instituições | `indicadores.pedidos_abertos`, `pedidos_encerrados`, `doacoes_recebidas`, `empresas`, `doadores`, `instituicoes` |
+| Indicadores | Cartões: pedidos abertos e encerrados, doações recebidas e entregues, excedentes disponíveis e retirados, tempo médio até a reserva, empresas de alimentos, ONGs, doadores e instituições legadas | `indicadores.pedidos_abertos`, `pedidos_encerrados`, `doacoes_recebidas`, `doacoes_entregues`, `excedentes_disponiveis`, `excedentes_resgatados`, `tempo_medio_reserva_min`, `empresas_alimentos`, `ongs`, `doadores`, `instituicoes` |
 | Métricas | "Atendimento dos pedidos abertos" em % com barra de progresso e "X de Y itens pedidos com a meta completa" | `indicadores.percentual_atendimento` (Σ min(recebido, meta) ÷ Σ meta × 100), `itens_pedidos`, `itens_atendidos` |
-| Gráficos | Barras "Pedido × recebido por categoria" e linha "Doações por dia" (Chart.js) | `por_categoria[]`, `por_dia[]` |
+| Gráficos | Barras "Pedido × recebido por categoria" e linha de doações e excedentes retirados por dia (Chart.js) | `por_categoria[]`, `por_dia[]` |
 | Tabelas | "Empresas com mais doações recebidas", "Últimas doações" e "Ver dados em tabela" embaixo de cada gráfico | `top_empresas[]`, `ultimas_doacoes[]`, `por_categoria[]`, `por_dia[]` |
 | Históricos | Série dos últimos 30 dias (dias sem doação aparecem com 0) e as 10 últimas doações com data e hora | `por_dia[]` (30 dias, fuso de Brasília), `ultimas_doacoes[]` |
 | Alertas | Lista "Alertas" com link "Ver pedido": prazo terminando em até 3 dias, pedido aberto há 3 dias ou mais sem doação, item com 80% ou mais da meta, meta atingida | `alertas[]` com `tipo` = `PRAZO_PROXIMO`, `SEM_DOACOES`, `QUASE_COMPLETO`, `META_ATINGIDA` |
@@ -246,7 +265,7 @@ Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `
 python -m pytest -q
 ```
 
-Resultado atual: **221 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
+Resultado atual: **243 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -255,8 +274,8 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | Método | Endpoint | Descrição |
 |---|---|---|
 | GET | `/reconecta/saude` | Saúde da aplicação: 200 `{"status":"ok","banco":"ok"}`; 503 se o banco não responder. |
-| GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ: situação, atividades alimentares, `apto` e `motivos`. |
-| POST | `/reconecta/cadastro/empresa` | Cadastra empresa (refaz a verificação do CNPJ) e inicia a sessão. |
+| GET | `/reconecta/cadastro/cnpj/{cnpj}` | Consulta CNPJ: situação, natureza jurídica, perfis ONG/empresa de alimentos, `apto` e `motivos`. |
+| POST | `/reconecta/cadastro/empresa` | Cadastra organização com perfil ONG e/ou empresa de alimentos (refaz a verificação do CNPJ) e inicia a sessão. |
 | POST | `/reconecta/cadastro/doador` | Cadastra pessoa física e inicia a sessão. |
 | POST | `/reconecta/auth/login` | Login por e-mail, CNPJ ou CPF + senha. |
 | POST | `/reconecta/auth/logout` | Encerra a sessão. |
@@ -268,12 +287,26 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/publico/doacoes/{id}` | Detalhe do pedido com progresso por item. |
 | POST | `/reconecta/publico/doacoes/{id}/contribuicoes` | Doar (multipart: item, quantidade, validade, 4 respostas, foto). Limite de 20 por hora por usuário (429 `MUITAS_TENTATIVAS`). |
 | GET | `/reconecta/contribuicoes/{id}/foto` | Foto da doação (só quem doou ou a empresa dona). |
-| GET/POST | `/reconecta/painel/doacoes` | Pedidos da empresa logada / publicar pedido. |
+| GET/POST | `/reconecta/painel/doacoes` | Pedidos da organização logada / publicar pedido. |
 | DELETE | `/reconecta/painel/doacoes/{id}` | Remover pedido próprio. |
 | GET | `/reconecta/painel/minhas-doacoes` | Doações feitas pela pessoa ou empresa logada. |
+| POST | `/reconecta/painel/contribuicoes/{id}/receber` | Dono do pedido confirma a entrega da contribuição. |
+| POST | `/reconecta/painel/contribuicoes/{id}/nao-recebida` | Dono do pedido registra que a contribuição não chegou. |
+| GET/POST | `/reconecta/excedentes` | Lista excedentes disponíveis / publica excedente da empresa de alimentos. |
+| GET | `/reconecta/excedentes/meus` | Excedentes publicados pela organização logada. |
+| GET | `/reconecta/excedentes/reservas` | Reservas da ONG logada. |
+| GET/DELETE | `/reconecta/excedentes/{id}` | Detalhe / cancelamento pelo publicador quando disponível. |
+| POST | `/reconecta/excedentes/{id}/reservar` | ONG reserva um excedente disponível. |
+| POST | `/reconecta/excedentes/{id}/cancelar-reserva` | Reservante ou publicador libera a reserva. |
+| POST | `/reconecta/excedentes/{id}/confirmar-retirada` | Publicador confirma a retirada. |
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
-| POST | `/reconecta/ia/interpretar-pedido` | Empresa logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por empresa (429 `MUITAS_TENTATIVAS`). |
+| POST | `/reconecta/ia/interpretar-pedido` | Organização logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por organização (429 `MUITAS_TENTATIVAS`). |
 | POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados. Limite de 10 por minuto por IP (429 `LIMITE_IA`). |
+| POST | `/reconecta/ia/sugerir-destino` | Interpreta alimentos oferecidos e sugere pedidos compatíveis com pontuação e motivos. |
+| GET | `/reconecta/tempo-real` | Fluxo SSE de eventos públicos e privados autorizados. |
+| GET | `/reconecta/novidades` | Consulta JSON de eventos para retomada e fallback. |
+| GET | `/reconecta/notificacoes` | Notificações privadas da sessão. |
+| POST | `/reconecta/notificacoes/lidas` | Marca notificações como lidas até um id. |
 | GET público / POST admin | `/reconecta/estabelecimentos/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo e CNAE alimentar. |
 | GET público / PUT/DELETE admin | `/reconecta/estabelecimentos/{id}` | GET sem contato; admin recebe registro completo. DELETE com dependentes: 409. |
 | GET público / POST admin | `/reconecta/instituicoes/` | Lista pública sem e-mail/telefone; POST verifica CNPJ ativo. |
@@ -281,11 +314,11 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-A tabela cobre as **36 operações em 25 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **52 operações em 39 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 
-Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao` (itens pedidos), `contribuicoes` (doações recebidas, com respostas do questionário e foto) e `reservas` (modelo do CP1, sem endpoints nesta versão). A revisão completa, com diagrama ER, está em [docs/modelagem.md](docs/modelagem.md), organizada por item do critério:
+Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `itens_doacao`, `contribuicoes` (doações para pedidos), `excedentes`, `itens_excedente`, `eventos`, `notificacao_leitura` e `reservas` (modelo legado do CP1). A revisão do domínio, com diagrama ER, está em [docs/modelagem.md](docs/modelagem.md), organizada por item do critério:
 
 | Item do critério | Seção em `docs/modelagem.md` | Resumo |
 |---|---|---|
@@ -293,7 +326,7 @@ Entidades: `estabelecimentos`, `doadores`, `instituicoes`, `doacoes` (pedido), `
 | Relacionamentos | Relacionamentos | Cardinalidades 1:N com chaves estrangeiras `ON DELETE RESTRICT` (nada some em cascata sem querer) |
 | Integridade dos dados | Integridade dos dados | PK, FK, UNIQUE (CNPJ, CPF, e-mail), NOT NULL e CHECKs nomeados de status, quantidade e origem — iguais no código (ORM) e no `schema.sql`; FK composta impede vincular um item a outro pedido |
 | Organização das entidades | Organização das entidades | O que cada tabela representa e quem escreve nela |
-| Índices quando necessários | Índices | 8 índices, cada um ligado à consulta que ele acelera |
+| Índices quando necessários | Índices | Índices dos pedidos e dos excedentes ligados às consultas que aceleram |
 | Normalização | Normalização | 1FN, 2FN e 3FN com exemplos e as exceções deliberadas |
 | Justificar decisões | Decisões de modelagem | Tabela decisão × alternativa × motivo |
 
@@ -308,7 +341,7 @@ Onde cada item exigido está atualizado:
 | README | Este arquivo, reescrito para o CP2 (fluxo de pedidos e doações, dashboard, LLM, segurança) e ampliado com dataset, modelo, STRIDE, SAST, Docker, CI/CD e nuvem |
 | Swagger | `/swagger` (gerado do código pelo Flask-RESTX) e [swagger.json](swagger.json) exportado da API atual, com todos os endpoints, modelos de entrada/saída, códigos de resposta e o cabeçalho `X-Admin-Token` |
 | Instruções de instalação | Seções **Instalação** (Python local com venv, `requirements.txt` e `requirements-dev.txt`, PostgreSQL ou SQLite, Ollama gratuito; ou Docker Compose), **Execução** e **Testes**; nuvem em [docs/implantacao.md](docs/implantacao.md) |
-| Endpoints | Seção **Endpoints**: todas as 36 operações da API (25 caminhos) com método, caminho e descrição, mais as rotas de página em **Arquitetura** |
+| Endpoints | Seção **Endpoints**: todas as 52 operações da API (39 caminhos) com método, caminho e descrição, mais as rotas de página em **Arquitetura** |
 | Arquitetura | Seção **Arquitetura**: um arquivo por responsabilidade, front-end em `static/`, testes em `tests/`, docs em `docs/` |
 | Funcionalidades | Seções **Funcionalidades** e **Regras de negócio** (RN01–RN11), mais as tabelas dos critérios 2, 3 e 4 |
 | Variáveis de ambiente | Seção **Variáveis de ambiente** (as 11 da aplicação, as 2 do Docker Compose e as dos testes opcionais) e o arquivo `.env.example` |
@@ -323,7 +356,7 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **221 passed, 4 skipped**. Os testes usam SQLite em memória e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
+Resultado atual: **243 passed, 4 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita e o Ollama, então rodam sem internet e sem tocar no banco real. Os 4 pulados são provas opcionais que precisam de um ambiente a mais:
 
 - 3 provas em PostgreSQL (`tests/test_integridade_banco.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
 - 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
@@ -331,20 +364,22 @@ Resultado atual: **221 passed, 4 skipped**. Os testes usam SQLite em memória e 
 | Tipo de teste | Arquivos | O que cobrem |
 |---|---|---|
 | Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, normalização e validação da saída da LLM, fallback por regras, formato do dataset, treino reprodutível e acurácia mínima do classificador |
-| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cada rota (cadastro, login, edição de dados, pedidos, doação com foto, painel, dashboard, IA, CRUDs do CP1, paginação e filtros, saúde) |
-| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | RN01–RN11: CNPJ ativo e alimentar, só empresa publica, questionário e validade, empresa não doa no próprio pedido, foto privada, dados pessoais fora do público, escrita do CP1 só com token, limites de login, de IA e de doações |
-| De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + banco: migrações idempotentes preservando dados, CHECKs e FK composta, fuso de Brasília no dashboard, número de consultas SQL das listas, foto no banco com leitura do arquivo antigo, URL do Supabase, auditoria sem credenciais, classificador dentro da interpretação de pedidos |
+| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, CRUDs e saúde |
+| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | Elegibilidade por natureza jurídica ou CNAE, reserva exclusiva por ONG, confirmação pelo dono do pedido, privacidade de eventos e fotos, limites de login, IA, publicações e doações |
+| De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + SQLite isolado: migrações, restrições, transições de estado, fluxo de eventos, fuso, consultas SQL, foto no banco, auditoria e classificador dentro da interpretação de pedidos |
 
 ## LLM (critério 8 do CP2)
 
-O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API paga) em duas funções ligadas às regras de negócio — não é um chatbot genérico:
+O ReConecta usa uma LLM **gratuita e local** (Ollama + `qwen2.5:3b`, sem API paga) em funções ligadas às regras de negócio — não é um chatbot genérico:
 
 1. **"Preencher com IA"** (painel da empresa → "Publicar pedido de doação"): a empresa escreve, por exemplo, "Precisamos de 100 caixas de leite e 100 pães até sexta-feira"; a LLM classifica e estrutura os itens nas **categorias e unidades fixas da plataforma** e sugere o prazo. O formulário é preenchido para a empresa revisar; a publicação continua passando pelas validações do pedido.
 2. **"Gerar resumo com IA"** (dashboard): a LLM interpreta os indicadores agregados dos pedidos e doações e devolve um resumo e recomendações para apoiar decisões.
 
+3. **"Sugerir destino"** (`POST /reconecta/ia/sugerir-destino`): interpreta o alimento oferecido, compara com os pedidos disponíveis e devolve até cinco sugestões com pontuação e motivos para a pessoa escolher.
+
 Quando a LLM não está disponível, ou devolve uma categoria fora da lista, a categoria de cada item vem do classificador treinado do projeto (seção [Modelo funcional local](#modelo-funcional-local)).
 
-Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados enviados, resposta obtida, uso da resposta, limitações e segurança/dados sensíveis — está na tabela do início de [docs/llm.md](docs/llm.md), com exemplos reais de entrada e saída. Endpoints: `POST /reconecta/ia/interpretar-pedido` e `POST /reconecta/ia/resumo-dashboard`; código em `llm_service.py` e `IA.py`; testes em `tests/test_ia.py`.
+Tudo o que o critério pede para explicar — modelo/serviço, finalidade, dados enviados, resposta obtida, uso da resposta, limitações e segurança/dados sensíveis — está na tabela do início de [docs/llm.md](docs/llm.md), com exemplos reais de entrada e saída. Endpoints: `POST /reconecta/ia/interpretar-pedido`, `POST /reconecta/ia/resumo-dashboard` e `POST /reconecta/ia/sugerir-destino`; código em `llm_service.py`, `IA.py` e `conexao.py`; testes em `tests/test_ia.py` e `tests/test_tempo_real.py`.
 
 ## Dataset estruturado
 
@@ -470,7 +505,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 
 ## Limitações conhecidas
 
-- O CP1 tinha apenas o modelo `reservas`, sem endpoints de reserva. O fluxo atual é pedido → contribuição; reserva e retirada por instituições ainda não têm fluxo na aplicação.
+- O modelo legado `reservas` do CP1 continua sem endpoints próprios; a reserva e retirada atuais usam as tabelas `excedentes` e `itens_excedente`.
 - Recuperação de senha não implementada.
 - A consulta de CNPJ depende de serviços públicos externos (com cache de 10 minutos e fontes alternativas).
 - A LLM é pequena e roda localmente: as sugestões passam por validação e revisão humana; sem Ollama, as funções usam o classificador e regras automáticas e indicam `fonte: "regras"`.
