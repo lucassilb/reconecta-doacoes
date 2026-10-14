@@ -150,7 +150,7 @@ def test_auditoria_json_sem_credenciais(cliente, caplog, monkeypatch):
         assert erro.status_code == 401
         criado = cliente.post("/reconecta/cadastro/doador", json={
             "nome": "Maria Teste", "cpf": "52998224725", "email": "maria@example.org",
-            "telefone": "11999998888", "senha": "SenhaSecreta123"})
+            "telefone": "11999998888", "senha": "SenhaSecreta123", "aceite_privacidade": True})
         assert criado.status_code == 201
         editado = cliente.put("/reconecta/auth/me", json={
             "telefone": "11999997777", "senha_atual": "SenhaSecreta123", "nova_senha": "OutraSenha456"})

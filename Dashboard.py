@@ -81,6 +81,47 @@ def _resumo_sast():
             _ler_json(RAIZ / "data" / "resumo_sast.json"))
 
 
+def _refeicoes_mensal(tabela):
+    """kg confirmados por mês civil de Brasília, convertidos com a mesma premissa."""
+    mensal = defaultdict(Decimal)
+    ano = extract("year", Contribuicao.criado_em)
+    mes = extract("month", Contribuicao.criado_em)
+    dia = extract("day", Contribuicao.criado_em)
+    entregues = (db.session.query(ano, mes, dia, Contribuicao.categoria,
+                 Contribuicao.unidade_medida, func.sum(Contribuicao.quantidade))
+                 .filter(Contribuicao.status == "ENTREGUE",
+                         Contribuicao.criado_em.isnot(None))
+                 .group_by(ano, mes, dia, Contribuicao.categoria,
+                           Contribuicao.unidade_medida).all())
+    for a, m, d, categoria, unidade, quantidade in entregues:
+        peso = converter_kg(quantidade, categoria, unidade, tabela)
+        if peso is None:
+            continue
+        data = utc_para_brasilia(datetime(int(a), int(m), int(d))).date()
+        mensal[(data.year, data.month)] += peso[0]
+
+    ano = extract("year", Excedente.retirado_em)
+    mes = extract("month", Excedente.retirado_em)
+    dia = extract("day", Excedente.retirado_em)
+    retirados = (db.session.query(ano, mes, dia, ItemExcedente.categoria,
+                 ItemExcedente.unidade_medida, func.sum(ItemExcedente.quantidade))
+                 .join(Excedente, Excedente.id == ItemExcedente.excedente_id)
+                 .filter(Excedente.status == "RETIRADO",
+                         Excedente.retirado_em.isnot(None))
+                 .group_by(ano, mes, dia, ItemExcedente.categoria,
+                           ItemExcedente.unidade_medida).all())
+    for a, m, d, categoria, unidade, quantidade in retirados:
+        peso = converter_kg(quantidade, categoria, unidade, tabela)
+        if peso is None:
+            continue
+        data = utc_para_brasilia(datetime(int(a), int(m), int(d))).date()
+        mensal[(data.year, data.month)] += peso[0]
+
+    return [{"mes": f"{a:04d}-{m:02d}", "kg": round(float(kg), 3),
+             "refeicoes": round(float(kg / KG_POR_REFEICAO))}
+            for (a, m), kg in sorted(mensal.items())]
+
+
 def montar_impacto():
     """Conta somente entregas e retiradas; ofertas abertas não são impacto."""
     tabela = conversoes_kg()
@@ -183,6 +224,8 @@ def montar_impacto():
         "calor_doacoes": {"periodo": "todo o histórico", "fuso": "America/Sao_Paulo",
                            "dias": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
                            "horas": list(range(24)), "valores": calor},
+        "refeicoes_mensal": {"premissa": "kg confirmados ÷ 0,5 kg por refeição, por mês civil de Brasília",
+                             "serie": _refeicoes_mensal(tabela)},
         "ia": {"metricas": _ler_json(RAIZ / "modelo" / "metricas.json"),
                "limiares": _ler_json(RAIZ / "modelo" / "limiares.json")},
     }

@@ -82,6 +82,7 @@ imagem (a base slim é atualizada) e, se quiser reduzir a superfície, avaliar
 |---|---|
 | B104 `app.py:133` — bind `0.0.0.0` | **Corrigido**: `FLASK_RUN_HOST` com padrão `127.0.0.1` e `PORT` por ambiente (`app.py:194-196`); gunicorn faz o bind em produção (`Dockerfile:21`) |
 | B608 ×4 `migracoes.py` — SQL com f-string | **Justificados**: falso positivo confirmado (identificadores são literais internos); a Frente A marcou `# nosec B608` com comentário (`migracoes.py:88,127,174,221`). Bandit reporta "4 skipped due to nosec" |
+| B608 ×2 `migracoes.py:_migrar_consentimento` (rodada 14) | **Justificados**: mesma situação — a f-string carrega só nomes de tabela da tupla fixa (`estabelecimentos`, `doadores`) e nomes de coluna literais; nada entra por entrada do usuário. `# nosec B608` com comentário (`migracoes.py:96,99`) |
 
 ### Trivy fs (4 MEDIUM → 0)
 
@@ -112,3 +113,24 @@ matriz, T6): actions por tag e não por SHA; sem lockfile com hash.
    (E8) e a `observacao` do excedente é texto livre público (I12).
 
 **Nenhum achado CRITICAL nem HIGH acionável. Nenhuma correção pendente nesta frente.**
+
+## Security Gates (rodada 14)
+
+O CI deixou de só gerar relatórios: cada varredura agora tem um portão que
+reprova o job (`.github/workflows/ci.yml`), e `scripts/resumo_sast.py`
+reproduz a regra sobre o último relatório gerado, publicando
+`resumo.json → gates` (gate, regra, resultado `passou`/`falhou`/`sem_dados`,
+detalhe) para o dashboard.
+
+| Gate | Job | Regra |
+|---|---|---|
+| `bandit-high` | `sast-bandit` | `bandit -lll` — falha em qualquer achado de severidade HIGH |
+| `trivy-fs` | `sast-trivy` | `fs` scanners `vuln,secret,misconfig`, severity `HIGH,CRITICAL`, `ignore-unfixed` — falha em vuln corrigível, segredo ou misconfig alta |
+| `trivy-config` | `sast-trivy` | `config` severity `HIGH,CRITICAL` — falha em misconfiguração alta de IaC (Dockerfile) |
+| `trivy-imagem` | `sast-trivy` | `image` severity `CRITICAL`, `ignore-unfixed` — falha em CRITICAL corrigível na imagem |
+| `ia-limiares` | `ia` | `python scripts/ciclo_ia.py` compara com `modelo/limiares.json` — falha abaixo dos mínimos |
+
+O critério "corrigível" (`ignore-unfixed`) é deliberado: os 44 HIGH da imagem
+são pacotes Debian sem `FixedVersion` publicada — não acionáveis e já aceitos
+na triagem. O relatório segue gravando as severidades totais, então o dashboard
+mostra as 44 em "Críticas" da rosca mesmo com o gate de imagem verde.

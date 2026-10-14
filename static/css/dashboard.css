@@ -118,3 +118,20 @@
   .tabela { font-size: .86rem; }
   .tabela th, .tabela td { padding: 8px 6px; }
 }
+
+/* ---------- security gates e rosca de vulnerabilidades ---------- */
+.seg-grade { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+.seg-bloco h3 { font-size: .95rem; margin: 0 0 10px; }
+.seg-rosca { position: relative; height: 220px; }
+.seg-rosca canvas { width: 100% !important; }
+.gates { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gate { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-items: baseline; padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); border-left: 4px solid var(--linha-forte); }
+.gate__status { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.gate--passou { border-left-color: var(--verde); }
+.gate--passou .gate__status { color: var(--verde-texto); }
+.gate--falhou { border-left-color: var(--erro); background: var(--erro-suave); }
+.gate--falhou .gate__status { color: var(--erro); }
+.gate--sem_dados .gate__status { color: var(--tinta-suave); }
+.gate__regra { font-size: .86rem; color: var(--tinta); }
+.gate__detalhe { grid-column: 2; font-size: .78rem; color: var(--tinta-suave); }
+@media (max-width: 719.98px) { .seg-grade { grid-template-columns: 1fr; } }

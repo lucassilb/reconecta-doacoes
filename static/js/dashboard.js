@@ -189,6 +189,30 @@
     mapaUF(refeicoes.por_uf || []);
     mapaHoras(d.calor_doacoes || {});
     graficoAcuracia(d.ia || {});
+    graficoMes(d.refeicoes_mensal || {});
+  }
+
+  function rotuloMes(iso) {
+    var p = String(iso || "").split("-");
+    return p.length === 2 ? p[1] + "/" + p[0] : iso;
+  }
+
+  function graficoMes(mensal) {
+    var serie = mensal.serie || [];
+    if (mensal.premissa) $("mes-sub").textContent = mensal.premissa + ".";
+    $("t-mes").replaceChildren(tabela("Refeições estimadas por mês", ["Mês", "Kg confirmados", "Refeições estimadas"],
+      serie.map(function (r) { return [rotuloMes(r.mes), decimal.format(r.kg), inteiro.format(r.refeicoes)]; }), [1, 2]));
+    var op = opcoesBase();
+    grafico("g-mes", {
+      type: "line",
+      data: {
+        labels: serie.map(function (r) { return rotuloMes(r.mes); }),
+        datasets: [{ label: "Refeições geradas", data: serie.map(function (r) { return r.refeicoes; }),
+          borderColor: COR.verde, backgroundColor: "rgba(74,131,38,.12)",
+          fill: true, tension: .3, pointRadius: 3, pointHoverRadius: 6 }]
+      },
+      options: op
+    });
   }
 
   function graficoRegiao(lista) {
@@ -207,9 +231,15 @@
     $("ia-medicao").textContent = "Avaliação de " + (m.data || "data não informada") + "; versão " + (m.versao || "—") + ". Valores do conjunto de teste, não taxa de acerto em produção.";
     var chaves = ["acuracia_classificador", "acuracia_top1", "acuracia_top3", "taxa_sem_sugestao_correta"];
     var rotulos = ["Classificador", "Destino top-1", "Destino top-3", "Sem sugestão correta"];
-    $("ia-metricas").replaceChildren.apply($("ia-metricas"), chaves.map(function (k, i) {
+    var linhas = chaves.map(function (k, i) {
       return el("p", { texto: rotulos[i] + ": " + decimal.format(100 * Number(m[k] || 0)) + "% · limiar " + decimal.format(100 * Number(l[k] || 0)) + "%" });
-    }));
+    });
+    var risco = m.risco_descarte;
+    linhas.push(el("p", { texto: risco && typeof risco.acuracia === "number"
+      ? "Acurácia na predição de descarte: " + decimal.format(100 * risco.acuracia) + "%"
+        + (typeof risco.auc === "number" ? " · ROC-AUC " + decimal.format(risco.auc) : "")
+      : "Acurácia na predição de descarte: ainda não avaliada nesta versão" }));
+    $("ia-metricas").replaceChildren.apply($("ia-metricas"), linhas);
     var op = opcoesBase(); op.indexAxis = "y"; op.scales.x.max = 100;
     grafico("g-acuracia", { type: "bar", data: { labels: rotulos, datasets: [
       { label: "Medido (%)", data: chaves.map(function (k) { return 100 * Number(m[k] || 0); }), backgroundColor: COR.verde, borderRadius: 5 },
@@ -278,6 +308,7 @@
     var stride = sast.stride || {};
     var correcoes = sast.correcoes_documentadas || {};
     $("stride-resumo").textContent = "Correções documentadas: " + (correcoes.cves_corrigidas || 0) + " CVEs de dependências e " + (correcoes.bandit_b104_corrigido ? "1 achado Bandit B104" : "nenhum B104 confirmado") + ". " + (correcoes.bandit_b608_justificado ? "Os 4 B608 foram justificados; não contam como CVEs corrigidas. " : "") + "STRIDE: " + (stride.mitigados || 0) + " riscos marcados mitigados; " + (stride.residuais || 0) + " com risco residual. Os achados HIGH da imagem Debian, na data indicada acima, não foram contados como mitigados.";
+    pintarGates(sast);
     var c = d.controles || {};
     $("seg-controles").replaceChildren(
       el("p", { texto: "Cabeçalhos ativos: " + (c.cabecalhos || []).join(", ") + ". HSTS " + (c.hsts_condicional ? "ativo em HTTPS" : "condicionado a COOKIE_SEGURO=1") + "." }),
@@ -285,6 +316,52 @@
       el("p", { texto: "Falhas de login: " + (c.falhas_login || "não medidas") }),
       el("p", { texto: "Bloqueios de login: " + (c.bloqueios_login || "não medidos") })
     );
+  }
+
+  var ROTULO_GATE = { passou: "Passou", falhou: "Falhou", sem_dados: "Sem dados" };
+  function pintarGates(sast) {
+    var gates = sast.gates || [];
+    var alvo = $("gates-lista");
+    if (!gates.length) {
+      alvo.replaceChildren(el("li", { classe: "gate", texto: "Status dos gates indisponível neste resumo." }));
+    } else {
+      alvo.replaceChildren.apply(alvo, gates.map(function (g) {
+        return el("li", { classe: "gate gate--" + (g.resultado || "sem_dados") }, [
+          el("span", { classe: "gate__status", texto: ROTULO_GATE[g.resultado] || g.resultado }),
+          el("span", { classe: "gate__regra", texto: g.regra }),
+          el("span", { classe: "gate__detalhe", texto: g.detalhe || "" })
+        ]);
+      }));
+    }
+
+    /* Rosca Mitigadas / Em análise / Críticas:
+       mitigadas = correções documentadas em docs/sast.md; críticas = achados
+       HIGH+CRITICAL do snapshot atual; em análise = severidades menores,
+       segredos e misconfigs dos mesmos relatórios. */
+    var mitigadas = Number((sast.correcoes_documentadas || {}).cves_corrigidas || 0)
+      + ((sast.correcoes_documentadas || {}).bandit_b104_corrigido ? 1 : 0);
+    var criticas = 0, emAnalise = 0;
+    Object.keys(sast.ferramentas || {}).forEach(function (nome) {
+      var r = sast.ferramentas[nome] || {}, sev = r.severidades || {};
+      if (!r.disponivel) return;
+      criticas += Number(sev.CRITICAL || 0) + Number(sev.HIGH || 0);
+      emAnalise += Number(sev.MEDIUM || 0) + Number(sev.LOW || 0) + Number(sev.UNKNOWN || 0)
+        + Number(r.segredos || 0) + Number(r.configuracoes || 0);
+    });
+    $("t-seguranca").replaceChildren(tabela("Vulnerabilidades por estado",
+      ["Estado", "Quantidade", "O que conta"],
+      [["Mitigadas", inteiro.format(mitigadas), "CVEs corrigidas e o B104 corrigido, documentados em docs/sast.md"],
+       ["Em análise", inteiro.format(emAnalise), "Achados MEDIUM/LOW/UNKNOWN, segredos e misconfigs do snapshot atual"],
+       ["Críticas", inteiro.format(criticas), "Achados HIGH e CRITICAL do snapshot atual"]], [1]));
+    var op = opcoesBase();
+    delete op.scales;
+    grafico("g-seguranca", {
+      type: "doughnut",
+      data: { labels: ["Mitigadas", "Em análise", "Críticas"],
+        datasets: [{ data: [mitigadas, emAnalise, criticas],
+          backgroundColor: [COR.verde, COR.trilho, "#A8261D"], borderColor: "#fff", borderWidth: 2 }] },
+      options: op
+    });
   }
 
   function carregarAnalise(numero, origem) {

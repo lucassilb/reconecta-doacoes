@@ -53,14 +53,14 @@ def cadastrar_empresa(cliente, monkeypatch):
     monkeypatch.setattr("Cadastro.consultar_cnpj", lambda _: empresa_consultada())
     return cliente.post("/reconecta/cadastro/empresa", json={
         "cnpj": EMPRESA_CNPJ, "email": "empresa@exemplo.com",
-        "telefone": "11999998888", "senha": SENHA,
+        "telefone": "11999998888", "senha": SENHA, "aceite_privacidade": True,
     })
 
 
 def cadastrar_doador(cliente):
     return cliente.post("/reconecta/cadastro/doador", json={
         "nome": "Maria Souza", "cpf": CPF, "email": "maria@exemplo.com",
-        "telefone": "11999998888", "senha": SENHA,
+        "telefone": "11999998888", "senha": SENHA, "aceite_privacidade": True,
     })
 
 
@@ -69,14 +69,14 @@ def test_senha_fraca_e_obrigatoria(cliente, monkeypatch):
     for senha in (None, "abcdefgh", "12345678", "Ab1"):
         resposta = cliente.post("/reconecta/cadastro/empresa", json={
             "cnpj": EMPRESA_CNPJ, "email": "empresa@exemplo.com",
-            "telefone": "11999998888", "senha": senha,
+            "telefone": "11999998888", "senha": senha, "aceite_privacidade": True,
         })
         assert resposta.status_code == 400
         assert resposta.json["codigo"] == "DADOS_INVALIDOS"
         assert "senha" in resposta.json["campos"]
     doador = cliente.post("/reconecta/cadastro/doador", json={
         "nome": "Maria Souza", "cpf": CPF, "email": "maria@exemplo.com",
-        "telefone": "11999998888", "senha": "semnumeros",
+        "telefone": "11999998888", "senha": "semnumeros", "aceite_privacidade": True,
     })
     assert doador.status_code == 400
     assert "senha" in doador.json["campos"]

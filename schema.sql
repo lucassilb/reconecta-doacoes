@@ -141,3 +141,7 @@ CREATE INDEX IF NOT EXISTS ix_contribuicoes_doacao_status ON contribuicoes (doac
 CREATE INDEX IF NOT EXISTS ix_contribuicoes_item_doacao_id ON contribuicoes (item_doacao_id);
 CREATE INDEX IF NOT EXISTS ix_contribuicoes_doador_id ON contribuicoes (doador_id);
 CREATE INDEX IF NOT EXISTS ix_contribuicoes_estabelecimento_id ON contribuicoes (estabelecimento_id);
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS consentimento_versao VARCHAR(20);
+ALTER TABLE estabelecimentos ADD COLUMN IF NOT EXISTS consentimento_em TIMESTAMP;
+ALTER TABLE doadores ADD COLUMN IF NOT EXISTS consentimento_versao VARCHAR(20);
+ALTER TABLE doadores ADD COLUMN IF NOT EXISTS consentimento_em TIMESTAMP;

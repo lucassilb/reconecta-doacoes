@@ -240,7 +240,7 @@
       ]),
       el("div", { classe: "rodape__colunas" }, [
         coluna("Plataforma", [["Início", "/"], ["Doações disponíveis", "/#doacoes"], ["Excedentes de hoje", "/#excedentes"], ["Como funciona", "/#como-funciona"], ["Dashboard", "/dashboard"], ["Sobre", "/sobre"]]),
-        coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Documentação da API", "/swagger"]])
+        coluna("Participe", [["Cadastrar", "/cadastro"], ["Entrar", "/entrar"], ["Painel", "/painel"], ["Privacidade", "/privacidade"], ["Documentação da API", "/swagger"]])
       ]),
       el("div", { classe: "rodape__base" }, [
         el("span", { texto: "ReConecta · Projeto acadêmico de Computational Thinking with Python" }),

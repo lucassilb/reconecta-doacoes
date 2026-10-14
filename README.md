@@ -125,7 +125,7 @@ ReConecta/
 └── requirements-dev.txt   # Dependências de desenvolvimento (pytest, bandit, playwright)
 ```
 
-Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`, `/excedentes/<id>` (excedente: reserva, cancelamento e confirmação de retirada, com a situação ao vivo). Todas as páginas carregam `static/js/layout.js`, que abre uma única conexão com `/reconecta/tempo-real`, cai para `/reconecta/novidades` a cada 10 s se o fluxo falhar e repassa cada evento às páginas pelo evento `reconecta:evento`; o sino de notificações e os avisos ao vivo saem daí. Na Home, o botão "Tenho alimento para doar" abre o assistente que chama `POST /reconecta/ia/sugerir-destino` e leva ao pedido sugerido com o questionário preenchido; a faixa "Excedentes de hoje" e o progresso dos pedidos se atualizam sem recarregar.
+Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/privacidade`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`, `/excedentes/<id>` (excedente: reserva, cancelamento e confirmação de retirada, com a situação ao vivo). Todas as páginas carregam `static/js/layout.js`, que abre uma única conexão com `/reconecta/tempo-real`, cai para `/reconecta/novidades` a cada 10 s se o fluxo falhar e repassa cada evento às páginas pelo evento `reconecta:evento`; o sino de notificações e os avisos ao vivo saem daí. Na Home, o botão "Tenho alimento para doar" abre o assistente que chama `POST /reconecta/ia/sugerir-destino` e leva ao pedido sugerido com o questionário preenchido; a faixa "Excedentes de hoje" e o progresso dos pedidos se atualizam sem recarregar.
 
 ## Frontend (critério 2 do CP2)
 
@@ -292,6 +292,8 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | POST | `/reconecta/auth/logout` | Encerra a sessão. |
 | GET | `/reconecta/auth/me` | Perfil da sessão. |
 | PUT | `/reconecta/auth/me` | Edita os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha com a senha atual. |
+| GET | `/reconecta/auth/me/dados` | Exporta em JSON os dados da conta e os registros do titular (LGPD, art. 18, II). |
+| DELETE | `/reconecta/auth/me` | Exclui a conta por anonimização: remove identificação e mantém pedidos/doações como estatística (LGPD, art. 16). |
 | GET | `/reconecta/publico/resumo` | Contadores públicos. |
 | GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
 | GET | `/reconecta/publico/doacoes` | Pedidos abertos. Paginação `pagina`/`por_pagina` (máx. 50), filtros `categoria`, `uf`, `busca`; cabeçalhos `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`. |
@@ -329,7 +331,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-A tabela cobre as **55 operações em 42 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **58 operações em 44 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 
@@ -379,8 +381,8 @@ Resultado atual: **250 passed, 4 skipped**. Os testes usam SQLite isolado (em me
 | Tipo de teste | Arquivos | O que cobrem |
 |---|---|---|
 | Unitários | `test_cnae_alimentos.py`, `test_classificador.py`, `test_ciclo_ia.py`, partes de `test_ia.py` e `test_cadastro.py` | Critério de atividade alimentar por CNAE, dígitos de CPF/CNPJ, validação da saída da LLM, fallback, treino reprodutível, recomendação e limiares da IA |
-| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_geo.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, rota de coleta, CRUDs e saúde |
-| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py` | Elegibilidade por natureza jurídica ou CNAE, reserva exclusiva por ONG, confirmação pelo dono do pedido, privacidade de eventos e fotos, limites de login, IA, publicações e doações |
+| De endpoints | `test_cadastro.py`, `test_auth.py`, `test_publico_painel.py`, `test_pedidos.py`, `test_dashboard.py`, `test_ia.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_geo.py`, `test_lgpd.py`, `test_crud_seguro.py`, `test_cp2_api.py`, `test_nuvem.py` | Códigos HTTP, formato das respostas e erros JSON de cadastro, login, pedidos, doações, excedentes, confirmação de entrega, eventos, notificações, dashboard, IA, rota de coleta, CRUDs e saúde |
+| De regras de negócio | `test_cadastro.py`, `test_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_crud_seguro.py`, `test_auth.py`, `test_ia.py`, `test_nuvem.py`, `test_lgpd.py` | Elegibilidade por natureza jurídica ou CNAE, reserva exclusiva por ONG, confirmação pelo dono do pedido, privacidade de eventos e fotos, limites de login, IA, privacidade/LGPD e doações |
 | De integração | `test_integridade_banco.py`, `test_migracao_doador.py`, `test_migracao_pedidos.py`, `test_dominio_r11.py`, `test_tempo_real.py`, `test_fuso.py`, `test_cp2_api.py`, `test_nuvem.py`, `test_classificador.py` | Aplicação + SQLite isolado: migrações, restrições, transições de estado, fluxo de eventos, fuso, consultas SQL, foto no banco, auditoria e classificador dentro da interpretação de pedidos |
 
 ## LLM (critério 8 do CP2)
@@ -461,7 +463,8 @@ simulação, matriz de confusão, teste e limitações estão em
 - **Relatórios SAST**: pasta [`relatorios/sast/`](relatorios/sast/), versionada. Bandit no código Python (`bandit.json`, `bandit.txt`, `bandit.html`) e Trivy em três varreduras: arquivos e dependências (`trivy-fs.*`, scanners `vuln,secret,misconfig`), configuração do Dockerfile (`trivy-config.*`) e imagem Docker (`trivy-image.*`). A triagem achado a achado está em `docs/sast.md`.
 - **Resumo dos achados**: varredura de 2026-10-13 (Bandit 1.9.4, Trivy 0.75.0). **Bandit: 0 achados** em 3.415 linhas (na primeira varredura eram 5 médios: 1 corrigido e 4 falsos positivos justificados no código). **Trivy em arquivos e dependências: 0 vulnerabilidades, 0 segredos, 0 falhas de configuração** (eram 4 dependências com CVE média, todas atualizadas). **Trivy no Dockerfile: 0 falhas** (a versão usada não tem verificador para Compose, `render.yaml` e workflow; esses foram revisados à mão na matriz STRIDE). **Trivy na imagem Docker: 0 críticas, 44 altas, 58 médias, 61 baixas e 3 sem classificação**, todas em pacotes do sistema Debian da imagem base `python:3.12-slim`; nenhuma está em pacote Python e só 2 (sem classificação) têm correção publicada. O antes e depois e a triagem de cada achado estão em [docs/sast.md](docs/sast.md)
 - **Refazer os relatórios**: `python scripts/sast.py` na raiz do projeto. Precisa do Bandit (`pip install -r requirements-dev.txt`) e do binário gratuito do Trivy no PATH ou em `TRIVY=<caminho>`.
-- **No pipeline**: o GitHub Actions repete Bandit e Trivy a cada push ou pull request na `main` e guarda os relatórios como artefatos.
+- **Security Gates no pipeline**: o GitHub Actions repete Bandit e Trivy a cada push ou pull request na `main` e guarda os relatórios como artefatos. Os portões reprovam: Bandit em severidade alta (`-lll`); Trivy `fs` em vulnerabilidade HIGH/CRITICAL com correção, segredo ou misconfig alta; `trivy config` em HIGH/CRITICAL; Trivy `image` em CRITICAL corrigível; o job `ia` se as métricas caírem abaixo de `modelo/limiares.json`. `scripts/resumo_sast.py` declara a regra e o último resultado de cada portão em `relatorios/sast/resumo.json`, e o dashboard mostra esse bloco junto à rosca "Mitigadas / Em análise / Críticas".
+- **LGPD**: a política de privacidade fica em `/privacidade` (mapa de dados em [`docs/lgpd.md`](docs/lgpd.md)); o cadastro exige aceite, gravado com versão e data (`consentimento_versao`, `consentimento_em`); o titular exporta tudo em `GET /reconecta/auth/me/dados` e exclui a conta por anonimização em `DELETE /reconecta/auth/me` — pedidos e doações ficam só como estatística.
 
 Controles que estão no código:
 
@@ -510,8 +513,8 @@ O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda a cada pu
 |---|---|---|
 | `testes` | Python 3.12, instala `requirements.txt` e `requirements-dev.txt`, roda `python -m pytest` e guarda o relatório JUnit como artefato | Algum teste falha |
 | `ia` | Treina o classificador, avalia a conexão, confere `modelo/limiares.json` e publica `metricas-ia` | Qualquer métrica cai abaixo do mínimo |
-| `sast-bandit` | Bandit no código da aplicação; relatórios JSON e texto como artefato `bandit-report` | Achado de severidade alta |
-| `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Vulnerabilidade crítica com correção disponível |
+| `sast-bandit` | Bandit no código da aplicação; relatórios JSON e texto como artefato `bandit-report` | Achado de severidade alta (`bandit -lll`) |
+| `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Arquivos: achado HIGH/CRITICAL corrigível; configuração (IaC): achado HIGH/CRITICAL; imagem: achado CRITICAL corrigível |
 | `docker` | `docker compose build app`, `docker compose up -d --wait` e chamada a `/reconecta/saude` | A imagem não constrói ou a aplicação não fica saudável |
 | `deploy` | Opcional e manual: dispara o Deploy Hook do Render guardado no segredo `RENDER_DEPLOY_HOOK_URL` | Sem o segredo, termina com aviso e sem erro |
 

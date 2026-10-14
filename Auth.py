@@ -19,6 +19,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from cnpj_service import formatar_cnpj
 from models import Doador, Estabelecimento, db
+from privacidade import (anonimizar_conta, consentimento_registrado,
+                         conta_removida, exportar_dados)
 
 
 ns = Namespace("auth", description="Entrada, saída e sessão do usuário")
@@ -54,6 +56,7 @@ me_model = ns.model("UsuarioAutenticado", {
     "cnpj_formatado": fields.String, "endereco": fields.String,
     "cpf_formatado": fields.String,
     "perfis": fields.List(fields.String),
+    "consentimento": fields.Raw,
 })
 
 
@@ -115,12 +118,16 @@ def usuario_atual():
         usuario = db.session.get(Doador, usuario_id)
     else:
         return None
-    return (tipo, usuario) if usuario else None
+    # Conta anonimizada perde a sessão em qualquer navegador.
+    if not usuario or conta_removida(usuario):
+        return None
+    return tipo, usuario
 
 
 def dados_usuario(tipo, usuario):
     dados = {"tipo": tipo, "id": usuario.id, "nome": usuario.nome,
-             "email": usuario.email, "telefone": usuario.telefone}
+             "email": usuario.email, "telefone": usuario.telefone,
+             "consentimento": consentimento_registrado(usuario)}
     if tipo == "empresa":
         cnpj = re.sub(r"\D", "", usuario.cnpj)
         dados.update(cnpj_formatado=formatar_cnpj(cnpj), endereco=usuario.endereco,
@@ -304,3 +311,36 @@ class Me(Resource):
         if trocando_senha:
             registrar_auditoria("senha_trocada", "ok", tipo=tipo, ator_id=usuario.id)
         return dados_usuario(tipo, usuario), 200
+
+    @ns.response(204, "Conta excluída e dados anonimizados")
+    @ns.response(401, "Não autenticado", erro_model)
+    def delete(self):
+        """Exclui a conta por anonimização, preservando a estatística agregada.
+
+        Pedidos, doações e excedentes ficam sem identificação do titular.
+        """
+        atual = usuario_atual()
+        if not atual:
+            return _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
+        tipo, usuario = atual
+        anonimizar_conta(tipo, usuario)
+        registrar_auditoria("conta_removida", "ok", tipo=tipo, ator_id=usuario.id)
+        session.clear()
+        return "", 204
+
+
+@ns.route("/me/dados")
+class MeusDados(Resource):
+    @ns.response(200, "Cópia dos dados pessoais e registros da conta")
+    @ns.response(401, "Não autenticado", erro_model)
+    def get(self):
+        """Exporta os dados da conta em JSON, para portabilidade pela LGPD.
+
+        Cópia completa do cadastro e dos registros do titular (artigo 18).
+        """
+        atual = usuario_atual()
+        if not atual:
+            return _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
+        tipo, usuario = atual
+        registrar_auditoria("dados_exportados", "ok", tipo=tipo, ator_id=usuario.id)
+        return exportar_dados(tipo, usuario), 200

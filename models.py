@@ -22,6 +22,8 @@ class Estabelecimento(db.Model):
     natureza_juridica_codigo = db.Column(db.String(4), nullable=True)
     sem_fins_lucrativos = db.Column(db.Boolean, nullable=False, default=False, server_default=false())
     atividade_alimentar = db.Column(db.Boolean, nullable=False, default=True, server_default=true())
+    consentimento_versao = db.Column(db.String(20), nullable=True)
+    consentimento_em = db.Column(db.DateTime, nullable=True)
     doacoes = db.relationship('Doacao', backref='estabelecimento', lazy=True)
 
 class Doador(db.Model):
@@ -33,6 +35,8 @@ class Doador(db.Model):
     telefone = db.Column(db.String(20), nullable=False)
     criado_em = db.Column(db.DateTime, default=_utc_naive, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=True)
+    consentimento_versao = db.Column(db.String(20), nullable=True)
+    consentimento_em = db.Column(db.DateTime, nullable=True)
     doacoes = db.relationship('Doacao', backref='doador', lazy=True)
 
 class Instituicao(db.Model):

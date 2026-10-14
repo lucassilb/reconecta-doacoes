@@ -524,3 +524,9 @@ button, input { font: inherit; color: inherit; }
 
 /* senha e confirmação alinhadas pelo topo (o medidor de força não estica a coluna vizinha) */
 .grupo-contato--acesso { align-items: start; }
+
+/* ---------- consentimento LGPD ---------- */
+
+.consentimento { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; color: var(--tinta-suave); cursor: pointer; }
+.consentimento input { margin-top: 3px; accent-color: var(--verde); width: 16px; height: 16px; flex: none; }
+.consentimento input[aria-invalid] { outline: 2px solid var(--erro); outline-offset: 2px; }

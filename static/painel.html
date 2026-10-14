@@ -13,6 +13,7 @@
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/painel.js" defer></script>
   <script src="/static/js/painel-excedentes.js" defer></script>
+  <script src="/static/js/meus-dados.js" defer></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o painel</a>
@@ -185,6 +186,20 @@
         <section class="cartao" aria-labelledby="disponiveis-t">
           <h2 id="disponiveis-t" class="cartao__titulo">Pedidos abertos agora</h2>
           <div id="lista-disponiveis" class="doacoes" aria-live="polite"></div>
+        </section>
+      </div>
+      <!-- ===== privacidade (LGPD): qualquer conta ===== -->
+      <div id="bloco-privacidade" class="painel__grade" hidden>
+        <section class="cartao" aria-labelledby="privacidade-t">
+          <h2 id="privacidade-t" class="cartao__titulo">Meus dados e privacidade</h2>
+          <p class="cartao__sub">Você pode ver o que guardamos, baixar uma cópia ou excluir a conta. A exclusão anonimiza seu cadastro; pedidos e doações ficam só como estatística, sem identificação.</p>
+          <p class="consent-info" id="consent-info"></p>
+          <div id="aviso-privacidade" class="aviso" role="status" aria-live="polite" hidden></div>
+          <div class="privacidade-acoes">
+            <button type="button" id="btn-exportar-dados" class="btn btn--secundario btn--pequeno">Baixar meus dados (JSON)</button>
+            <a class="link-seta" href="/privacidade">Ler a Política de Privacidade <span aria-hidden="true">→</span></a>
+            <button type="button" id="btn-excluir-conta" class="btn btn--perigo btn--pequeno">Excluir minha conta</button>
+          </div>
         </section>
       </div>
     </div>

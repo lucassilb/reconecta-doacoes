@@ -140,7 +140,8 @@
     cnpj: "Este CNPJ não é válido. Confira os números digitados.",
     cnpjIncompleto: "O CNPJ tem 14 dígitos.",
     senha: "A senha precisa de pelo menos 8 caracteres, com letra e número.",
-    confirmar: "As senhas não são iguais."
+    confirmar: "As senhas não são iguais.",
+    privacidade: "É preciso ler e aceitar a Política de Privacidade para criar a conta."
   };
 
   function senhaValida(v) {
@@ -356,6 +357,7 @@
   var btnEmpresa = $("btn-empresa");
   var notaEmpresa = $("nota-empresa");
   var avisoEmpresa = $("aviso-empresa");
+  var aceiteEmpresa = $("empresa-privacidade");
 
   ligarSenha(senhaEmpresa, confirmarEmpresa, $("empresa-senha-forca"));
 
@@ -612,7 +614,8 @@
     if (!emailValido(emailEmpresa.value)) campos.email = MSG.email;
     if (!telefoneValido(telEmpresa.value)) campos.telefone = MSG.telefone;
     if (!senhaValida(senhaEmpresa.value)) campos.senha = MSG.senha;
-    var mapa = { email: emailEmpresa, telefone: telEmpresa, cnpj: cnpjInput, senha: senhaEmpresa };
+    if (!aceiteEmpresa.checked) campos.privacidade = MSG.privacidade;
+    var mapa = { email: emailEmpresa, telefone: telEmpresa, cnpj: cnpjInput, senha: senhaEmpresa, privacidade: aceiteEmpresa };
     if (confirmarEmpresa.value !== senhaEmpresa.value) {
       mostrarErro(confirmarEmpresa, MSG.confirmar);
       if (!Object.keys(campos).length) { confirmarEmpresa.focus(); return; }
@@ -624,7 +627,8 @@
       cnpj: empresaVerificada.cnpj,
       email: emailEmpresa.value.trim(),
       telefone: digitos(telEmpresa.value),
-      senha: senhaEmpresa.value
+      senha: senhaEmpresa.value,
+      aceite_privacidade: true
     }).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) { mostrarSucesso(c); return; }
@@ -675,7 +679,8 @@
   var confirmarDoador = $("doador-confirmar");
   var btnDoador = $("btn-doador");
   var avisoDoador = $("aviso-doador");
-  var mapaDoador = { nome: nomeDoador, cpf: cpfDoador, email: emailDoador, telefone: telDoador, senha: senhaDoador };
+  var aceiteDoador = $("doador-privacidade");
+  var mapaDoador = { nome: nomeDoador, cpf: cpfDoador, email: emailDoador, telefone: telDoador, senha: senhaDoador, privacidade: aceiteDoador };
 
   ligarSenha(senhaDoador, confirmarDoador, $("doador-senha-forca"));
 
@@ -688,7 +693,8 @@
       },
       email: function () { return emailValido(emailDoador.value) ? "" : MSG.email; },
       telefone: function () { return telefoneValido(telDoador.value) ? "" : MSG.telefone; },
-      senha: function () { return senhaValida(senhaDoador.value) ? "" : MSG.senha; }
+      senha: function () { return senhaValida(senhaDoador.value) ? "" : MSG.senha; },
+      privacidade: function () { return aceiteDoador.checked ? "" : MSG.privacidade; }
     };
     return v[campo]();
   }
@@ -736,7 +742,8 @@
       cpf: digitos(cpfDoador.value),
       email: emailDoador.value.trim(),
       telefone: digitos(telDoador.value),
-      senha: senhaDoador.value
+      senha: senhaDoador.value,
+      aceite_privacidade: true
     }).then(function (r) {
       var c = r.corpo;
       if (r.status === 201) { mostrarSucesso(c); return; }

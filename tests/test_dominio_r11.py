@@ -128,7 +128,7 @@ def test_ong_sem_cnae_alimentar_pode_cadastrar_e_duplo_perfil(monkeypatch):
     assert consulta.json["perfis"] == ["ong"]
     resposta = cliente.post("/reconecta/cadastro/empresa", json={
         "cnpj": base["cnpj"], "email": "ong@exemplo.test", "telefone": "11999999999",
-        "senha": "Senha1234"})
+        "senha": "Senha1234", "aceite_privacidade": True})
     assert resposta.status_code == 201, resposta.json
     assert cliente.get("/reconecta/auth/me").json["perfis"] == ["ong"]
     with app.app_context():

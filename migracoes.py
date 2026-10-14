@@ -83,6 +83,22 @@ def _migrar_integridade_postgresql(engine):
                     ) from erro
 
 
+def _migrar_consentimento(engine):
+    """Colunas de aceite LGPD; nulas para cadastros anteriores à política."""
+    inspector = inspect(engine)
+    for tabela in ("estabelecimentos", "doadores"):
+        if not inspector.has_table(tabela):
+            continue
+        colunas = {coluna["name"] for coluna in inspector.get_columns(tabela)}
+        with engine.begin() as conexao:
+            if "consentimento_versao" not in colunas:
+                conexao.execute(text(
+                    f"ALTER TABLE {tabela} ADD COLUMN consentimento_versao VARCHAR(20)"))  # tabela da tupla fixa; # nosec B608
+            if "consentimento_em" not in colunas:
+                conexao.execute(text(
+                    f"ALTER TABLE {tabela} ADD COLUMN consentimento_em TIMESTAMP"))  # tabela da tupla fixa; # nosec B608
+
+
 def _migrar_pedidos(engine):
     """Descarta somente tabelas vazias da rodada 8 e libera validade do pedido."""
     inspector = inspect(engine)
@@ -248,6 +264,7 @@ def aplicar_migracoes(engine=None):
             for coluna, definicao in definicoes.items():
                 if coluna not in colunas:
                     conexao.execute(text(f"ALTER TABLE estabelecimentos ADD COLUMN {coluna} {definicao}"))
+    _migrar_consentimento(engine)
     if inspector.has_table("doacoes"):
         if engine.dialect.name == "sqlite":
             _migrar_doacoes_sqlite(engine, inspector.get_columns("doacoes"))

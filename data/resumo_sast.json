@@ -51,9 +51,41 @@
       "configuracoes": 0
     }
   },
+  "gates": [
+    {
+      "gate": "bandit-high",
+      "regra": "sast-bandit falha com qualquer achado de severidade HIGH",
+      "resultado": "passou",
+      "detalhe": "0 achado(s) HIGH no último relatório"
+    },
+    {
+      "gate": "trivy-fs",
+      "regra": "sast-trivy falha em HIGH/CRITICAL com correção nos arquivos",
+      "resultado": "passou",
+      "detalhe": "0 achado(s) bloqueante(s) (corrigível, segredo ou misconfig alta)"
+    },
+    {
+      "gate": "trivy-config",
+      "regra": "sast-trivy falha em HIGH/CRITICAL na configuração (IaC)",
+      "resultado": "passou",
+      "detalhe": "0 achado(s) bloqueante(s)"
+    },
+    {
+      "gate": "trivy-imagem",
+      "regra": "sast-trivy falha em CRITICAL com correção na imagem Docker",
+      "resultado": "passou",
+      "detalhe": "0 achado(s) bloqueante(s)"
+    },
+    {
+      "gate": "ia-limiares",
+      "regra": "job ia falha se métricas caírem abaixo de modelo/limiares.json",
+      "resultado": "passou",
+      "detalhe": "todas as métricas com limiar atendem"
+    }
+  ],
   "stride": {
-    "residuais": 31,
-    "mitigados": 23,
+    "residuais": 33,
+    "mitigados": 25,
     "fonte": "docs/stride.md; estado declarado por risco"
   },
   "correcoes_documentadas": {

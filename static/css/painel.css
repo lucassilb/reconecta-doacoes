@@ -228,3 +228,8 @@
 .ex-cartao .pedido-itens-painel { gap: 4px; }
 .ex-cartao .pedido-linha { color: var(--tinta-suave); font-size: .88rem; }
 .ex-cartao .doacao__onde { color: var(--tinta); }
+
+/* ---------- privacidade (LGPD) ---------- */
+
+.privacidade-acoes { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.consent-info { font-size: .85rem; color: var(--tinta-suave); margin: 0; }

@@ -72,7 +72,7 @@ jobs:
           name: bandit-report
           path: reports/bandit.*
           if-no-files-found: warn
-      - name: Bloquear achados de severidade alta
+      - name: "Gate: bloquear achados de severidade alta (Bandit -lll)"
         run: bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -lll
 
   sast-trivy:
@@ -153,17 +153,24 @@ jobs:
           name: trivy-report
           path: reports/trivy-*
           if-no-files-found: warn
-      - name: Bloquear critica corrigivel nos arquivos
+      - name: "Gate: bloquear alta/critica corrigivel nos arquivos"
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
           scanners: vuln,secret,misconfig
           skip-dirs: .git,__pycache__,instance,relatorios,tests/fixtures,.venv,venv
-          severity: CRITICAL
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "1"
-      - name: Bloquear critica corrigivel na imagem
+      - name: "Gate: bloquear alta/critica na configuracao (IaC)"
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - name: "Gate: bloquear critica corrigivel na imagem"
         if: always()
         uses: aquasecurity/trivy-action@v0.36.0
         with:
