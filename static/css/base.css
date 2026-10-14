@@ -343,6 +343,74 @@ select.campo__entrada { appearance: none; padding-right: 40px;
   .cabecalho__nav { display: block; }
 }
 
+/* ---------- sino de notificações e avisos ao vivo (layout.js) ---------- */
+
+.sino { position: relative; display: flex; }
+.sino__botao {
+  position: relative; display: grid; place-items: center;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: none; border: 0; cursor: pointer; color: var(--tinta-suave);
+}
+.sino__botao:hover, .sino__botao[aria-expanded="true"] { color: var(--tinta); background: var(--superficie-2); }
+.sino__conta {
+  position: absolute; top: 2px; right: 0;
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--pilula);
+  background: var(--erro); color: #fff; font-size: .68rem; font-weight: 700; line-height: 18px; text-align: center;
+  box-shadow: 0 0 0 2px var(--superficie);
+}
+.sino__painel {
+  position: absolute; right: -8px; top: calc(100% + 12px); z-index: 40;
+  width: min(360px, calc(100vw - 24px));
+  background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio);
+  box-shadow: var(--sombra-2); padding: 14px; display: grid; gap: 10px;
+  animation: rc-surgir .18s ease both;
+}
+.sino__topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cabecalho .sino__topo h2 { font-family: var(--fonte-texto); font-size: .95rem; font-weight: 700; letter-spacing: 0; color: var(--tinta); }
+.sino__marcar { background: none; border: 0; cursor: pointer; padding: 6px 8px; border-radius: var(--pilula); font-size: .82rem; font-weight: 600; color: var(--verde-texto); }
+.sino__marcar:hover { background: var(--verde-suave); }
+.sino__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: min(60vh, 420px); overflow-y: auto; }
+.cabecalho__aba .sino__item a {
+  display: grid; gap: 2px; padding: 10px 10px 10px 22px; border-radius: var(--raio-p);
+  color: var(--tinta); text-decoration: none; position: relative; font-size: .9rem; font-weight: 400;
+}
+.cabecalho__aba .sino__item a:hover { background: var(--superficie-2); }
+.cabecalho__aba .sino__item.is-nova a { background: var(--verde-suave); }
+.cabecalho__aba .sino__item.is-nova a::before {
+  content: ""; position: absolute; left: 9px; top: 17px; width: 7px; height: 7px; border-radius: 50%; background: var(--verde);
+}
+.sino__texto { overflow-wrap: anywhere; }
+.sino__quando { font-size: .78rem; color: var(--tinta-suave); }
+.sino__vazio { font-size: .9rem; color: var(--tinta-suave); padding: 6px 2px; }
+
+.avisos-vivo {
+  position: fixed; left: 16px; bottom: 16px; z-index: 60;
+  display: grid; gap: 8px; width: min(380px, calc(100vw - 32px)); pointer-events: none;
+}
+.aviso-vivo {
+  pointer-events: auto;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 10px;
+  padding: 12px 10px 12px 14px;
+  background: var(--tinta); color: #fff; border-radius: var(--raio-p);
+  box-shadow: var(--sombra-2); font-size: .9rem;
+  animation: rc-surgir .25s ease both;
+}
+.aviso-vivo__ponto { width: 8px; height: 8px; margin-top: 7px; border-radius: 50%; background: #9BD475; }
+.aviso-vivo--meu .aviso-vivo__ponto { background: var(--trigo); }
+.aviso-vivo__texto { color: #fff; text-decoration: none; overflow-wrap: anywhere; }
+.aviso-vivo__texto:hover { text-decoration: underline; }
+.aviso-vivo__texto:focus-visible, .aviso-vivo__fechar:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.aviso-vivo__fechar {
+  width: 28px; height: 28px; margin-top: -3px; border-radius: 50%;
+  background: none; border: 0; cursor: pointer; color: #C9CCD6; font-size: 1.2rem; line-height: 1;
+}
+.aviso-vivo__fechar:hover { color: #fff; background: rgba(255, 255, 255, .14); }
+
+@media (max-width: 899.98px) {
+  .sino__botao { width: 36px; height: 36px; }
+  .sino__painel { position: fixed; left: 12px; right: 12px; top: 76px; width: auto; }
+}
+
 /* ---------- rodapé (injetado por layout.js) ---------- */
 
 .rodape {
