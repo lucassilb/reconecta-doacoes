@@ -147,8 +147,14 @@
     // sem caixa alta da Receita: "ARCOS DOURADOS ..." → "Olá, Arcos"
     var nome = (window.ReConecta && window.ReConecta.nomeTitulo) ? window.ReConecta.nomeTitulo(u.nome) : String(u.nome || "");
     $("saudacao-nome").textContent = "Olá, " + nome.split(" ")[0];
-    var selo = $("saudacao-selo");
-    selo.textContent = u.tipo === "empresa" ? "Empresa" : "Doador";
+    var selos = $("saudacao-selos");
+    var perfis = Array.isArray(u.perfis) ? u.perfis : [];
+    var rotulos = u.tipo === "doador" ? ["Doador"] : [];
+    if (perfis.indexOf("ong") !== -1) rotulos.push("ONG");
+    if (perfis.indexOf("empresa_alimentos") !== -1) rotulos.push("Empresa de alimentos");
+    if (!rotulos.length) rotulos.push("Empresa");
+    selos.replaceChildren();
+    rotulos.forEach(function (perfil) { selos.appendChild(el("span", { classe: "selo", texto: perfil })); });
   }
 
   function dlDados(dl, pares) {
@@ -199,7 +205,7 @@
   function paresDados(u) {
     if (u.tipo === "empresa") {
       return [
-        ["Empresa", u.nome],
+        [u.perfis && u.perfis.indexOf("ong") !== -1 ? "Organização" : "Empresa", u.nome],
         ["CNPJ", u.cnpj_formatado],
         ["Endereço", u.endereco],
         ["E-mail", u.email],
@@ -442,12 +448,13 @@
   var linhasItens = [];
 
   function iniciarEmpresa(u) {
-    saudacao(u, "Painel da empresa");
+    var ong = Array.isArray(u.perfis) && u.perfis.indexOf("ong") !== -1;
+    saudacao(u, ong ? "Painel da organização" : "Painel da empresa");
     $("bloco-empresa").hidden = false;
 
     iniciarMeusDados(u);
 
-    iniciarDoacoes();
+    if (ong) iniciarDoacoes();
     carregarMinhasDoacoes();
   }
 
@@ -711,6 +718,30 @@
   function unidadeDe(c) { return c.unidade_medida || (c.item && c.item.unidade_medida) || ""; }
 
   function recebida(c) {
+    var estado = { ACEITA: ["Aguardando entrega", "selo--acento"], ENTREGUE: ["Entregue", ""], CANCELADA: ["Não recebida", "selo--erro"] }[c.status] || ["Aguardando entrega", "selo--acento"];
+    var acoes = el("div", { classe: "recebida__acoes", "aria-live": "polite" });
+    if (c.status === "ACEITA") {
+      [
+        ["Recebi", "receber", false], ["Não recebi", "nao-recebida", true]
+      ].forEach(function (config) {
+        var btn = el("button", { type: "button", classe: "btn btn--secundario btn--pequeno", texto: config[0] });
+        btn.addEventListener("click", function () {
+          if (config[2] && btn.dataset.confirmar !== "sim") {
+            btn.dataset.confirmar = "sim";
+            btn.textContent = "Confirmar: não recebi";
+            return;
+          }
+          btn.disabled = true;
+          postJson("/reconecta/painel/contribuicoes/" + c.id + "/" + config[1], {}).then(function (r) {
+            if (r.ok) { carregarDoacoes(); return; }
+            acoes.replaceChildren(el("p", { classe: "campo__erro", role: "alert", texto: r.corpo.mensagem || "Não foi possível atualizar esta doação." }));
+          }).catch(function () {
+            acoes.replaceChildren(el("p", { classe: "campo__erro", role: "alert", texto: "Sem conexão com o servidor. Tente atualizar." }));
+          }).then(function () { btn.disabled = false; });
+        });
+        acoes.appendChild(btn);
+      });
+    }
     return el("li", { classe: "recebida" }, [
       c.foto_url
         ? el("a", { classe: "recebida__foto", href: c.foto_url, target: "_blank", rel: "noopener" }, [
@@ -718,7 +749,9 @@
         : el("span", { classe: "recebida__foto", "aria-hidden": "true" }),
       el("div", { classe: "recebida__texto" }, [
         el("p", null, [el("strong", { texto: nomeItem(c) }), " · " + fmtQtd(c.quantidade, unidadeDe(c))]),
-        el("p", { classe: "recebida__meta", texto: [quemDoou(c), c.validade ? "val. " + fmtData(c.validade) : "", c.criado_em ? "em " + fmtDataHora(c.criado_em) : ""].filter(Boolean).join(" · ") })
+        el("p", { classe: "recebida__meta", texto: [quemDoou(c), c.validade ? "val. " + fmtData(c.validade) : "", c.criado_em ? "em " + fmtDataHora(c.criado_em) : ""].filter(Boolean).join(" · ") }),
+        el("span", { classe: "selo " + estado[1], texto: estado[0] }),
+        c.status === "ACEITA" ? acoes : null
       ])
     ]);
   }
@@ -739,15 +772,15 @@
     if (propria) {
       art.appendChild(recebidas.length
         ? el("details", { classe: "doacao__recebidas", open: recebidas.length <= 4 }, [
-            el("summary", { texto: "Doações recebidas (" + recebidas.length + ")" }),
+             el("summary", { texto: "Contribuições (" + recebidas.length + ")" }),
             el("ul", null, recebidas.map(recebida))
           ])
-        : el("p", { classe: "doacao__sem", texto: "Ainda não chegou nenhuma doação para este pedido." }));
+        : el("p", { classe: "doacao__sem", texto: "Ainda não há contribuições para este pedido." }));
     } else {
       art.appendChild(el("a", { classe: "btn btn--primario btn--pequeno doacao__doar", href: "/doacoes/" + d.id }, ["Doar para este pedido"]));
     }
 
-    if (propria && d.status === "DISPONIVEL") {
+    if (propria && d.status === "DISPONIVEL" && !recebidas.length) {
       var acoes = el("div", { classe: "doacao__acoes", "aria-live": "polite" });
       var btnRemover = el("button", { type: "button", classe: "btn btn--perigo btn--pequeno", texto: "Remover" });
 
@@ -809,6 +842,10 @@
     iniciarMeusDados(u);
     carregarMinhasDoacoes();
 
+    carregarRede();
+  }
+
+  function carregarRede() {
     requisitar("/reconecta/publico/resumo").then(function (r) {
       if (!r.ok) return;
       var c = r.corpo;
@@ -840,7 +877,7 @@
     var ped = c.doacao || c.pedido || {};
     var emp = typeof ped.empresa === "string" ? { nome: ped.empresa } : (ped.empresa || {});
     var ent = c.entrega || {};
-    var STATUS = { ACEITA: ["Aceita", ""], ENTREGUE: ["Entregue", "selo--cinza"], CANCELADA: ["Cancelada", "selo--acento"] };
+    var STATUS = { ACEITA: ["Aceita · aguardando entrega", "selo--acento"], ENTREGUE: ["Entregue", ""], CANCELADA: ["Não recebida", "selo--erro"] };
     var st = STATUS[c.status] || STATUS.ACEITA;
     var ate = ent.receber_ate || ped.receber_ate || ped.data_limite_retirada;
     return el("article", { classe: "doacao minha-doacao" }, [
@@ -883,4 +920,18 @@
       el("span", { classe: "metrica__rotulo", texto: rotulo })
     ]);
   }
+
+  var recargaPendente;
+  document.addEventListener("reconecta:evento", function (evento) {
+    var tipo = evento.detail && evento.detail.tipo;
+    if (!tipo) return;
+    if (/^(pedido\.|doacao\.)/.test(tipo)) {
+      clearTimeout(recargaPendente);
+      recargaPendente = setTimeout(function () {
+        if (!$("bloco-doacoes").hidden) carregarDoacoes();
+        if (!$("bloco-rede").hidden) carregarRede();
+        if (!$("bloco-minhas-doacoes").hidden) carregarMinhasDoacoes();
+      }, 200);
+    }
+  });
 })();

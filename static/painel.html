@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/css/painel.css">
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/painel.js" defer></script>
+  <script src="/static/js/painel-excedentes.js" defer></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o painel</a>
@@ -30,7 +31,7 @@
           <p class="sobretitulo" id="saudacao-tipo">Painel</p>
           <h1 id="saudacao-nome">Olá</h1>
         </div>
-        <span id="saudacao-selo" class="selo"></span>
+        <div id="saudacao-selos" class="painel__selos" aria-label="Perfis da conta"></div>
       </header>
 
       <!-- ===== empresa ===== -->
@@ -46,6 +47,48 @@
           <form id="form-dados-empresa" class="form-dados" novalidate hidden></form>
         </section>
 
+      </div>
+
+      <!-- excedentes: publicação por empresa de alimentos; reservas por ONG -->
+      <div id="bloco-excedentes" class="painel__grade" hidden>
+        <section class="cartao" id="publicar-excedente" aria-labelledby="publicar-excedente-t" hidden>
+          <h2 id="publicar-excedente-t" class="cartao__titulo">Publicar excedente</h2>
+          <p class="cartao__sub">Ofereça alimentos dentro da validade para uma ONG retirar antes do prazo.</p>
+          <form id="form-excedente" class="form-doacao" novalidate>
+            <div class="campo campo--limite">
+              <label for="ex-retirar-ate" class="campo__rotulo">Retirar até</label>
+              <input id="ex-retirar-ate" type="datetime-local" class="campo__entrada campo__entrada--mono" required aria-describedby="ex-retirar-ate-erro">
+              <p id="ex-retirar-ate-erro" class="campo__erro" data-erro></p>
+            </div>
+            <fieldset class="itens">
+              <legend class="itens__legenda">Itens disponíveis</legend>
+              <p id="ex-itens-erro" class="campo__erro" data-erro></p>
+              <div id="ex-itens" class="itens__lista"></div>
+              <button type="button" id="ex-add-item" class="btn btn--secundario btn--pequeno btn--add">Adicionar item</button>
+            </fieldset>
+            <div class="campo">
+              <label for="ex-observacao" class="campo__rotulo">Observação para a ONG (opcional)</label>
+              <textarea id="ex-observacao" class="campo__entrada" maxlength="200" rows="2" placeholder="Ex.: Retirada pela portaria lateral"></textarea>
+            </div>
+            <fieldset class="ex-declaracoes">
+              <legend class="itens__legenda">Confirme as condições dos alimentos</legend>
+              <label><input id="ex-dentro-validade" type="checkbox" required> Todos os alimentos estão dentro da validade.</label>
+              <label><input id="ex-embalagem-ok" type="checkbox" required> As embalagens estão íntegras.</label>
+              <label><input id="ex-armazenado-ok" type="checkbox" required> Os alimentos foram armazenados corretamente.</label>
+              <p id="ex-declaracoes-erro" class="campo__erro" data-erro></p>
+            </fieldset>
+            <div id="ex-aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+            <button id="ex-publicar" type="submit" class="btn btn--primario">Publicar excedente</button>
+          </form>
+        </section>
+        <section class="cartao" id="meus-excedentes" aria-labelledby="meus-excedentes-t" hidden>
+          <div class="cartao__linha"><h2 id="meus-excedentes-t" class="cartao__titulo">Meus excedentes</h2><button type="button" id="ex-recarregar-meus" class="link-seta">Atualizar</button></div>
+          <div id="ex-lista-meus" class="doacoes" aria-live="polite"></div>
+        </section>
+        <section class="cartao" id="minhas-reservas" aria-labelledby="minhas-reservas-t" hidden>
+          <div class="cartao__linha"><h2 id="minhas-reservas-t" class="cartao__titulo">Minhas reservas de excedente</h2><button type="button" id="ex-recarregar-reservas" class="link-seta">Atualizar</button></div>
+          <div id="ex-lista-reservas" class="doacoes" aria-live="polite"></div>
+        </section>
       </div>
 
       <!-- ===== doador ===== -->

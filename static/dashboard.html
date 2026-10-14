@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard · ReConecta</title>
-  <meta name="description" content="Indicadores do ReConecta com dados reais: pedidos abertos, doações recebidas, atendimento por categoria, doações por dia, empresas e alertas.">
+  <meta name="description" content="Indicadores do ReConecta: pedidos, doações entregues, excedentes resgatados, ONGs e tempo até a reserva.">
   <meta name="color-scheme" content="light">
   <link rel="icon" type="image/svg+xml" href="/static/img/marca.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
       <div>
         <p class="sobretitulo sobretitulo--acento">Dashboard</p>
         <h1 id="dash-titulo">A rede em <em>números</em></h1>
-        <p class="lead">Dados reais da plataforma: pedidos das empresas, doações recebidas, atendimento por categoria e o que precisa de atenção agora.</p>
+        <p class="lead">Pedidos, doações entregues e alimentos resgatados por ONGs, com os números atualizados quando a rede muda.</p>
       </div>
       <div class="dash-topo__acoes">
         <p class="dash-gerado" id="dash-gerado" aria-live="polite">Carregando…</p>
@@ -45,9 +45,15 @@
           <span class="indicador__nota" id="ind-itens">—</span>
         </li>
         <li class="indicador" data-ind="pedidos_abertos"><span class="indicador__rotulo">Pedidos abertos</span><span class="indicador__valor">—</span></li>
-        <li class="indicador" data-ind="doacoes_recebidas"><span class="indicador__rotulo">Doações recebidas</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="doacoes_recebidas"><span class="indicador__rotulo">Doações aceitas</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="doacoes_entregues"><span class="indicador__rotulo">Doações entregues</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="excedentes_disponiveis"><span class="indicador__rotulo">Excedentes disponíveis</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="excedentes_resgatados"><span class="indicador__rotulo">Excedentes resgatados</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="tempo_medio_reserva_min"><span class="indicador__rotulo">Tempo médio até a reserva</span><span class="indicador__valor">—</span><span class="indicador__nota">Minutos, após a publicação</span></li>
         <li class="indicador" data-ind="pedidos_encerrados"><span class="indicador__rotulo">Pedidos encerrados</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="empresas"><span class="indicador__rotulo">Empresas</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="empresas_alimentos"><span class="indicador__rotulo">Empresas de alimentos</span><span class="indicador__valor">—</span></li>
+        <li class="indicador" data-ind="ongs"><span class="indicador__rotulo">ONGs</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="doadores"><span class="indicador__rotulo">Doadores (CPF)</span><span class="indicador__valor">—</span></li>
         <li class="indicador" data-ind="instituicoes"><span class="indicador__rotulo">Instituições</span><span class="indicador__valor">—</span></li>
       </ul>
@@ -77,12 +83,12 @@
         <details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-categoria"></div></details>
       </section>
 
-      <!-- doações por dia -->
+      <!-- doações e excedentes por dia -->
       <section class="cartao dash-graf" aria-labelledby="g-dia-titulo">
-        <h2 id="g-dia-titulo">Doações por dia</h2>
-        <p class="dash-graf__sub">Doações aceitas nos últimos 30 dias.</p>
+        <h2 id="g-dia-titulo">Doações e resgates por dia</h2>
+        <p class="dash-graf__sub">Doações aceitas e excedentes retirados nos últimos 30 dias.</p>
         <figure class="dash-graf__area">
-          <canvas id="g-dia" role="img" aria-label="Gráfico de linha com as doações aceitas por dia nos últimos 30 dias"></canvas>
+          <canvas id="g-dia" role="img" aria-label="Gráfico de linha com doações aceitas e excedentes retirados por dia nos últimos 30 dias"></canvas>
         </figure>
         <details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-dia"></div></details>
       </section>

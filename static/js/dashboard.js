@@ -61,7 +61,8 @@
     Object.keys(ind).forEach(function (k) {
       var item = lista.querySelector('[data-ind="' + k + '"] .indicador__valor');
       if (!item) return;
-      item.textContent = k === "percentual_atendimento" ? decimal.format(Number(ind[k]) || 0) + "%" : inteiro.format(Number(ind[k]) || 0);
+      if (k === "tempo_medio_reserva_min") item.textContent = ind[k] == null ? "—" : Number(ind[k]) < 1 ? "< 1 min" : decimal.format(Number(ind[k])) + " min";
+      else item.textContent = k === "percentual_atendimento" ? decimal.format(Number(ind[k]) || 0) + "%" : inteiro.format(Number(ind[k]) || 0);
     });
     var pct = Math.max(0, Math.min(100, Number(ind.percentual_atendimento) || 0));
     lista.querySelector(".indicador__barra span").style.width = pct + "%";
@@ -115,17 +116,21 @@
   }
 
   function graficoDias(lista) {
-    $("t-dia").replaceChildren(tabela("Doações por dia", ["Dia", "Doações"],
-      lista.filter(function (d) { return d.doacoes > 0; }).map(function (d) { return [diaMes(d.data), inteiro.format(d.doacoes)]; }), [1]));
+    $("t-dia").replaceChildren(tabela("Doações e resgates por dia", ["Dia", "Doações aceitas", "Excedentes retirados"],
+      lista.filter(function (d) { return d.doacoes > 0 || d.excedentes_resgatados > 0; })
+        .map(function (d) { return [diaMes(d.data), inteiro.format(d.doacoes), inteiro.format(d.excedentes_resgatados)]; }), [1, 2]));
     var op = opcoesBase();
-    op.plugins.legend.display = false;
     op.scales.x.ticks.maxTicksLimit = 8;
     grafico("g-dia", {
       type: "line",
       data: {
         labels: lista.map(function (d) { return diaMes(d.data); }),
-        datasets: [{ label: "Doações", data: lista.map(function (d) { return d.doacoes; }), borderColor: COR.verde, backgroundColor: "rgba(74,131,38,.12)",
-                     fill: true, tension: .3, pointRadius: 2, pointHoverRadius: 5 }]
+        datasets: [
+          { label: "Doações aceitas", data: lista.map(function (d) { return d.doacoes; }), borderColor: COR.verde, backgroundColor: "rgba(74,131,38,.12)",
+            fill: true, tension: .3, pointRadius: 2, pointHoverRadius: 5 },
+          { label: "Excedentes retirados", data: lista.map(function (d) { return d.excedentes_resgatados; }), borderColor: "#B17413",
+            tension: .3, pointRadius: 2, pointHoverRadius: 5 }
+        ]
       },
       options: op
     });
@@ -219,5 +224,14 @@
 
   $("btn-atualizar").addEventListener("click", carregar);
   $("btn-resumo").addEventListener("click", gerarResumo);
+  var atualizacaoPendente;
+  document.addEventListener("reconecta:evento", function (evento) {
+    if (!evento.detail || !/^(pedido\.|doacao\.|excedente\.)/.test(evento.detail.tipo)) return;
+    clearTimeout(atualizacaoPendente);
+    atualizacaoPendente = setTimeout(carregar, 250);
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) carregar();
+  });
   carregar();
 })();
