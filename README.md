@@ -312,6 +312,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/dashboard/seguranca` | Resumo versionado SAST/STRIDE e controles de segurança declarados. |
 | POST | `/reconecta/ia/interpretar-pedido` | Organização logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por organização (429 `MUITAS_TENTATIVAS`). |
 | POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados. Limite de 10 por minuto por IP (429 `LIMITE_IA`). |
+| POST | `/reconecta/ia/risco-descarte` | Estima risco de descarte de um lote com modelo treinado em dados simulados; devolve probabilidade, prioridade e aviso de limitação. Limite de 10 por minuto por IP. |
 | POST | `/reconecta/ia/sugerir-destino` | Interpreta alimentos oferecidos e sugere pedidos compatíveis com pontuação e motivos. |
 | GET | `/reconecta/tempo-real` | Fluxo SSE de eventos públicos e privados autorizados. |
 | GET | `/reconecta/novidades` | Consulta JSON de eventos para retomada e fallback. |
@@ -324,7 +325,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-A tabela cobre as **54 operações em 41 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **55 operações em 42 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 
@@ -433,6 +434,22 @@ Detalhes (atributos, treino, métricas por categoria, matriz de confusão, limia
 O gabarito manual [`data/ofertas_avaliacao.jsonl`](data/ofertas_avaliacao.jsonl) tem 80 ofertas com pedidos abertos: 59 com destino correto e 21 sem destino. `python scripts/avaliar_conexao.py` mede `conexao.casar` e grava [`modelo/avaliacao_conexao.json`](modelo/avaliacao_conexao.json). Na execução de 2026-10-14, o classificador acertou **144/185 (77,84%)** no teste separado; a conexão acertou **52/59 (88,14%)** no top-1 e no top-3 e retornou vazio corretamente em **21/21 (100%)** casos sem destino. Os sete erros restantes, sobretudo nomes regionais equivalentes, estão no JSON.
 
 `python scripts/ciclo_ia.py` refaz o treino determinístico e as duas avaliações, grava data, versão e tamanhos em [`modelo/metricas.json`](modelo/metricas.json) e falha abaixo dos mínimos de [`modelo/limiares.json`](modelo/limiares.json): **75%** no classificador, **85%** no top-1 e top-3, **95%** na rejeição correta. O job `ia` em [CI](.github/workflows/ci.yml) roda esse comando, publica as métricas e é exigido antes do deploy. Tudo roda sem LLM ou serviço pago; detalhes e critério do gabarito em [docs/dataset-modelo.md](docs/dataset-modelo.md).
+
+### Predição simulada de descarte
+
+O mesmo ciclo treina e testa dois modelos scikit-learn com pandas sobre 3.200
+lotes **simulados** de [`data/lotes_descarte.csv`](data/lotes_descarte.csv).
+A regressão logística obteve no teste separado acurácia **67,50%**, F1 **50,48%**
+e ROC-AUC **70,15%**; os limites do CI são 64%, 47% e 67%. O artefato
+[`modelo/risco_descarte.json`](modelo/risco_descarte.json) roda em Python puro na
+API, sem essas bibliotecas na imagem. A lista pública de excedentes usa a
+probabilidade para priorizar ofertas e identifica as de prioridade alta. A
+temperatura e a distância não cadastradas aparecem como ausentes; a previsão
+não é uma taxa observada no sistema nem substitui a decisão da ONG. No mesmo
+teste de 185 alimentos, o TF-IDF linear obteve 74,59% de acurácia, abaixo dos
+77,84% do Naive Bayes já usado; o classificador atual foi mantido. Regras da
+simulação, matriz de confusão, teste e limitações estão em
+[docs/dataset-modelo.md](docs/dataset-modelo.md).
 
 ## Segurança (STRIDE e SAST)
 

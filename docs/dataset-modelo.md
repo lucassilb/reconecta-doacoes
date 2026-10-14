@@ -182,3 +182,69 @@ quando a LLM não acerta), nome parecido, quanto falta, prazo e UF. Os dados usa
 os campos públicos do pedido; o resultado é recomendação explicável (`motivos`), e quem
 decide é a pessoa. Detalhes em [llm.md](llm.md#sugestão-de-destino-post-reconecta-ia-sugerir-destino)
 e no código `conexao.py`.
+
+## Risco de descarte e prioridade dos excedentes
+
+`data/lotes_descarte.csv` contém **3.200 lotes simulados**, gerados por
+`python scripts/treinar_risco.py --gerar-dados` com semente 1402. Cada linha tem
+categoria, perecibilidade, dias até a validade, quantidade em kg, temperatura,
+armazenamento, dia e hora de publicação, UF, distância informada até a ONG mais
+próxima e o rótulo `descartado`. O rótulo é sorteado por uma regra declarada no
+gerador: validade curta, perecibilidade, temperatura elevada, volume, distância,
+fim de semana e horário noturno aumentam a chance simulada de não retirada.
+**Essas taxas são premissas didáticas, não foram estimadas de perdas reais.** A
+UF está no conjunto para documentar a abrangência, mas não é um atributo do
+modelo: sem evidência de campo, atribuir risco direto a um estado seria indevido.
+Temperatura e distância podem faltar; o modelo recebe marcadores explícitos de
+ausência e não inventa uma medição.
+
+`scripts/treinar_risco.py` lê o CSV com pandas e compara regressão logística e
+floresta aleatória do scikit-learn em cinco dobras estratificadas somente no
+treino (2.560 linhas). Seleciona pela média de F1, confere uma vez no teste
+separado (640 linhas), refaz o ajuste com todos os lotes e exporta
+`modelo/risco_descarte.json`, sem pickle. A API usa `risco_descarte.py` em Python
+puro; pandas e scikit-learn entram apenas em `requirements-dev.txt` e no job
+`ia` do CI, fora da imagem de produção. As versões de treino estão fixadas em
+[pandas 3.0.6](https://pypi.org/project/pandas/3.0.6/) e
+[scikit-learn 1.9.1](https://pypi.org/project/scikit-learn/1.9.1/).
+
+| Medida no teste simulado | Resultado | Mínimo no CI |
+|---|---:|---:|
+| Acurácia | 0,6750 | 0,64 |
+| Precisão | 0,5889 | — |
+| Recall | 0,4417 | — |
+| F1 | 0,5048 | 0,47 |
+| ROC-AUC | 0,7015 | 0,67 |
+
+A matriz de confusão (linhas reais 0/1, colunas previstas 0/1) é
+`[[326, 74], [134, 106]]`. A regressão logística venceu a validação cruzada
+por F1 (0,5565 contra 0,5413 da floresta). O modelo avaliado no teste foi
+ajustado só no treino; o JSON servido é reajustado depois com as 3.200 linhas.
+Esses números medem a recuperação da própria regra sintética. Não comprovam
+acurácia de descarte na operação e não autorizam descartar ou aceitar alimentos
+automaticamente.
+
+`POST /reconecta/ia/risco-descarte` aceita um lote sem dados pessoais e devolve
+probabilidade estimada, nível `alto`/`medio`/`baixo`, sinais observáveis e o aviso
+de simulação. A lista pública `GET /reconecta/excedentes` ordena ofertas pela
+probabilidade antes da paginação e expõe `prioridade.selo = "Prioridade alta"`
+quando o nível é alto. Só categoria, validade, peso convertido e horário são
+conhecidos para uma oferta publicada; temperatura, armazenamento e distância
+ficam marcados como não informados. Os motivos descrevem sinais do lote, não
+explicações causais da previsão. A escolha de reserva continua humana.
+
+No mesmo teste independente de 185 nomes de alimentos, TF-IDF de caracteres
+com regressão logística do scikit-learn acertou **0,7459** (F1 macro 0,7470),
+contra **0,7784** (F1 macro 0,7807) do Naive Bayes existente. Por isso o
+classificador atual permaneceu em produção. A acurácia cruzada do TF-IDF no
+treino foi 0,7649; o resultado da comparação fica em
+`modelo/metricas.json → comparacao_classificador`. Se o TF-IDF superar o
+Naive Bayes em uma futura atualização do dataset, o ciclo falha até a adoção
+explícita de um artefato leve e compatível com a API.
+
+Para reproduzir: instale `requirements.txt` e `requirements-dev.txt`, rode
+`python scripts/treinar_risco.py --gerar-dados` e `python scripts/ciclo_ia.py`.
+O ciclo grava as métricas de descarte em `modelo/metricas.json → risco_descarte`
+e falha se acurácia, F1 ou AUC caírem abaixo dos limites versionados em
+`modelo/limiares.json`. Testes em `tests/test_risco_descarte.py` conferem
+reprodutibilidade, equivalência de inferência com scikit-learn, API e ordenação.
