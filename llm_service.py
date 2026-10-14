@@ -259,6 +259,9 @@ def _pedido_regras(texto, usar_classificador=True):
     for trecho in trechos[:10]:
         trecho = re.split(r"\s+(?:at[eé]\s+|para\s+o\s+dia\s+)", trecho,
                           maxsplit=1, flags=re.IGNORECASE)[0]
+        # "tomate, vencem amanhã": a validade dita depois não faz parte do nome
+        trecho = re.split(r"[,;]?\s+(?:que\s+)?(?:venc\w+|com\s+validade|validade)\b", trecho,
+                          maxsplit=1, flags=re.IGNORECASE)[0]
         # a primeira frase com quantidade e alimento: saudação ou telefone antes não atrapalham
         achado = next((a for a in (padrao.search(frase) for frase in
                                    re.split(r"(?<=[.!?])\s+", trecho.strip())) if a), None)

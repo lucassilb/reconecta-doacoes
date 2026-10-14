@@ -295,3 +295,14 @@ def test_dono_confirma_doacao_e_progresso_preserva_compromisso():
     detalhe = cliente.get(f"/reconecta/publico/doacoes/{ids[2]}").json
     assert detalhe["itens"][0]["recebido"] == 4
     assert detalhe["itens"][0]["entregue"] == 4
+
+
+def test_nome_do_item_nao_leva_a_validade_dita_depois():
+    from llm_service import _pedido_regras
+
+    itens = _pedido_regras("sobraram 30 pães e 5 kg de tomate, vencem amanhã", False)["itens"]
+    assert [(i["nome"], i["quantidade"]) for i in itens] == [("pães", 30), ("tomate", 5)]
+    itens = _pedido_regras("10 kg de camarão congelado, vence em 3 dias", False)["itens"]
+    assert itens[0]["nome"] == "camarão congelado"
+    itens = _pedido_regras("20 caixas de leite com validade longa", False)["itens"]
+    assert itens[0]["nome"] == "leite"

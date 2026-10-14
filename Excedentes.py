@@ -202,6 +202,8 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None):
         dados.update(pode_reservar=motivo is None, motivo_bloqueio=motivo,
                      observacao=excedente.observacao,
                      criado_em=iso_evento(excedente.criado_em))
+        dados["meu"] = bool(atual and atual[0] == "empresa" and
+                            atual[1].id == excedente.estabelecimento_id)
         if atual and atual[0] == "empresa":
             usuario_id = atual[1].id
             if usuario_id == excedente.reservado_por_id:

@@ -93,6 +93,8 @@ def _fluxo(desde, chave):
     ultimo_id = desde
     inicio = time.monotonic()
     ultimo_envio = inicio
+    # comentário imediato: o navegador abre a conexão sem esperar o primeiro evento
+    yield ": conectado\n\n"
     while time.monotonic() - inicio < DURACAO_MAX:
         for evento in _consultar(ultimo_id, chave, MAX_NOVIDADES):
             ultimo_id = evento.id

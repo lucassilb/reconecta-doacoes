@@ -154,9 +154,10 @@ def test_tempo_real_entrega_evento_em_sse():
     trecho = b""
     for pedaco in resposta.response:
         trecho += pedaco
-        if b"\n\n" in trecho:
+        if b"id: " in trecho and b"\n\n" in trecho.split(b"id: ", 1)[1]:
             break
     resposta.close()
+    assert trecho.startswith(b": conectado")
     assert b"id: " in trecho and b'"pedido.publicado"' in trecho
     assert b'"pedido_id": 7' in trecho
 
