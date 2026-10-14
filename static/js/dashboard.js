@@ -3,6 +3,9 @@
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
+  var modo = new URLSearchParams(window.location.search).get("modo") === "demonstracao" ? "demonstracao" : "real";
+  var numeroCarga = 0;
+  function rota(url, origem) { return url + ((origem || modo) === "demonstracao" ? "?modo=demonstracao" : ""); }
 
   function el(tag, attrs, filhos) {
     var no = document.createElement(tag);
@@ -284,14 +287,17 @@
     );
   }
 
-  function carregarAnalise() {
-    return requisitar("/reconecta/dashboard/impacto").then(function (r) {
+  function carregarAnalise(numero, origem) {
+    return requisitar(rota("/reconecta/dashboard/impacto", origem)).then(function (r) {
+      if (numero !== numeroCarga || origem !== modo) return;
       if (!r.ok) throw new Error("HTTP " + r.status);
       pintarImpacto(r.corpo);
-    }).catch(function () { $("kg-medido").textContent = "Indisponível"; });
+    }).catch(function () { if (numero === numeroCarga) $("kg-medido").textContent = "Indisponível"; });
   }
   function carregarSeguranca() {
-    return requisitar("/reconecta/dashboard/seguranca").then(function (r) {
+    var origem = modo;
+    return requisitar(rota("/reconecta/dashboard/seguranca", origem)).then(function (r) {
+      if (origem !== modo) return;
       if (!r.ok) throw new Error("HTTP " + r.status);
       pintarSeguranca(r.corpo);
     }).catch(function () { $("sast-cards").textContent = "Indicadores de segurança indisponíveis."; });
@@ -301,9 +307,11 @@
 
   function carregar() {
     var btn = $("btn-atualizar");
+    var origem = modo, numero = ++numeroCarga;
     btn.disabled = true;
     $("dash-erro").hidden = true;
-    return requisitar("/reconecta/dashboard").then(function (r) {
+    return requisitar(rota("/reconecta/dashboard", origem)).then(function (r) {
+      if (numero !== numeroCarga || origem !== modo) return;
       if (!r.ok) throw new Error("HTTP " + r.status);
       var d = r.corpo;
       preencherIndicadores(d.indicadores || {});
@@ -312,18 +320,20 @@
       preencherAlertas(d.alertas || []);
       preencherTabelas(d);
       $("dash-gerado").textContent = "Dados de " + dataHora(d.gerado_em);
-      carregarAnalise();
+      carregarAnalise(numero, origem);
     }).catch(function () {
+      if (numero !== numeroCarga) return;
       var e = $("dash-erro");
       e.replaceChildren(el("p", { classe: "aviso__titulo", texto: "Não conseguimos carregar os indicadores" }), el("p", { texto: "Verifique sua conexão e tente atualizar." }));
       e.hidden = false;
       $("dash-gerado").textContent = "";
-    }).then(function () { btn.disabled = false; });
+    }).then(function () { if (numero === numeroCarga) btn.disabled = false; });
   }
 
   /* ---------- resumo com IA ---------- */
 
   function gerarResumo() {
+    if (modo === "demonstracao") return;
     var btn = $("btn-resumo"), alvo = $("ia-resultado");
     btn.disabled = true; btn.classList.add("is-carregando");
     alvo.hidden = false;
@@ -332,6 +342,7 @@
     fetch("/reconecta/ia/resumo-dashboard", { method: "POST", credentials: "same-origin", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: "{}" })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (c) { return { status: r.status, ok: r.ok, corpo: c }; }); })
       .then(function (r) {
+        if (modo === "demonstracao") return;
         var c = r.corpo || {};
         if (r.status === 429) { alvo.replaceChildren(el("p", { classe: "aviso", texto: c.mensagem || "Muitos pedidos de resumo seguidos. Aguarde um pouco e tente de novo." })); return; }
         if (!r.ok) throw new Error("HTTP " + r.status);
@@ -348,22 +359,50 @@
         );
       })
       .catch(function () {
+        if (modo === "demonstracao") return;
         alvo.replaceChildren(el("p", { classe: "aviso aviso--erro", texto: "Não foi possível gerar o resumo agora. Tente novamente em instantes." }));
       })
-      .then(function () { btn.disabled = false; btn.classList.remove("is-carregando"); alvo.setAttribute("aria-busy", "false"); });
+      .then(function () { btn.disabled = modo === "demonstracao"; btn.classList.remove("is-carregando"); alvo.setAttribute("aria-busy", "false"); });
   }
 
+  var resumoReal = document.querySelector(".dash-ia__sub").textContent;
+  function aplicarModo() {
+    var demo = modo === "demonstracao";
+    $("dash-demo-faixa").hidden = !demo;
+    $("modo-real").setAttribute("aria-pressed", String(!demo));
+    $("modo-demonstracao").setAttribute("aria-pressed", String(demo));
+    $("btn-resumo").disabled = demo;
+    $("btn-resumo").textContent = demo ? "Disponível em dados reais" : "Gerar resumo com IA";
+    document.querySelector(".dash-ia__sub").textContent = demo ?
+      "A avaliação da IA acima é real. O resumo por linguagem natural usa dados operacionais e está disponível no modo Dados reais." : resumoReal;
+    $("ia-resultado").hidden = true;
+    $("ia-resultado").replaceChildren();
+    $("dash-gerado").textContent = "Carregando…";
+  }
+  function selecionarModo(novo) {
+    if (modo === novo) return;
+    modo = novo;
+    window.history.replaceState(null, "", window.location.pathname + (modo === "demonstracao" ? "?modo=demonstracao" : "") + window.location.hash);
+    aplicarModo();
+    carregar();
+    carregarSeguranca();
+  }
+
+  $("modo-real").addEventListener("click", function () { selecionarModo("real"); });
+  $("modo-demonstracao").addEventListener("click", function () { selecionarModo("demonstracao"); });
   $("btn-atualizar").addEventListener("click", carregar);
   $("btn-resumo").addEventListener("click", gerarResumo);
   var atualizacaoPendente;
   document.addEventListener("reconecta:evento", function (evento) {
+    if (modo === "demonstracao") return;
     if (!evento.detail || !/^(pedido\.|doacao\.|excedente\.)/.test(evento.detail.tipo)) return;
     clearTimeout(atualizacaoPendente);
     atualizacaoPendente = setTimeout(carregar, 250);
   });
   document.addEventListener("visibilitychange", function () {
-    if (!document.hidden) carregar();
+    if (!document.hidden && modo === "real") carregar();
   });
+  aplicarModo();
   carregar();
   carregarSeguranca();
 })();

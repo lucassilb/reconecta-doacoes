@@ -18,6 +18,7 @@
 </head>
 <body class="dash">
   <header data-layout="cabecalho"></header>
+  <div class="dash-demo-faixa" id="dash-demo-faixa" role="status" hidden>Dados de demonstração — simulados, não são doações reais</div>
 
   <main id="conteudo" class="container">
     <section class="dash-topo" aria-labelledby="dash-titulo">
@@ -27,6 +28,10 @@
         <p class="lead">Pedidos, doações entregues e alimentos resgatados por ONGs, com os números atualizados quando a rede muda.</p>
       </div>
       <div class="dash-topo__acoes">
+        <div class="dash-modos" role="group" aria-label="Origem dos indicadores">
+          <button type="button" id="modo-real" aria-pressed="true">Dados reais</button>
+          <button type="button" id="modo-demonstracao" aria-pressed="false">Demonstração</button>
+        </div>
         <p class="dash-gerado" id="dash-gerado" aria-live="polite">Carregando…</p>
         <button type="button" class="btn btn--secundario btn--pequeno" id="btn-atualizar">Atualizar dados</button>
       </div>

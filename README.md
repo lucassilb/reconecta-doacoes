@@ -161,6 +161,8 @@ O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a pr
 
 O bloco de segurança lê `relatorios/sast/resumo.json` com achados e data de Bandit, Trivy de arquivos/configuração/imagem e estado STRIDE. A imagem versionada ainda tem 44 achados HIGH do Debian base; o painel não os chama de mitigados. Cabeçalhos/CSP e cotas são controles existentes; falhas e bloqueios de login aparecem como **não medidos**, pois só constam no log. Regras, premissas, atualização do relatório e prova estão em [docs/dashboard.md](docs/dashboard.md); testes em `tests/test_dashboard_impacto.py`.
 
+Para a apresentação no site público, a alternância **Dados reais | Demonstração** mantém os dados reais como padrão e identifica a simulação por uma faixa fixa. `?modo=demonstracao` calcula os mesmos indicadores em SQLite **em memória**, sem escrever no banco configurado: a semente versionada em `data/demonstracao.json` cria 25 ONGs, 5 mercados e 8 doadores fictícios, com 320 pedidos/doações e 160 excedentes. Acurácia da IA e SAST permanecem reais nos dois modos. O resumo em linguagem natural só está disponível nos dados reais. O snapshot SAST em `data/resumo_sast.json` acompanha a imagem Docker, que exclui `relatorios/`. Testes em `tests/test_dashboard_demo.py`.
+
 ## Otimização da API (critério 4 do CP2)
 
 Detalhes, medições e como repetir em [docs/otimizacoes.md](docs/otimizacoes.md).

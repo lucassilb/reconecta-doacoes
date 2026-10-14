@@ -2,6 +2,14 @@
 
 O painel público em `/dashboard` usa `GET /reconecta/dashboard` para os números anteriores e `GET /reconecta/dashboard/impacto` e `/seguranca` para esta análise. Os dados de negócio vêm do banco em uso; os dois arquivos de métricas da IA e o resumo SAST são artefatos versionados. O navegador recarrega impacto depois de `reconecta:evento`. Os relatórios SAST só mudam quando gerados e incorporados à versão do projeto.
 
+## Modo demonstração para apresentação pública
+
+A alternância **Dados reais | Demonstração** abre as mesmas rotas com `?modo=demonstracao`; por padrão, a página mostra dados reais. No modo de demonstração, uma faixa fixa durante a rolagem diz **“Dados de demonstração — simulados, não são doações reais”**. O endereço `/dashboard?modo=demonstracao` abre diretamente nesse estado. O resumo em linguagem natural fica desativado nesse modo porque sua rota atual usa dados reais; as métricas da avaliação da IA continuam reais e iguais nos dois modos.
+
+`Dashboard.py` cria uma segunda instância Flask ligada a `sqlite://` com `StaticPool`. Ela semeia o banco **em memória** uma vez por processo a partir de [data/demonstracao.json](../data/demonstracao.json), com gerador pseudoaleatório de semente fixa, e executa `montar_dashboard()` e `montar_impacto()` sem mudar o banco configurado. O acesso ao SQLite da demonstração é serializado; nenhum dado da simulação é gravado no Supabase ou no SQLite de produção. A data base é o dia de inicialização para manter os gráficos dos últimos 30 dias atuais; para o mesmo dia e a mesma semente, os valores são reprodutíveis.
+
+A semente cria 25 ONGs e 5 mercados com nomes explicitamente fictícios, 8 pessoas de exemplo, 320 pedidos/doações e 160 excedentes distribuídos em 60 dias e nas cinco macrorregiões. CNPJ e CPF são marcadores inválidos com prefixo `DEMO`, e contatos usam `example.invalid`. Doações confirmadas e retiradas seguem o mesmo cálculo que o modo real. O snapshot SAST também é copiado em `data/resumo_sast.json` pelo script gerador, pois `relatorios/` não entra na imagem Docker; o código usa essa cópia apenas quando o relatório principal não está presente.
+
 ## Interpretação dos números
 
 | Indicador | Regra | Limite |
@@ -20,4 +28,4 @@ O painel público em `/dashboard` usa `GET /reconecta/dashboard` para os número
 
 O cartão de controles lista os cabeçalhos configurados em `app.py` e as cotas da aplicação. HSTS só é ativo com `COOKIE_SEGURO=1`. Falhas e bloqueios de login são registrados no log de auditoria, mas não há contador persistente; o painel indica **não medido**.
 
-Validação: `python -m pytest -q tests/test_dashboard_impacto.py`, `python scripts/resumo_sast.py`, `/reconecta/dashboard/impacto`, `/reconecta/dashboard/seguranca`. Os testes cobrem conversão, entregas e retiradas, UF, médias, IA, SAST, STRIDE e privacidade da resposta.
+Validação: `python -m pytest -q tests/test_dashboard_impacto.py tests/test_dashboard_demo.py`, `python scripts/resumo_sast.py`, `/reconecta/dashboard/impacto`, `/reconecta/dashboard/seguranca`. Os testes cobrem conversão, entregas e retiradas, UF, médias, IA, SAST, STRIDE, isolamento do banco real, reprodutibilidade da semente e privacidade da resposta.

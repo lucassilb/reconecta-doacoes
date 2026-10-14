@@ -2,14 +2,17 @@
 
 import csv
 import json
+import random
+from threading import RLock
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
-from flask import current_app
+from flask import Flask, current_app, request
 from flask_restx import Namespace, Resource
 from sqlalchemy import extract, func, select
+from sqlalchemy.pool import StaticPool
 
 from fuso import agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
@@ -29,6 +32,8 @@ MACROREGIOES = {
     "Sul": "PR RS SC".split(),
 }
 REGIAO_UF = {uf: regiao for regiao, ufs in MACROREGIOES.items() for uf in ufs}
+_DEMO_APP = None
+_DEMO_LOCK = RLock()
 
 
 def conversoes_kg(caminho=None):
@@ -68,6 +73,11 @@ def _ler_json(caminho):
         return json.loads(caminho.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
+
+
+def _resumo_sast():
+    return (_ler_json(RAIZ / "relatorios" / "sast" / "resumo.json") or
+            _ler_json(RAIZ / "data" / "resumo_sast.json"))
 
 
 def montar_impacto():
@@ -160,7 +170,7 @@ def montar_impacto():
 def montar_seguranca():
     """Configuração comprovável e relatórios estáticos, nunca telemetria simulada."""
     return {
-        "sast": _ler_json(RAIZ / "relatorios" / "sast" / "resumo.json"),
+        "sast": _resumo_sast(),
         "controles": {
             "cabecalhos": ["Content-Security-Policy", "X-Content-Type-Options",
                            "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"],
@@ -350,21 +360,146 @@ def montar_dashboard() -> dict:
     }
 
 
+def _semear_demonstracao(dados):
+    """Cria fatos fictícios de forma reprodutível no app SQLite isolado."""
+    sorteio = random.Random(dados["semente"])
+    agora = agora_brasilia()
+    agora_utc = agora.astimezone(timezone.utc).replace(tzinfo=None)
+    prazo_atual = (agora + timedelta(days=7)).replace(tzinfo=None)
+    validade = agora.date() + timedelta(days=14)
+    ongs = []
+    for numero, local in enumerate(dados["organizacoes_ficticias"], 1):
+        ong = Estabelecimento(
+            nome=f"ONG Exemplo {local['cidade']} {numero} (fictícia)",
+            cnpj=f"DEMO-CNPJ-{numero:05d}", email=f"ong{numero}@example.invalid",
+            telefone="00000000000",
+            endereco=f"Rua Demonstração, {numero} - Centro, {local['cidade']}/{local['uf']} - 00000000",
+            sem_fins_lucrativos=True, atividade_alimentar=False)
+        db.session.add(ong)
+        ongs.append(ong)
+    empresas = []
+    for numero in range(1, dados["empresas_ficticias"] + 1):
+        empresa = Estabelecimento(
+            nome=f"Mercado Exemplo {numero} (fictício)", cnpj=f"DEMO-MERC-{numero:05d}",
+            email=f"mercado{numero}@example.invalid", telefone="00000000000",
+            endereco=f"Rua Demonstração, {numero} - Centro, Cidade Exemplo/SP - 00000000",
+            sem_fins_lucrativos=False, atividade_alimentar=True)
+        db.session.add(empresa)
+        empresas.append(empresa)
+    doadores = []
+    for numero in range(1, dados["doadores_ficticios"] + 1):
+        doador = Doador(nome=f"Pessoa Exemplo {numero} (fictícia)",
+                       cpf=f"DEMO{numero:07d}", email=f"pessoa{numero}@example.invalid",
+                       telefone="00000000000")
+        db.session.add(doador)
+        doadores.append(doador)
+    db.session.flush()
+
+    catalogo = dados["alimentos_ficticios"]
+    periodo = dados["dias_historico"]
+    for indice in range(dados["pedidos"]):
+        ong = ongs[indice % len(ongs)]
+        alimento = catalogo[sorteio.randrange(len(catalogo))]
+        criado = agora_utc - timedelta(days=1 + indice % periodo,
+                                        hours=sorteio.randrange(24))
+        pedido = Doacao(estabelecimento_id=ong.id, data_cadastro=criado,
+                        data_limite_retirada=prazo_atual,
+                        status="DISPONIVEL" if indice % periodo < 5 else "RETIRADA")
+        db.session.add(pedido)
+        db.session.flush()
+        quantidade = sorteio.randrange(8, 65)
+        item = ItemDoacao(doacao_id=pedido.id, nome=alimento["nome"],
+                          categoria=alimento["categoria"], quantidade=quantidade,
+                          unidade_medida=alimento["unidade"], validade=validade)
+        db.session.add(item)
+        db.session.flush()
+        status = ("ENTREGUE" if indice % 10 < 7 else
+                  "ACEITA" if indice % 10 < 9 else "CANCELADA")
+        db.session.add(Contribuicao(
+            doacao_id=pedido.id, item_doacao_id=item.id,
+            doador_id=doadores[indice % len(doadores)].id,
+            alimento=alimento["nome"], categoria=alimento["categoria"],
+            quantidade=sorteio.randrange(2, quantidade + 1),
+            unidade_medida=alimento["unidade"], validade=validade,
+            respostas="{}", foto_arquivo="exemplo-sem-foto.jpg", status=status,
+            criado_em=criado + timedelta(minutes=sorteio.randrange(10, 600))))
+
+    for indice in range(dados["excedentes"]):
+        ong = ongs[(indice * 7) % len(ongs)]
+        empresa = empresas[indice % len(empresas)]
+        alimento = catalogo[sorteio.randrange(len(catalogo))]
+        criado = agora_utc - timedelta(days=1 + indice % periodo,
+                                        hours=sorteio.randrange(24))
+        status = "RETIRADO" if indice % 10 < 7 else "RESERVADO" if indice % 10 < 9 else "DISPONIVEL"
+        reservado = status in ("RETIRADO", "RESERVADO")
+        excedente = Excedente(
+            estabelecimento_id=empresa.id, reservado_por_id=ong.id if reservado else None,
+            retirar_ate=prazo_atual, status=status, criado_em=criado,
+            reservado_em=criado + timedelta(minutes=sorteio.randrange(5, 360)) if reservado else None,
+            retirado_em=criado + timedelta(hours=8) if status == "RETIRADO" else None)
+        excedente.itens = [ItemExcedente(
+            nome=alimento["nome"], categoria=alimento["categoria"],
+            quantidade=sorteio.randrange(2, 30), unidade_medida=alimento["unidade"],
+            validade=validade)]
+        db.session.add(excedente)
+    db.session.commit()
+
+
+def _aplicacao_demonstracao():
+    global _DEMO_APP
+    if _DEMO_APP is None:
+        dados = _ler_json(RAIZ / "data" / "demonstracao.json")
+        app_demo = Flask("reconecta_dashboard_demonstracao")
+        app_demo.config.update(
+            SQLALCHEMY_DATABASE_URI="sqlite://",
+            SQLALCHEMY_TRACK_MODIFICATIONS=False,
+            SQLALCHEMY_ENGINE_OPTIONS={"poolclass": StaticPool,
+                                       "connect_args": {"check_same_thread": False}},
+        )
+        db.init_app(app_demo)
+        with app_demo.app_context():
+            db.create_all()
+            _semear_demonstracao(dados)
+        _DEMO_APP = app_demo
+    return _DEMO_APP
+
+
+def _consultar_demonstracao(calcular):
+    # O bloqueio serializa o acesso à conexão SQLite compartilhada em memória.
+    with _DEMO_LOCK:
+        app_demo = _aplicacao_demonstracao()
+        with app_demo.app_context():
+            resposta = calcular()
+        return resposta | {"modo": "demonstracao"}
+
+
+def _modo_demonstracao():
+    return request.args.get("modo") == "demonstracao"
+
+
 @ns.route("")
 class Dashboard(Resource):
+    @ns.param("modo", "demonstracao: indicadores simulados em SQLite isolado", _in="query")
     def get(self):
-        return montar_dashboard(), 200
+        return (_consultar_demonstracao(montar_dashboard)
+                if _modo_demonstracao() else montar_dashboard()), 200
 
 
 @ns.route("/impacto")
 class Impacto(Resource):
     @ns.response(200, "Kg medidos/estimados, refeições projetadas por região, match, IA e calor")
+    @ns.param("modo", "demonstracao: impacto simulado em SQLite isolado", _in="query")
     def get(self):
-        return montar_impacto(), 200
+        return (_consultar_demonstracao(montar_impacto)
+                if _modo_demonstracao() else montar_impacto()), 200
 
 
 @ns.route("/seguranca")
 class Seguranca(Resource):
     @ns.response(200, "Relatórios SAST/STRIDE e controles verificáveis, sem dados pessoais")
+    @ns.param("modo", "demonstracao: mesmo SAST e controles reais; origem sinalizada", _in="query")
     def get(self):
-        return montar_seguranca(), 200
+        resposta = montar_seguranca()
+        if _modo_demonstracao():
+            resposta["modo"] = "demonstracao"
+        return resposta, 200

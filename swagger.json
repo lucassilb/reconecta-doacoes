@@ -295,6 +295,14 @@
           }
         },
         "operationId": "get_dashboard",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: indicadores simulados em SQLite isolado",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
         "tags": [
           "dashboard"
         ]
@@ -308,6 +316,14 @@
           }
         },
         "operationId": "get_impacto",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: impacto simulado em SQLite isolado",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
         "tags": [
           "dashboard"
         ]
@@ -321,6 +337,14 @@
           }
         },
         "operationId": "get_seguranca",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: mesmo SAST e controles reais; origem sinalizada",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
         "tags": [
           "dashboard"
         ]

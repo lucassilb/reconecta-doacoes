@@ -65,5 +65,8 @@ def resumir(raiz=RAIZ):
 
 if __name__ == "__main__":
     destino = RAIZ / "relatorios" / "sast" / "resumo.json"
-    destino.write_text(json.dumps(resumir(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    conteudo = json.dumps(resumir(), ensure_ascii=False, indent=2) + "\n"
+    destino.write_text(conteudo, encoding="utf-8")
+    # relatorios/ é excluído da imagem Docker; esta cópia acompanha o código.
+    (RAIZ / "data" / "resumo_sast.json").write_text(conteudo, encoding="utf-8")
     print(destino)

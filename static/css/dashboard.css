@@ -7,6 +7,12 @@
 .dash-topo h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; margin: 6px 0 12px; }
 .dash-topo .lead { max-width: 44em; }
 .dash-topo__acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.dash-modos { display: inline-flex; max-width: 100%; padding: 3px; gap: 2px; border: 1px solid var(--linha-forte); border-radius: 12px; background: var(--superficie); }
+.dash-modos button { border: 0; border-radius: 9px; background: transparent; color: var(--tinta); padding: 8px 12px; font: 700 .83rem var(--fonte-texto); cursor: pointer; white-space: nowrap; }
+.dash-modos button[aria-pressed="true"] { background: var(--verde); color: white; }
+.dash-modos button:focus-visible { outline: 2px solid var(--verde-texto); outline-offset: 2px; }
+.dash-demo-faixa { position: sticky; top: 0; z-index: 50; padding: 10px 16px; text-align: center; background: #7c440b; color: white; font-weight: 700; font-size: .9rem; box-shadow: 0 3px 12px rgba(42,26,6,.2); }
+.dash-demo-faixa[hidden] { display: none; }
 .dash-gerado { font-size: .9rem; color: var(--tinta-suave); }
 @media (min-width: 900px) { .dash-topo { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } .dash-topo__acoes { justify-content: flex-end; } }
 
