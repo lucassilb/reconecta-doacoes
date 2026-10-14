@@ -49,7 +49,7 @@ A distância é a do círculo máximo (haversine, raio médio da Terra de 6.371 
 | até 400 km | +2 |
 | mais longe | 0 |
 
-Quando há distância, ela **substitui** o antigo "+10 mesma UF" e vira um motivo legível: "a 3,8 km", "a cerca de 84 km" quando algum dos lados foi localizado só pela cidade, ou "na mesma cidade". Sem distância (endereço sem município reconhecível, ou pessoa física que não informou o CEP), vale a regra de UF de antes. A avaliação offline da recomendação (`scripts/avaliar_conexao.py`, 80 casos sem coordenadas) continua igual: top-1 0,8814, top-3 0,8814 e 100% de "sem sugestão" correta.
+Quando há distância, ela **substitui** o antigo "+10 mesma UF" e vira um motivo legível: "a 3,8 km", "a cerca de 84 km" quando algum dos lados foi localizado só pela cidade, ou "na mesma cidade". Sem distância (endereço sem município reconhecível, ou pessoa física que não informou o CEP), vale a regra de UF de antes. A avaliação offline da recomendação (`scripts/avaliar_conexao.py`, 86 casos sem coordenadas) mede top-1 0,8906, top-3 0,8906 e 100% de "sem sugestão" correta.
 
 Origem da distância em `POST /reconecta/ia/sugerir-destino`:
 
