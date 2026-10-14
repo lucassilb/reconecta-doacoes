@@ -1,6 +1,7 @@
 """Provas do treino simulado, inferência leve e prioridade pública."""
 
 import json
+import math
 import os
 from datetime import date, timedelta
 
@@ -38,6 +39,16 @@ def test_dataset_simulado_tem_regra_reproduzivel_e_ambas_classes(tmp_path):
     assert copia.read_bytes() == treinar_risco.DATASET.read_bytes()
 
 
+def _quase_igual(a, b):
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(_quase_igual(a[k], b[k]) for k in a)
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_quase_igual(x, y) for x, y in zip(a, b))
+    if isinstance(a, float) or isinstance(b, float):
+        return math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-9)
+    return a == b
+
+
 def test_exportacao_json_reproduz_probabilidade_do_sklearn(tmp_path):
     caminho = tmp_path / "risco.json"
     metricas = treinar_risco.executar(modelo_path=caminho, hoje=date(2026, 10, 14))
@@ -46,7 +57,8 @@ def test_exportacao_json_reproduz_probabilidade_do_sklearn(tmp_path):
     assert metricas["modelo_escolhido"] in {"logistica", "floresta"}
     gravado = carregar()
     gravado["treinado_em"] = "2026-10-14"
-    assert json.loads(caminho.read_text(encoding="utf-8")) == gravado
+    # o mesmo treino pode variar na última casa decimal entre sistemas (Windows x Linux do CI)
+    assert _quase_igual(json.loads(caminho.read_text(encoding="utf-8")), gravado)
 
     tabela, x, y = treinar_risco.ler_dataset()
     modelo_sklearn = treinar_risco._modelos()[metricas["modelo_escolhido"]].fit(x, y)
