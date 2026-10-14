@@ -206,9 +206,8 @@
     if (!x || usuario === undefined) return;
     var titulo = $("acao-titulo");
     var eu = usuario && usuario.tipo === "empresa" ? usuario : null;
-    // o detalhe não traz o id de quem publicou: reconhece pelo nome da própria organização
-    // (e por reservado_por, que o servidor só manda para o publicador)
-    var souPublicador = !!(eu && (x.reservado_por || (x.empresa && x.empresa.nome === eu.nome)));
+    // o servidor marca "meu": true no detalhe para quem publicou
+    var souPublicador = !!(eu && x.meu === true);
     var reserveiEu = !!x.retirada;
     var blocos = [];
 

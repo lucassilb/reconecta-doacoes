@@ -774,7 +774,7 @@
       ? (perfis.length ? perfis.map(function (p) { return PERFIS_NOME[p]; }).join(" e ") : "Organização")
       : "Doador";
     $("sucesso-texto").textContent = !empresa
-      ? "Obrigado por fazer parte. Avisaremos você por e-mail sobre as próximas ações de doação."
+      ? "Obrigado por fazer parte. Você já pode doar para os pedidos abertos; os avisos sobre as suas doações aparecem no sino do site."
       : temOng && temEmp
         ? "Sua organização já faz parte da rede: publique pedidos, reserve excedentes e doe o que sobrar."
         : temOng

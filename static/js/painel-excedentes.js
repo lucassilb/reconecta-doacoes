@@ -228,6 +228,30 @@
       recargaPendente = setTimeout(function () { carregarMeus(); carregarReservas(); }, 200);
     }
   });
+  /* Vindo do assistente da Home ("Publicar como excedente"): os itens já interpretados
+     entram no formulário; validade, prazo e declarações continuam por conta da empresa. */
+  function aplicarRascunho() {
+    var bruto = null;
+    try { bruto = sessionStorage.getItem("reconecta:rascunho-excedente"); sessionStorage.removeItem("reconecta:rascunho-excedente"); } catch (e) { return; }
+    var rascunho = null;
+    try { rascunho = bruto ? JSON.parse(bruto) : null; } catch (e) { return; }
+    var itens = rascunho && Array.isArray(rascunho.itens) ? rascunho.itens.slice(0, 10) : [];
+    if (!itens.length) return;
+    $("ex-itens").replaceChildren();
+    linhas = [];
+    itens.forEach(function (item) {
+      adicionarItem();
+      var linha = linhas[linhas.length - 1];
+      linha.nome.value = String(item.nome || "").slice(0, 100);
+      if (opcoes.categorias.indexOf(item.categoria) !== -1) linha.categoria.value = item.categoria;
+      if (Number(item.quantidade) > 0) linha.quantidade.value = String(Number(item.quantidade));
+      if (opcoes.unidades.indexOf(item.unidade_medida) !== -1) linha.unidade_medida.value = item.unidade_medida;
+    });
+    aviso("Trouxemos do assistente " + (itens.length === 1 ? "o item" : "os " + itens.length + " itens") +
+      ". Confira, informe a validade e o prazo de retirada e publique.", false);
+    linhas[0].validade.focus();
+  }
+
   var iniciou = false;
   function iniciar(usuario) {
       if (iniciou) return;
@@ -244,8 +268,14 @@
         pedir("/reconecta/publico/opcoes").then(function (r) {
           if (r.ok) opcoes = r.corpo;
           adicionarItem();
-        }).catch(function () { adicionarItem(); });
+        }).catch(function () { adicionarItem(); }).then(aplicarRascunho);
         carregarMeus();
+        // o bloco estava oculto na carga: o navegador não rola sozinho até a âncora
+        if (location.hash === "#publicar-excedente") {
+          $("publicar-excedente").scrollIntoView({ block: "start" });
+          $("publicar-excedente-t").setAttribute("tabindex", "-1");
+          $("publicar-excedente-t").focus({ preventScroll: true });
+        }
       }
       if (ong) { $("minhas-reservas").hidden = false; carregarReservas(); }
   }
