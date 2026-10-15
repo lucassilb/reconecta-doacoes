@@ -2,23 +2,29 @@
 
 Publica quem tem alimento sobrando: empresa de alimentos (CNPJ) ou pessoa física (CPF),
 que informa o endereço de retirada. Só ONGs reservam; quem publicou confirma a retirada.
+Cada oferta leva uma foto do alimento mostrando a validade, guardada no banco.
 """
 
+import json
 import re
+import struct
 import threading
 import time
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
+from io import BytesIO
 
-from flask import current_app, request
+from flask import current_app, request, send_file
 from flask_restx import Namespace, Resource, fields
+from werkzeug.datastructures import FileStorage
 from sqlalchemy import or_, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import selectinload
 
 import geo
 from Auth import registrar_auditoria, usuario_atual
+from Contribuicoes import MAX_FOTO, MIMES, _extensao_foto
 from conexao import casar
 from eventos import emitir as _emitir
 from Publico import CATEGORIAS, UNIDADES, _inteiro_positivo, _municipio_uf
@@ -27,22 +33,6 @@ from models import Estabelecimento, Excedente, ItemExcedente, _utc_naive, db
 from risco_descarte import prever as prever_risco, PERECIVEIS
 
 ns = Namespace("excedentes", description="Excedentes para reserva e retirada por ONGs")
-item_entrada = ns.model("ItemExcedenteEntrada", {
-    "nome": fields.String(required=True), "categoria": fields.String(required=True),
-    "quantidade": fields.Float(required=True), "unidade_medida": fields.String(required=True),
-    "validade": fields.String(required=True, description="Data AAAA-MM-DD"),
-})
-entrada = ns.model("ExcedenteEntrada", {
-    "retirar_ate": fields.String(required=True, description="Data e hora ISO local de Brasília, sem offset"),
-    "itens": fields.List(fields.Nested(item_entrada), required=True),
-    "observacao": fields.String(description="Até 200 caracteres"),
-    "dentro_validade": fields.Boolean(required=True),
-    "embalagem_ok": fields.Boolean(required=True),
-    "armazenado_ok": fields.Boolean(required=True),
-    "nao_caseiro": fields.Boolean(description="Obrigatório para pessoa física: não é comida feita em casa"),
-    "retirada": fields.Raw(description="Obrigatório para pessoa física: {logradouro, numero, bairro, "
-                                       "municipio, uf, cep}; só a ONG que reservar vê o endereço"),
-})
 saida = ns.model("ExcedenteSaida", {
     "id": fields.Integer, "empresa": fields.Raw, "retirar_ate": fields.String,
     "itens": fields.List(fields.Raw), "status": fields.String,
@@ -53,6 +43,16 @@ saida = ns.model("ExcedenteSaida", {
 erro_model = ns.model("ExcedenteErro", {
     "codigo": fields.String, "mensagem": fields.String, "campos": fields.Raw,
 })
+# multipart/form-data: a oferta vai em `dados` (JSON) e a foto da validade em `foto`
+publicacao = ns.parser()
+publicacao.add_argument(
+    "dados", location="form", required=True,
+    help="JSON: retirar_ate (data e hora ISO de Brasília, sem offset); itens [{nome, categoria, "
+         "quantidade, unidade_medida, validade AAAA-MM-DD}]; observacao (até 200 caracteres); "
+         "dentro_validade, embalagem_ok e armazenado_ok = true. Pessoa física: nao_caseiro = true "
+         "e retirada {logradouro, numero, bairro, municipio, uf, cep}, que só a ONG que reservar vê")
+publicacao.add_argument("foto", location="files", type=FileStorage, required=True,
+                        help="Foto do alimento mostrando a validade: JPEG, PNG ou WebP de até 5 MB")
 
 _cotas = {}
 _cotas_lock = threading.Lock()
@@ -179,6 +179,126 @@ def _validar_retirada(bruto):
     local = ", ".join(p for p in (bairro, municipio) if p) + f"/{uf}"
     endereco = " - ".join(p for p in (f"{logradouro}, {numero}", local, cep) if p)
     return endereco[:200], {}
+
+
+# Metadados que a foto de celular traz (EXIF com GPS, XMP, IPTC, comentários) saem antes
+# de gravar: a foto vai para outras organizações e não pode levar onde a pessoa mora.
+_JPEG_DESCARTAR = {0xE1, *range(0xE3, 0xEE), 0xEF, 0xFE}  # APP1, APP3-13, APP15, COM
+_PNG_DESCARTAR = {b"eXIf", b"tEXt", b"iTXt", b"zTXt", b"tIME"}
+
+
+def _jpeg_sem_metadados(dados):
+    saida, i = bytearray(dados[:2]), 2
+    while i + 2 <= len(dados):
+        if dados[i] != 0xFF:
+            return None
+        marcador = dados[i + 1]
+        if marcador == 0xFF:  # bytes de preenchimento
+            i += 1
+            continue
+        if marcador == 0xD9 or 0xD0 <= marcador <= 0xD7 or marcador == 0x01:
+            saida += dados[i:i + 2]
+            if marcador == 0xD9:
+                return bytes(saida)
+            i += 2
+            continue
+        if i + 4 > len(dados):
+            return None
+        fim = i + 2 + struct.unpack(">H", dados[i + 2:i + 4])[0]
+        if fim > len(dados) or fim < i + 4:
+            return None
+        if marcador == 0xDA:  # início da imagem comprimida: o resto vai inteiro
+            return bytes(saida + dados[i:])
+        if marcador not in _JPEG_DESCARTAR:
+            saida += dados[i:fim]
+        i = fim
+    return None
+
+
+def _png_sem_metadados(dados):
+    saida, i = bytearray(dados[:8]), 8
+    while i + 12 <= len(dados):
+        tamanho = struct.unpack(">I", dados[i:i + 4])[0]
+        tipo, fim = dados[i + 4:i + 8], i + 12 + tamanho
+        if fim > len(dados):
+            return None
+        if tipo not in _PNG_DESCARTAR:
+            saida += dados[i:fim]
+        i = fim
+        if tipo == b"IEND":
+            return bytes(saida)
+    return None
+
+
+def _webp_sem_metadados(dados):
+    pedacos, i = [], 12
+    while i + 8 <= len(dados):
+        tipo, tamanho = dados[i:i + 4], struct.unpack("<I", dados[i + 4:i + 8])[0]
+        fim = i + 8 + tamanho + (tamanho & 1)
+        if i + 8 + tamanho > len(dados):
+            return None
+        if tipo == b"VP8X" and tamanho >= 10:
+            # bits de "tem EXIF" (0x08) e "tem XMP" (0x04) apagados junto com os pedaços
+            pedaco = bytearray(dados[i:fim])
+            pedaco[8] &= ~0x0C & 0xFF
+            pedacos.append(bytes(pedaco))
+        elif tipo not in (b"EXIF", b"XMP "):
+            pedacos.append(dados[i:fim])
+        i = fim
+    if not pedacos:
+        return None
+    corpo = b"WEBP" + b"".join(pedacos)
+    return b"RIFF" + struct.pack("<I", len(corpo)) + corpo
+
+
+def foto_sem_metadados(dados):
+    """(tipo, bytes limpos) de uma foto JPEG/PNG/WebP real, ou None se não for uma."""
+    tipo = _extensao_foto(dados)
+    limpar = {"jpg": _jpeg_sem_metadados, "png": _png_sem_metadados,
+              "webp": _webp_sem_metadados}.get(tipo)
+    limpos = limpar(dados) if limpar else None
+    return (tipo, limpos) if limpos else None
+
+
+def _ler_foto(arquivo):
+    """(tipo, bytes, mensagem de erro)."""
+    if arquivo is None:
+        return None, None, "Envie uma foto do alimento mostrando a validade (JPEG, PNG ou WebP)."
+    dados = arquivo.read(MAX_FOTO + 1)
+    if len(dados) > MAX_FOTO:
+        return None, None, "A foto deve ter até 5 MB."
+    limpa = foto_sem_metadados(dados)
+    if not limpa:
+        return None, None, "Envie uma foto JPEG, PNG ou WebP válida."
+    return limpa[0], limpa[1], None
+
+
+def _corpo_e_foto():
+    """multipart/form-data: campo `dados` com o JSON de sempre e o arquivo `foto`.
+    JSON puro ainda é lido para apontar todos os campos, mas sem foto não publica."""
+    if request.mimetype == "multipart/form-data":
+        try:
+            corpo = json.loads(request.form.get("dados") or "{}")
+        except ValueError:
+            corpo = None
+        return corpo, request.files.get("foto")
+    return request.get_json(silent=True), None
+
+
+def pode_ver_foto(excedente, atual):
+    """Quem publicou e ONGs logadas: enquanto a oferta está aberta, ou a ONG que reservou."""
+    if not excedente.foto_tipo or not atual:
+        return False
+    if _eh_dono(excedente, atual):
+        return True
+    tipo, usuario = atual
+    if tipo != "empresa" or not usuario.sem_fins_lucrativos:
+        return False
+    return usuario.id == excedente.reservado_por_id or status_efetivo(excedente) == "DISPONIVEL"
+
+
+def foto_url(excedente):
+    return f"/reconecta/excedentes/{excedente.id}/foto"
 
 
 def _cota_esgotada(acao, usuario_id, tipo="empresa"):
@@ -353,6 +473,8 @@ def serializar_excedente(excedente, *, detalhe=False, atual=None, prioridade=Non
                                       "nome": excedente.reservado_por.nome}
         if dados["meu"] and excedente.doador_id is not None:
             dados["retirada_informada"] = excedente.retirada_endereco
+        if pode_ver_foto(excedente, atual):
+            dados["foto_url"] = foto_url(excedente)
     return dados
 
 
@@ -403,10 +525,13 @@ class Excedentes(Resource):
                 for item, prioridade in anuncios], 200, {
             "X-Total-Count": str(total), "X-Pagina": str(pagina), "X-Por-Pagina": str(tamanho)}
 
-    @ns.expect(entrada)
+    @ns.expect(publicacao)
     @ns.response(201, "Excedente publicado", saida)
+    @ns.response(400, "Dados inválidos; sem foto válida, campos.foto", erro_model)
+    @ns.response(413, "Foto acima de 5 MB", erro_model)
     @ns.response(429, "Cota de 20 publicações por hora")
     def post(self):
+        """Publica uma oferta: multipart com `dados` (JSON da oferta) e `foto` da validade."""
         atual, erro = _sessao()
         if erro:
             return erro
@@ -415,9 +540,12 @@ class Excedentes(Resource):
             return _erro("PERFIL_SEM_ATIVIDADE_ALIMENTAR", "Este CNPJ não pode publicar excedentes.", 403)
         if _cota_esgotada("publicar", usuario.id, tipo):
             return _erro("MUITAS_TENTATIVAS", "Aguarde antes de publicar outro excedente.", 429)
-        corpo = request.get_json(silent=True)
+        corpo, arquivo = _corpo_e_foto()
         corpo = corpo if isinstance(corpo, dict) else {}
         prazo, itens, observacao, campos = _validar(corpo)
+        foto_tipo, foto_dados, erro_foto = _ler_foto(arquivo)
+        if erro_foto:
+            campos["foto"] = erro_foto
         retirada = None
         if tipo == "doador":
             # pessoa física: comida caseira não entra e o endereço de retirada é obrigatório
@@ -435,6 +563,7 @@ class Excedentes(Resource):
             endereco, publicador_id, nome = usuario.endereco, usuario.id, usuario.nome
         excedente.retirar_ate = prazo
         excedente.observacao = observacao.strip() if observacao else None
+        excedente.foto_tipo, excedente.foto_dados = foto_tipo, foto_dados
         try:
             db.session.add(excedente)
             db.session.flush()
@@ -512,6 +641,23 @@ class ExcedenteDetalhe(Resource):
         db.session.commit()
         registrar_auditoria("excedente_cancelado", "ok", tipo=atual[0], ator_id=atual[1].id)
         return "", 204
+
+
+@ns.route("/<int:excedente_id>/foto")
+class FotoExcedente(Resource):
+    @ns.response(200, "Foto da validade (só quem publicou e ONGs logadas)")
+    @ns.response(404, "Foto não encontrada ou sem permissão", erro_model)
+    def get(self, excedente_id):
+        atual = usuario_atual()
+        excedente = db.session.get(Excedente, excedente_id)
+        # 404 também sem permissão: não revela se a oferta tem foto
+        if (not excedente or not pode_ver_foto(excedente, atual) or
+                excedente.foto_tipo not in MIMES or excedente.foto_dados is None):
+            return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
+        resposta = send_file(BytesIO(excedente.foto_dados), mimetype=MIMES[excedente.foto_tipo])
+        resposta.headers["X-Content-Type-Options"] = "nosniff"
+        resposta.headers["Cache-Control"] = "private, no-store"
+        return resposta
 
 
 @ns.route("/<int:excedente_id>/reservar")

@@ -23,6 +23,7 @@ os.environ["DATABASE_URL"] = "sqlite://"
 import pii  # noqa: E402
 import registro  # noqa: E402
 from app import app  # noqa: E402
+from foto_oferta import JPEG, com_foto  # noqa: E402
 from fuso import agora_brasilia_sem_fuso  # noqa: E402
 from models import Doador, db  # noqa: E402
 
@@ -79,13 +80,16 @@ def test_fluxo_completo_nao_deixa_dado_pessoal_nos_logs(logs, monkeypatch):
     assert c.get("/reconecta/auth/me").status_code == 200
     assert c.put("/reconecta/auth/me", json={"telefone": TELEFONE_NOVO}).status_code == 200
     prazo = agora_brasilia_sem_fuso() + timedelta(hours=6)
-    publicado = c.post("/reconecta/excedentes", json={
+    # foto da validade com o e-mail no nome do arquivo; uma falsa antes, recusada
+    falsa = c.post("/reconecta/excedentes", data={"dados": "{}", "foto": (io.BytesIO(b"<html>" + EMAIL.encode()), f"{EMAIL}.jpg")})
+    assert falsa.status_code == 400 and "foto" in falsa.json["campos"]
+    publicado = c.post("/reconecta/excedentes", data=com_foto({
         "retirar_ate": prazo.isoformat(timespec="seconds"), "observacao": OBSERVACAO,
         "itens": [{"nome": "Arroz", "categoria": "Grãos e cereais", "quantidade": 5, "unidade_medida": "kg",
                    "validade": (prazo.date() + timedelta(days=60)).isoformat()}],
         "dentro_validade": True, "embalagem_ok": True, "armazenado_ok": True, "nao_caseiro": True,
         "retirada": {"logradouro": RUA, "numero": "1000", "bairro": "Centro", "municipio": "Campinas",
-                     "uf": "SP", "cep": CEP}})
+                     "uf": "SP", "cep": CEP}}, JPEG, f"{EMAIL}.jpg"))
     assert publicado.status_code == 201, publicado.json
     assert c.post("/reconecta/ia/sugerir-destino", json={
         "texto": f"5 kg de arroz, me liga 11 98765-4321 ou {EMAIL}", "cep": CEP}).status_code == 200

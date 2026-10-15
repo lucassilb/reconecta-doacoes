@@ -72,3 +72,11 @@
 .exc-acao .btn { min-height: 46px; border: 1.5px solid var(--btn-borda, transparent); }
 .btn--perigo { --btn-cor: var(--erro); --btn-borda: var(--erro-linha); --btn-bg: var(--superficie); }
 .btn--perigo:hover:not(:disabled) { --btn-bg: var(--erro-suave); --btn-cor: var(--erro); }
+
+/* foto da validade (rodada 19): só quem publicou e ONGs logadas recebem foto_url */
+.exc-validade { margin: 12px 0 0; display: grid; gap: 6px; }
+.exc-validade[hidden] { display: none; }
+.exc-validade a { display: block; justify-self: start; max-width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--linha); }
+.exc-validade a:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.exc-validade img { display: block; width: auto; max-width: 100%; height: auto; max-height: 260px; background: var(--superficie-2); }
+.exc-validade figcaption { font-size: .86rem; color: var(--tinta-suave); }

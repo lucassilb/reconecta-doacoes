@@ -26,6 +26,20 @@ def _migrar_foto_contribuicao(engine):
             conexao.execute(text(f"ALTER TABLE contribuicoes ADD COLUMN foto_dados {tipo}"))
 
 
+def _migrar_foto_excedente(engine):
+    """Foto da validade na oferta (rodada 19): colunas novas e nulas, sem tocar nos dados."""
+    inspector = inspect(engine)
+    if not inspector.has_table("excedentes"):
+        return
+    colunas = {coluna["name"] for coluna in inspector.get_columns("excedentes")}
+    binario = "BYTEA" if engine.dialect.name == "postgresql" else "BLOB"
+    with engine.begin() as conexao:
+        if "foto_tipo" not in colunas:
+            conexao.execute(text("ALTER TABLE excedentes ADD COLUMN foto_tipo VARCHAR(4)"))
+        if "foto_dados" not in colunas:
+            conexao.execute(text(f"ALTER TABLE excedentes ADD COLUMN foto_dados {binario}"))
+
+
 def _restricao_postgresql(conexao, tabela, nome):
     """None se ausente; caso contrário informa se já foi validada."""
     linha = conexao.execute(text("""
@@ -343,6 +357,7 @@ def aplicar_migracoes(engine=None):
     _migrar_excedentes_pessoa_fisica(engine)
     _migrar_pedidos(engine)
     _migrar_foto_contribuicao(engine)
+    _migrar_foto_excedente(engine)
     _migrar_indices(engine)
     if engine.dialect.name == "postgresql":
         _migrar_integridade_postgresql(engine)

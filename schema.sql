@@ -111,6 +111,8 @@ CREATE TABLE IF NOT EXISTS excedentes (
     reservado_em TIMESTAMP,
     retirado_em TIMESTAMP,
     observacao VARCHAR(200),
+    foto_tipo VARCHAR(4),
+    foto_dados BYTEA,
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT ck_excedentes_status CHECK (status IN ('DISPONIVEL', 'RESERVADO', 'RETIRADO', 'CANCELADO', 'EXPIRADO')),
     CONSTRAINT ck_excedentes_observacao CHECK (length(observacao) <= 200),
@@ -125,6 +127,9 @@ CREATE TABLE IF NOT EXISTS excedentes (
 ALTER TABLE excedentes ALTER COLUMN estabelecimento_id DROP NOT NULL;
 ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS doador_id INT REFERENCES doadores(id) ON DELETE RESTRICT;
 ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS retirada_endereco VARCHAR(200);
+-- foto do alimento mostrando a validade (rodada 19), nula nas ofertas anteriores
+ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS foto_tipo VARCHAR(4);
+ALTER TABLE excedentes ADD COLUMN IF NOT EXISTS foto_dados BYTEA;
 
 CREATE TABLE IF NOT EXISTS itens_excedente (
     id SERIAL PRIMARY KEY,

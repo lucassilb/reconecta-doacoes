@@ -8,6 +8,7 @@ from sqlalchemy import create_engine, inspect, text
 os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
+from foto_oferta import com_foto  # noqa: E402
 from cnpj_service import _normalizar_brasilapi, _normalizar_cnpjws, _normalizar_opencnpj  # noqa: E402
 from fuso import agora_brasilia_sem_fuso  # noqa: E402
 from Excedentes import _ongs_compativeis  # noqa: E402
@@ -150,7 +151,7 @@ def test_excedente_reserva_unica_endereco_privado_e_retirada():
         db.session.commit()
     cliente = app.test_client()
     sessao(cliente, ids[0])
-    criado = cliente.post("/reconecta/excedentes", json=anuncio())
+    criado = cliente.post("/reconecta/excedentes", data=com_foto(anuncio()))
     assert criado.status_code == 201, criado.json
     id_ = criado.json["id"]
     assert cliente.post(f"/reconecta/excedentes/{id_}/reservar").status_code == 403
@@ -193,12 +194,12 @@ def test_excedente_validacoes_e_expiracao_sem_job():
         db.session.commit()
     cliente = app.test_client()
     sessao(cliente, ids[1])
-    assert cliente.post("/reconecta/excedentes", json=anuncio()).status_code == 403
+    assert cliente.post("/reconecta/excedentes", data=com_foto(anuncio())).status_code == 403
     sessao(cliente, ids[0])
     invalido = anuncio()
     invalido["embalagem_ok"] = False
     assert cliente.post("/reconecta/excedentes", json=invalido).status_code == 400
-    criado = cliente.post("/reconecta/excedentes", json=anuncio())
+    criado = cliente.post("/reconecta/excedentes", data=com_foto(anuncio()))
     assert criado.status_code == 201
     id_ = criado.json["id"]
     with app.app_context():
@@ -235,7 +236,7 @@ def test_destinatarios_do_excedente_exigem_pedido_categoria_e_uf():
         mercado_id, ong_id, fora_id = mercado.id, ong.id, fora.id
     cliente = app.test_client()
     sessao(cliente, mercado_id)
-    assert cliente.post("/reconecta/excedentes", json=anuncio()).status_code == 201
+    assert cliente.post("/reconecta/excedentes", data=com_foto(anuncio())).status_code == 201
     with app.app_context():
         privados = Evento.query.filter_by(tipo="excedente.publicado", publico=False).all()
         assert [(evento.dest_tipo, evento.dest_id) for evento in privados] == [("empresa", ong_id)]

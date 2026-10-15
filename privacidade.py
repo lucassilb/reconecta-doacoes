@@ -55,6 +55,15 @@ def _excedente(excedente):
                       for item in excedente.itens]}
 
 
+def _excedente_publicado(excedente):
+    # a foto da validade é do titular: a exportação aponta o tipo e onde baixá-la
+    dados = _excedente(excedente)
+    dados["foto_validade"] = ({"tipo": excedente.foto_tipo,
+                               "url": f"/reconecta/excedentes/{excedente.id}/foto"}
+                              if excedente.foto_tipo else None)
+    return dados
+
+
 def exportar_dados(tipo, usuario):
     """Cópia dos dados pessoais e registros da conta, sem dados de terceiros."""
     dados = {"gerado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -67,14 +76,14 @@ def exportar_dados(tipo, usuario):
         dados["doacoes_feitas"] = [_contribuicao(c) for c in usuario.contribuicoes]
         dados["pedidos_publicados"] = [_pedido(d) for d in usuario.doacoes]
         dados["excedentes_publicados"] = [
-            {**_excedente(e), "retirada_endereco": e.retirada_endereco} for e in
+            {**_excedente_publicado(e), "retirada_endereco": e.retirada_endereco} for e in
             Excedente.query.filter_by(doador_id=usuario.id).all()]
     else:
         dados["titular"].update(cnpj=usuario.cnpj, endereco=usuario.endereco)
         dados["pedidos_publicados"] = [_pedido(d) for d in usuario.doacoes]
         dados["doacoes_feitas"] = [_contribuicao(c) for c in usuario.contribuicoes]
         dados["excedentes_publicados"] = [
-            _excedente(e) for e in
+            _excedente_publicado(e) for e in
             Excedente.query.filter_by(estabelecimento_id=usuario.id).all()]
         dados["excedentes_reservados"] = [
             _excedente(e) for e in
@@ -110,7 +119,8 @@ def anonimizar_conta(tipo, usuario):
         (Excedente.query.filter_by(doador_id=usuario.id, status="DISPONIVEL")
          .update({"status": "CANCELADO"}, synchronize_session=False))
         (Excedente.query.filter_by(doador_id=usuario.id)
-         .update({"retirada_endereco": "Endereço removido"}, synchronize_session=False))
+         .update({"retirada_endereco": "Endereço removido", "foto_tipo": None,
+                  "foto_dados": None}, synchronize_session=False))
     else:
         usuario.cnpj = f"REMOVIDO-{usuario.id:08d}"
         usuario.endereco = "Endereço removido"
@@ -120,5 +130,7 @@ def anonimizar_conta(tipo, usuario):
         (Contribuicao.query.filter_by(estabelecimento_id=usuario.id)
          .update({"foto_dados": None, "foto_arquivo": "removida"},
                  synchronize_session=False))
+        (Excedente.query.filter_by(estabelecimento_id=usuario.id)
+         .update({"foto_tipo": None, "foto_dados": None}, synchronize_session=False))
     db.session.commit()
     return marcador

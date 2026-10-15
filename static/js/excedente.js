@@ -122,6 +122,15 @@
     $("exc-local").textContent = endereco || ((emp.municipio_uf ? local(emp.municipio_uf) + ". " : "") + "O endereço aparece para a ONG que reservar.");
     $("exc-obs-linha").hidden = !x.observacao;
     $("exc-obs").textContent = x.observacao || "";
+    var figura = $("exc-validade-foto"), img = $("exc-validade-img");
+    figura.hidden = !x.foto_url;
+    if (x.foto_url && img.getAttribute("src") !== x.foto_url) {
+      img.onerror = function () { figura.hidden = true; };  // ex.: outra ONG reservou e o acesso acabou
+      img.src = x.foto_url;
+      $("exc-validade-link").href = x.foto_url;
+    }
+    $("exc-validade-legenda").textContent = x.meu ? "Foto da validade que você enviou. Só você e as ONGs veem."
+      : "Foto da validade enviada por quem doou. Confira a data antes de reservar.";
     // com mais de um item, a lista completa; com um só, o título já diz tudo
     $("exc-itens").replaceChildren.apply($("exc-itens"), itens.length > 1 ? itens.map(function (i) {
       return el("li", null, [el("strong", { texto: i.nome }), el("span", { texto: qtd(i.quantidade, i.unidade_medida) + " · " + validade(i.validade) })]);

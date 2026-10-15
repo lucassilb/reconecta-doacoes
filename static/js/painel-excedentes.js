@@ -14,19 +14,22 @@
     });
     return no;
   }
+  function ler(r) {
+    return r.text().then(function (texto) {
+      var corpo = {};
+      try { corpo = texto ? JSON.parse(texto) : {}; } catch (e) { /* 204 */ }
+      return { ok: r.ok, status: r.status, corpo: corpo };
+    });
+  }
   function pedir(url, opcoes) {
     opcoes = opcoes || {};
+    // FormData segue como multipart (o navegador põe o boundary); o resto vai em JSON
+    var form = opcoes.body instanceof FormData;
     return fetch(url, {
       method: opcoes.method || "GET", credentials: "same-origin",
-      headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: opcoes.body == null ? undefined : JSON.stringify(opcoes.body)
-    }).then(function (r) {
-      return r.text().then(function (texto) {
-        var corpo = {};
-        try { corpo = texto ? JSON.parse(texto) : {}; } catch (e) { /* 204 */ }
-        return { ok: r.ok, status: r.status, corpo: corpo };
-      });
-    });
+      headers: form ? { "Accept": "application/json" } : { "Accept": "application/json", "Content-Type": "application/json" },
+      body: opcoes.body == null ? undefined : form ? opcoes.body : JSON.stringify(opcoes.body)
+    }).then(ler);
   }
   function hora(iso) {
     var d = window.ReConecta.dataBrasilia(iso);
@@ -44,6 +47,39 @@
     return el("div", { classe: "campo" }, [
       el("label", { for: id, classe: "campo__rotulo", texto: rotulo }), input
     ]);
+  }
+  /* Foto do alimento mostrando a validade: reduzida no navegador (doacao-foto.js) antes do envio. */
+  var fotoUrl = null, fotoPronta = null, fotoErro = "", fotoPreparo = null;
+  function erroFoto(msg) {
+    $("ex-foto-erro").textContent = msg || "";
+    if (msg) $("ex-foto").setAttribute("aria-invalid", "true"); else $("ex-foto").removeAttribute("aria-invalid");
+  }
+  function validarFoto() {
+    if (!($("ex-foto").files || [])[0]) return "Tire ou escolha uma foto do alimento mostrando a validade.";
+    return fotoErro || (fotoPronta ? "" : "Aguarde: a foto ainda está sendo preparada.");
+  }
+  function esperarFoto() { return fotoPreparo || Promise.resolve(); }
+  function atualizarFoto() {
+    var f = $("ex-foto").files && $("ex-foto").files[0], previa = $("ex-foto-previa");
+    if (fotoUrl) { URL.revokeObjectURL(fotoUrl); fotoUrl = null; }
+    erroFoto("");
+    fotoPronta = null; fotoErro = ""; fotoPreparo = null;
+    previa.classList.remove("foto__previa--img"); previa.style.backgroundImage = "";
+    if (!f) { $("ex-foto-nome").textContent = "Tirar ou escolher foto"; return; }
+    $("ex-foto-nome").textContent = "Preparando a foto…";
+    var preparo = fotoPreparo = window.ReConectaFoto.preparar(f).then(function (pronta) {
+      if (preparo !== fotoPreparo) return;
+      fotoPronta = pronta;
+      fotoUrl = URL.createObjectURL(pronta.arquivo);
+      previa.style.backgroundImage = "url(\"" + fotoUrl + "\")";
+      previa.classList.add("foto__previa--img");
+      $("ex-foto-nome").textContent = window.ReConectaFoto.descrever(pronta);
+    }, function (erro) {
+      if (preparo !== fotoPreparo) return;
+      fotoErro = erro.message;
+      $("ex-foto-nome").textContent = "Tirar ou escolher outra foto";
+      erroFoto(fotoErro);
+    });
   }
   var opcoes = { categorias: [], unidades: [] };
   var linhas = [];
@@ -71,6 +107,7 @@
     $("ex-resumo").replaceChildren(
       el("strong", { texto: "Você está doando" }),
       el("ul", null, linhas.map(function (i) { return el("li", { texto: i.nome.value.trim() + " · " + i.quantidade.value + " " + i.unidade_medida.value + " · validade " + dataCurta(i.validade.value) }); })),
+      fotoUrl ? el("img", { src: fotoUrl, alt: "Foto da validade que será enviada", classe: "ex-resumo__foto" }) : null,
       el("p", { texto: "Retirada: " + local + " · até " + dataCurta(prazo) + (prazo ? " às " + prazo.slice(11, 16) : "") })
     );
   }
@@ -86,6 +123,9 @@
         return false;
       }
       $("ex-itens-erro").textContent = "";
+      var semFoto = validarFoto();
+      erroFoto(semFoto);
+      if (semFoto) { $("ex-foto").focus(); return false; }
     }
     if (numero === 2) {
       var prazo = $("ex-retirar-ate").value;
@@ -178,6 +218,9 @@
         erros.push($("ex-retirar-ate"));
       }
     });
+    var semFoto = validarFoto();
+    erroFoto(semFoto);
+    if (semFoto) erros.push($("ex-foto"));
     var declaracoes = ["dentro-validade", "embalagem-ok", "armazenado-ok"].concat(pessoaFisica ? ["nao-caseiro"] : []);
     declaracoes.forEach(function (nome) {
       if (!$("ex-" + nome).checked) {
@@ -204,6 +247,9 @@
   }
   function publicar(evento) {
     evento.preventDefault();
+    esperarFoto().then(publicarPronto);
+  }
+  function publicarPronto() {
     $("ex-aviso").hidden = true;
     if (!validar()) return;
     var btn = $("ex-publicar");
@@ -228,10 +274,19 @@
         uf: $("ex-ret-uf").value, cep: $("ex-ret-cep").value.replace(/\D/g, "")
       };
     }
-    pedir("/reconecta/excedentes", { method: "POST", body: corpo }).then(function (r) {
+    // multipart: os dados em JSON no campo "dados" e a foto já reduzida
+    var envio = new FormData();
+    envio.append("dados", JSON.stringify(corpo));
+    envio.append("foto", fotoPronta.arquivo, "validade.jpg");
+    pedir("/reconecta/excedentes", { method: "POST", body: envio }).then(function (r) {
       if (r.status === 401) { location.replace("/entrar?proximo=/painel"); return; }
       if (!r.ok) {
         var campos = r.corpo.campos || {};
+        if (campos.foto || r.status === 413) {
+          erroFoto(campos.foto || "A foto é grande demais. Use uma de até 5 MB.");
+          mostrarEtapa(1);
+          $("ex-foto").focus();
+        }
         var deRetirada = Object.keys(campos).filter(function (k) { return k.indexOf("retirada.") === 0; });
         if (deRetirada.length) $("ex-retirada-erro").textContent = campos[deRetirada[0]];
         aviso(deRetirada.length ? campos[deRetirada[0]] : (r.corpo.mensagem || "Não foi possível publicar o excedente."), true);
@@ -244,6 +299,7 @@
         id ? el("a", { href: "/excedentes/" + id, texto: "Ver sua doação" }) : "As ONGs já podem reservá-la.");
       alvo.hidden = false;
       $("form-excedente").reset();
+      atualizarFoto();
       linhas = [];
       $("ex-itens").replaceChildren();
       adicionarItem();
@@ -292,6 +348,7 @@
         return el("li", { classe: "pedido-linha", texto: i.nome + " · " + i.quantidade + " " + i.unidade_medida + " · validade " + i.validade.split("-").reverse().join("/") });
       }))
     ]);
+    if (item.foto_url) cartao.appendChild(el("img", { src: item.foto_url, alt: "Foto da validade enviada", classe: "ex-cartao__foto", loading: "lazy" }));
     if (item.reservado_por) cartao.appendChild(el("p", { classe: "doacao__retirada", texto: "Reservado por " + item.reservado_por.nome }));
     if (!propria && item.retirada && item.retirada.endereco) cartao.appendChild(el("p", { classe: "doacao__retirada", texto: "Retirar em: " + item.retirada.endereco }));
     var acoes = el("div", { classe: "doacao__acoes", "aria-live": "polite" });
@@ -382,8 +439,11 @@
   $("ex-recarregar-reservas").addEventListener("click", carregarReservas);
   $("ex-add-item").addEventListener("click", adicionarItem);
   $("form-excedente").addEventListener("submit", publicar);
+  $("ex-foto").addEventListener("change", atualizarFoto);
   document.querySelectorAll("[data-ex-avancar]").forEach(function (botao) {
-    botao.addEventListener("click", function () { if (validarEtapa(etapa)) mostrarEtapa(Number(botao.dataset.exAvancar)); });
+    botao.addEventListener("click", function () {
+      esperarFoto().then(function () { if (validarEtapa(etapa)) mostrarEtapa(Number(botao.dataset.exAvancar)); });
+    });
   });
   document.querySelectorAll("[data-ex-voltar]").forEach(function (botao) {
     botao.addEventListener("click", function () { mostrarEtapa(Number(botao.dataset.exVoltar)); });

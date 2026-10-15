@@ -15,6 +15,7 @@ from sqlalchemy import create_engine, inspect, text
 os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
+from foto_oferta import com_foto  # noqa: E402
 from eventos import Evento  # noqa: E402
 from fuso import agora_brasilia_sem_fuso  # noqa: E402
 from models import Doador, Estabelecimento, Excedente, db  # noqa: E402
@@ -64,7 +65,7 @@ def test_pessoa_fisica_publica_ong_reserva_e_ela_confirma_a_retirada():
     ong_id, pessoa_id = contas()
     pessoa, ong = cliente("doador", pessoa_id), cliente("empresa", ong_id)
 
-    publicado = pessoa.post("/reconecta/excedentes", json=oferta())
+    publicado = pessoa.post("/reconecta/excedentes", data=com_foto(oferta()))
     assert publicado.status_code == 201, publicado.json  # antes: 403 APENAS_EMPRESAS
     id_ = publicado.json["id"]
     assert publicado.json["meu"] is True
@@ -119,7 +120,7 @@ def test_outra_pessoa_nao_gerencia_e_pessoa_fisica_nao_reserva():
         db.session.add(outra)
         db.session.commit()
         outra_id = outra.id
-    id_ = cliente("doador", pessoa_id).post("/reconecta/excedentes", json=oferta()).json["id"]
+    id_ = cliente("doador", pessoa_id).post("/reconecta/excedentes", data=com_foto(oferta())).json["id"]
     intrusa = cliente("doador", outra_id)
     assert intrusa.delete(f"/reconecta/excedentes/{id_}").status_code == 404
     assert intrusa.post(f"/reconecta/excedentes/{id_}/reservar").status_code == 403
