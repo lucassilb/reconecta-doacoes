@@ -8,6 +8,7 @@ os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
 import Dashboard  # noqa: E402
+import IA  # noqa: E402
 from fuso import BRASILIA, inicio_dia_utc  # noqa: E402
 from models import Contribuicao, Estabelecimento, db  # noqa: E402
 
@@ -126,3 +127,48 @@ def test_demonstracao_ressemeia_quando_dia_muda(monkeypatch):
     assert primeiro.json["indicadores"]["pedidos_abertos"] > 0
     assert segundo.json["indicadores"]["pedidos_abertos"] > 0
     assert any(d["doacoes"] for d in segundo.json["por_dia"])
+
+
+def test_resumo_demo_isolado_cache_diario_e_rotulo(monkeypatch):
+    relogio = {"agora": datetime(2026, 10, 14, 12, tzinfo=BRASILIA)}
+    monkeypatch.setattr(Dashboard, "agora_brasilia", lambda: relogio["agora"])
+    monkeypatch.setattr(IA, "agora_brasilia", lambda: relogio["agora"])
+    monkeypatch.setattr(IA, "_resumo_demo_dia", None)
+    monkeypatch.setattr(IA, "_resumo_demo_cache", None)
+    recebidos = []
+
+    def resumir(painel):
+        recebidos.append(painel)
+        return {"resumo": "Resumo de teste", "recomendacoes": [],
+                "fonte": "regras", "modelo": None, "gerado_em": painel["gerado_em"]}
+
+    monkeypatch.setattr(IA, "resumir_dashboard", resumir)
+    with app.app_context():
+        consultas_reais = []
+
+        def observar(_conn, _cursor, comando, _parametros, _contexto, _varios):
+            consultas_reais.append(comando)
+
+        event.listen(db.engine, "before_cursor_execute", observar)
+        try:
+            cliente = app.test_client()
+            primeiro = cliente.post("/reconecta/ia/resumo-dashboard?modo=demonstracao")
+            repetido = cliente.post("/reconecta/ia/resumo-dashboard?modo=demonstracao",
+                                    environ_overrides={"REMOTE_ADDR": "127.0.0.2"})
+            relogio["agora"] += timedelta(days=1)
+            dia_seguinte = cliente.post("/reconecta/ia/resumo-dashboard?modo=demonstracao")
+        finally:
+            event.remove(db.engine, "before_cursor_execute", observar)
+
+    assert consultas_reais == []
+    assert all(r.status_code == 200 for r in (primeiro, repetido, dia_seguinte))
+    assert primeiro.json == repetido.json
+    assert primeiro.json["modo"] == dia_seguinte.json["modo"] == "demonstracao"
+    assert len(recebidos) == 2
+    assert recebidos[0]["indicadores"]["doacoes_entregues"] == 224
+    assert recebidos[0]["modo"] == "demonstracao"
+    assert recebidos[0]["por_dia"][-1]["data"] == "2026-10-14"
+    assert recebidos[1]["por_dia"][-1]["data"] == "2026-10-15"
+    assert "Resumo de dados simulados" in (
+        app.test_client().get("/dashboard").get_data(as_text=True)
+        + (Dashboard.RAIZ / "static" / "js" / "dashboard.js").read_text(encoding="utf-8"))

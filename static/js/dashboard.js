@@ -307,14 +307,16 @@
   function pintarGates(sast) {
     var gates = sast.gates || [];
     var alvo = $("gates-lista");
+    $("gates-resumo").textContent = gates.length
+      ? gates.filter(function (g) { return g.resultado === "passou"; }).length + " de " + gates.length + " verificações de segurança do CI passaram"
+      : "Status das verificações de segurança do CI indisponível";
     if (!gates.length) {
       alvo.replaceChildren(el("li", { classe: "gate", texto: "Status dos gates indisponível neste resumo." }));
     } else {
       alvo.replaceChildren.apply(alvo, gates.map(function (g) {
         return el("li", { classe: "gate gate--" + (g.resultado || "sem_dados") }, [
           el("span", { classe: "gate__status", texto: ROTULO_GATE[g.resultado] || g.resultado }),
-          el("span", { classe: "gate__regra", texto: g.regra }),
-          el("span", { classe: "gate__detalhe", texto: g.detalhe || "" })
+          el("span", { classe: "gate__rotulo", texto: g.rotulo })
         ]);
       }));
     }
@@ -395,22 +397,23 @@
   /* ---------- resumo com IA ---------- */
 
   function gerarResumo() {
-    if (modo === "demonstracao") return;
     var btn = $("btn-resumo"), alvo = $("ia-resultado");
+    var origem = modo;
     btn.disabled = true; btn.classList.add("is-carregando");
     alvo.hidden = false;
     alvo.setAttribute("aria-busy", "true");
     alvo.replaceChildren(el("p", { classe: "dash-ia__carregando", texto: "Gerando o resumo… isso pode levar alguns segundos." }));
-    fetch("/reconecta/ia/resumo-dashboard", { method: "POST", credentials: "same-origin", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: "{}" })
+    fetch(rota("/reconecta/ia/resumo-dashboard", origem), { method: "POST", credentials: "same-origin", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: "{}" })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (c) { return { status: r.status, ok: r.ok, corpo: c }; }); })
       .then(function (r) {
-        if (modo === "demonstracao") return;
+        if (origem !== modo) return;
         var c = r.corpo || {};
         if (r.status === 429) { alvo.replaceChildren(el("p", { classe: "aviso", texto: c.mensagem || "Muitos pedidos de resumo seguidos. Aguarde um pouco e tente de novo." })); return; }
         if (!r.ok) throw new Error("HTTP " + r.status);
         var llm = c.fonte === "llm";
         // a resposta é tratada como texto (textContent), nunca como HTML
         alvo.replaceChildren(
+          ...(c.modo === "demonstracao" ? [el("p", { classe: "selo selo--regras", texto: "Resumo de dados simulados" })] : []),
           el("p", { classe: "selo " + (llm ? "selo--ia" : "selo--regras"), texto: llm
             ? (String(c.modelo || "").startsWith("groq:") ? "Gerado com Groq Free" : "Gerado pelo modelo local gratuito " + (c.modelo || ""))
             : "Resumo automático (IA indisponível no momento)" }),
@@ -423,10 +426,10 @@
         );
       })
       .catch(function () {
-        if (modo === "demonstracao") return;
+        if (origem !== modo) return;
         alvo.replaceChildren(el("p", { classe: "aviso aviso--erro", texto: "Não foi possível gerar o resumo agora. Tente novamente em instantes." }));
       })
-      .then(function () { btn.disabled = modo === "demonstracao"; btn.classList.remove("is-carregando"); alvo.setAttribute("aria-busy", "false"); });
+      .then(function () { if (origem === modo) { btn.disabled = false; btn.classList.remove("is-carregando"); alvo.setAttribute("aria-busy", "false"); } });
   }
 
   var resumoReal = document.querySelector(".dash-ia__sub").textContent;
@@ -440,10 +443,11 @@
       "Cálculos sobre doações entregues e excedentes retirados fictícios da demonstração." : descricaoImpactoReal;
     $("modo-real").setAttribute("aria-pressed", String(!demo));
     $("modo-demonstracao").setAttribute("aria-pressed", String(demo));
-    $("btn-resumo").disabled = demo;
-    $("btn-resumo").textContent = demo ? "Disponível em dados reais" : "Gerar resumo com IA";
+    $("btn-resumo").disabled = false;
+    $("btn-resumo").classList.remove("is-carregando");
+    $("btn-resumo").textContent = "Gerar resumo com IA";
     document.querySelector(".dash-ia__sub").textContent = demo ?
-      "A avaliação da IA acima é real. O resumo por linguagem natural usa dados operacionais e está disponível no modo Dados reais." : resumoReal;
+      "Resumo e recomendações sobre os dados simulados da demonstração. A avaliação da IA acima usa métricas reais." : resumoReal;
     $("ia-resultado").hidden = true;
     $("ia-resultado").replaceChildren();
     $("dash-gerado").textContent = "Carregando…";

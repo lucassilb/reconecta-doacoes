@@ -872,6 +872,14 @@
           }
         },
         "operationId": "post_resumo_dashboard",
+        "parameters": [
+          {
+            "in": "query",
+            "description": "demonstracao: resumo sobre SQLite isolado, com cache diário",
+            "name": "modo",
+            "type": "string"
+          }
+        ],
         "tags": [
           "ia"
         ]
@@ -2212,6 +2220,10 @@
         },
         "gerado_em": {
           "type": "string"
+        },
+        "modo": {
+          "type": "string",
+          "description": "demonstracao quando o resumo usa dados simulados"
         }
       },
       "type": "object"
