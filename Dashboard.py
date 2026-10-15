@@ -465,6 +465,9 @@ def montar_dashboard() -> dict:
 def _semear_demonstracao(dados, dia):
     """Cria fatos fictícios de forma reprodutível no app SQLite isolado."""
     sorteio = random.Random(dados["semente"])
+    # cidade de cada doação fictícia: sorteio próprio, ponderado pela população (IBGE, Censo 2022),
+    # para não mexer na sequência das quantidades
+    sorteio_cidade = random.Random(dados["semente"] + 1)
     agora = datetime.combine(dia, time.min, BRASILIA)
     agora_utc = agora.astimezone(timezone.utc).replace(tzinfo=None)
     prazo_atual = (agora + timedelta(days=7)).replace(tzinfo=None)
@@ -496,11 +499,15 @@ def _semear_demonstracao(dados, dia):
         db.session.add(doador)
         doadores.append(doador)
     db.session.flush()
+    populacao = [local.get("populacao", 1) for local in dados["organizacoes_ficticias"]]
+
+    def ong_sorteada():
+        return sorteio_cidade.choices(ongs, weights=populacao)[0]
 
     catalogo = dados["alimentos_ficticios"]
     periodo = dados["dias_historico"]
     for indice in range(dados["pedidos"]):
-        ong = ongs[indice % len(ongs)]
+        ong = ong_sorteada()
         alimento = catalogo[sorteio.randrange(len(catalogo))]
         criado = agora_utc - timedelta(days=1 + indice % periodo,
                                         hours=sorteio.randrange(24))
@@ -527,7 +534,7 @@ def _semear_demonstracao(dados, dia):
             criado_em=criado + timedelta(minutes=sorteio.randrange(10, 600))))
 
     for indice in range(dados["excedentes"]):
-        ong = ongs[(indice * 7) % len(ongs)]
+        ong = ong_sorteada()
         empresa = empresas[indice % len(empresas)]
         alimento = catalogo[sorteio.randrange(len(catalogo))]
         criado = agora_utc - timedelta(days=1 + indice % periodo,

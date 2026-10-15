@@ -38,8 +38,8 @@ def test_demonstracao_usa_sqlite_separado_e_semente_deterministica():
     assert all(r.status_code == 200 for r in (resumo, impacto, seguranca, repetido))
     assert all(r.json["modo"] == "demonstracao" for r in (resumo, impacto, seguranca))
     indicadores = resumo.json["indicadores"]
-    assert indicadores["ongs"] == 25
-    assert indicadores["empresas"] == 30
+    assert indicadores["ongs"] == 100
+    assert indicadores["empresas"] == 105
     assert indicadores["empresas_alimentos"] == 5
     assert indicadores["doadores"] == 8
     assert indicadores["doacoes_recebidas"] == 288

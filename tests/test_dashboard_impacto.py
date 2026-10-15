@@ -9,6 +9,7 @@ import pytest
 os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
+import Dashboard  # noqa: E402
 from Dashboard import converter_kg, conversoes_kg  # noqa: E402
 from models import (Contribuicao, Doacao, Doador, Estabelecimento, Excedente,
                     ItemDoacao, ItemExcedente, db)  # noqa: E402
@@ -247,15 +248,23 @@ def test_malha_do_ibge_versionada_tem_27_ufs_e_fonte():
     assert '/static/js/mapa-calor.js' in html and "tile" not in html.lower()
 
 
-def test_demonstracao_enche_o_mapa_com_as_25_cidades_ficticias():
+def test_demonstracao_espalha_o_mapa_pelas_cidades_mais_populosas():
     dados = json.loads((Path(__file__).resolve().parents[1] / "data" / "demonstracao.json")
                        .read_text(encoding="utf-8"))
+    assert len(dados["organizacoes_ficticias"]) == 100 and "Censo 2022" in dados["fonte_populacao"]
     refeicoes = app.test_client().get("/reconecta/dashboard/impacto?modo=demonstracao").json["refeicoes"]
     cidades = {(m["municipio"], m["uf"]) for m in refeicoes["por_municipio"]}
-    assert cidades == {(o["cidade"], o["uf"]) for o in dados["organizacoes_ficticias"]}
+    assert cidades <= {(o["cidade"], o["uf"]) for o in dados["organizacoes_ficticias"]}
+    assert len(cidades) >= 80
+    assert {Dashboard.REGIAO_UF[uf] for _, uf in cidades} == set(Dashboard.MACROREGIOES)
+    # peso pela população: São Paulo é a cidade com mais refeições e o Sudeste supera o Norte
+    assert refeicoes["por_municipio"][0]["municipio"] == "São Paulo"
+    regioes = {r["regiao"]: r["refeicoes_estimadas"] for r in refeicoes["por_regiao"]}
+    assert regioes["Sudeste"] > 3 * regioes["Norte"]
     assert refeicoes["organizacoes_sem_municipio"] == 0
-    assert all(-34 < m["lat"] < 6 and -74 < m["lon"] < -34 and m["refeicoes_estimadas"] > 0
+    assert all(-34 < m["lat"] < 6 and -74 < m["lon"] < -34 and m["kg_medido"] + m["kg_estimado"] > 0
                for m in refeicoes["por_municipio"])
+    # cada linha arredonda as próprias refeições: a diferença fica em até 1 por município
     assert sum(m["refeicoes_estimadas"] for m in refeicoes["por_municipio"]) == pytest.approx(
-        sum(u["refeicoes_estimadas"] for u in refeicoes["por_uf"]), abs=25)
+        sum(u["refeicoes_estimadas"] for u in refeicoes["por_uf"]), abs=len(cidades))
     assert "Exemplo" not in json.dumps(refeicoes)  # nomes das ONGs fictícias não vão para o mapa

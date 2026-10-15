@@ -34,14 +34,16 @@
 @media (min-width: 1000px) { .dash-graf--mapa { grid-column: 1 / -1; } }
 .mapa-calor { width: 100%; max-width: 760px; margin-inline: auto; }
 .mapa-calor__moldura { position: relative; width: 100%; aspect-ratio: 815 / 802; overflow: hidden; border-radius: 14px;
-  background: linear-gradient(160deg, #B9D8E8 0%, #A5CBE0 60%, #9AC2DA 100%); touch-action: manipulation; }
+  background: radial-gradient(ellipse at 85% 30%, #7DB6E0 0%, transparent 60%), linear-gradient(160deg, #6FA9D8 0%, #5294C9 55%, #3F7FB8 100%);
+  touch-action: manipulation; }
 .mapa-calor__calor, .mapa-calor__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.mapa-calor__fundo path { fill: #ECEBE2; stroke: #C9CBBE; stroke-width: .8; }
-.mapa-calor__oceano { fill: #4F7B95; font-style: italic; letter-spacing: .12em; text-anchor: middle; }
+.mapa-calor__fundo path { fill: #EFE7D2; stroke: #CDBF9F; stroke-width: .8; }
+.mapa-calor__textura { opacity: .35; pointer-events: none; }
+.mapa-calor__oceano { fill: #E8F2FA; font-style: italic; font-weight: 700; letter-spacing: .12em; text-anchor: middle; opacity: .9; }
 .mapa-calor__ufs path { fill: transparent; stroke: rgba(255,255,255,.85); stroke-width: 1.1; stroke-linejoin: round; cursor: pointer; }
 .mapa-calor__ufs path.is-ativo { stroke: #1B1D22; stroke-width: 2.6; }
 .mapa-calor__rotulos { pointer-events: none; font-family: var(--fonte-texto); font-weight: 800; }
-.mapa-calor__rotulos text { fill: #1B1D22; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: rgba(255,255,255,.88); stroke-width: 3px; stroke-linejoin: round; }
+.mapa-calor__rotulos text { fill: #1B1D22; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
 .mapa-calor__chamada { stroke: #1B1D22; stroke-width: .9; opacity: .7; }
 .mapa-calor__dica { position: absolute; z-index: 2; display: grid; gap: 2px; max-width: min(260px, calc(100% - 8px)); padding: 8px 11px; border-radius: 10px;
   background: rgba(27,29,34,.92); color: white; font-size: .8rem; line-height: 1.35; pointer-events: none; box-shadow: var(--sombra-2); }
@@ -53,6 +55,7 @@
 .mapa-calor__marcas, .mapa-calor__valores { display: flex; justify-content: space-between; gap: 6px; }
 .mapa-calor__marcas { font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta); font-size: .72rem; }
 .mapa-calor__valores span:last-child { text-align: right; }
+.mapa-calor__escala { text-align: center; font-size: .76rem; }
 #t-municipio { margin-top: 10px; }
 .mapa-horas { display: grid; grid-template-columns: 32px repeat(24, minmax(0, 1fr)); gap: 3px; align-items: center; overflow-x: auto; padding-bottom: 8px; }
 .mapa-horas span { font-size: .65rem; text-align: center; }

@@ -1,12 +1,14 @@
 /* ReConecta — mapa de calor do /dashboard.
-   Contornos dos 27 estados: malha oficial do IBGE (static/geo/brasil.topo.json, ver static/geo/FONTES.md),
+   Contornos dos 27 estados: malha oficial do IBGE (static/geo/brasil.topo.json, ver static/geo/FONTES.txt),
    desenhados aqui em SVG; o calor é pintado em Canvas e recortado pelo contorno do Brasil.
    Sem tiles externos, sem chave e sem biblioteca: o TopoJSON é decodificado abaixo.
 
-   Cor de cada ponto do país = média entre (a) as refeições potenciais da UF (suavizadas na divisa)
-   e (b) a concentração em torno dos municípios de quem recebeu: kernel gaussiano em que cada sede
-   vale, no centro, as suas próprias refeições. As duas parcelas estão em refeições potenciais.
-   Escala linear: Baixo = 0, Médio = metade, Alto = a maior UF (acima disso fica no vermelho). */
+   Valor de cada ponto do país, em refeições potenciais = 40% da camada de fundo da UF (suavizada na
+   divisa) + 60% dos pontos quentes nos municípios de quem recebeu: kernel gaussiano curto em que cada
+   sede vale, no centro, as suas próprias refeições.
+   Escala logarítmica de duas décadas: t = ln(1 + valor/c) / ln(1 + maior UF/c), c = maior UF / 100.
+   Baixo = 0, Alto = a maior UF (acima disso fica no vermelho), Médio = c·(√101 − 1) ≈ 9% da maior UF;
+   os três números vão na legenda. */
 (function () {
   "use strict";
   var SVG = "http://www.w3.org/2000/svg";
@@ -14,8 +16,9 @@
   var OESTE = -74.6, LESTE = -32.4, NORTE = 5.9, SUL = -34.2, PX = 20;
   var KX = Math.cos(15 * Math.PI / 180);
   var LARGURA = Math.round((LESTE - OESTE) * KX * PX), ALTURA = Math.round((NORTE - SUL) * PX);
-  var SIGMA_GRAUS = 2;     // desvio do kernel (~220 km)
-  var DIVISA_GRAUS = 0.6;  // suavização da cor da UF na divisa (~65 km)
+  var SIGMA_GRAUS = 0.9;   // desvio do kernel dos pontos quentes (~100 km)
+  var DIVISA_GRAUS = 1;    // suavização da camada de fundo da UF na divisa (~110 km)
+  var PESO_UF = 0.4, PESO_PONTOS = 0.6, DECADAS = 2;
   var PASSO = 2;           // px de tela por célula da grade do calor
   // paleta da referência: azul → verde → amarelo → laranja → vermelho
   var PALETA = [[0, "#22409A"], [0.15, "#2C6FD0"], [0.3, "#35AFC4"], [0.42, "#7CCB5A"],
@@ -150,7 +153,7 @@
 
     var imagem = g.createImageData(gw, gh), px = imagem.data;
     for (var k = 0; k < gw * gh; k++) {
-      var t = (0.5 * base[k] + 0.5 * calor[k]) / dados.maximo;
+      var t = Math.log1p((PESO_UF * base[k] + PESO_PONTOS * calor[k]) / dados.c) / Math.log1p(dados.maximo / dados.c);
       var c = cores[Math.min(255, Math.round(t * 255))];
       px[k * 4] = c[0]; px[k * 4 + 1] = c[1]; px[k * 4 + 2] = c[2]; px[k * 4 + 3] = 255;
     }
@@ -180,7 +183,7 @@
     var porUf = {}, linhas = {};
     (entrada.porUf || []).forEach(function (r) { porUf[r.uf] = r.refeicoes_estimadas || 0; linhas[r.uf] = r; });
     var maximo = Math.max.apply(null, Object.keys(porUf).map(function (k) { return porUf[k]; }).concat([1]));
-    var dados = { porUf: porUf, maximo: maximo,
+    var dados = { porUf: porUf, maximo: maximo, c: maximo / Math.pow(10, DECADAS),
                   pontos: (entrada.porMunicipio || []).map(function (m) { return { lat: m.lat, lon: m.lon, peso: m.refeicoes_estimadas }; }) };
 
     var moldura = document.createElement("div");
@@ -190,6 +193,17 @@
     canvas.setAttribute("aria-hidden", "true");
     var svg = no("svg", { viewBox: "0 0 " + LARGURA + " " + ALTURA, class: "mapa-calor__svg", "aria-hidden": "true", focusable: "false" });
     var fundo = no("g", { class: "mapa-calor__fundo" });
+    // textura leve no mar (ruído do próprio SVG), mascarada fora do Brasil e dos vizinhos
+    var defs = no("defs");
+    var filtro = no("filter", { id: "mc-ruido", x: "0", y: "0", width: "100%", height: "100%" });
+    filtro.append(no("feTurbulence", { type: "fractalNoise", baseFrequency: "0.018", numOctaves: "3", seed: "7" }),
+                  no("feColorMatrix", { type: "matrix", values: "0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 -.32" }));
+    var mascara = no("mask", { id: "mc-mar" });
+    mascara.appendChild(no("rect", { width: LARGURA, height: ALTURA, fill: "#fff" }));
+    geo.vizinhos.concat(geo.ufs.map(function (u) { return u.d; })).forEach(function (d) { mascara.appendChild(no("path", { d: d, fill: "#000" })); });
+    defs.append(filtro, mascara);
+    svg.appendChild(defs);
+    fundo.appendChild(no("rect", { width: LARGURA, height: ALTURA, filter: "url(#mc-ruido)", mask: "url(#mc-mar)", class: "mapa-calor__textura" }));
     geo.vizinhos.forEach(function (d) { fundo.appendChild(no("path", { d: d })); });
     fundo.appendChild(no("text", { x: projetar([-36, -26])[0], y: projetar([-36, -26])[1], class: "mapa-calor__oceano" }, "OCEANO"));
     fundo.appendChild(no("text", { x: projetar([-36, -27.3])[0], y: projetar([-36, -27.3])[1], class: "mapa-calor__oceano" }, "ATLÂNTICO"));
@@ -213,7 +227,8 @@
     var legenda = document.createElement("div");
     legenda.className = "mapa-calor__legenda";
     [["mapa-calor__barra", []], ["mapa-calor__marcas", ["Baixo", "Médio", "Alto"]],
-     ["mapa-calor__valores", ["0", formato.format(maximo / 2), formato.format(maximo) + " refeições potenciais"]]].forEach(function (l) {
+     ["mapa-calor__valores", ["0", formato.format(dados.c * (Math.sqrt(1 + maximo / dados.c) - 1)), formato.format(maximo)]],
+     ["mapa-calor__escala", ["Refeições potenciais · escala logarítmica"]]].forEach(function (l) {
       var linha = document.createElement("span");
       linha.className = l[0];
       l[1].forEach(function (t) { var s = document.createElement("span"); s.textContent = t; linha.appendChild(s); });
