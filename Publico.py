@@ -38,9 +38,13 @@ doacao_model = ns.model("PedidoPublico", {
 })
 
 def _municipio_uf(endereco):
+    if not isinstance(endereco, str) or len(endereco) > 1024:
+        return None
     for parte in (endereco or "").split(" - "):
         candidato = parte.rsplit(",", 1)[-1].strip()
-        if re.fullmatch(r"[^,/]+/[A-Za-z]{2}", candidato):
+        municipio, barra, uf = candidato.rpartition("/")
+        if (barra and municipio and "/" not in municipio and "," not in municipio
+                and len(uf) == 2 and uf.isascii() and uf.isalpha()):
             return candidato
     return None
 

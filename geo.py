@@ -76,15 +76,20 @@ def chave(endereco):
 def partes_endereco(endereco):
     """Separa o texto gravado no cadastro (Cadastro._endereco_texto)."""
     resultado = {"logradouro": None, "numero": None, "municipio": None, "uf": None, "cep": None}
-    pedacos = [p.strip() for p in str(endereco or "").split(" - ") if p.strip()]
+    texto = str(endereco or "")
+    if len(texto) > 1024:
+        return resultado
+    pedacos = [p.strip() for p in texto.split(" - ") if p.strip()]
     for pedaco in pedacos:
         if re.fullmatch(r"\d{5}-?\d{3}", pedaco):
             resultado["cep"] = pedaco.replace("-", "")
             continue
         local = pedaco.rsplit(",", 1)[-1].strip()
-        achado = re.fullmatch(r"([^,/]+)/([A-Za-z]{2})", local)
-        if achado and resultado["municipio"] is None:
-            resultado["municipio"], resultado["uf"] = achado.group(1).strip(), achado.group(2).upper()
+        municipio, barra, uf = local.rpartition("/")
+        if (barra and municipio and "/" not in municipio and "," not in municipio
+                and len(uf) == 2 and uf.isascii() and uf.isalpha()
+                and resultado["municipio"] is None):
+            resultado["municipio"], resultado["uf"] = municipio.strip(), uf.upper()
             continue
         if resultado["logradouro"] is None:
             campos = [c.strip() for c in pedaco.split(",")]
