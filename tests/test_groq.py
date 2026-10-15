@@ -154,3 +154,42 @@ def test_resposta_incoerente_do_groq_tenta_ollama(monkeypatch):
     monkeypatch.setattr(llm, "_chamar_ollama", lambda *_a, **_k: pedido_valido())
     saida = llm.interpretar_pedido("100 caixas de leite")
     assert saida["modelo"] == "qwen2.5:3b" and llm._groq_estado["falhas"] == 1
+
+def test_gpt_oss_raciocina_pouco_e_tem_folga_para_responder(monkeypatch):
+    # sem isso o raciocínio do modelo gastava o limite e a resposta vinha vazia (HTTP 400)
+    corpos = []
+
+    def post(_sessao, _url, **kwargs):
+        corpos.append(kwargs["json"])
+        return Resposta(conteudo=json.dumps(pedido_valido()))
+
+    monkeypatch.setattr(requests.Session, "post", post)
+    llm.interpretar_pedido("100 caixas de leite")
+    assert corpos[0]["reasoning_effort"] == "low"
+    assert corpos[0]["max_completion_tokens"] >= 800
+    monkeypatch.setenv("GROQ_MODEL", "qwen/qwen3.8-27b")
+    llm.interpretar_pedido("100 caixas de leite")
+    assert "reasoning_effort" not in corpos[1]
+
+
+def test_json_validate_failed_tenta_uma_vez_mais_e_so_uma(monkeypatch):
+    class Erro400(Resposta):
+        def __init__(self):
+            super().__init__(status=400)
+
+        def json(self):
+            return {"error": {"code": "json_validate_failed"}}
+
+    respostas = [Erro400(), Resposta(conteudo=json.dumps(pedido_valido()))]
+    monkeypatch.setattr(requests.Session, "post", lambda *_a, **_k: respostas.pop(0))
+    assert llm.interpretar_pedido("100 caixas de leite")["fonte"] == "llm"
+
+    chamadas = []
+
+    def sempre_400(*_a, **_k):
+        chamadas.append(1)
+        return Erro400()
+
+    monkeypatch.setattr(requests.Session, "post", sempre_400)
+    assert llm.interpretar_pedido("100 caixas de leite")["fonte"] == "regras"
+    assert len(chamadas) == 2

@@ -144,29 +144,49 @@ def _groq_estrutura(objeto, formato):
             and all(isinstance(x, str) for x in objeto["recomendacoes"]))
 
 
+def _codigo_erro_groq(resposta):
+    try:
+        return resposta.json().get("error", {}).get("code")
+    except (ValueError, AttributeError):
+        return None
+
+
 def _chamar_groq(sistema, usuario, *, formato):
     chave, modelo = os.getenv("GROQ_API_KEY", "").strip(), _modelo_groq()
     if not chave or not modelo:
         return None
     esquema = ESQUEMA_GROQ_PEDIDO if formato == "pedido" else ESQUEMA_RESUMO
-    max_tokens = 700 if formato == "pedido" else 450
+    # os modelos gpt-oss raciocinam antes de responder e esse raciocínio conta no limite;
+    # com folga curta a resposta saía vazia (HTTP 400 json_validate_failed)
+    max_tokens = 1000 if formato == "pedido" else 800
     if not _groq_reservar(sistema, usuario, esquema, max_tokens):
         return None
     sessao = requests.Session()
     sessao.trust_env = False
     try:
-        resposta = sessao.post(
-            GROQ_URL,
-            headers={"Authorization": "Bearer " + chave, "Content-Type": "application/json"},
-            json={"model": modelo,
+        corpo = {"model": modelo,
                   "messages": [{"role": "system", "content": sistema},
                                {"role": "user", "content": usuario}],
                   "response_format": {"type": "json_schema", "json_schema": {
                       "name": "pedido_alimentos" if formato == "pedido" else "resumo_dashboard",
                       "strict": True, "schema": esquema}},
-                  "max_completion_tokens": max_tokens},
-            timeout=(2, 8), allow_redirects=False,
-        )
+                  "max_completion_tokens": max_tokens}
+        if modelo.startswith("openai/gpt-oss"):
+            corpo["reasoning_effort"] = "low"
+            corpo["temperature"] = 0.2
+        for tentativa in range(2):
+            resposta = sessao.post(
+                GROQ_URL,
+                headers={"Authorization": "Bearer " + chave, "Content-Type": "application/json"},
+                json=corpo, timeout=(2, 8), allow_redirects=False,
+            )
+            # o modelo às vezes não fecha o JSON do esquema (400 json_validate_failed):
+            # uma única nova tentativa, dentro do orçamento, antes de cair no plano B
+            if (tentativa == 0 and resposta.status_code == 400 and
+                    _codigo_erro_groq(resposta) == "json_validate_failed" and
+                    _groq_reservar(sistema, usuario, esquema, max_tokens)):
+                continue
+            break
         if resposta.status_code == 429:
             try:
                 espera = max(1, min(3600, math.ceil(float(resposta.headers.get("retry-after", "60")))))
