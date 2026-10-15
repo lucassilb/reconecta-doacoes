@@ -61,10 +61,11 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 | Pedidos de doação | Organização com CNPJ publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
 | Doar para um pedido | Pessoa (CPF) ou outra organização; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A foto é guardada no banco de dados, para não se perder quando o servidor da nuvem reinicia. A organização não doa no próprio pedido. Limite de 20 envios por hora por usuário. |
 | Progresso e entrega | Cada item mostra recebido × meta, quanto falta e quantidade entregue; o dono do pedido confirma **Recebi** ou **Não recebi** em cada doação aceita. |
-| Excedentes | Empresa de alimentos publica itens com validade e prazo de retirada; ONG reserva, pode cancelar a reserva e a publicadora confirma a retirada. |
+| Alimentos doados (excedentes) | Empresa de alimentos **ou pessoa física** oferece o que sobrou em 3 etapas curtas (o que é, onde retirar, confirmações), com **foto obrigatória do alimento mostrando a validade** (reduzida no navegador e sem os metadados de GPS); ONG reserva, pode cancelar e quem doou confirma a retirada. O endereço de retirada só aparece para a ONG que reservou. |
+| Página inicial | Bloco "Agora na rede" com abas **Pedidos das ONGs**, **Alimentos doados** e **ONGs na rede**, filtro por categoria com fotos reais (créditos em `static/img/categorias/CREDITOS.md`) e botão **Doar** no topo para quem entrou. |
 | Painéis | Organização: publicar pedido (com "Preencher com IA"), acompanhar contribuições e confirmar recebimento; empresa de alimentos também publica e acompanha excedentes; ONG acompanha reservas. Doador: minhas doações e estado da entrega. |
 | Meus dados | No painel, "Editar" altera os próprios dados (empresa: e-mail e telefone; doador: nome, e-mail e telefone) e troca a senha informando a atual. CNPJ e CPF não mudam. |
-| Dashboard | Indicadores de pedidos, doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva; gráficos, alertas e últimas doações com dados do banco. Botão "Gerar resumo com IA". |
+| Dashboard | Indicadores de pedidos, doações entregues, excedentes disponíveis e retirados, ONGs, empresas de alimentos e tempo médio até a reserva; gráficos, alertas e últimas doações com dados do banco. Botão "Gerar resumo com IA". **Mapa de calor do Brasil** (contornos oficiais do IBGE, escala logarítmica de refeições potenciais por estado e cidade) e modo **Demonstração** rotulado. |
 | LLM | Groq Free (`openai/gpt-oss-20b`) quando configurado; Ollama local (`qwen2.5:3b`) como reserva. Interpretam o texto do pedido e resumem o dashboard. Detalhes em [docs/llm.md](docs/llm.md). |
 | Classificador treinado | Modelo próprio, treinado no dataset do projeto, que escolhe a categoria de cada item em "Preencher com IA". Roda dentro da aplicação, inclusive na nuvem, onde o Ollama não está disponível. Detalhes em [docs/dataset-modelo.md](docs/dataset-modelo.md). |
 | Segurança | Cabeçalhos de segurança e Content-Security-Policy em todas as respostas; trilha de auditoria em JSON (login, cadastro, edição de dados, pedidos, doações e uso do token de administrador) sem senha, documento, e-mail ou foto; limites de uso nas rotas de IA e de doação. |
@@ -164,6 +165,8 @@ O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a pr
 O bloco de segurança lê `relatorios/sast/resumo.json` com achados e data de Bandit, Trivy de arquivos/configuração/imagem e estado STRIDE. A imagem versionada ainda tem 44 achados HIGH do Debian base; o painel não os chama de mitigados. Cabeçalhos/CSP e cotas são controles existentes; falhas e bloqueios de login aparecem como **não medidos**, pois só constam no log. Regras, premissas, atualização do relatório e prova estão em [docs/dashboard.md](docs/dashboard.md); testes em `tests/test_dashboard_impacto.py`.
 
 Para a apresentação no site público, a alternância **Dados reais | Demonstração** mantém os dados reais como padrão e identifica a simulação por uma faixa fixa. `?modo=demonstracao` calcula os mesmos indicadores em SQLite **em memória**, sem escrever no banco configurado: a semente versionada em `data/demonstracao.json` cria 25 ONGs, 5 mercados e 8 doadores fictícios, com 320 pedidos/doações e 160 excedentes. A semeadura usa a meia-noite de Brasília e é renovada quando o dia muda. Acurácia da IA e SAST permanecem reais nos dois modos. O resumo em linguagem natural só está disponível nos dados reais. O snapshot SAST em `data/resumo_sast.json` acompanha a imagem Docker, que exclui `relatorios/`. Testes em `tests/test_dashboard_demo.py`.
+
+**Mapa de calor.** `static/js/mapa-calor.js` desenha o Brasil em SVG com os contornos oficiais do IBGE (`static/geo/brasil.topo.json`, 37 KB, fonte e licença em `static/geo/FONTES.txt`) e pinta o calor em Canvas recortado pelo país: 40% de fundo suave por estado e 60% de pontos quentes nas cidades de quem recebeu. A cor segue o dado real em refeições potenciais, em **escala logarítmica** (azul = baixo, amarelo = médio, vermelho = alto, com os números na legenda). Passar o mouse ou tocar num estado mostra refeições, kg e ONGs; a tabela por estado e por cidade fica logo abaixo. Os dados vêm de `refeicoes.por_municipio` em `GET /reconecta/dashboard/impacto` (só cidade, UF e números). No modo Demonstração, 100 ONGs fictícias ficam nas 100 cidades mais populosas (IBGE, Censo 2022).
 
 ## Otimização da API (critério 4 do CP2)
 
@@ -278,7 +281,7 @@ Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `
 python -m pytest -q
 ```
 
-Resultado atual: **250 passed, 4 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
+Resultado atual: **455 passed, 10 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -377,7 +380,7 @@ Comando para demonstrar na apresentação (na pasta do projeto, com o ambiente v
 python -m pytest -v
 ```
 
-Resultado atual: **330 passed, 5 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita, o Groq e o Ollama, então rodam sem internet e sem tocar no banco real. Os testes pulados são provas opcionais que precisam de um ambiente a mais:
+Resultado atual: **455 passed, 10 skipped**. Os testes usam SQLite isolado (em memória ou em arquivo temporário) e simulam a Receita, o Groq e o Ollama, então rodam sem internet e sem tocar no banco real. Os testes pulados são provas opcionais que precisam de um ambiente a mais:
 
 - 4 provas em PostgreSQL (`tests/test_integridade_banco.py` e `tests/test_excedente_pessoa_fisica.py`): rodam com `CP2_PG_SUPERUSER_PASSWORD_FILE` apontando para um arquivo com a senha do superusuário; criam e apagam um banco temporário.
 - 1 prova de CSP num navegador de verdade (`tests/test_nuvem.py`): roda com `RECON_CSP_URL=http://localhost:5000` e a aplicação no ar pelo Docker Compose; abre as páginas com o Playwright e falha se o console acusar violação de CSP.
@@ -472,6 +475,14 @@ simulação, matriz de confusão, teste e limitações estão em
 - **Segurança "enquanto coda" (pre-commit)**: `.pre-commit-config.yaml` roda checks básicos, Bandit, Semgrep (ruleset local, offline), pip-audit e gitleaks **antes de cada commit**. Instalar com `pip install pre-commit semgrep pip-audit`, o binário do gitleaks no PATH e `pre-commit install` uma vez por clone. Varreduras completas e triagem da rodada 18: [docs/seguranca.md](docs/seguranca.md), relatórios em [`relatorios/seguranca/`](relatorios/seguranca/).
 - **LGPD**: a política de privacidade fica em `/privacidade` (mapa de dados em [`docs/lgpd.md`](docs/lgpd.md)); o cadastro exige aceite, gravado com versão e data (`consentimento_versao`, `consentimento_em`); o titular exporta tudo em `GET /reconecta/auth/me/dados` e exclui a conta por anonimização em `DELETE /reconecta/auth/me` — pedidos e doações ficam só como estatística.
 - **Guardas da IA e log mínimo (rodada 18)**: o NVIDIA NeMo Guardrails (`guardrails/`, Colang) barra injeção de prompt e pedidos fora do tema antes da LLM e descarta respostas com dado pessoal, link ou vazamento do prompt; no CI roda o NeMo de verdade (job `guardrails`), em produção as mesmas ações rodam sem a biblioteca para caber no Render free. Os logs não levam CPF, CNPJ, e-mail, telefone, endereço, texto livre, cookie, token nem IP completo (`registro.py`, `pii.py`, `gunicorn.conf.py`). O NeMo protege a IA; os hooks de pre-commit protegem o código. Números, achados e riscos residuais em [docs/seguranca.md](docs/seguranca.md); o inventário de logs em [docs/lgpd.md](docs/lgpd.md#logs-log-mínimo).
+- **Varredura completa da rodada 18** (detalhes, comandos, números e falsos positivos em [docs/seguranca.md](docs/seguranca.md)):
+  - **SAST**: Bandit (0 alto/médio), Semgrep com 288 regras oficiais + regras próprias (37 achados iniciais → 0) e Trivy de configuração (0).
+  - **SCA**: pip-audit e Trivy de dependências (0 vulnerabilidades nas 15 bibliotecas) e SBOM CycloneDX em `relatorios/seguranca/sbom-cyclonedx.json`.
+  - **Segredos**: gitleaks no código e nos 123 commits do histórico (nenhum segredo real; 3 falsos positivos registrados por impressão digital).
+  - **DAST**: OWASP ZAP 2.17 (baseline + API pelo `swagger.json`) contra o Compose efêmero, com sessões fictícias de doador, empresa e ONG: 0 crítico, 0 alto, 0 médio.
+  - **IAST**: sensor próprio (`iast_sensor.py`, ligado só com `RECONECTA_IAST=1`) que vigia SQL com dado da requisição, código dinâmico, arquivos e conexões durante a suíte e o ZAP: 0 achados.
+  - **Autorização por objeto (BOLA/IDOR)**: `scripts/avaliar_autorizacao.py` gera a matriz pelo Swagger e tenta cada escrita e leitura privada como dono, outro usuário, outro perfil e anônimo (213 requisições, 0 falhas).
+- **13 portões no GitHub Actions** antes de publicar: testes, ciclo da IA, Bandit, Trivy, Semgrep, pip-audit, gitleaks, pre-commit, Docker, DAST, IAST + BOLA, guardas da IA (NeMo) e resumo de segurança. Se um falhar, o Render não publica.
 
 Controles que estão no código:
 
@@ -571,6 +582,16 @@ Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir 
 ## Organização no Trello
 
 [Quadro ReConecta no Trello](https://trello.com/invite/b/6a96cdf34f25b339652662c3/ATTI4b7785042036ae55024963ac1546279b355F294D/reconecta)
+
+## Roteiro da apresentação
+
+1. Abrir https://reconecta-iota.onrender.com alguns minutos antes: o plano gratuito do Render dorme quando fica parado e leva até um minuto para acordar.
+2. **Página inicial**: abas Pedidos das ONGs, Alimentos doados e ONGs na rede; botão **Doar** no topo e o assistente "Tenho alimento para doar", que lê o texto com o Groq (`openai/gpt-oss-20b`) e sugere a ONG certa e mais próxima.
+3. **Fluxo ao vivo** (duas abas, uma como ONG e outra como doador ou empresa): publicar um pedido; doar com foto da validade; reservar; confirmar a retirada; marcar Recebi. Os avisos chegam no sino em segundos.
+4. **Dashboard** (`/dashboard`): em **Demonstração**, kg salvos, refeições por região no mapa de calor, acurácia da IA, tempo médio de match e segurança; em **Dados reais**, os números de verdade.
+5. **API e segurança**: Swagger interativo em `/swagger`; portões verdes no GitHub Actions; relatórios em `relatorios/` e `docs/seguranca.md`.
+
+Inteligências do projeto: leitura de texto por LLM (Groq Free, com Ollama local e regras como reserva, protegida pelas guardas NeMo), classificador de categoria Naive Bayes (77,8%), modelo de risco de descarte com scikit-learn (67,5%, AUC 0,70, dados simulados) e recomendação Doador × ONG por pontuação com distância (89,1% de acerto na primeira sugestão). Todas são medidas a cada envio pelo job `ia`.
 
 ## Integrantes
 
