@@ -16,24 +16,20 @@ exigem atribuição — mantida neste arquivo e na nota de rodapé de `/privacid
 - Licença: Public domain
 
 ## `laticinios.webp` — Laticínios
-- Foto: [File:Queijo Minas Frescal.JPG](https://commons.wikimedia.org/wiki/File:Queijo_Minas_Frescal.JPG)
-- Autor(a): The original uploader was Hellkt at German Wikipedia . ( Original text: de:Benutzer:Hellkt )
-- Licença: Public domain
+- Foto escolhida pelo grupo em 2026-10-15 (arquivo original `laticinios-1.jpg`), recortada em 4:3 e convertida para WebP 640×480 sem metadados.
+- Origem e licença: informadas pelo grupo; substitui a foto do Wikimedia Commons usada antes.
 
 ## `carnes-peixes.webp` — Carnes e peixes
-- Foto: [File:Raw salmon fillets.jpg](https://commons.wikimedia.org/wiki/File:Raw_salmon_fillets.jpg)
-- Autor(a): FULVIO_TOGNON
-- Licença: CC0 ([link](http://creativecommons.org/publicdomain/zero/1.0/deed.en))
+- Foto escolhida pelo grupo em 2026-10-15 (arquivo original `carnes-peixe-salmao-frango-carne-suina-carne-vermelha-1664563601836_v2_4x3.jpg`), recortada em 4:3 e convertida para WebP 640×480 sem metadados.
+- Origem e licença: informadas pelo grupo; substitui a foto do Wikimedia Commons usada antes.
 
 ## `graos-cereais.webp` — Grãos e cereais
-- Foto: [File:Dry beans, lentils etc.jpg](https://commons.wikimedia.org/wiki/File:Dry_beans,_lentils_etc.jpg)
-- Autor(a): E4024
-- Licença: CC BY-SA 4.0 ([link](https://creativecommons.org/licenses/by-sa/4.0))
+- Foto escolhida pelo grupo em 2026-10-15 (arquivo original `graos-scaled.jpg`), recortada em 4:3 e convertida para WebP 640×480 sem metadados.
+- Origem e licença: informadas pelo grupo; substitui a foto do Wikimedia Commons usada antes.
 
 ## `refeicoes-prontas.webp` — Refeições prontas
-- Foto: [File:Feijoada à brasileira 1.jpg](https://commons.wikimedia.org/wiki/File:Feijoada_%C3%A0_brasileira_1.jpg)
-- Autor(a): Melsj
-- Licença: CC BY-SA 4.0 ([link](https://creativecommons.org/licenses/by-sa/4.0))
+- Foto escolhida pelo grupo em 2026-10-15 (arquivo original `refeiçãoprontas.jfif`), recortada em 4:3 e convertida para WebP 640×480 sem metadados.
+- Origem e licença: informadas pelo grupo; substitui a foto do Wikimedia Commons usada antes.
 
 ## `bebidas.webp` — Bebidas não alcoólicas
 - Foto: [File:Juice smoothie compote 20250430 073919.jpg](https://commons.wikimedia.org/wiki/File:Juice_smoothie_compote_20250430_073919.jpg)
