@@ -1,0 +1,12 @@
+title = "ReConecta gitleaks"
+
+# Mantém o ruleset padrão do gitleaks; só acrescenta exceções triadas
+# (docs/seguranca.md, rodada 18).
+[extend]
+default = true
+
+[allowlist]
+description = "Relatórios gerados por scanners (saídas de varredura, não fonte)"
+paths = [
+  '''relatorios[\\/].*''',
+]

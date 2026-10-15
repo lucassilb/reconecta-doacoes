@@ -1,0 +1,10 @@
+# Falsos positivos triados na rodada 18 (docs/seguranca.md):
+# - test_nuvem.py: literal de teste que prova que o token NÃO sai no log
+# - relatorios/sast/trivy-image.json: metadados da imagem base python:* (ENV/GPG_KEY
+#   públicos do Dockerfile oficial), não segredos do projeto
+relatorios/sast/trivy-image.json:generic-api-key:64
+relatorios/sast/trivy-image.json:generic-api-key:186
+tests/test_nuvem.py:generic-api-key:176
+1e548026dad4bdafcded3e6c62110c08c4c65f5f:tests/test_nuvem.py:generic-api-key:171
+ec38fe776680297e8b53efc0207de4d703c219bc:relatorios/sast/trivy-image.json:generic-api-key:64
+ec38fe776680297e8b53efc0207de4d703c219bc:relatorios/sast/trivy-image.json:generic-api-key:186

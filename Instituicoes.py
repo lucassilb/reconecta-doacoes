@@ -91,8 +91,8 @@ class InstituicaoList(Resource):
             **contato,
             endereco=data["endereco"]
         )
-        
-    
+
+
         db.session.add(nova_instituicao)
         try:
             db.session.commit()
@@ -135,7 +135,7 @@ class Instituicao(Resource):
             i.email = contato["email"]
             i.telefone = contato["telefone"]
             i.endereco = data.get("endereco", i.endereco)
-            
+
             try:
                 db.session.commit()
             except IntegrityError:

@@ -1,0 +1,92 @@
+rules:
+  - id: reconecta-flask-debug
+    patterns:
+      - pattern: $APP.run(..., debug=True, ...)
+      - pattern-inside: |
+          $APP = flask.Flask(__name__)
+          ...
+    message: "Flask com debug=True expõe o depurador interativo."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-executavel-perigoso
+    pattern-either:
+      - pattern: eval($X)
+      - pattern: exec($X)
+      - pattern: os.system($X)
+      - pattern: __import__($X)
+    message: "execução dinâmica de código — injeção se $X vier de fora."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-subprocess-shell
+    pattern: subprocess.$F(..., shell=True, ...)
+    message: "subprocess com shell=True: só se os argumentos forem literais fixos."
+    severity: WARNING
+    languages: [python]
+  - id: reconecta-requests-sem-verificacao
+    pattern-either:
+      - pattern: requests.$M($URL, ..., verify=False, ...)
+      - pattern: requests.$M($URL, ..., timeout=None, ...)
+      - pattern: urllib.request.urlopen($X)
+    message: "requisição sem verificação TLS / sem timeout / urlopen sem validação."
+    severity: WARNING
+    languages: [python]
+  - id: reconecta-yaml-load-inseguro
+    pattern: yaml.load($X, ...)
+    pattern-not: yaml.load($X, ..., Loader=yaml.SafeLoader, ...)
+    message: "yaml.load sem SafeLoader executa objetos arbitrários."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-crypto-fraca
+    pattern-either:
+      - pattern: hashlib.md5($X)
+      - pattern: hashlib.sha1($X)
+    message: "md5/sha1 não servem para segurança; use sha256+."
+    severity: WARNING
+    languages: [python]
+  - id: reconecta-sql-concatenado
+    patterns:
+      - pattern-inside: |
+          def $F(...):
+              ...
+      - pattern-either:
+          - pattern: sqlalchemy.text("..." + $X + "...")
+          - pattern: sqlalchemy.text($X % ...)
+          - pattern: text("..." + $X + "...")
+          - pattern: text($X % ...)
+    message: "SQL textual com concatenação/formato — prefira bind params ou identificadores validados."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-secret-literal
+    patterns:
+      - pattern-regex: (?i)(?<![\w])(secret_key|password|senha|token|api[_-]?key|private[_-]?key)(?![\w])\s*=\s*["'][^"']{8,}["']
+      - pattern-not-regex: (?i)(os\.environ|getenv|app\.config|generate_|teste|exemplo|fake|mock|removido)
+    message: "segredo literal no código — use variável de ambiente."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-pickle
+    pattern-either:
+      - pattern: pickle.loads($X)
+      - pattern: pickle.load($X)
+      - pattern: marshal.loads($X)
+    message: "desserialização pickle/marshal executa código — não usar em dado externo."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-cors-aberto
+    pattern: flask_cors.CORS($APP, ..., origins="*", ...)
+    message: "CORS com origins='*' — restrinja às origens do site."
+    severity: WARNING
+    languages: [python]
+  - id: reconecta-secret-key-em-texto
+    patterns:
+      - pattern: $APP.secret_key = "..."
+      - pattern-not: $APP.secret_key = $X
+    message: "secret_key literal: session fixation. Use $X de ambiente."
+    severity: ERROR
+    languages: [python]
+  - id: reconecta-bind-todas-interfaces
+    pattern-either:
+      - pattern: $APP.run(..., host="0.0.0.0", ...)
+      - pattern: socket.socket(...).bind(("0.0.0.0", ...))
+    message: "bind em 0.0.0.0 expõe o serviço a todas as interfaces — só em container."
+    severity: WARNING
+    languages: [python]
