@@ -90,9 +90,9 @@ _INJECAO = [re.compile(p) for p in (
 )]
 # marcadores de papel/turno colados no texto (testados no texto original, sem simplificar)
 _MARCADORES = re.compile(
-    r"(?im)(?:^|\n)\s*(?:system|sistema|assistant|assistente|developer|user)\s*:|"
+    r"(?im)^[^\S\n]*(?:system|sistema|assistant|assistente|developer|user)[^\S\n]*:|"
     r"<\|?(?:im_start|im_end|system|endoftext)\|?>|\[/?(?:INST|SYS)\]|<</?SYS>>|</?s>|"
-    r"```\s*(?:system|json)|###\s*(?:instru|system|sistema)")
+    r"```\s{0,64}(?:system|json)|###\s{0,64}(?:instru|system|sistema)")
 # JSON pronto com as chaves do esquema: tentativa de ditar a saída do modelo
 _CHAVES = r"(?:itens|nome|categoria|quantidade|unidade_medida|receber_ate|observacoes|resumo|recomendacoes)"
 _JSON_ESQUEMA = re.compile(r"[{,]\s*[\"']?" + _CHAVES + r"[\"']?\s*:|[\"']" + _CHAVES + r"[\"']\s*:")
@@ -180,6 +180,8 @@ def _bloqueio(motivo):
 def verificar_entrada(texto):
     """Texto livre do usuário antes de qualquer LLM. Bloqueia injeção e pedido fora do tema."""
     bruto = str(texto or "")
+    if len(bruto) > 600:
+        return _bloqueio("fora_do_tema")
     simples = _simples(bruto)
     variantes = {simples, _simples(bruto, leet=True)}
     soletrados = [s for v in variantes for s in _soletrados(v)]
@@ -245,6 +247,8 @@ def verificar_saida(objeto, formato, dados=None):
     e, no resumo, número que não veio dos agregados enviados ao modelo."""
     textos = [str(t or "") for t in _textos_saida(objeto, formato)]
     for texto in textos:
+        if len(texto) > 1000:  # _validar_resumo permite até 1000 caracteres.
+            return _bloqueio("vazamento")
         if pii.encontrar(texto):
             return _bloqueio("dado_pessoal")
         if _LINK.search(texto):

@@ -311,3 +311,47 @@ privado e limita testes ativos ao ambiente local; `.github/CODEOWNERS` marca
 `@lucassilb`; `.github/dependabot.yml` agenda atualizações semanais de pip,
 Docker e GitHub Actions. Essas configurações só terão efeito no GitHub após
 integração na branch principal.
+
+## CodeQL Python ReDoS — rodada 26 (Codex #2)
+
+Os nove alertas `py/polynomial-redos` recebiam texto de cadastro, endereço ou
+pedido de IA. Os limites abaixo são verificados **antes** da busca; a rota de
+interpretação já rejeitava pedidos acima de 600 caracteres. Não foi adicionada
+supressão de alerta.
+
+| Alerta | Entrada e causa | Correção | Prova |
+|---|---|---|---|
+| #1 `Cadastro.py:132` | E-mail do JSON de cadastro; regex com grupos repetidos para local e domínio. A rota já impunha 100 caracteres, mas o padrão ainda merecia remoção. | Separação de `@` e rótulos do domínio por operações de string, com limite de 100. | E-mails válidos/inválidos e 50 KB em `test_codeql_redos.py`. |
+| #2 `Publico.py:43` | Endereço salvo pelo usuário; classe gulosa `[^,/]+` no município antes de `/UF`. | `rpartition` e verificação de letras ASCII; limite de 1024 antes da divisão. | Município/UF público e 50 KB. |
+| #3 `geo.py:85` | Mesmo endereço salvo, analisado para geolocalização; classe gulosa antes de `/UF`. | Mesmo parsing por separador e limite de 1024, preservando CEP e logradouro. | Endereço completo e 50 KB. |
+| #4 `guardas_ia.py:186` | Pedido de IA; `(^|\n)\s*` podia reexaminar a mesma sequência de quebras de linha. | Âncora por linha, espaços horizontais no marcador e largura limitada nas marcas de bloco; limite de 600 na guarda. | Marcador de injeção e 50 KB de quebras de linha. |
+| #5 `llm_service.py:229` | Pedido enviado ao modelo local; a máscara de e-mail podia tentar vários inícios em um token com pontuação. | Varredura de tokens e arrobas sem retroceder, com limite de 600 antes de qualquer regex residual. | Máscara comum, corpus de pedidos e 50 KB de `a!.`. |
+| #6 `llm_service.py:439` | Extração por regras; `search` tentava o padrão de quantidade em cada dígito de uma sequência longa. | Leitura sequencial da quantidade, unidade e nome, iniciada uma vez por sequência de dígitos; limite de 600 na função. | Quantidades reais, corpus e 50 KB de zeros. |
+| #7 `llm_service.py:426` | Separação de itens; `\s+` podia testar cada posição de uma sequência de espaços. | Varredura única que só separa antes de item iniciado por dígito. | Vírgula decimal, separadores e 50 KB de espaços. |
+| #8 `llm_service.py:433` | Corte de prazo; tentativas repetidas sobre espaços. | Leitura sequencial de `até` e `para o dia`. | Prazo normal, corpus e 50 KB de espaços. |
+| #9 `llm_service.py:436` | Corte de validade; tentativas repetidas sobre espaços. | Leitura sequencial de `que venc...`, `com validade` e `validade`. | Validade normal, corpus e 50 KB de espaços. |
+| Local `llm_service.py:222` | Texto retornado pelo modelo; `<[^>]*>` reexaminava muitos `<` sem fechamento. Surgiu na análise local após a remoção do alerta #6. | Remoção de tags por busca sequencial de `<` e `>`, com limite de 10.000 caracteres antes da transformação. | Texto com tags, 50 KB de `<` e suíte de IA. |
+
+O snapshot antes/depois dos **66 pedidos** de `data/pedidos_avaliacao.jsonl` e
+**86 ofertas** de `data/ofertas_avaliacao.jsonl` permaneceu idêntico nos caminhos
+afetados. Uma comparação com a implementação anterior de **5.000 entradas curtas**
+variadas também não encontrou divergência na interpretação por regras nem na
+máscara de identificadores. A avaliação completa de `conexao.casar` nas 86
+ofertas, com data fixa, também produziu JSON idêntico na base e no branch. O
+teste de desempenho exige menos de 50 ms para
+50 KB em cada caminho corrigido; as medições isoladas estão no relatório da rodada.
+
+No benchmark isolado de 50 KB, os padrões/funções antigos dos alertas #4–#9 e
+da remoção de tags ultrapassaram o timeout de **2 s**; os caminhos corrigidos
+levaram de **0,01 a 6,67 ms**. Os vetores testados para #1–#3 levaram menos
+de 1 ms já na versão
+anterior: o limite do e-mail e o `fullmatch` ancorado impediam a reprodução de
+uma lentidão nesse caso. Ainda assim, foram trocados por parsing direto e
+limite explícito, sem descartar os alertas sem correção.
+
+O CodeQL CLI 2.27.1 com `codeql/python-queries` 1.8.12 e a suíte
+`python-security-extended` foi executado em uma cópia isolada de `135691b` e
+no worktree corrigido: **9 → 0 `py/polynomial-redos`**. O scan final manteve
+cinco alertas de outras regras (3 `py/log-injection`, 2 `py/partial-ssrf`), fora
+desta frente; nenhum deles foi ocultado. SARIF e logs estão no diretório de
+relatórios da rodada 26, fora do repositório.

@@ -219,18 +219,61 @@ def _sem_acentos(valor):
 def _texto_plano(valor, limite):
     if not isinstance(valor, str):
         return ""
-    texto = re.sub(r"<[^>]*>", "", valor)
+    # Texto livre vindo do modelo: limite antes das transformações.
+    valor = valor[:10000]
+    partes = []
+    inicio = 0
+    while (abertura := valor.find("<", inicio)) != -1:
+        fechamento = valor.find(">", abertura + 1)
+        if fechamento == -1:
+            break
+        partes.append(valor[inicio:abertura])
+        inicio = fechamento + 1
+    partes.append(valor[inicio:])
+    texto = "".join(partes)
     texto = re.sub(r"[\x00-\x1f\x7f]", " ", texto)
     return " ".join(texto.split())[:limite]
 
 
 def _sem_identificadores(texto):
     """Remove padrões comuns de contato/documento antes do prompt local."""
-    texto = re.sub(r"\b[^\s@]+@[^\s@]+\.[^\s@]+\b", "[email]", texto)
+    if len(texto) > 600:
+        return ""  # O endpoint recusa acima de 600; nunca enviar texto extra ao modelo.
+    texto = _mascarar_emails(texto)
     texto = re.sub(r"(?<!\d)(?:\d[.\-/ ]?){11,14}(?!\d)", "[documento]", texto)
     texto = re.sub(r"(?<!\d)(?:\+?55[ -]?)?\(?\d{2}\)?[ -]?\d{4,5}[ -]?\d{4}(?!\d)",
                    "[telefone]", texto)
     return texto
+
+
+def _mascarar_emails(texto):
+    """Varre cada token uma vez, sem retroceder sobre pontuação repetida."""
+    partes = []
+    anterior = 0
+    for match in re.finditer(r"\S+", texto):
+        token = match.group()
+        saida = []
+        cursor = 0
+        segmento = 0
+        while (arroba := token.find("@", segmento)) != -1:
+            proxima = token.find("@", arroba + 1)
+            fim_segmento = len(token) if proxima == -1 else proxima
+            inicio = next((i for i in range(max(cursor, segmento), arroba)
+                           if token[i].isalnum() or token[i] == "_"), None)
+            fim = next((i + 1 for i in range(fim_segmento - 1, arroba, -1)
+                        if token[i].isalnum() or token[i] == "_"), None)
+            if (inicio is not None and fim is not None and
+                    any(arroba + 1 < i < fim - 1 and token[i] == "."
+                        for i in range(arroba + 1, fim))):
+                saida.extend((token[cursor:inicio], "[email]"))
+                cursor = fim
+            segmento = arroba + 1
+        if cursor:
+            saida.append(token[cursor:])
+            partes.extend((texto[anterior:match.start()], "".join(saida)))
+            anterior = match.end()
+    partes.append(texto[anterior:])
+    return "".join(partes)
 
 
 def _hosts_permitidos():
@@ -421,28 +464,166 @@ def _prazo_regras(texto):
     return None
 
 
+def _apos_espacos(texto, indice):
+    while indice < len(texto) and texto[indice].isspace():
+        indice += 1
+    return indice
+
+
+def _literal(texto, indice, palavra):
+    return texto[indice:indice + len(palavra)].lower() == palavra
+
+
+def _dividir_itens(texto):
+    """Separa ';', ', ' e ' e ' somente quando o próximo campo inicia com dígito."""
+    trechos = []
+    inicio = indice = 0
+    while indice < len(texto):
+        caractere = texto[indice]
+        destino = None
+        if caractere.isspace():
+            apos = _apos_espacos(texto, indice)
+            if (_literal(texto, apos, "e") and apos + 1 < len(texto)
+                    and texto[apos + 1].isspace()):
+                candidato = _apos_espacos(texto, apos + 1)
+                if candidato < len(texto) and texto[candidato].isdecimal():
+                    destino = candidato
+            if destino is None:
+                indice = apos
+                continue
+        elif caractere in ";,":
+            apos = _apos_espacos(texto, indice + 1)
+            if (caractere == ";" or apos > indice + 1) and apos < len(texto) and texto[apos].isdecimal():
+                destino = apos
+        if destino is not None:
+            trechos.append(texto[inicio:indice])
+            inicio = indice = destino
+        else:
+            indice += 1
+    trechos.append(texto[inicio:])
+    return trechos
+
+
+def _cortar_prazo(trecho):
+    indice = 0
+    while indice < len(trecho):
+        if not trecho[indice].isspace():
+            indice += 1
+            continue
+        apos = _apos_espacos(trecho, indice)
+        if (_literal(trecho, apos, "ate") or _literal(trecho, apos, "até")):
+            fim = apos + 3
+            if fim < len(trecho) and trecho[fim].isspace():
+                return trecho[:indice]
+        if _literal(trecho, apos, "para"):
+            fim = apos + 4
+            if fim < len(trecho) and trecho[fim].isspace():
+                fim = _apos_espacos(trecho, fim)
+                if _literal(trecho, fim, "o") and fim + 1 < len(trecho) and trecho[fim + 1].isspace():
+                    fim = _apos_espacos(trecho, fim + 1)
+                    if _literal(trecho, fim, "dia") and fim + 3 < len(trecho) and trecho[fim + 3].isspace():
+                        return trecho[:indice]
+        indice = apos
+    return trecho
+
+
+def _palavra(texto, indice):
+    return indice < len(texto) and (texto[indice].isalnum() or texto[indice] == "_")
+
+
+def _cortar_validade(trecho):
+    indice = 0
+    while indice < len(trecho):
+        if not trecho[indice].isspace():
+            indice += 1
+            continue
+        apos = _apos_espacos(trecho, indice)
+        inicio = indice - 1 if indice > 0 and trecho[indice - 1] in ",;" else indice
+        if _literal(trecho, apos, "que") and apos + 3 < len(trecho) and trecho[apos + 3].isspace():
+            apos = _apos_espacos(trecho, apos + 3)
+        if _literal(trecho, apos, "venc"):
+            fim = apos + 4
+            if _palavra(trecho, fim):
+                while _palavra(trecho, fim):
+                    fim += 1
+                return trecho[:inicio]
+        if _literal(trecho, apos, "validade") and not _palavra(trecho, apos + 8):
+            return trecho[:inicio]
+        if _literal(trecho, apos, "com") and apos + 3 < len(trecho) and trecho[apos + 3].isspace():
+            fim = _apos_espacos(trecho, apos + 3)
+            if _literal(trecho, fim, "validade") and not _palavra(trecho, fim + 8):
+                return trecho[:inicio]
+        indice = _apos_espacos(trecho, indice)
+    return trecho
+
+
+def _nome_apos_quantidade(frase, indice):
+    for prefixo in ("de", "dos", "do", "das", "da"):
+        fim = indice + len(prefixo)
+        if (_literal(frase, indice, prefixo) and fim < len(frase)
+                and frase[fim].isspace()):
+            nome = _apos_espacos(frase, fim)
+            if _palavra(frase, nome) and not frase[nome].isdecimal() and frase[nome] != "_":
+                return frase[nome:].split("\n", 1)[0]
+    if _palavra(frase, indice) and not frase[indice].isdecimal() and frase[indice] != "_":
+        return frase[indice:].split("\n", 1)[0]
+    return None
+
+
+def _buscar_item(frase):
+    """Extrai a primeira quantidade com nome, sem tentar cada dígito do mesmo número."""
+    unidades = ("caixas", "caixa", "pacotes", "pacote", "unidades", "unidade",
+                "kg", "g", "litros", "litro", "l", "quilos", "quilo", "gramas", "grama")
+    for inicio, caractere in enumerate(frase):
+        if not caractere.isdecimal() or (inicio and frase[inicio - 1].isdecimal()):
+            continue
+        fim_inteiro = inicio
+        while fim_inteiro < len(frase) and frase[fim_inteiro].isdecimal():
+            fim_inteiro += 1
+        quantidades = []
+        if fim_inteiro < len(frase) and frase[fim_inteiro] in ".,":
+            fim_decimal = fim_inteiro + 1
+            while (fim_decimal < len(frase) and frase[fim_decimal].isdecimal()
+                   and fim_decimal <= fim_inteiro + 2):
+                fim_decimal += 1
+            quantidades.extend(range(fim_decimal, fim_inteiro + 1, -1))
+        quantidades.append(fim_inteiro)
+        for fim_quantidade in quantidades:
+            posicao = _apos_espacos(frase, fim_quantidade)
+            for unidade in unidades:
+                fim_unidade = posicao + len(unidade)
+                if (_literal(frase, posicao, unidade)
+                        and not _palavra(frase, fim_unidade)):
+                    nome = _nome_apos_quantidade(frase, _apos_espacos(frase, fim_unidade))
+                    if nome is not None:
+                        return {"quantidade": frase[inicio:fim_quantidade],
+                                "unidade": frase[posicao:fim_unidade], "nome": nome}
+            nome = _nome_apos_quantidade(frase, posicao)
+            if nome is not None:
+                return {"quantidade": frase[inicio:fim_quantidade],
+                        "unidade": None, "nome": nome}
+    return None
+
+
 def _pedido_regras(texto, usar_classificador=True):
-    # vírgula só separa itens quando há espaço depois: "2,5 kg" continua um número
-    trechos = re.split(r"\s+e\s+(?=\d)|;\s*(?=\d)|,\s+(?=\d)", texto, flags=re.IGNORECASE)
+    if len(texto) > 600:
+        return {"itens": [], "receber_ate": None,
+                "observacoes": "Revise os itens e o prazo antes de publicar."}
+    # Vírgula só separa itens quando há espaço depois: "2,5 kg" continua um número.
+    trechos = _dividir_itens(texto)
     itens = []
-    padrao = re.compile(
-        r"(?P<quantidade>\d+(?:[.,]\d{1,2})?)\s*"
-        r"(?:(?P<unidade>caixas?|pacotes?|unidades?|kg|g|litros?|l|quilos?|gramas?)\b\s*)?"
-        r"(?:de\s+|d[oa]s?\s+)?(?P<nome>[^\W\d_].*)", re.IGNORECASE)
     for trecho in trechos[:10]:
-        trecho = re.split(r"\s+(?:at[eé]\s+|para\s+o\s+dia\s+)", trecho,
-                          maxsplit=1, flags=re.IGNORECASE)[0]
+        trecho = _cortar_prazo(trecho)
         # "tomate, vencem amanhã": a validade dita depois não faz parte do nome
-        trecho = re.split(r"[,;]?\s+(?:que\s+)?(?:venc\w+|com\s+validade|validade)\b", trecho,
-                          maxsplit=1, flags=re.IGNORECASE)[0]
+        trecho = _cortar_validade(trecho)
         # a primeira frase com quantidade e alimento: saudação ou telefone antes não atrapalham
-        achado = next((a for a in (padrao.search(frase) for frase in
+        achado = next((a for a in (_buscar_item(frase) for frase in
                                    re.split(r"(?<=[.!?])\s+", trecho.strip())) if a), None)
         if not achado:
             continue
-        nome = _texto_plano(achado.group("nome"), 100).strip(" ,.;!?")
-        quantidade = _quantidade(achado.group("quantidade"))
-        unidade = _unidade(achado.group("unidade")) if achado.group("unidade") else "unidade"
+        nome = _texto_plano(achado["nome"], 100).strip(" ,.;!?")
+        quantidade = _quantidade(achado["quantidade"])
+        unidade = _unidade(achado["unidade"]) if achado["unidade"] else "unidade"
         if nome and quantidade is not None and unidade:
             itens.append({"nome": nome,
                           "categoria": _categoria_item(nome, usar_classificador),

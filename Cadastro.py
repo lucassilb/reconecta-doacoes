@@ -129,9 +129,16 @@ def _email(valor):
     email = valor.strip()
     if ".." in email or email.startswith(".") or ".@" in email:
         return False
-    if re.fullmatch(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", email) is None:
+    local, separador, dominio = email.partition("@")
+    permitidos_local = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.!#$%&'*+/=?^_`{|}~-"
+    if (not separador or not local or any(c not in permitidos_local for c in local)
+            or "@" in dominio):
         return False
-    return all(not parte.startswith("-") and not parte.endswith("-") for parte in email.split("@", 1)[1].split("."))
+    partes = dominio.split(".")
+    return (len(partes) >= 2 and
+            all(parte and parte[0] != "-" and parte[-1] != "-" and
+                all("A" <= c <= "Z" or "a" <= c <= "z" or "0" <= c <= "9" or c == "-"
+                    for c in parte) for parte in partes))
 
 
 def _telefone(valor):
