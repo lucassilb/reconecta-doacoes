@@ -23,7 +23,7 @@ jobs:
       - run: python -m pytest -q --junitxml=pytest.xml
         env:
           DATABASE_URL: sqlite://
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: pytest-junit
@@ -43,7 +43,7 @@ jobs:
         run: python scripts/ciclo_ia.py
         env:
           DATABASE_URL: sqlite://
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: metricas-ia
@@ -66,7 +66,7 @@ jobs:
           mkdir -p reports
           bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f json -o reports/bandit.json || true
           bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f txt -o reports/bandit.txt || true
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: bandit-report
@@ -147,7 +147,7 @@ jobs:
           format: json
           output: reports/trivy-image.json
           exit-code: "0"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: trivy-report
@@ -193,7 +193,7 @@ jobs:
           mkdir -p reports
           semgrep --config p/python --config p/flask --config p/secrets --config p/owasp-top-ten \
             --json -o reports/semgrep.json --exclude tests --exclude .venv . || true
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: semgrep-report
@@ -220,7 +220,7 @@ jobs:
           pip-audit -r requirements.txt -r requirements-dev.txt -f json -o reports/pip-audit.json || true
           cat requirements.txt requirements-dev.txt > /tmp/reqs.txt
           cyclonedx-py requirements /tmp/reqs.txt -o reports/sbom-cyclonedx.json --of JSON
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: sca-report
@@ -245,7 +245,7 @@ jobs:
           mkdir -p reports
           gitleaks dir . -r reports/gitleaks-dir.json --exit-code 0
           gitleaks git . -r reports/gitleaks-git.json --exit-code 0
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: gitleaks-report
@@ -320,7 +320,7 @@ jobs:
           path: relatorios/seguranca
       - name: Resumir varreduras e STRIDE
         run: python scripts/resumo_sast.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sast-resumo
           path: relatorios/sast/resumo.json
@@ -348,7 +348,7 @@ jobs:
       - name: Resumir e bloquear achados altos
         if: always()
         run: python scripts/resumo_iast.py reports/iast
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: iast-report
@@ -366,7 +366,7 @@ jobs:
           python-version: "3.12"
       - name: ZAP baseline e API com sessões fictícias no Compose local
         run: python scripts/dast.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: dast-iast-report
@@ -396,7 +396,7 @@ jobs:
           python scripts/relatorio_log_minimo.py
         env:
           DATABASE_URL: sqlite://
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: guardrails-log-minimo
