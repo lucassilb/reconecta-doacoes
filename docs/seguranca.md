@@ -123,6 +123,19 @@ A matriz verifica dono, outro titular do mesmo perfil, perfil diferente e ausên
 
 Esta é uma prova dos fluxos e papéis semeados, não um modelo formal de autorização. As escritas públicas de cadastro/login e IA agregada ficam classificadas no inventário; o ZAP e os testes funcionais cobrem suas validações. O script testa também a criação de contribuição com foto e a autorização da IA com resposta local simulada, sem enviar conteúdo a provedores externos.
 
+### Triagem condicional do ZAP (regra 40018)
+
+Na execução do CI de 2026-10-15 o ZAP marcou uma vez "SQL Injection" (regra 40018, ALTA) em
+`/reconecta/ia/interpretar-pedido`; na execução anterior, com o mesmo código, não marcou. A regra
+compara respostas a textos como `AND 1=1` e `AND 1=2`, e essas rotas devolvem justamente a
+interpretação do texto enviado, então qualquer diferença no texto muda a resposta. No mesmo
+scan, o sensor IAST observou 2.026 SQLs e nenhum com dado da requisição, e a rota não usa o
+texto em consulta ao banco. `scripts/dast.py` só rebaixa esse alerta para FALSO_POSITIVO nas
+rotas de leitura de texto da IA e **apenas quando o IAST da mesma varredura não tem achado**;
+em qualquer outra rota, ou com achado do IAST, o gate continua barrando. O rebaixamento fica
+registrado em `relatorios/seguranca/zap.json` (`falsos_positivos`). Teste:
+`tests/test_dast.py::test_sqli_em_rota_de_texto_so_vira_falso_positivo_com_iast_limpo`.
+
 ## Frente C — NeMo Guardrails na IA e log mínimo
 
 Data: 2026-10-14. Base: main `a0ba325`. Relatórios: [`relatorios/seguranca/nemo-guardrails.json`](../relatorios/seguranca/nemo-guardrails.json)

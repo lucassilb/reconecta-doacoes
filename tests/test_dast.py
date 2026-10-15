@@ -100,3 +100,25 @@ def test_contagem_do_access_log_desconta_a_prova_direta():
                            "app-1  | POST /reconecta/excedentes/7/reservar 403 80 1ms",
                            "app-1  | GET /reconecta/excedentes 200 2 1ms"])
     assert respostas_da_oferta(registro) == {"400": 1}
+
+
+def _resumo_com_sqli(rotas):
+    return {"varreduras": {"empresa": {"alertas": [
+        {"id": "40018", "nome": "SQL Injection", "severidade": "ALTA", "ocorrencias": 1, "rotas": rotas}]}},
+        "por_severidade": {"ALTA": 1, "CRITICA": 0}}
+
+
+def test_sqli_em_rota_de_texto_so_vira_falso_positivo_com_iast_limpo():
+    from scripts.dast import aplicar_falsos_positivos
+
+    limpo = {"eventos": {"sql_observado": 10}, "achados": []}
+    resumo = aplicar_falsos_positivos(_resumo_com_sqli(["/reconecta/ia/interpretar-pedido"]), limpo)
+    assert resumo["por_severidade"]["ALTA"] == 0
+    assert resumo["falsos_positivos"]["alertas"][0]["id"] == "40018"
+
+    sujo = {"achados": [{"tipo": "sql_com_dado_da_requisicao", "severidade": "ALTA"}]}
+    assert aplicar_falsos_positivos(_resumo_com_sqli(["/reconecta/ia/interpretar-pedido"]), sujo)[
+        "por_severidade"]["ALTA"] == 1
+
+    outra_rota = aplicar_falsos_positivos(_resumo_com_sqli(["/reconecta/auth/login"]), limpo)
+    assert outra_rota["por_severidade"]["ALTA"] == 1

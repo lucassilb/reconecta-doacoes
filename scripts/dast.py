@@ -196,6 +196,39 @@ def auth_config(cookie, destino):
         f"replacer.full_list(0).replacement={cookie}", "")), encoding="utf-8")
 
 
+# Regra 40018 (SQL Injection por diferença de resposta) nas rotas que LEEM o texto enviado:
+# a resposta muda com qualquer texto, então "AND 1=1" x "AND 1=2" parece injeção. Só vira
+# falso positivo se o IAST da MESMA varredura não viu nenhum SQL com dado da requisição.
+FALSOS_POSITIVOS_CONDICIONAIS = {
+    "40018": {"/reconecta/ia/interpretar-pedido", "/reconecta/ia/sugerir-destino",
+              "/reconecta/ia/risco-descarte"},
+}
+
+
+def aplicar_falsos_positivos(resumo, iast):
+    """Rebaixa alertas da lista acima quando o IAST confirma que não houve SQL contaminado."""
+    if iast.get("achados"):
+        return resumo
+    rebaixados = []
+    for nome, varredura in resumo["varreduras"].items():
+        for alerta in varredura["alertas"]:
+            rotas = FALSOS_POSITIVOS_CONDICIONAIS.get(str(alerta["id"]))
+            if (rotas and alerta["severidade"] in ("ALTA", "CRITICA")
+                    and set(alerta["rotas"]) <= rotas):
+                resumo["por_severidade"][alerta["severidade"]] -= 1
+                resumo["por_severidade"]["FALSO_POSITIVO"] = resumo["por_severidade"].get("FALSO_POSITIVO", 0) + 1
+                rebaixados.append({"varredura": nome, "id": alerta["id"], "nome": alerta["nome"],
+                                   "severidade_original": alerta["severidade"], "rotas": alerta["rotas"]})
+                alerta["severidade"] = "FALSO_POSITIVO"
+    if rebaixados:
+        resumo["falsos_positivos"] = {
+            "justificativa": ("rota lê o texto e devolve o que entendeu; o sensor IAST da mesma "
+                              f"varredura observou {iast.get('eventos', {}).get('sql_observado', 0)} "
+                              "SQLs e nenhum com dado da requisição"),
+            "alertas": rebaixados}
+    return resumo
+
+
 def resumir_zap(arquivos):
     varreduras = {}
     total = {nome: 0 for nome in RISCO.values()}
@@ -299,6 +332,11 @@ def main():
             comando([sys.executable, str(RAIZ / "scripts" / "resumo_iast.py"), str(iast),
                      "--saida", str(SAIDA / "iast-dast.json")],
                     ambiente=ambiente)
+            iast_dast = json.loads((SAIDA / "iast-dast.json").read_text(encoding="utf-8"))
+            resumo = aplicar_falsos_positivos(resumo, iast_dast)
+            (SAIDA / "zap.json").write_text(json.dumps(resumo, ensure_ascii=False, indent=2) + "\n",
+                                            encoding="utf-8")
+            print(f"ZAP após triagem com o IAST: {resumo['por_severidade']}", flush=True)
             if resumo["por_severidade"].get("ALTA", 0) or resumo["por_severidade"].get("CRITICA", 0):
                 raise RuntimeError("ZAP encontrou alerta ALTA/CRITICA")
         finally:
