@@ -586,7 +586,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 
 Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir do código (sempre igual à API em execução). A especificação exportada está em [swagger.json](swagger.json) e é regenerada a cada mudança de endpoint. Na nuvem, fica em `/swagger` da URL pública desta entrega (seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase)). O endereço publicado no CP1 (https://reconecta.onrender.com/swagger) é de outra conta e mostra a versão do CP1.
 
-## Avaliação de segurança (Cyber Risk)
+## Avaliação de segurança
 
 O [guia de avaliação](docs/avaliacao-cyber-risk.md) descreve a arquitetura, o ambiente isolado sem credenciais de produção, contas fictícias, comandos de testes e riscos residuais. Execute testes ativos somente contra a instância local.
 
@@ -594,7 +594,7 @@ O [guia de avaliação](docs/avaliacao-cyber-risk.md) descreve a arquitetura, o 
 
 [Quadro ReConecta no Trello](https://trello.com/invite/b/6a96cdf34f25b339652662c3/ATTI4b7785042036ae55024963ac1546279b355F294D/reconecta)
 
-**Atenção:** o convite contém um token que permite ingressar no quadro. Mantido para a avaliação; o quadro não deve conter dados sensíveis. Veja o [risco e as medidas após a avaliação](docs/avaliacao-cyber-risk.md#convite-do-trello).
+
 
 ## Roteiro da apresentação
 
@@ -614,6 +614,7 @@ Inteligências do projeto: leitura de texto por LLM (Groq Free, com Ollama local
 | Brian Barreto Brasil | RM570384 |
 | Enzo Gabriel Lima Miranda | RM573094 |
 | Victor Deggerone Gomes | RM569518 |
+| Lucas Silvério Bomtempo | RM568585 |
 
 ## Status
 
