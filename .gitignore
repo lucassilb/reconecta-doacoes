@@ -149,6 +149,8 @@ activemq-data/
 
 # Environments
 .env
+.env.*
+!.env.example
 .envrc
 .venv
 env/
@@ -216,3 +218,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Credenciais, bancos locais e backups fora do controle de versão
+*.db
+*.sqlite*
+*.key
+*.pem
+*.p12
+superuser.pw
+nuvem-acessos*
+*.dump
+backup-*.sql

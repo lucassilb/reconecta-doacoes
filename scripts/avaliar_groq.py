@@ -20,7 +20,6 @@ import llm_service  # noqa: E402
 from fuso import hoje_brasilia  # noqa: E402
 from scripts.avaliar_modelos import ler_pedidos, pontuar, resolver_prazo  # noqa: E402
 
-CHAVE_LOCAL = Path("C:/Users/lucas/relatorios/reconecta-2026-10-14/r17/groq.key")
 SAIDA = RAIZ / "modelo" / "avaliacao_groq.json"
 
 
@@ -37,7 +36,9 @@ def avaliar(pedidos, funcao):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--key-file", type=Path, default=CHAVE_LOCAL)
+    parser.add_argument("--key-file", type=Path,
+                        default=Path(os.getenv("GROQ_KEY_FILE") or "groq.key"),
+                        help="arquivo local opcional; padrão: GROQ_KEY_FILE ou groq.key")
     parser.add_argument("--intervalo", type=float, default=12.2,
                         help="segundos mínimos entre chamadas ao Groq")
     args = parser.parse_args()

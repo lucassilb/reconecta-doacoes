@@ -164,7 +164,7 @@ O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a pr
 
 O bloco de segurança lê `relatorios/sast/resumo.json` com achados e data de Bandit, Trivy de arquivos/configuração/imagem e estado STRIDE. A imagem versionada ainda tem 44 achados HIGH do Debian base; o painel não os chama de mitigados. Cabeçalhos/CSP e cotas são controles existentes; falhas e bloqueios de login aparecem como **não medidos**, pois só constam no log. Regras, premissas, atualização do relatório e prova estão em [docs/dashboard.md](docs/dashboard.md); testes em `tests/test_dashboard_impacto.py`.
 
-Para a apresentação no site público, a alternância **Dados reais | Demonstração** mantém os dados reais como padrão e identifica a simulação por uma faixa fixa. `?modo=demonstracao` calcula os mesmos indicadores em SQLite **em memória**, sem escrever no banco configurado: a semente versionada em `data/demonstracao.json` cria 25 ONGs, 5 mercados e 8 doadores fictícios, com 320 pedidos/doações e 160 excedentes. A semeadura usa a meia-noite de Brasília e é renovada quando o dia muda. Acurácia da IA e SAST permanecem reais nos dois modos. O resumo em linguagem natural só está disponível nos dados reais. O snapshot SAST em `data/resumo_sast.json` acompanha a imagem Docker, que exclui `relatorios/`. Testes em `tests/test_dashboard_demo.py`.
+Para a apresentação no site público, a alternância **Dados reais | Demonstração** mantém os dados reais como padrão e identifica a simulação por uma faixa fixa. `?modo=demonstracao` calcula os mesmos indicadores em SQLite **em memória**, sem escrever no banco configurado: a semente versionada em `data/demonstracao.json` cria 25 ONGs, 5 mercados e 8 doadores fictícios, com 320 pedidos/doações e 160 excedentes. A semeadura usa a meia-noite de Brasília e é renovada quando o dia muda. Acurácia da IA e SAST permanecem reais nos dois modos. O resumo em linguagem natural funciona nos dois modos; na Demonstração é rotulado como resumo de dados simulados. Sem Groq ou Ollama, usa regras locais. O snapshot SAST em `data/resumo_sast.json` acompanha a imagem Docker, que exclui `relatorios/`. Testes em `tests/test_dashboard_demo.py`.
 
 **Mapa de calor.** `static/js/mapa-calor.js` desenha o Brasil em SVG com os contornos oficiais do IBGE (`static/geo/brasil.topo.json`, 37 KB, fonte e licença em `static/geo/FONTES.txt`) e pinta o calor em Canvas recortado pelo país: 40% de fundo suave por estado e 60% de pontos quentes nas cidades de quem recebeu. A cor segue o dado real em refeições potenciais, em **escala logarítmica** (azul = baixo, amarelo = médio, vermelho = alto, com os números na legenda). Passar o mouse ou tocar num estado mostra refeições, kg e ONGs; a tabela por estado e por cidade fica logo abaixo. Os dados vêm de `refeicoes.por_municipio` em `GET /reconecta/dashboard/impacto` (só cidade, UF e números). No modo Demonstração, 100 ONGs fictícias ficam nas 100 cidades mais populosas (IBGE, Censo 2022).
 
@@ -195,7 +195,7 @@ Todas gratuitas.
 
 ## Instalação
 
-Há dois caminhos: Python direto na máquina ou Docker Compose.
+Há dois caminhos: Python direto na máquina ou Docker Compose. Para avaliação de segurança em ambiente isolado, siga também o [guia Cyber Risk](docs/avaliacao-cyber-risk.md).
 
 ### Caminho 1: Python local
 
@@ -205,16 +205,16 @@ Pré-requisitos:
 - PostgreSQL (opcional: sem `DATABASE_URL` a aplicação usa SQLite em `instance/reconecta.db`);
 - Chave Groq Free ou Ollama (ambos opcionais) para a LLM. Sem os dois, as funções usam o classificador treinado e regras automáticas.
 
-```bash
-git clone <URL_DO_REPOSITORIO>
-cd ReConecta
+```text
+git clone <URL_DO_REPOSITORIO> reconecta-avaliacao
+cd reconecta-avaliacao
 python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# Linux ou macOS
-source .venv/bin/activate
-pip install -r requirements.txt        # produção
-pip install -r requirements-dev.txt    # testes e Bandit (desenvolvimento)
+# Windows PowerShell (sem ativação)
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+# Linux ou macOS (sem ativação)
+./.venv/bin/python -m pip install -r requirements.txt
+./.venv/bin/python -m pip install -r requirements-dev.txt
 ```
 
 LLM local (opcional, gratuito): instale o Ollama (https://ollama.com/download) e baixe o modelo:
@@ -230,7 +230,7 @@ Pré-requisito: Docker com Compose (`docker version` e `docker compose version`)
 
 ## Variáveis de ambiente
 
-Crie um `.env` a partir do `.env.example` (não publique o `.env`). Nenhuma é obrigatória para rodar localmente.
+Se precisar configurar variáveis, crie um `.env` a partir do `.env.example` (não publique o `.env`). Sem ele, o caminho Python usa SQLite local; o Compose tem valores padrão apenas para desenvolvimento. Use somente credenciais fictícias na avaliação.
 
 | Variável | Padrão | Uso |
 |---|---|---|
@@ -246,7 +246,7 @@ Crie um `.env` a partir do `.env.example` (não publique o `.env`). Nenhuma é o
 | `GROQ_MODEL` | `openai/gpt-oss-20b` | Modelo strict gratuito; aceita também `openai/gpt-oss-120b` e `qwen/qwen3.8-27b`. Outro valor desliga o Groq. |
 | `OLLAMA_URL` | `http://localhost:11434` | Endereço do Ollama. Só HTTP, com porta, em `localhost`, `127.0.0.1` ou `::1`. |
 | `OLLAMA_MODELO` | `qwen2.5:3b` | Modelo gratuito usado pela IA; outro valor desliga a chamada à LLM. |
-| `GEO_EXTERNO` | `1` | `0` desliga as consultas ao Nominatim e à BrasilAPI; as distâncias usam o cache e a sede do município (`data/municipios.csv`). |
+| `GEO_EXTERNO` | `1` | `0` desliga as consultas de geolocalização ao Nominatim e à BrasilAPI; as distâncias usam o cache e a sede do município (`data/municipios.csv`). A consulta pública de CNPJ no cadastro continua independente dessa variável. |
 | `OLLAMA_PERMITIR_DOCKER` | desligado | `1` aceita também, e somente, o host `ollama` do Docker Compose em `OLLAMA_URL` (`http://ollama:11434`). O Compose já define. |
 
 Só no Docker Compose (lidas pelo `docker-compose.yml`):
@@ -262,8 +262,11 @@ Só nos testes opcionais: `CP2_PG_SUPERUSER_PASSWORD_FILE` (provas em PostgreSQL
 
 Local:
 
-```bash
-python app.py
+```text
+# Windows PowerShell
+.\.venv\Scripts\python.exe app.py
+# Linux ou macOS
+./.venv/bin/python app.py
 ```
 
 Com Docker Compose:
@@ -277,11 +280,14 @@ Nos dois casos a aplicação sobe em `http://localhost:5000`, com o Swagger em `
 
 ## Testes
 
-```bash
-python -m pytest -q
+```text
+# Windows PowerShell
+.\.venv\Scripts\python.exe -m pytest -q
+# Linux ou macOS
+./.venv/bin/python -m pytest -q
 ```
 
-Resultado atual: **455 passed, 10 skipped**. Tipos de teste, arquivos e o motivo dos 4 pulados estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
+Os totais variam conforme o ambiente e os testes opcionais. Tipos de teste e condições de execução estão em [Testes (critério 7 do CP2)](#testes-critério-7-do-cp2).
 
 ## Endpoints
 
@@ -579,9 +585,15 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 
 Interativa em `http://localhost:5000/swagger`, gerada pelo Flask-RESTX a partir do código (sempre igual à API em execução). A especificação exportada está em [swagger.json](swagger.json) e é regenerada a cada mudança de endpoint. Na nuvem, fica em `/swagger` da URL pública desta entrega (seção [Nuvem: Render e Supabase](#nuvem-render-e-supabase)). O endereço publicado no CP1 (https://reconecta.onrender.com/swagger) é de outra conta e mostra a versão do CP1.
 
+## Avaliação de segurança (Cyber Risk)
+
+O [guia de avaliação](docs/avaliacao-cyber-risk.md) descreve a arquitetura, o ambiente isolado sem credenciais de produção, contas fictícias, comandos de testes e riscos residuais. Execute testes ativos somente contra a instância local.
+
 ## Organização no Trello
 
 [Quadro ReConecta no Trello](https://trello.com/invite/b/6a96cdf34f25b339652662c3/ATTI4b7785042036ae55024963ac1546279b355F294D/reconecta)
+
+**Atenção:** o convite contém um token que permite ingressar no quadro. Mantido para a avaliação; o quadro não deve conter dados sensíveis. Veja o [risco e as medidas após a avaliação](docs/avaliacao-cyber-risk.md#convite-do-trello).
 
 ## Roteiro da apresentação
 

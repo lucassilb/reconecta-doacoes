@@ -1,0 +1,4 @@
+# Fixtures compared byte for byte by tests; preserve LF on Windows clones.
+.gitattributes text eol=lf
+static/index.html text eol=lf
+data/lotes_descarte.csv text eol=lf

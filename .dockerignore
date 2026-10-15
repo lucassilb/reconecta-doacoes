@@ -15,5 +15,12 @@ __pycache__/
 venv/
 *.db
 *.sqlite*
+*.key
+*.pem
+*.p12
+superuser.pw
+nuvem-acessos*
+*.dump
+backup-*.sql
 *.log
 requirements-dev.txt
