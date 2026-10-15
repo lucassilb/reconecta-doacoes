@@ -1,4 +1,4 @@
-pytest==9.0.3
+pytest==9.1.1
 bandit>=1.8,<2
 playwright==1.63.0
 pandas==3.0.6
