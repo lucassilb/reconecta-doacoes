@@ -1,5 +1,5 @@
 {
-  "data": "2026-10-14",
+  "data": "2026-10-15",
   "pedidos": 66,
   "modelo": "openai/gpt-oss-20b",
   "regras": {
@@ -26,10 +26,10 @@
     "pedidos_perfeitos": 51,
     "total": 66,
     "fontes": {
-      "qwen2.5:3b": 11,
-      "groq:openai/gpt-oss-20b": 44,
-      "regras": 11
+      "groq:openai/gpt-oss-20b": 43,
+      "regras": 22,
+      "guarda_recusou": 1
     },
-    "chamadas_groq": 66
+    "chamadas_groq": 53
   }
 }
