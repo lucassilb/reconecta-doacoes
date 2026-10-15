@@ -124,6 +124,13 @@ def test_seguranca_publica_nao_inventa_contadores():
     assert resposta.status_code == 200
     assert resposta.json["controles"]["falhas_login"].startswith("Não medidas")
     assert resposta.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] > 0
+    gates = resposta.json["sast"]["gates"]
+    assert gates
+    assert all(set(gate) == {"rotulo", "resultado"} for gate in gates)
+    assert all(gate["rotulo"] and gate["resultado"] in
+               {"passou", "falhou", "sem_dados"} for gate in gates)
+    assert "regra" not in resposta.get_data(as_text=True)
+    assert "detalhe" not in resposta.get_data(as_text=True)
 
 
 @pytest.mark.parametrize("cookie_seguro", [False, True])

@@ -12,8 +12,8 @@ from sqlalchemy.orm import selectinload
 import geo
 from Auth import usuario_atual
 from conexao import casar
-from Dashboard import montar_dashboard
-from fuso import agora_brasilia_sem_fuso
+from Dashboard import _consultar_demonstracao, montar_dashboard
+from fuso import agora_brasilia, agora_brasilia_sem_fuso
 from llm_service import EntradaRecusada, interpretar_pedido, resumir_dashboard
 from models import Doacao
 from Publico import _municipio_uf, serializar_doacao
@@ -32,6 +32,7 @@ pedido_model = ns.model("PedidoSugeridoIA", {
 resumo_model = ns.model("ResumoDashboardIA", {
     "resumo": fields.String, "recomendacoes": fields.List(fields.String),
     "fonte": fields.String, "modelo": fields.String, "gerado_em": fields.String,
+    "modo": fields.String(description="demonstracao quando o resumo usa dados simulados"),
 })
 risco_model = ns.model("LoteRiscoDescarteIA", {
     "categoria": fields.String(required=True), "dias_validade": fields.Integer(required=True),
@@ -45,6 +46,9 @@ _acessos = {}
 _acessos_lock = threading.Lock()
 JANELA_SEGUNDOS = 60
 LIMITE_POR_IP = 10
+_resumo_demo_lock = threading.Lock()
+_resumo_demo_dia = None
+_resumo_demo_cache = None
 
 
 def _permitir(chave):
@@ -103,11 +107,22 @@ class InterpretarPedido(Resource):
 @ns.route("/resumo-dashboard")
 class ResumoDashboard(Resource):
     @ns.response(200, "Resumo dos indicadores", resumo_model)
+    @ns.param("modo", "demonstracao: resumo sobre SQLite isolado, com cache diário", _in="query")
     def post(self):
         if not _permitir(f"ip:{request.remote_addr or 'desconhecido'}"):
             return {"codigo": "LIMITE_IA", "mensagem": "Limite de 10 resumos por minuto atingido."}, 429, {
                 "Retry-After": "60"}
         # O corpo do cliente é ignorado: só os agregados calculados aqui seguem ao modelo.
+        if request.args.get("modo") == "demonstracao":
+            global _resumo_demo_dia, _resumo_demo_cache
+            with _resumo_demo_lock:
+                dia = agora_brasilia().date()
+                if _resumo_demo_dia != dia or _resumo_demo_cache is None:
+                    painel = _consultar_demonstracao(montar_dashboard)
+                    resumo = resumir_dashboard(painel)
+                    _resumo_demo_cache = {**resumo, "modo": "demonstracao"}
+                    _resumo_demo_dia = dia
+                return _resumo_demo_cache.copy(), 200
         return resumir_dashboard(montar_dashboard()), 200
 
 

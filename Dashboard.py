@@ -271,8 +271,26 @@ def montar_impacto():
 
 def montar_seguranca():
     """Configuração comprovável e relatórios estáticos, nunca telemetria simulada."""
+    sast = _resumo_sast()
+    if sast is not None:
+        rotulos = {
+            "bandit-high": "Análise de código",
+            "trivy-fs": "Arquivos",
+            "trivy-config": "Configuração",
+            "trivy-imagem": "Imagem",
+            "ia-limiares": "IA",
+            "semgrep-erro": "Análise de código",
+            "sca-pip-audit": "Dependências",
+            "segredos-gitleaks": "Segredos",
+        }
+        sast = {**sast, "gates": [
+            {"rotulo": rotulos.get(gate.get("gate"), "Verificação"),
+             "resultado": gate.get("resultado") if gate.get("resultado") in
+             {"passou", "falhou", "sem_dados"} else "sem_dados"}
+            for gate in sast.get("gates", [])
+        ]}
     return {
-        "sast": _resumo_sast(),
+        "sast": sast,
         "controles": {
             "cabecalhos": ["Content-Security-Policy", "X-Content-Type-Options",
                            "X-Frame-Options", "Referrer-Policy", "Permissions-Policy"],

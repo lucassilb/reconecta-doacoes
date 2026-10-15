@@ -159,8 +159,8 @@
 .gate--falhou { border-left-color: var(--erro); background: var(--erro-suave); }
 .gate--falhou .gate__status { color: var(--erro); }
 .gate--sem_dados .gate__status { color: var(--tinta-suave); }
-.gate__regra { font-size: .86rem; color: var(--tinta); }
-.gate__detalhe { grid-column: 2; font-size: .78rem; color: var(--tinta-suave); }
+.gate__rotulo { font-size: .86rem; color: var(--tinta); }
+#gates-resumo { margin: 0 0 10px; font-size: .88rem; font-weight: 700; }
 @media (max-width: 719.98px) { .seg-grade { grid-template-columns: 1fr; } }
 
 /* R21: dashboard compacto em largura total. Só esta página; tamanhos de fonte inalterados. */
