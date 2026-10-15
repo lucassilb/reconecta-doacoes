@@ -128,6 +128,29 @@ Residual: `sessao_versao` é global por conta — sair em um navegador encerra a
 demais sessões da mesma conta (decisão documentada, não bug); sessões antigas
 sem a marca não são revogáveis retroativamente.
 
+### Alertas CodeQL JavaScript (rodada 26 — `static/js/entrar.js`)
+
+Quatro alertas (10-13 do GitHub) no mesmo código-fonte `location.search` →
+`location.replace/assign`. Causa real: o `?proximo=` era validado pela regex
+`/^\/(?!\/)[^\\]*$/`, que **não rejeita caracteres de controle que o navegador
+remove ao interpretar a URL** — `?proximo=/%09/evil.com` passava na regex e o
+parser WHATWG transformava `/<TAB>/evil.com` em `//evil.com` (redirecionamento
+aberto confirmado no navegador: a página tentou sair para `chrome-error://`
+em `evil.example`). Correção pela causa: `new URL(p, location.origin)` com a
+conferência `alvo.origin === location.origin` sobre a URL **já normalizada**,
+mais rejeição antecipada de controle/espaço/`\` e exigência de `/` inicial;
+qualquer outro host, esquema (`javascript:`, `data:`) ou caminho
+protocol-relative cai em `/painel`.
+
+| # GitHub | Regra | Linha | Causa | Correção | Teste |
+|---|---|---|---|---|---|
+| 12, 13 | js/client-side-unvalidated-url-redirection | entrar.js:45, :191 | controle removido pelo parser de URL → `//host` | `new URL` + `origin === location.origin` | `tests/test_entrar_destino.py` — `/%09/evil`, `//evil`, `https://evil`, `/\evil` no Chrome headless |
+| 10, 11 | js/xss | entrar.js:45, :191 | esquema arbitrário no destino (`javascript:`) | mesmo guard — origem fixa e esquema http(s) | `javascript:alert(1)` e `<img onerror>` no mesmo teste |
+
+Prova CodeQL local (CLI 2.27.2, `javascript-security-extended`): **4 alertas
+antes → 0 depois**, nos mesmos pontos que o GitHub apontou. Comportamento
+mantido: caminhos internos (`/doacoes/5`, `/?assistente=1`) seguem funcionando.
+
 ## Frente B — DAST, IAST e autorização por objeto
 ### DAST: OWASP ZAP
 

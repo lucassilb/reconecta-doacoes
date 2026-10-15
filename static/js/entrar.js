@@ -29,11 +29,21 @@
   var btnOlho = $("btn-olho");
   var aviso = $("aviso-entrar");
 
-  /* ---------- destino pós-login (?proximo= aceita só caminho relativo) ---------- */
+  /* ---------- destino pós-login (?proximo= só caminho da mesma origem) ---------- */
 
   function destino() {
+    /* O navegador remove tabulações e quebras de linha ao interpretar a URL e
+       trata "\" como "/" em http(s), então a decisão usa a URL já normalizada:
+       só caminho interno da própria origem — outro host, esquema ou
+       protocol-relative (//site) voltam para /painel. */
     var p = new URLSearchParams(location.search).get("proximo") || "";
-    if (/^\/(?!\/)[^\\]*$/.test(p)) return p;
+    if (p.charAt(0) !== "/" || /[\x00-\x20\x7f\\]/.test(p)) return "/painel";
+    try {
+      var alvo = new URL(p, location.origin);
+      if (alvo.origin === location.origin && alvo.protocol === location.protocol) {
+        return alvo.pathname + alvo.search + alvo.hash;
+      }
+    } catch (e) { /* URL inválida: cai no retorno interno abaixo */ }
     return "/painel";
   }
 
