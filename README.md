@@ -475,7 +475,7 @@ simulação, matriz de confusão, teste e limitações estão em
 
 - **Matriz de riscos STRIDE**: [docs/stride.md](docs/stride.md). Traz o diagrama de fluxo de dados com as fronteiras de confiança, os ativos e atores, a matriz com probabilidade × impacto, os controles existentes com referência `arquivo:linha`, as lacunas e os riscos residuais.
 - **Relatórios SAST**: pasta [`relatorios/sast/`](relatorios/sast/), versionada. Bandit no código Python (`bandit.json`, `bandit.txt`, `bandit.html`) e Trivy em três varreduras: arquivos e dependências (`trivy-fs.*`, scanners `vuln,secret,misconfig`), configuração do Dockerfile (`trivy-config.*`) e imagem Docker (`trivy-image.*`). A triagem achado a achado está em `docs/sast.md`.
-- **Resumo dos achados**: varredura de 2026-10-13 (Bandit 1.9.4, Trivy 0.75.0). **Bandit: 0 achados** em 3.415 linhas (na primeira varredura eram 5 médios: 1 corrigido e 4 falsos positivos justificados no código). **Trivy em arquivos e dependências: 0 vulnerabilidades, 0 segredos, 0 falhas de configuração** (eram 4 dependências com CVE média, todas atualizadas). **Trivy no Dockerfile: 0 falhas** (a versão usada não tem verificador para Compose, `render.yaml` e workflow; esses foram revisados à mão na matriz STRIDE). **Trivy na imagem Docker: 0 críticas, 44 altas, 58 médias, 61 baixas e 3 sem classificação**, todas em pacotes do sistema Debian da imagem base `python:3.12-slim`; nenhuma está em pacote Python e só 2 (sem classificação) têm correção publicada. O antes e depois e a triagem de cada achado estão em [docs/sast.md](docs/sast.md)
+- **Resumo dos achados**: a varredura SAST de 13/10 registrou 0 achados Bandit e 0 vulnerabilidades/segredos/misconfigurações em arquivos. A imagem Debian anterior tinha 44 ocorrências HIGH de 8 CVEs. Em 15/10, a imagem Alpine construída neste branch foi varrida com Trivy 0.75.0 (`vuln,secret,misconfig`) e teve **0 vulnerabilidades, 0 segredos e 0 misconfigurações**. Os resultados têm datas próprias; veja o antes, o depois e as limitações em [docs/sast.md](docs/sast.md).
 - **Refazer os relatórios**: `python scripts/sast.py` na raiz do projeto. Precisa do Bandit (`pip install -r requirements-dev.txt`) e do binário gratuito do Trivy no PATH ou em `TRIVY=<caminho>`.
 - **Security Gates no pipeline**: o GitHub Actions repete Bandit e Trivy a cada push ou pull request na `main` e guarda os relatórios como artefatos. Os portões reprovam: Bandit em severidade alta (`-lll`); Trivy `fs` em vulnerabilidade HIGH/CRITICAL com correção, segredo ou misconfig alta; `trivy config` em HIGH/CRITICAL; Trivy `image` em CRITICAL corrigível; **Semgrep** (pacotes `p/python`, `p/flask`, `p/secrets` e `p/owasp-top-ten`, mais o ruleset próprio `semgrep-local.yml`) em achado ERROR; **pip-audit** em qualquer CVE de `requirements.txt`/`requirements-dev.txt` (com SBOM CycloneDX como artefato); **gitleaks** em qualquer segredo nos arquivos (diretório e histórico); o job `guardas` roda `pre-commit run --all-files` — os mesmos hooks do commit local — e o job `ia` se as métricas caírem abaixo de `modelo/limiares.json`. `scripts/resumo_sast.py` declara a regra e o último resultado de cada portão em `relatorios/sast/resumo.json`, e o dashboard mostra esse bloco junto à rosca "Mitigadas / Em análise / Críticas".
 - **Segurança "enquanto coda" (pre-commit)**: `.pre-commit-config.yaml` roda checks básicos, Bandit, Semgrep (ruleset local, offline), pip-audit e gitleaks **antes de cada commit**. Instalar com `pip install pre-commit semgrep pip-audit`, o binário do gitleaks no PATH e `pre-commit install` uma vez por clone. Varreduras completas e triagem da rodada 18: [docs/seguranca.md](docs/seguranca.md), relatórios em [`relatorios/seguranca/`](relatorios/seguranca/).
@@ -504,7 +504,7 @@ Controles que estão no código:
 
 ## Docker e Docker Compose
 
-O [`Dockerfile`](Dockerfile) parte de `python:3.12-slim`, instala só o `requirements.txt` de produção, roda com o usuário sem privilégio `reconecta` e serve a aplicação com gunicorn (2 workers, timeout de 90 s). Tem `HEALTHCHECK` em `/reconecta/saude` e não leva segredo nenhum: tudo chega por variável de ambiente.
+O [`Dockerfile`](Dockerfile) parte de `python:3.12-alpine` fixado por digest e aplica as atualizações de pacotes do Alpine no build. Instala só o `requirements.txt` de produção, remove o `pip`, roda com o usuário sem privilégio `reconecta` e serve a aplicação com gunicorn gthread (2 workers, 8 threads, timeout de 90 s). Tem `HEALTHCHECK` em `/reconecta/saude`, respeita a variável `PORT` do Render e não leva segredo nenhum: tudo chega por variável de ambiente. A troca da base Debian para Alpine eliminou os 44 achados HIGH da imagem anterior no [snapshot Trivy de 15/10/2026](docs/sast.md); refaça o scan em cada reconstrução.
 
 O [`docker-compose.yml`](docker-compose.yml) sobe dois serviços, mais um opcional:
 
@@ -538,7 +538,7 @@ O workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda a cada pu
 | `testes` | Python 3.12, instala `requirements.txt` e `requirements-dev.txt`, roda `python -m pytest` e guarda o relatório JUnit como artefato | Algum teste falha |
 | `ia` | Treina o classificador, avalia a conexão, confere `modelo/limiares.json` e publica `metricas-ia` | Qualquer métrica cai abaixo do mínimo |
 | `sast-bandit` | Bandit no código da aplicação; relatórios JSON e texto como artefato `bandit-report` | Achado de severidade alta (`bandit -lll`) |
-| `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Arquivos: achado HIGH/CRITICAL corrigível; configuração (IaC): achado HIGH/CRITICAL; imagem: achado CRITICAL corrigível |
+| `sast-trivy` | Constrói a imagem e roda o Trivy nos arquivos (dependências, segredos, configuração) e na imagem; tabelas e SARIF como artefato `trivy-report` | Arquivos: achado HIGH/CRITICAL corrigível; configuração (IaC): achado HIGH/CRITICAL; imagem: qualquer achado HIGH/CRITICAL |
 | `docker` | `docker compose build app`, `docker compose up -d --wait` e chamada a `/reconecta/saude` | A imagem não constrói ou a aplicação não fica saudável |
 | `deploy` | Opcional e manual: dispara o Deploy Hook do Render guardado no segredo `RENDER_DEPLOY_HOOK_URL` | Sem o segredo, termina com aviso e sem erro |
 
@@ -567,6 +567,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - [docs/implantacao.md](docs/implantacao.md) — Docker Compose, Supabase, Render e CI/CD, passo a passo;
 - [docs/stride.md](docs/stride.md) — matriz de riscos STRIDE;
 - [docs/sast.md](docs/sast.md) — triagem dos relatórios do Bandit e do Trivy;
+- [SECURITY.md](SECURITY.md) — relato responsável de vulnerabilidades e escopo de testes locais;
 - [docs/cnae-alimentos.md](docs/cnae-alimentos.md) — critério de atividade alimentar;
 - [docs/geo.md](docs/geo.md) — localização, distância na recomendação, avisos por proximidade e rota de coleta.
 
@@ -579,7 +580,7 @@ O passo a passo completo (criar o projeto no Supabase, criar o serviço no Rende
 - O classificador conhece o vocabulário de 254 alimentos do dataset, que é sintético; alimento muito diferente pode cair na categoria errada, e a empresa sempre revisa antes de publicar.
 - O plano gratuito do Render suspende o serviço depois de um tempo sem acesso, então o primeiro acesso seguinte demora; ele também não roda o Ollama.
 - Os limites de uso (login, IA, doações) ficam na memória de cada processo: com 2 workers do gunicorn, cada um conta separado, e a contagem zera quando o serviço reinicia.
-- Riscos residuais registrados em [docs/stride.md](docs/stride.md), seção 5: não há prova de posse do e-mail nem do CNPJ no cadastro (exigiria serviço de e-mail); não há limite global de requisições por IP e os limites de uso ficam na memória de cada processo; o token de administrador é único e estático; a trilha de auditoria vai só para o log, sem persistência; as ações do pipeline são fixadas por versão, não por hash, e a imagem base tem vulnerabilidades do Debian ainda sem correção.
+- Riscos residuais registrados em [docs/stride.md](docs/stride.md), seção 5: não há prova de posse do e-mail nem do CNPJ no cadastro (exigiria serviço de e-mail); não há limite global de requisições por IP e os limites de uso ficam na memória de cada processo; o token de administrador é único e estático; a trilha de auditoria vai só para o log, sem persistência. As actions do CI e a imagem base usam digest/SHA; o `apk upgrade` consulta o repositório Alpine durante cada build, então um novo scan continua necessário.
 
 ## Documentação Swagger
 

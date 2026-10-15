@@ -170,15 +170,14 @@ jobs:
           scan-ref: .
           severity: HIGH,CRITICAL
           exit-code: "1"
-      - name: "Gate: bloquear critica corrigivel na imagem"
+      - name: "Gate: bloquear alta ou critica na imagem"
         if: always()
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
           image-ref: reconecta:ci
           scanners: vuln,secret,misconfig
-          severity: CRITICAL
-          ignore-unfixed: true
+          severity: HIGH,CRITICAL
           exit-code: "1"
 
   sast-semgrep:

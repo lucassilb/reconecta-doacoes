@@ -249,3 +249,29 @@ guardas, a medida de falso positivo é sobre pedidos legítimos: 0 de 15 no corp
 - Os logs de borda do Render (IP e user-agent do proxy) estão fora do controle do
   aplicativo. A retenção é a do plano: 7 dias no Hobby.
 - Com o NeMo, a guarda de saída informa só o motivo genérico `saida` no log.
+
+## Frente Docker e GitHub — rodada 25 (Codex #2)
+
+O `Dockerfile` trocou a base Debian 13 de `python:3.12-slim` por
+`python:3.12-alpine` fixada por digest, com `apk upgrade --no-cache`. Preservou
+Python 3.12, Gunicorn gthread, dois workers, oito threads, healthcheck e usuário
+sem privilégio (UID 10001). A imagem não declara volume e aceita `PORT` dinâmico.
+O Trivy 0.75.0 em 15/10/2026, com scanners de vulnerabilidade, segredo e
+configuração, encontrou **0/0/0**; o snapshot Debian anterior tinha 44 ocorrências
+HIGH de oito CVEs. O gate de imagem no CI agora reprova qualquer HIGH/CRITICAL,
+inclusive sem versão corrigida, e `scripts/resumo_sast.py` usa a mesma regra.
+Veja os artefatos e a distinção entre snapshots em [SAST](sast.md).
+
+No Compose local com PostgreSQL, o app ficou saudável, respondeu ao SSE e
+publicou uma oferta com JPEG (**201**); o dono baixou a foto (**200**, `image/jpeg`).
+O teste separado com `PORT=5200` também passou. A suíte completa continua no job
+Python do CI; a imagem de produção não inclui `pytest`, `pandas` ou
+`scikit-learn`, usados apenas para testes e treino. O digest da base fixa os
+bytes iniciais, mas o `apk upgrade` consulta o repositório Alpine no build:
+cada reconstrução precisa de nova varredura.
+
+Para o repositório público, [SECURITY.md](../SECURITY.md) orienta o relato
+privado e limita testes ativos ao ambiente local; `.github/CODEOWNERS` marca
+`@lucassilb`; `.github/dependabot.yml` agenda atualizações semanais de pip,
+Docker e GitHub Actions. Essas configurações só terão efeito no GitHub após
+integração na branch principal.
