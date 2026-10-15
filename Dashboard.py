@@ -274,12 +274,12 @@ def montar_seguranca():
     sast = _resumo_sast()
     if sast is not None:
         rotulos = {
-            "bandit-high": "Análise de código",
+            "bandit-high": "Código Python",
             "trivy-fs": "Arquivos",
             "trivy-config": "Configuração",
             "trivy-imagem": "Imagem",
             "ia-limiares": "IA",
-            "semgrep-erro": "Análise de código",
+            "semgrep-erro": "Padrões de código",
             "sca-pip-audit": "Dependências",
             "segredos-gitleaks": "Segredos",
         }
