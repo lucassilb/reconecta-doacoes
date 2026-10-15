@@ -78,7 +78,8 @@ def cliente():
 def mock_brasilapi(monkeypatch, dados=None):
     chamadas = []
 
-    def get(url, timeout):
+    def get(url, timeout, allow_redirects):
+        assert allow_redirects is False
         chamadas.append((url, timeout))
         return Resposta(dados=dados or empresa())
 
@@ -132,7 +133,8 @@ def test_atividade_alimentar_secundaria_e_cache(cliente, monkeypatch):
 def test_fallback_opencnpj(cliente, monkeypatch):
     chamadas = []
 
-    def get(url, timeout):
+    def get(url, timeout, allow_redirects):
+        assert allow_redirects is False
         chamadas.append(url)
         if "brasilapi" in url:
             raise requests.Timeout()
@@ -154,7 +156,8 @@ def test_fallback_opencnpj(cliente, monkeypatch):
 def test_fallback_cnpjws(cliente, monkeypatch):
     chamadas = []
 
-    def get(url, timeout):
+    def get(url, timeout, allow_redirects):
+        assert allow_redirects is False
         chamadas.append(url)
         if "cnpj.ws" not in url:
             raise requests.Timeout()
@@ -179,7 +182,8 @@ def test_fallback_cnpjws(cliente, monkeypatch):
 def test_todas_fontes_falham(cliente, monkeypatch):
     chamadas = []
 
-    def get(url, timeout):
+    def get(url, timeout, allow_redirects):
+        assert allow_redirects is False
         chamadas.append(url)
         raise requests.Timeout()
 

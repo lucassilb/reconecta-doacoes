@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from models import db
 from Auth import configurar_chave_secreta
 from migracoes import aplicar_migracoes
-from registro import configurar_logs
+from registro import configurar_logs, neutralizar_controles
 
 load_dotenv()
 
@@ -220,14 +220,14 @@ def metodo_nao_permitido(_erro):
 def erro_api_interno(erro):
     if isinstance(erro, HTTPException) and 400 <= erro.code < 500:
         return _erro_api("REQUISICAO_INVALIDA", erro.description, erro.code)
-    app.logger.exception("Falha em %s", request.path, exc_info=erro)
+    app.logger.exception("Falha em %s", neutralizar_controles(request.path), exc_info=erro)
     return _erro_api("ERRO_INTERNO", "Não foi possível concluir a solicitação.", 500)
 
 
 @app.errorhandler(500)
 def erro_interno(erro):
     if request.path.startswith("/reconecta/"):
-        app.logger.exception("Falha em %s", request.path, exc_info=erro)
+        app.logger.exception("Falha em %s", neutralizar_controles(request.path), exc_info=erro)
         return _erro_api("ERRO_INTERNO", "Não foi possível concluir a solicitação.", 500)
     return erro
 

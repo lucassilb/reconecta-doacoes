@@ -90,7 +90,8 @@ def test_fallback_prioriza_fonte_com_codigo_de_natureza(monkeypatch):
         def json(self):
             return self.dados
 
-    def get(url, timeout):
+    def get(url, timeout, allow_redirects):
+        assert allow_redirects is False
         chamadas.append(url)
         if "brasilapi" in url:
             raise requests.Timeout()

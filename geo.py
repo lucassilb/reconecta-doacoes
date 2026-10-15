@@ -23,6 +23,7 @@ import time
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 from sqlalchemy import event, inspect as inspecionar
@@ -36,6 +37,8 @@ RAIZ = Path(__file__).resolve().parent
 USER_AGENT = "ReConecta/1.0 (projeto academico; +https://github.com/lucassilb/reconecta-doacoes)"
 NOMINATIM = "https://nominatim.openstreetmap.org/search"
 BRASILAPI_CEP = "https://brasilapi.com.br/api/cep/v2/{cep}"
+_BRASILAPI_CEP_PREFIXO = "https://brasilapi.com.br/api/cep/v2/"
+_HOSTS_GEO = frozenset({"nominatim.openstreetmap.org", "brasilapi.com.br"})
 INTERVALO_NOMINATIM = 1.1  # política de uso: no máximo 1 consulta por segundo
 TIMEOUT = (3, 5)
 LIMITE_FILA = 500
@@ -214,7 +217,7 @@ def localizar_cep(cep):
     sem ligação com quem consultou. Devolve None se não der para localizar.
     """
     cep = re.sub(r"\D", "", str(cep or ""))
-    if len(cep) != 8:
+    if not re.fullmatch(r"[0-9]{8}", cep):
         return None
     k = chave("cep:" + cep)
     linha = Geolocalizacao.query.filter_by(chave=k).first()
@@ -276,6 +279,19 @@ def _externo_ligado():
 
 
 def _get_json(url, params=None):
+    partes = urlsplit(url)
+    if partes.scheme != "https" or partes.netloc not in _HOSTS_GEO:
+        raise ValueError("Fonte de geolocalização não permitida")
+    if url == NOMINATIM:
+        if not isinstance(params, dict) or set(params) != {
+                "format", "limit", "countrycodes", "street", "city", "state"}:
+            raise ValueError("Parâmetros de geolocalização inválidos")
+    elif url.startswith(_BRASILAPI_CEP_PREFIXO):
+        cep = url[len(_BRASILAPI_CEP_PREFIXO):]
+        if not re.fullmatch(r"[0-9]{8}", cep) or params is not None:
+            raise ValueError("CEP inválido")
+    else:
+        raise ValueError("Rota de geolocalização não permitida")
     resposta = requests.get(url, params=params, timeout=TIMEOUT,
                             headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
                             allow_redirects=False)
@@ -304,7 +320,7 @@ def _nominatim(partes):
 
 
 def _brasilapi(cep):
-    if not cep:
+    if not isinstance(cep, str) or not re.fullmatch(r"[0-9]{8}", cep):
         return None
     dados = _get_json(BRASILAPI_CEP.format(cep=cep))
     coordenadas = ((dados or {}).get("location") or {}).get("coordinates") or {}

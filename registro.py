@@ -16,18 +16,26 @@ from pii import mascarar
 _fabrica_original = None
 
 
+def neutralizar_controles(texto):
+    """Impede que entrada controlada crie novas linhas ou controles no log."""
+    if texto is None:
+        return None
+    texto = texto.replace("\r", " ").replace("\n", " ")
+    return "".join(" " if ord(c) < 32 or 127 <= ord(c) < 160 else c for c in texto)
+
+
 def _registro_mascarado(*args, **kwargs):
     registro = _fabrica_original(*args, **kwargs)
     try:
         mensagem = registro.getMessage()
     except Exception:  # noqa: BLE001 - mensagem malformada não pode derrubar o log
         mensagem = str(registro.msg)
-    registro.msg, registro.args = mascarar(mensagem), ()
+    registro.msg, registro.args = neutralizar_controles(mascarar(mensagem)), ()
     if registro.exc_info and registro.exc_info[0] is not None and not registro.exc_text:
         texto = "".join(traceback.format_exception(*registro.exc_info)).rstrip("\n")
-        registro.exc_text = mascarar(texto)
+        registro.exc_text = neutralizar_controles(mascarar(texto))
     if registro.stack_info:
-        registro.stack_info = mascarar(registro.stack_info)
+        registro.stack_info = neutralizar_controles(mascarar(registro.stack_info))
     return registro
 
 

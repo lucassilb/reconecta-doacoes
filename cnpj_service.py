@@ -3,6 +3,7 @@
 import re
 import threading
 import time
+from urllib.parse import urlsplit
 
 import requests
 
@@ -166,11 +167,12 @@ FONTES = (
     ("opencnpj", "https://api.opencnpj.org/{}", _normalizar_opencnpj),
     ("cnpjws", "https://publica.cnpj.ws/cnpj/{}", _normalizar_cnpjws),
 )
+_HOSTS_CNPJ = frozenset({"brasilapi.com.br", "api.opencnpj.org", "publica.cnpj.ws"})
 
 
 def consultar_cnpj(valor):
     digitos = validar_cnpj(valor)
-    if not digitos:
+    if not digitos or not re.fullmatch(r"[0-9]{14}", digitos):
         raise ConsultaCNPJError("CNPJ_INVALIDO", "Informe um CNPJ válido.", 400)
 
     with _cache_lock:
@@ -184,7 +186,11 @@ def consultar_cnpj(valor):
         sem_codigo = None
         for nome, url, normalizar in FONTES:
             try:
-                resposta = requests.get(url.format(digitos), timeout=TIMEOUT)
+                destino = url.format(digitos)
+                partes = urlsplit(destino)
+                if partes.scheme != "https" or partes.netloc not in _HOSTS_CNPJ:
+                    continue
+                resposta = requests.get(destino, timeout=TIMEOUT, allow_redirects=False)
                 if resposta.status_code == 404:
                     raise ConsultaCNPJError("CNPJ_NAO_ENCONTRADO", "CNPJ não encontrado na Receita Federal.", 404)
                 resposta.raise_for_status()

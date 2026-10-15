@@ -20,6 +20,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from cnpj_service import formatar_cnpj
 from models import Doador, Estabelecimento, db
 from pii import ip_reduzido
+from registro import neutralizar_controles
 from privacidade import (anonimizar_conta, consentimento_registrado,
                          conta_removida, exportar_dados)
 
@@ -42,7 +43,7 @@ def registrar_auditoria(evento, resultado, *, tipo=None, ator_id=None):
     _auditoria.info(json.dumps({
         "data": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "evento": evento, "ator_tipo": tipo, "ator_id": ator_id,
-        "ip": ip_reduzido(request.remote_addr), "resultado": resultado,
+        "ip": neutralizar_controles(ip_reduzido(request.remote_addr)), "resultado": resultado,
     }, ensure_ascii=False, separators=(",", ":")))
 
 _falhas = {}

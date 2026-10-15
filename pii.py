@@ -5,6 +5,7 @@ marcadores; `encontrar` diz quais tipos aparecem num texto (guarda de saída da 
 Nome, endereço e texto livre não têm formato fixo: esses ficam fora dos logs na origem.
 """
 
+import ipaddress
 import re
 
 _CNPJ = re.compile(r"(?<!\d)\d{2}\.?\d{3}\.?\d{3}(?:/|%2F)?\d{4}-?\d{2}(?!\d)", re.IGNORECASE)
@@ -65,6 +66,10 @@ def ip_reduzido(ip):
     if not ip:
         return None
     ip = str(ip).strip()
+    try:
+        ipaddress.ip_address(ip)
+    except ValueError:
+        return None
     if ":" in ip:
         grupos = ip.split(":")
         return ":".join(grupos[:3]) + "::" if len(grupos) > 3 else ip

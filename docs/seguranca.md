@@ -378,3 +378,24 @@ no worktree corrigido: **9 → 0 `py/polynomial-redos`**. O scan final manteve
 cinco alertas de outras regras (3 `py/log-injection`, 2 `py/partial-ssrf`), fora
 desta frente; nenhum deles foi ocultado. SARIF e logs estão no diretório de
 relatórios da rodada 26, fora do repositório.
+
+## CodeQL security-extended — complemento da rodada 26
+
+Na base integrada, a suíte `python-security-extended` apontava cinco alertas:
+três `py/log-injection` e dois `py/partial-ssrf`. A suíte
+`javascript-security-extended` apontava zero. A correção não suprime regras:
+
+- O registro central mascara dados pessoais e substitui CR, LF e outros caracteres
+  de controle por espaços, inclusive em exceções. Os caminhos registrados pelos
+  handlers de erro passam pela mesma função. A auditoria valida o IP antes de
+  reduzi-lo e neutraliza seu valor antes de serializar o JSON; IP inválido vira
+  `null`. Os campos de log continuam os mesmos.
+- A consulta de CNPJ só forma o caminho externo com 14 dígitos ASCII validados;
+  a origem precisa ser HTTPS e um dos três hosts fixos das fontes. A consulta de
+  CEP aceita apenas oito dígitos ASCII e a rota fixa da BrasilAPI. O Nominatim
+  recebe o endereço por `params=`, limitado às chaves da consulta. Ambas as
+  chamadas bloqueiam redirecionamentos para preservar a allowlist de hosts.
+
+Os testes cobrem controles nos logs, URL e parâmetros externos rejeitados,
+além dos fluxos normais de cadastro e geolocalização. O resultado CodeQL final,
+a suíte completa e os demais gates estão no relatório da rodada 26.
