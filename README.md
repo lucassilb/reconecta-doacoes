@@ -57,7 +57,7 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 |---|---|
 | Cadastro de organização | Valida o CNPJ (dígitos), consulta fontes públicas gratuitas (BrasilAPI, com OpenCNPJ e CNPJ.ws como alternativas) e exige situação **ATIVA** e natureza jurídica sem fins lucrativos ou CNAE alimentar. Devolve os perfis ONG e/ou empresa de alimentos. |
 | Cadastro de doador | Valida o CPF pelos dígitos verificadores; CPF sempre devolvido mascarado. |
-| Login | E-mail, CNPJ ou CPF + senha (hash scrypt). Sessão em cookie HttpOnly/SameSite=Lax; 5 falhas em 15 min bloqueiam novas tentativas. |
+| Login | E-mail, CNPJ ou CPF + senha (hash scrypt). Sessão em cookie HttpOnly/SameSite=Lax; 5 falhas em 15 min bloqueiam novas tentativas; o tempo de resposta não difere entre identificador válido e inválido. Sair, trocar a senha ou excluir a conta incrementa a geração da sessão e invalida os cookies emitidos para a conta. |
 | Pedidos de doação | Organização com CNPJ publica: itens (nome, categoria, quantidade, unidade) e prazo "receber até". Remover só pedido próprio, disponível e sem reservas. |
 | Doar para um pedido | Pessoa (CPF) ou outra organização; questionário de 4 perguntas + foto obrigatória (JPEG/PNG/WebP até 5 MB, conferida pelos bytes). A foto é guardada no banco de dados, para não se perder quando o servidor da nuvem reinicia. A organização não doa no próprio pedido. Limite de 20 envios por hora por usuário. |
 | Progresso e entrega | Cada item mostra recebido × meta, quanto falta e quantidade entregue; o dono do pedido confirma **Recebi** ou **Não recebi** em cada doação aceita. |
@@ -86,7 +86,7 @@ Tudo usa ferramentas de código aberto e planos gratuitos, sem chave de API paga
 | RN08 | CPF, e-mail, telefone e endereços privados não aparecem em telas ou respostas públicas; o endereço cadastrado de estabelecimentos e instituições permanece público nos CRUDs do CP1. |
 | RN09 | E-mail, CNPJ e CPF são únicos. |
 | RN10 | POST/PUT/DELETE dos CRUDs do CP1 exigem `X-Admin-Token` válido; sem `ADMIN_TOKEN` configurado, a escrita fica desativada. |
-| RN11 | Limites de uso: 5 falhas de login em 15 min bloqueiam novas tentativas; cada empresa interpreta até 10 pedidos por minuto com a IA; cada IP gera até 10 resumos do dashboard por minuto; cada usuário envia até 20 doações por hora. Acima disso a API responde 429. |
+| RN11 | Limites de uso: 5 falhas de login em 15 min bloqueiam novas tentativas; cada empresa interpreta até 10 pedidos por minuto com a IA; cada IP gera até 10 resumos do dashboard por minuto e até 20 consultas de CNPJ por minuto; cada usuário envia até 20 doações por hora. Acima disso a API responde 429. |
 
 ## Arquitetura
 
@@ -126,7 +126,7 @@ ReConecta/
 └── requirements-dev.txt   # Dependências de desenvolvimento (pytest, bandit, playwright)
 ```
 
-Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita). Páginas integradas: `/` (Home), `/sobre`, `/privacidade`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`, `/excedentes/<id>` (excedente: reserva, cancelamento e confirmação de retirada, com a situação ao vivo). Todas as páginas carregam `static/js/layout.js`, que abre uma única conexão com `/reconecta/tempo-real`, cai para `/reconecta/novidades` a cada 10 s se o fluxo falhar e repassa cada evento às páginas pelo evento `reconecta:evento`; o sino de notificações e os avisos ao vivo saem daí. Na Home, o botão "Tenho alimento para doar" abre o assistente que chama `POST /reconecta/ia/sugerir-destino` e leva ao pedido sugerido com o questionário preenchido; a faixa "Excedentes de hoje" e o progresso dos pedidos se atualizam sem recarregar.
+Front-end: páginas HTML/CSS/JS puras que consomem a API com `fetch` (sessão por cookie). Gráficos com Chart.js (MIT, CDN gratuita com verificação de integridade SRI). Páginas integradas: `/` (Home), `/sobre`, `/privacidade`, `/cadastro`, `/entrar`, `/painel`, `/doacoes/<id>` (pedido e doação), `/dashboard`, `/excedentes/<id>` (excedente: reserva, cancelamento e confirmação de retirada, com a situação ao vivo). Todas as páginas carregam `static/js/layout.js`, que abre uma única conexão com `/reconecta/tempo-real`, cai para `/reconecta/novidades` a cada 10 s se o fluxo falhar e repassa cada evento às páginas pelo evento `reconecta:evento`; o sino de notificações e os avisos ao vivo saem daí. Na Home, o botão "Tenho alimento para doar" abre o assistente que chama `POST /reconecta/ia/sugerir-destino` e leva ao pedido sugerido com o questionário preenchido; a faixa "Excedentes de hoje" e o progresso dos pedidos se atualizam sem recarregar.
 
 ## Frontend (critério 2 do CP2)
 

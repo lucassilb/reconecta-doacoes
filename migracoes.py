@@ -337,6 +337,9 @@ def aplicar_migracoes(engine=None):
         if "senha_hash" not in colunas:
             with engine.begin() as conexao:
                 conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN senha_hash VARCHAR(255)"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
+        if "sessao_versao" not in colunas:
+            with engine.begin() as conexao:
+                conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN sessao_versao INTEGER NOT NULL DEFAULT 0"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
     if inspector.has_table("estabelecimentos"):
         colunas = {coluna["name"] for coluna in inspect(engine).get_columns("estabelecimentos")}
         definicoes = {

@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from pathlib import Path
 
-from flask import current_app, request, send_file, send_from_directory
+from flask import current_app, request, send_file
 from flask_restx import Namespace, Resource
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -37,6 +37,17 @@ MIMES = {"jpg": "image/jpeg", "png": "image/png", "webp": "image/webp"}
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
+
+
+def _foto_limpa(dados):
+    """Bytes sem EXIF/XMP (GPS do celular), como na foto da oferta; None se falhar.
+
+    A foto da doação também vai para outra organização (a que fez o pedido), então
+    recebe o mesmo tratamento. O import fica aqui porque Excedentes já importa
+    MAX_FOTO/MIMES/_extensao_foto daqui: importar no topo criaria um ciclo."""
+    from Excedentes import foto_sem_metadados
+    limpa = foto_sem_metadados(dados)
+    return limpa[1] if limpa else None
 
 
 def _extensao_foto(dados):
@@ -167,6 +178,8 @@ def criar_contribuicao(doacao):
         campos["foto"] = "A foto deve ter até 5 MB."
     elif not extensao:
         campos["foto"] = "Envie uma foto JPEG, PNG ou WebP válida."
+    else:
+        dados_foto = _foto_limpa(dados_foto) or dados_foto
     if campos:
         registrar_auditoria("doacao_recusada", "foto_invalida", tipo=tipo, ator_id=usuario.id)
         return _erro("DADOS_INVALIDOS", "Corrija os campos indicados.", 400, campos=campos)
@@ -235,13 +248,17 @@ class FotoContribuicao(Resource):
         if not autorizado or not re.fullmatch(r"[0-9a-f]{32}\.(jpg|png|webp)", contribuicao.foto_arquivo):
             return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
         mime = MIMES[contribuicao.foto_arquivo.rsplit(".", 1)[1]]
+        # Fotos antigas (antes da limpeza na gravação) saem sem metadados na leitura.
         if contribuicao.foto_dados is not None:
-            resposta = send_file(BytesIO(contribuicao.foto_dados), mimetype=mime)
+            resposta = send_file(BytesIO(
+                _foto_limpa(contribuicao.foto_dados) or contribuicao.foto_dados),
+                mimetype=mime)
         else:
             pasta = Path(current_app.instance_path) / "uploads" / "contribuicoes"
             if not (pasta / contribuicao.foto_arquivo).is_file():
                 return _erro("FOTO_NAO_ENCONTRADA", "Foto não encontrada.", 404)
-            resposta = send_from_directory(pasta, contribuicao.foto_arquivo, mimetype=mime)
+            bruto = (pasta / contribuicao.foto_arquivo).read_bytes()
+            resposta = send_file(BytesIO(_foto_limpa(bruto) or bruto), mimetype=mime)
         resposta.headers["X-Content-Type-Options"] = "nosniff"
         resposta.headers["Cache-Control"] = "private, no-store"
         return resposta

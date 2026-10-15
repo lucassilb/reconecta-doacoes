@@ -1,6 +1,9 @@
 """Cadastro validado de empresas alimentares e doadores pessoa física."""
 
 import re
+import threading
+import time
+from collections import deque
 
 from flask import request
 from flask_restx import Namespace, Resource, fields
@@ -85,6 +88,32 @@ erro_model = ns.model("CadastroErro", {
 
 def _erro(codigo, mensagem, status, **extras):
     return {"codigo": codigo, "mensagem": mensagem, **extras}, status
+
+
+# Cota da consulta pública de CNPJ por IP e processo: cada CNPJ novo pode abrir
+# até três chamadas a APIs públicas externas, e a resposta denuncia CNPJ já
+# cadastrado — sem teto, a rota vira proxy de enumeração.
+_consultas_cnpj = {}
+_consultas_lock = threading.Lock()
+JANELA_CONSULTA = 60
+LIMITE_CONSULTA = 20
+
+
+def _consulta_liberada(chave):
+    """Janela deslizante em memória: até LIMITE_CONSULTA consultas por minuto."""
+    agora = time.monotonic()
+    with _consultas_lock:
+        if len(_consultas_cnpj) > 2048:
+            for nome in list(_consultas_cnpj):
+                if not _consultas_cnpj[nome] or agora - _consultas_cnpj[nome][-1] >= JANELA_CONSULTA:
+                    del _consultas_cnpj[nome]
+        acessos = _consultas_cnpj.setdefault(chave, deque())
+        while acessos and agora - acessos[0] >= JANELA_CONSULTA:
+            acessos.popleft()
+        if len(acessos) >= LIMITE_CONSULTA:
+            return False
+        acessos.append(agora)
+        return True
 
 
 def _aceite_faltando(corpo, campos):
@@ -173,9 +202,14 @@ class ConsultaCNPJ(Resource):
     @ns.response(200, "Resultado da consulta", consulta_model)
     @ns.response(400, "CNPJ inválido", erro_model)
     @ns.response(404, "CNPJ não encontrado", erro_model)
+    @ns.response(429, "Muitas consultas em sequência", erro_model)
     @ns.response(503, "Consulta indisponível", erro_model)
     def get(self, cnpj):
         """Consulta existência, situação e atividades do CNPJ."""
+        if not _consulta_liberada(f"cnpj:{request.remote_addr or 'desconhecido'}"):
+            return _erro("MUITAS_TENTATIVAS",
+                         "Limite de consultas por minuto atingido. Tente de novo em instantes.",
+                         429)[0], 429, {"Retry-After": "60"}
         try:
             return _avaliar_empresa(consultar_cnpj(cnpj)), 200
         except ConsultaCNPJError as erro:
@@ -239,7 +273,7 @@ class CadastroEmpresa(Resource):
             if _empresa_cadastrada(cnpj):
                 return _erro("CNPJ_JA_CADASTRADO", "Este CNPJ já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
-        iniciar_sessao("empresa", empresa.id)
+        iniciar_sessao("empresa", empresa)
         registrar_auditoria("cadastro_empresa", "ok", tipo="empresa", ator_id=empresa.id)
         return {"id": empresa.id, "tipo": "empresa", "nome": empresa.nome,
                 "cnpj": empresa.cnpj, "cnpj_formatado": formatar_cnpj(empresa.cnpj),
@@ -291,7 +325,7 @@ class CadastroDoador(Resource):
             if Doador.query.filter_by(cpf=cpf).first():
                 return _erro("CPF_JA_CADASTRADO", "Este CPF já está cadastrado.", 409)
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
-        iniciar_sessao("doador", doador.id)
+        iniciar_sessao("doador", doador)
         registrar_auditoria("cadastro_doador", "ok", tipo="doador", ator_id=doador.id)
         return {"id": doador.id, "tipo": "doador", "nome": doador.nome,
                 "cpf_formatado": f"***.{cpf[3:6]}.{cpf[6:9]}-**",

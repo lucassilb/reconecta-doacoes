@@ -92,6 +92,42 @@ mesmos hooks do commit local). Todos entram nos `needs` do `sast-resumo` e do
   revisão continua nos PRs.
 - `check-added-large-files` tolera até 200 KB (fotos webp das categorias).
 
+### Endurecimento da rodada 25 (achados da revisão manual de r24)
+
+Correções aprovadas e aplicadas sobre a base `b28fc2a`, cada uma com teste que
+falhava antes e passa depois (`tests/test_r25_seguranca.py`, 12 testes):
+
+- **Login sem enumeração por tempo** (`Auth.py`): a verificação de senha agora
+  usa um hash fictício quando o identificador não existe — antes, conta válida
+  pagava ~0,45 s e inexistente ~0,004 s, o que revelava e-mail/CPF/CNPJ
+  cadastrados pela latência. Mensagem e código do erro seguem iguais.
+- **Sessão revogada de verdade** (`models.py`, `migracoes.py`, `Auth.py`,
+  `schema.sql`): nova coluna `sessao_versao` em `estabelecimentos` e `doadores`.
+  O cookie guarda a geração; sair, trocar a senha ou excluir a conta incrementa
+  o número e invalida todos os cookies emitidos (replay após logout → 401;
+  troca de senha derruba os outros navegadores e preserva o atual). Cookies
+  emitidos antes da mudança, sem geração, seguem valendo até expirar — sessões
+  novas sempre carregam a marca.
+- **EXIF/GPS fora da foto da contribuição** (`Contribuicoes.py`): a foto da
+  doação recebe a mesma remoção de metadados da foto da oferta na gravação, e
+  fotos antigas gravadas com EXIF são servidas já limpas na leitura.
+- **Cota na consulta pública de CNPJ** (`Cadastro.py`): 20 consultas por minuto
+  por IP e processo, com 429 `MUITAS_TENTATIVAS` + `Retry-After` — a rota deixa
+  de ser um proxy aberto de enumeração contra as APIs públicas externas.
+- **Integridade da CDN** (`static/dashboard.html`): o Chart.js fixado em
+  `4.4.4` ganhou `integrity="sha384-…"` + `crossorigin="anonymous"`; a CSP
+  continua a mesma.
+- **Conferência de origem nas escritas** (`app.py`): POST/PUT/PATCH/DELETE com
+  `Origin`/`Referer` de outro host (inclusive `Origin: null`) recebem 403
+  `ORIGEM_RECUSADA`; mesma origem, loopback no desenvolvimento e requisições sem
+  o cabeçalho (scripts, BOLA, DAST) seguem aceitas. `SameSite=Lax` continua
+  como primeira linha; a conferência cobre a exceção "Lax+POST" de cookies
+  recém-emitidos em navegação top-level.
+
+Residual: `sessao_versao` é global por conta — sair em um navegador encerra as
+demais sessões da mesma conta (decisão documentada, não bug); sessões antigas
+sem a marca não são revogáveis retroativamente.
+
 ## Frente B — DAST, IAST e autorização por objeto
 ### DAST: OWASP ZAP
 
