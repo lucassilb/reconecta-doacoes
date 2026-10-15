@@ -52,7 +52,7 @@ def test_demonstracao_usa_sqlite_separado_e_semente_deterministica():
     assert sum(sum(dia) for dia in impacto.json["calor_doacoes"]["valores"]) == 288
     assert impacto.json == repetido.json
     assert impacto.json["ia"]["metricas"]["acuracia_classificador"] == 0.7784
-    assert seguranca.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] == 44
+    assert seguranca.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] == 0
     assert "example.invalid" not in resumo.get_data(as_text=True)
     assert "DEMO-CNPJ" not in resumo.get_data(as_text=True)
 

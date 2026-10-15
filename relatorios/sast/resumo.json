@@ -39,13 +39,13 @@
     },
     "trivy-image": {
       "disponivel": true,
-      "varredura_em": "2026-10-13T17:58:09.3533664-03:00",
+      "varredura_em": "2026-10-15T18:32:04.074424-03:00",
       "severidades": {
         "CRITICAL": 0,
-        "HIGH": 44,
-        "MEDIUM": 58,
-        "LOW": 61,
-        "UNKNOWN": 3
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
       },
       "segredos": 0,
       "configuracoes": 0
@@ -88,7 +88,7 @@
     },
     {
       "gate": "trivy-imagem",
-      "regra": "sast-trivy falha em CRITICAL com correção na imagem Docker",
+      "regra": "sast-trivy falha em HIGH/CRITICAL na imagem Docker",
       "resultado": "passou",
       "detalhe": "0 achado(s) bloqueante(s)"
     },

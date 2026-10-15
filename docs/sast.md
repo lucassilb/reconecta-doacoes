@@ -4,10 +4,12 @@
 - **2ª passada:** 2026-10-13, base `main` `3a7939e` (Frentes A e C integradas) — resultado
   na seção "Estado anterior".
 - **3ª passada:** 2026-10-13, base `main` local `520d5b1` (rodada 11 integrada) — resultado
-  na seção "Estado atual". Trivy `image` **não foi refeito localmente** (daemon Docker
+  na seção histórica abaixo. Trivy `image` **não foi refeito localmente** (daemon Docker
   indisponível na máquina); ele roda no job `sast-trivy` do GitHub Actions
   (`ci.yml:84-99`) e os artefatos `trivy-image.*` em `relatorios/sast/` seguem referindo-se
-  à 2ª passada (`3a7939e`).
+  à 2ª passada (`3a7939e`) naquele momento.
+- **4ª passada:** 2026-10-15, branch `frente/r25-docker-github` sobre `b28fc2a` — imagem
+  Alpine reconstruída e varrida localmente, com resultado na seção "Imagem atual".
 
 ## Ferramentas e comandos
 
@@ -34,7 +36,29 @@ Kubernetes, Helm, Terraform, CloudFormation e Ansible — `docker-compose.yml`,
 deles está na matriz `docs/stride.md`, linhas T6/T7/D7/I9). O `trivy config` detecta só o
 `Dockerfile` neste repositório: 0 misconfigurações.
 
-## Estado atual (`520d5b1`, rodada 11)
+## Imagem atual (rodada 25, 15/10/2026)
+
+O `Dockerfile` usa `python:3.12-alpine` por digest e aplica `apk upgrade --no-cache`
+antes de instalar as dependências. A varredura da imagem construída neste branch,
+com Trivy 0.75.0 e scanners `vuln,secret,misconfig`, substituiu os artefatos
+[`trivy-image.json`](../relatorios/sast/trivy-image.json) e
+[`trivy-image.txt`](../relatorios/sast/trivy-image.txt). O resultado foi **0 CRITICAL,
+0 HIGH, 0 MEDIUM, 0 LOW, 0 UNKNOWN, 0 segredos e 0 misconfigurações**; o gate
+HIGH/CRITICAL sem `ignore-unfixed` passou. A imagem tem 43,1 MB segundo
+`docker image inspect`, executa Python 3.12.15 e roda como UID 10001. O Compose
+com PostgreSQL ficou saudável, e os testes de HTTP, SSE e upload de JPEG passaram.
+
+O snapshot anterior de `python:3.12-slim` (Debian 13.7) tinha **44 ocorrências HIGH
+ligadas a 8 CVEs distintos**, além de 58 MEDIUM, 61 LOW e 3 UNKNOWN. A troca de
+base removeu os pacotes vulneráveis da imagem de produção; nenhum achado foi
+ocultado por `.trivyignore` ou por um filtro de severidade. As contagens do Trivy
+são por pacote e dependem da data do banco de vulnerabilidades. Refaça o build
+e a varredura após atualizar a base ou o índice de pacotes Alpine.
+
+Os resultados de Bandit, Trivy `fs` e `config` nas seções seguintes são snapshots
+históricos separados, com suas próprias datas; esta rodada refez a imagem.
+
+## Estado anterior (`520d5b1`, rodada 11)
 
 Rodado localmente com `python scripts/sast.py --sem-imagem` (Bandit 1.9.4 no venv,
 Python 3.14; Trivy 0.75.0 com DB de 2026-10-13, binário fora do repositório).
@@ -56,7 +80,7 @@ B608 justificados de `migracoes.py`). Os módulos novos da rodada (`Excedentes.p
 Trivy `fs`/`config`: **0 vulnerabilidades, 0 segredos, 0 misconfigurações** — incluída a
 linha nova do `CMD` do gunicorn (`--worker-class gthread --threads 8`, `Dockerfile:21`).
 
-## Estado anterior (`3a7939e`)
+## Estado histórico (`3a7939e`)
 
 | Origem | CRITICAL | HIGH | MEDIUM | LOW | UNKNOWN |
 |---|---|---|---|---|---|
@@ -66,13 +90,13 @@ linha nova do `CMD` do gunicorn (`--worker-class gthread --threads 8`, `Dockerfi
 | Trivy `config` — IaC (Dockerfile) | — | — | **0** | — | — |
 | Trivy `image` — `reconecta:sast` (Debian 13.7 + Python) | 0 | **44** | 58 | 61 | 3 |
 
-**Imagem: os 44 HIGH são todos CVEs de pacotes Debian da imagem base `python:3.12-slim`
-sem correção disponível** (`util-linux`, `ncurses`, `pam`, `glibc`, `apt` etc. — status
+**Imagem à época: os 44 HIGH eram CVEs de pacotes Debian da base `python:3.12-slim`
+sem correção disponível na distribuição** (`util-linux`, `ncurses`, `systemd`, `acl`, `perl` — status
 "affected"/vazio em `FixedVersion`). Das 166 vulnerabilidades, só **2 têm correção** e
 ambas são `UNKNOWN`. Nenhum pacote Python da imagem tem CVE. O gate do CI
 (`severity: CRITICAL` + `ignore-unfixed`) passa. Ação recomendada: rebuild periódico da
-imagem (a base slim é atualizada) e, se quiser reduzir a superfície, avaliar
-`python:3.12-slim` reconstruída ou imagem distroless — fora do escopo da rodada.
+imagem era reconstruí-la periodicamente ou trocar a base. A rodada 25 aplicou a
+segunda opção com Alpine, conforme o snapshot atual acima.
 
 ## Antes → depois
 
@@ -97,13 +121,13 @@ imagem (a base slim é atualizada) e, se quiser reduzir a superfície, avaliar
 (`==3.3.6`, `==2.1.2`, `==2026.4`). Não há mais faixas abertas. Pendente (documentado na
 matriz, T6): actions por tag e não por SHA; sem lockfile com hash.
 
-## Triagem — o que resta
+## Triagem anterior — rodada 11
 
-1. **Trivy image — 44 HIGH / 58 MEDIUM sem correção.** Verdadeiros, mas não acionáveis
-   hoje: são CVEs de pacotes Debian da base, sem `FixedVersion`. O aplicativo roda como
+1. **Na imagem Debian anterior: Trivy image — 44 HIGH / 58 MEDIUM sem correção.**
+   Eram achados de pacotes da base, sem `FixedVersion`. O aplicativo rodava como
    usuário não-root (`Dockerfile:11,15`), não instala pacotes de sistema extras e remove
-   `pip` da imagem (`:10`), o que reduz a superfície real. Risco aceito para o MVP;
-   reavaliar quando a base publicar updates.
+   `pip` da imagem (`:10`), o que reduzia a superfície real. A imagem Alpine atual
+   foi varrida de novo e não contém essas ocorrências.
 2. **Sem segredos, sem misconfig detectada, sem CVE em dependência Python.**
 3. Itens que o SAST não cobre (fora do escopo da ferramenta) estão no STRIDE: prova de
    posse no cadastro, limite global por IP, token admin estático, auditoria só em stdout —
@@ -112,9 +136,9 @@ matriz, T6): actions por tag e não por SHA; sem lockfile com hash.
    (I11), contas legadas ficam `atividade_alimentar=True` até `atualizar_perfis.py` rodar
    (E8) e a `observacao` do excedente é texto livre público (I12).
 
-**Nenhum achado CRITICAL nem HIGH acionável. Nenhuma correção pendente nesta frente.**
+**Esta triagem é histórica.** O resultado vigente da imagem está no início deste documento.
 
-## Security Gates (rodada 14)
+## Security Gates (rodadas 14 e 25)
 
 O CI deixou de só gerar relatórios: cada varredura agora tem um portão que
 reprova o job (`.github/workflows/ci.yml`), e `scripts/resumo_sast.py`
@@ -127,10 +151,10 @@ detalhe) para o dashboard.
 | `bandit-high` | `sast-bandit` | `bandit -lll` — falha em qualquer achado de severidade HIGH |
 | `trivy-fs` | `sast-trivy` | `fs` scanners `vuln,secret,misconfig`, severity `HIGH,CRITICAL`, `ignore-unfixed` — falha em vuln corrigível, segredo ou misconfig alta |
 | `trivy-config` | `sast-trivy` | `config` severity `HIGH,CRITICAL` — falha em misconfiguração alta de IaC (Dockerfile) |
-| `trivy-imagem` | `sast-trivy` | `image` severity `CRITICAL`, `ignore-unfixed` — falha em CRITICAL corrigível na imagem |
+| `trivy-imagem` | `sast-trivy` | `image` severity `HIGH,CRITICAL` — falha em qualquer HIGH/CRITICAL na imagem, mesmo sem correção disponível |
 | `ia-limiares` | `ia` | `python scripts/ciclo_ia.py` compara com `modelo/limiares.json` — falha abaixo dos mínimos |
 
-O critério "corrigível" (`ignore-unfixed`) é deliberado: os 44 HIGH da imagem
-são pacotes Debian sem `FixedVersion` publicada — não acionáveis e já aceitos
-na triagem. O relatório segue gravando as severidades totais, então o dashboard
-mostra as 44 em "Críticas" da rosca mesmo com o gate de imagem verde.
+O critério "corrigível" (`ignore-unfixed`) continua apenas no gate de arquivos.
+O gate da imagem agora reprova qualquer HIGH/CRITICAL: a base Alpine eliminou as
+44 ocorrências HIGH do snapshot Debian. `scripts/resumo_sast.py` reproduz a mesma
+regra no resumo usado pelo dashboard, sem suprimir vulnerabilidades sem correção.

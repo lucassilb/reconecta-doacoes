@@ -1,5 +1,7 @@
 # Guia de avaliação de Cyber Risk
 
+Para comunicar uma vulnerabilidade, consulte [SECURITY.md](../SECURITY.md).
+
 Este guia permite examinar o código e testar uma **cópia local** do ReConecta. Use dados inventados e credenciais de teste. O relatório de uma execução deve registrar versão do commit, comandos, ambiente, achados e limitações; resultados antigos em `relatorios/` são evidência histórica, não substituem uma nova varredura.
 
 ## Escopo, arquitetura e superfícies
@@ -71,7 +73,8 @@ No PowerShell, defina `$env:RECONECTA_IAST='1'` e `$env:RECONECTA_IAST_REPORT_DI
 ## Riscos conhecidos e limites da prova
 
 - [STRIDE](stride.md) registra falta de prova de posse de CPF/CNPJ/e-mail no cadastro, token admin único e estático, auditoria só em stdout, ausência de limite global por IP e cotas em memória por processo. Dois workers dividem esses contadores e reinícios os zeram. SSE depende de convenção de não incluir PII em eventos futuros; a política ainda não é verificada automaticamente para todo emissor.
-- O [snapshot SAST de 13/10](sast.md) da imagem `python:3.12-slim` continha **0 CRITICAL, 44 HIGH, 58 MEDIUM, 61 LOW e 3 sem classificação** em pacotes Debian. O resultado de dependências Python/arquivos daquele dia foi zero; isso não elimina as CVEs da imagem nem garante que o estado atual permaneça igual. Refaça as varreduras.
+- O [snapshot SAST atual de 15/10](sast.md) da imagem `python:3.12-alpine` atualizada registrou **0 CRITICAL, 0 HIGH, 0 MEDIUM, 0 LOW, 0 UNKNOWN**, além de 0 segredos e 0 misconfigurações detectados. A imagem Debian anterior tinha **44 ocorrências HIGH em 8 CVEs**; os pacotes vulneráveis saíram com a troca de base, sem regra de exclusão. Esse número é pontual: o índice do `apk upgrade`, o banco do Trivy e as dependências podem mudar. Refaça build e scan antes de usar outra versão ou digest; um resultado zero não prova ausência de falhas.
+- Alpine usa musl em vez de glibc. O app, `psycopg`, o Compose com PostgreSQL, SSE e upload de foto passaram no teste local; bibliotecas de treino como `scikit-learn` não integram a imagem de produção. Ao atualizar dependências nativas, valide o build e os fluxos reais novamente.
 - Na reprodução do clone em Windows (15/10), Bandit encontrou dois avisos **LOW/B311** em `Dashboard.py` pela semente pseudoaleatória da demonstração; ela gera dados fictícios reproduzíveis e não protege segredo. Registre os avisos no relatório, sem tratá-los como prova de aleatoriedade criptográfica.
 - [Segurança](seguranca.md) documenta o alerta ZAP 40018 (SQL injection) em rota que interpreta texto: só é rebaixado como falso positivo **condicional** se ocorrer nas rotas específicas e o IAST da mesma varredura estiver limpo. Um novo alerta ou uma prova de SQL com dado da requisição exige investigação.
 - As guardas da IA são heurísticas e podem não reconhecer paráfrases ou outros idiomas. NeMo completo roda no CI com `RECONECTA_NEMO=1`; a produção executa as mesmas ações sem carregar a biblioteca, por limite de memória. Nomes, endereços e texto livre dependem de disciplina para não serem adicionados a novos logs.

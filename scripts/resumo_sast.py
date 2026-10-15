@@ -29,14 +29,17 @@ def contar_stride(texto):
     return dict(estados) | {"fonte": "docs/stride.md; estado declarado por risco"}
 
 
-def _trivy_bloqueantes(documento, severidades):
-    """Achados que reprovam o gate: vulns corrigíveis, segredos e misconfigs nas
-    severidades bloqueadas. Segredos do Trivy vêm sempre como CRITICAL."""
+def _trivy_bloqueantes(documento, severidades, *, somente_corrigiveis=True):
+    """Conta vulnerabilidades bloqueadas, segredos e misconfigs de alta gravidade.
+
+    O gate da imagem conta também CVEs sem correção publicada. O gate de arquivos
+    mantém o critério de correção disponível. Segredos do Trivy são CRITICAL.
+    """
     total = 0
     for resultado in documento.get("Results", []):
         for vuln in resultado.get("Vulnerabilities") or []:
             if (vuln.get("Severity", "").upper() in severidades and
-                    vuln.get("FixedVersion")):
+                    (not somente_corrigiveis or vuln.get("FixedVersion"))):
                 total += 1
         total += len(resultado.get("Secrets") or [])
         for misconfig in resultado.get("Misconfigurations") or []:
@@ -124,14 +127,14 @@ def _avaliar_gates(ferramentas, raiz):
     if imagem.get("disponivel"):
         bloqueantes = _trivy_bloqueantes(
             json.loads((pasta / "trivy-image.json").read_text(encoding="utf-8")),
-            {"CRITICAL"})
+            {"HIGH", "CRITICAL"}, somente_corrigiveis=False)
         gates.append(_gate("trivy-imagem",
-                           "sast-trivy falha em CRITICAL com correção na imagem Docker",
+                           "sast-trivy falha em HIGH/CRITICAL na imagem Docker",
                            "passou" if bloqueantes == 0 else "falhou",
                            f"{bloqueantes} achado(s) bloqueante(s)"))
     else:
         gates.append(_gate("trivy-imagem",
-                           "sast-trivy falha em CRITICAL com correção na imagem Docker",
+                           "sast-trivy falha em HIGH/CRITICAL na imagem Docker",
                            "sem_dados", "relatório trivy-image.json ausente"))
 
     passou_ia, detalhe_ia = _metricas_ia(raiz)

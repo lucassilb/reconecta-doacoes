@@ -123,7 +123,7 @@ def test_seguranca_publica_nao_inventa_contadores():
     resposta = app.test_client().get("/reconecta/dashboard/seguranca")
     assert resposta.status_code == 200
     assert resposta.json["controles"]["falhas_login"].startswith("Não medidas")
-    assert resposta.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] > 0
+    assert resposta.json["sast"]["ferramentas"]["trivy-image"]["severidades"]["HIGH"] == 0
     gates = resposta.json["sast"]["gates"]
     assert gates
     assert all(set(gate) == {"rotulo", "resultado"} for gate in gates)
