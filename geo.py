@@ -112,6 +112,22 @@ def centroide(municipio, uf):
     return _municipios().get((_normalizar(municipio), uf.upper()))
 
 
+@lru_cache(maxsize=1)
+def _nomes_municipios():
+    with open(RAIZ / "data" / "municipios.csv", encoding="utf-8", newline="") as arquivo:
+        return {(_normalizar(linha["nome"]), linha["uf"]): linha["nome"]
+                for linha in csv.DictReader(arquivo)}
+
+
+def municipio_ibge(municipio, uf):
+    """(nome oficial, latitude, longitude) da sede do município, ou None."""
+    if not municipio or not uf:
+        return None
+    chave_municipio = (_normalizar(municipio), uf.upper())
+    ponto = _municipios().get(chave_municipio)
+    return (_nomes_municipios()[chave_municipio], *ponto) if ponto else None
+
+
 # ---------------- distância ----------------
 
 def haversine_km(a, b):

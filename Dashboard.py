@@ -17,6 +17,7 @@ from sqlalchemy.pool import StaticPool
 from fuso import BRASILIA, agora_brasilia, inicio_dia_utc, iso_evento, utc_para_brasilia
 from models import (Contribuicao, Doacao, Doador, Estabelecimento,
                     Excedente, Instituicao, ItemDoacao, ItemExcedente, db)
+from geo import municipio_ibge, partes_endereco
 from Publico import _municipio_uf
 
 ns = Namespace("dashboard", description="Indicadores públicos agregados")
@@ -56,6 +57,13 @@ def _uf(endereco):
     municipio = _municipio_uf(endereco)
     uf = municipio.rsplit("/", 1)[-1].upper() if municipio else None
     return uf if uf in REGIAO_UF else "Não informada"
+
+
+def _municipio(endereco):
+    """(nome oficial IBGE, UF) do município do endereço e a sede (lat, lon), ou None."""
+    partes = partes_endereco(endereco)
+    achado = municipio_ibge(partes["municipio"], partes["uf"])
+    return ((achado[0], partes["uf"]), (achado[1], achado[2])) if achado else None
 
 
 def _minutos_sql(fim, inicio):
@@ -127,7 +135,27 @@ def montar_impacto():
     tabela = conversoes_kg()
     total = defaultdict(Decimal)
     por_uf = defaultdict(lambda: defaultdict(Decimal))
+    # mapa de calor: organizações que receberam, agregadas por município (sem nome nem id)
+    por_municipio = defaultdict(lambda: defaultdict(Decimal))
+    sedes = {}
+    orgs_uf = defaultdict(set)
+    orgs_municipio = defaultdict(set)
+    sem_coordenada = set()
     sem_conversao = 0
+
+    def somar(org_id, endereco, tipo, kg):
+        uf = _uf(endereco)
+        por_uf[uf][tipo] += kg
+        orgs_uf[uf].add(org_id)
+        municipio = _municipio(endereco)
+        if municipio is None:
+            sem_coordenada.add(org_id)
+            return
+        chave, sede = municipio
+        sedes[chave] = sede
+        por_municipio[chave][tipo] += kg
+        orgs_municipio[chave].add(org_id)
+
     calor = [[0] * 24 for _ in range(7)]
 
     tempos_pedido = (db.session.query(
@@ -156,7 +184,7 @@ def montar_impacto():
 
     contribuicoes = (db.session.query(
         Contribuicao.categoria, Contribuicao.unidade_medida,
-        Estabelecimento.endereco,
+        Estabelecimento.id.label("org_id"), Estabelecimento.endereco,
         func.sum(Contribuicao.quantidade).label("quantidade"),
         func.count(Contribuicao.id).label("itens"))
         .join(Doacao, Doacao.id == Contribuicao.doacao_id)
@@ -171,10 +199,11 @@ def montar_impacto():
             continue
         kg, tipo = peso
         total[tipo] += kg
-        por_uf[_uf(c.endereco)][tipo] += kg
+        somar(c.org_id, c.endereco, tipo, kg)
 
     retirados = (db.session.query(ItemExcedente.categoria,
-                 ItemExcedente.unidade_medida, Estabelecimento.endereco,
+                 ItemExcedente.unidade_medida, Estabelecimento.id.label("org_id"),
+                 Estabelecimento.endereco,
                  func.sum(ItemExcedente.quantidade).label("quantidade"),
                  func.count(ItemExcedente.id).label("itens"))
                  .join(Excedente, Excedente.id == ItemExcedente.excedente_id)
@@ -189,7 +218,7 @@ def montar_impacto():
             continue
         kg, tipo = peso
         total[tipo] += kg
-        por_uf[_uf(item.endereco)][tipo] += kg
+        somar(item.org_id, item.endereco, tipo, kg)
 
     def resumo_peso(valores):
         medido = valores.get("medido", Decimal(0))
@@ -212,7 +241,16 @@ def montar_impacto():
         "peso": resumo_peso(total) | {"itens_sem_conversao": sem_conversao},
         "refeicoes": {"kg_por_refeicao": float(KG_POR_REFEICAO),
                        "premissa": "0,5 kg de alimento por refeição; projeção, não refeições servidas",
-                       "por_uf": [{"uf": uf} | resumo_peso(v) for uf, v in sorted(por_uf.items())],
+                       "por_uf": [{"uf": uf} | resumo_peso(v) | {"ongs": len(orgs_uf[uf])}
+                                  for uf, v in sorted(por_uf.items())],
+                       # só cidade/UF, sede do município (IBGE) e números agregados
+                       "por_municipio": sorted(
+                           ({"municipio": m, "uf": uf,
+                             "lat": sedes[(m, uf)][0], "lon": sedes[(m, uf)][1]}
+                            | resumo_peso(v) | {"ongs": len(orgs_municipio[(m, uf)])}
+                            for (m, uf), v in por_municipio.items()),
+                           key=lambda r: (-r["refeicoes_estimadas"], r["uf"], r["municipio"])),
+                       "organizacoes_sem_municipio": len(sem_coordenada),
                        "por_regiao": [{"regiao": regiao} | resumo_peso(v)
                                       for regiao, v in sorted(regioes.items())]},
         "match": {"pedido_min": _media_sql(pedido_media, pedido_amostras),
@@ -552,7 +590,9 @@ class Dashboard(Resource):
 
 @ns.route("/impacto")
 class Impacto(Resource):
-    @ns.response(200, "Kg medidos/estimados, refeições projetadas por região, match, IA e calor")
+    @ns.response(200, "Kg medidos/estimados, refeições projetadas por região, UF e "
+                      "município de quem recebeu (só cidade/UF, sede IBGE e números), "
+                      "match, IA e calor")
     @ns.param("modo", "demonstracao: impacto simulado em SQLite isolado", _in="query")
     def get(self):
         return (_consultar_demonstracao(montar_impacto)

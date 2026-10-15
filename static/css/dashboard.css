@@ -30,8 +30,30 @@
 .dash-fonte { margin-top: 10px; }
 .dash-metricas { display: grid; gap: 4px; font-size: .86rem; color: var(--tinta-suave); }
 .dash-analise .cartao { min-width: 0; display: grid; align-content: start; gap: 10px; }
-.mapa-uf { width: 100%; min-height: 280px; }
-.mapa-uf svg { display: block; width: 100%; max-height: 370px; }
+/* mapa de calor (static/js/mapa-calor.js): canvas do calor sob o SVG dos contornos */
+@media (min-width: 1000px) { .dash-graf--mapa { grid-column: 1 / -1; } }
+.mapa-calor { width: 100%; max-width: 760px; margin-inline: auto; }
+.mapa-calor__moldura { position: relative; width: 100%; aspect-ratio: 815 / 802; overflow: hidden; border-radius: 14px;
+  background: linear-gradient(160deg, #B9D8E8 0%, #A5CBE0 60%, #9AC2DA 100%); touch-action: manipulation; }
+.mapa-calor__calor, .mapa-calor__svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mapa-calor__fundo path { fill: #ECEBE2; stroke: #C9CBBE; stroke-width: .8; }
+.mapa-calor__oceano { fill: #4F7B95; font-style: italic; letter-spacing: .12em; text-anchor: middle; }
+.mapa-calor__ufs path { fill: transparent; stroke: rgba(255,255,255,.85); stroke-width: 1.1; stroke-linejoin: round; cursor: pointer; }
+.mapa-calor__ufs path.is-ativo { stroke: #1B1D22; stroke-width: 2.6; }
+.mapa-calor__rotulos { pointer-events: none; font-family: var(--fonte-texto); font-weight: 800; }
+.mapa-calor__rotulos text { fill: #1B1D22; text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: rgba(255,255,255,.88); stroke-width: 3px; stroke-linejoin: round; }
+.mapa-calor__chamada { stroke: #1B1D22; stroke-width: .9; opacity: .7; }
+.mapa-calor__dica { position: absolute; z-index: 2; display: grid; gap: 2px; max-width: min(260px, calc(100% - 8px)); padding: 8px 11px; border-radius: 10px;
+  background: rgba(27,29,34,.92); color: white; font-size: .8rem; line-height: 1.35; pointer-events: none; box-shadow: var(--sombra-2); }
+.mapa-calor__dica[hidden] { display: none; }
+.mapa-calor__dica b { font-size: .86rem; }
+.mapa-calor__legenda { display: grid; gap: 3px; max-width: 420px; margin: 10px auto 0; font-size: .8rem; color: var(--tinta-suave); }
+.mapa-calor__barra { height: 12px; border-radius: 6px; border: 1px solid rgba(27,29,34,.15);
+  background: linear-gradient(90deg, #22409A 0%, #2C6FD0 15%, #35AFC4 30%, #7CCB5A 42%, #F2E234 50%, #F6A02C 68%, #E5432A 85%, #A50F1F 100%); }
+.mapa-calor__marcas, .mapa-calor__valores { display: flex; justify-content: space-between; gap: 6px; }
+.mapa-calor__marcas { font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta); font-size: .72rem; }
+.mapa-calor__valores span:last-child { text-align: right; }
+#t-municipio { margin-top: 10px; }
 .mapa-horas { display: grid; grid-template-columns: 32px repeat(24, minmax(0, 1fr)); gap: 3px; align-items: center; overflow-x: auto; padding-bottom: 8px; }
 .mapa-horas span { font-size: .65rem; text-align: center; }
 .mapa-horas .celula { min-width: 5px; aspect-ratio: 1; border-radius: 3px; background: var(--verde-suave); }
@@ -46,6 +68,8 @@
   .impacto-cards, .sast-cards, .seg-controles { grid-template-columns: 1fr; }
   .mapa-horas { gap: 1px; grid-template-columns: 24px repeat(24, minmax(5px, 1fr)); }
   .mapa-horas span { font-size: .55rem; }
+  /* no celular o mapa ocupa quase toda a largura do cartão */
+  .mapa-calor__moldura { width: calc(100% + 24px); margin-inline: -12px; border-radius: 10px; }
 }
 .indicadores { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 720px) { .indicadores { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

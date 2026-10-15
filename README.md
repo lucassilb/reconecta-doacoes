@@ -159,7 +159,7 @@ Privacidade: o dashboard é público e só traz dados agregados. "Últimas doaç
 
 ### Impacto e DevSecOps
 
-O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a premissa 1 L = 1 kg) separados de **kg estimados** por médias de categoria para unidade, pacote e caixa. Conta somente doações `ENTREGUE` e excedentes `RETIRADO`. As **refeições potenciais por UF e região** usam 0,5 kg por refeição como premissa, não refeições servidas. Exibe ainda o tempo médio pedido → doação aceita e oferta → reserva; a avaliação offline da IA com data, acurácias e limiares; gráficos Chart.js; cartograma de calor por UF; e calor dia × hora das doações aceitas. O impacto atualiza com eventos em tempo real.
+O painel mostra **kg em unidades físicas** (kg, g e litros convertidos com a premissa 1 L = 1 kg) separados de **kg estimados** por médias de categoria para unidade, pacote e caixa. Conta somente doações `ENTREGUE` e excedentes `RETIRADO`. As **refeições potenciais por UF e região** usam 0,5 kg por refeição como premissa, não refeições servidas. Exibe ainda o tempo médio pedido → doação aceita e oferta → reserva; a avaliação offline da IA com data, acurácias e limiares; gráficos Chart.js; mapa de calor do Brasil com os contornos do IBGE e manchas por município de quem recebeu (`static/js/mapa-calor.js`, sem tiles externos nem biblioteca); e calor dia × hora das doações aceitas. O impacto atualiza com eventos em tempo real.
 
 O bloco de segurança lê `relatorios/sast/resumo.json` com achados e data de Bandit, Trivy de arquivos/configuração/imagem e estado STRIDE. A imagem versionada ainda tem 44 achados HIGH do Debian base; o painel não os chama de mitigados. Cabeçalhos/CSP e cotas são controles existentes; falhas e bloqueios de login aparecem como **não medidos**, pois só constam no log. Regras, premissas, atualização do relatório e prova estão em [docs/dashboard.md](docs/dashboard.md); testes em `tests/test_dashboard_impacto.py`.
 
@@ -318,7 +318,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | POST | `/reconecta/excedentes/{id}/confirmar-retirada` | Publicador confirma a retirada. |
 | GET | `/reconecta/excedentes/rota` | ONG: ordem das retiradas reservadas (vizinho mais próximo + 2-opt), distâncias e links do OpenStreetMap. |
 | GET | `/reconecta/dashboard` | Indicadores, séries, ranking, alertas e últimas doações (agregados). |
-| GET | `/reconecta/dashboard/impacto` | Kg físicos e estimados, refeições potenciais por UF/região, match, avaliação da IA e calor por dia/hora. |
+| GET | `/reconecta/dashboard/impacto` | Kg físicos e estimados, refeições potenciais por UF/região e por município de quem recebeu (só cidade/UF, sede IBGE e números), match, avaliação da IA e calor por dia/hora. |
 | GET | `/reconecta/dashboard/seguranca` | Resumo versionado SAST/STRIDE e controles de segurança declarados. |
 | POST | `/reconecta/ia/interpretar-pedido` | Organização logada: texto livre → itens sugeridos para revisão. Categoria pelo classificador treinado. Limite de 10 por minuto por organização (429 `MUITAS_TENTATIVAS`). |
 | POST | `/reconecta/ia/resumo-dashboard` | Resumo e recomendações a partir dos agregados. Limite de 10 por minuto por IP (429 `LIMITE_IA`). |

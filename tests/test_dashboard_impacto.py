@@ -2,6 +2,7 @@
 import json
 import os
 from datetime import date, datetime
+from pathlib import Path
 
 import pytest
 
@@ -136,3 +137,125 @@ def test_seguranca_declara_cabecalhos_da_resposta(monkeypatch, cookie_seguro):
     assert declarados == {nome for nome in nomes if resposta.headers.get(nome)}
     assert bool(resposta.headers.get("Strict-Transport-Security")) == cookie_seguro
     assert resposta.json["controles"]["hsts_condicional"] == cookie_seguro
+
+
+def ong_em(nome, cnpj, endereco):
+    return Estabelecimento(nome=nome, cnpj=cnpj, email=f"{nome}@teste.local",
+                           telefone="11111111111", endereco=endereco, sem_fins_lucrativos=True)
+
+
+def entregar(ong, quantidade, unidade, doador):
+    pedido = Doacao(estabelecimento_id=ong.id, data_cadastro=datetime(2026, 10, 12, 12),
+                    data_limite_retirada=datetime(2026, 10, 30))
+    db.session.add(pedido)
+    db.session.flush()
+    item = ItemDoacao(doacao_id=pedido.id, nome="Arroz", categoria="Grãos e cereais",
+                      quantidade=quantidade, unidade_medida=unidade)
+    db.session.add(item)
+    db.session.flush()
+    db.session.add(Contribuicao(doacao_id=pedido.id, item_doacao_id=item.id, doador_id=doador.id,
+                                alimento="Arroz", categoria="Grãos e cereais", quantidade=quantidade,
+                                unidade_medida=unidade, validade=date(2026, 10, 30), respostas="{}",
+                                foto_arquivo="a.jpg", status="ENTREGUE",
+                                criado_em=datetime(2026, 10, 12, 14)))
+
+
+def test_mapa_de_calor_agrega_por_municipio_sem_dado_pessoal():
+    """Rodada 20: pontos por município de quem recebeu, só cidade/UF, sede IBGE e números."""
+    with app.app_context():
+        centro = ong_em("ongcentro", "12345678000195", "Rua Sigilosa, 10 - Sé, sao paulo/sp - 01001000")
+        zona = ong_em("ongzona", "23456789000189", "Av. Reservada, 20 - Mooca, São Paulo/SP - 03101000")
+        recife = ong_em("ongrecife", "45678901000102", "Rua Escondida, 5 - Boa Vista, Recife/PE - 50050000")
+        sumida = ong_em("ongsumida", "56789012000148", "Rua Três, 3 - Centro, Cidade Inventada/MG - 30000000")
+        mercado = ong_em("mercado", "34567890000110", "Rua Quatro, 4 - Centro, Campinas/SP - 13010000")
+        doador = Doador(nome="Pessoa Secreta", cpf="52998224725", email="pessoa@teste.local",
+                        telefone="11987654321")
+        db.session.add_all([centro, zona, recife, sumida, mercado, doador])
+        db.session.flush()
+        entregar(centro, 10, "kg", doador)
+        entregar(zona, 4, "kg", doador)
+        entregar(sumida, 6, "kg", doador)
+        retirado = Excedente(estabelecimento_id=mercado.id, reservado_por_id=recife.id,
+                             retirar_ate=datetime(2026, 10, 30), status="RETIRADO",
+                             criado_em=datetime(2026, 10, 12, 12),
+                             reservado_em=datetime(2026, 10, 12, 13),
+                             retirado_em=datetime(2026, 10, 12, 18))
+        retirado.itens = [ItemExcedente(nome="Feijão", categoria="Grãos e cereais", quantidade=3000,
+                                        unidade_medida="g", validade=date(2026, 10, 30))]
+        # oferta reservada e ainda não retirada não é impacto
+        reservado = Excedente(estabelecimento_id=mercado.id, reservado_por_id=recife.id,
+                              retirar_ate=datetime(2026, 10, 30), status="RESERVADO",
+                              criado_em=datetime(2026, 10, 12, 12),
+                              reservado_em=datetime(2026, 10, 12, 13))
+        reservado.itens = [ItemExcedente(nome="Feijão", categoria="Grãos e cereais", quantidade=50,
+                                         unidade_medida="kg", validade=date(2026, 10, 30))]
+        db.session.add_all([retirado, reservado])
+        db.session.commit()
+
+    resposta = app.test_client().get("/reconecta/dashboard/impacto")
+    assert resposta.status_code == 200
+    refeicoes = resposta.json["refeicoes"]
+    assert refeicoes["por_municipio"] == [
+        {"municipio": "São Paulo", "uf": "SP", "lat": -23.5329, "lon": -46.6395,
+         "kg_medido": 14, "kg_estimado": 0, "refeicoes_estimadas": 28, "ongs": 2},
+        {"municipio": "Recife", "uf": "PE", "lat": -8.04666, "lon": -34.8771,
+         "kg_medido": 3, "kg_estimado": 0, "refeicoes_estimadas": 6, "ongs": 1},
+    ]
+    assert refeicoes["organizacoes_sem_municipio"] == 1  # cidade fora da tabela do IBGE
+    ufs = {r["uf"]: r for r in refeicoes["por_uf"]}
+    assert (ufs["SP"]["ongs"], ufs["PE"]["ongs"], ufs["MG"]["ongs"]) == (2, 1, 1)
+    assert ufs["MG"]["refeicoes_estimadas"] == 12  # sem coordenada continua na UF
+    texto = resposta.get_data(as_text=True)
+    for pessoal in ("ongcentro", "ongzona", "ongrecife", "ongsumida", "Sigilosa", "Reservada", "Escondida", "Mooca", "01001000", "12345678000195",
+                    "Pessoa Secreta", "52998224725", "11987654321", "@teste.local", "mercado"):
+        assert pessoal not in texto, pessoal
+
+
+def test_contrato_do_mapa_por_municipio_e_por_uf():
+    with app.app_context():
+        ong = ong_em("ongbh", "12345678000195", "Rua A, 1 - Centro, Belo Horizonte/MG - 30110000")
+        doador = Doador(nome="Pessoa", cpf="52998224725", email="p@teste.local", telefone="11111111111")
+        db.session.add_all([ong, doador])
+        db.session.flush()
+        entregar(ong, 5, "kg", doador)
+        db.session.commit()
+    refeicoes = app.test_client().get("/reconecta/dashboard/impacto").json["refeicoes"]
+    assert set(refeicoes) >= {"por_uf", "por_regiao", "por_municipio", "organizacoes_sem_municipio"}
+    municipio, = refeicoes["por_municipio"]
+    assert set(municipio) == {"municipio", "uf", "lat", "lon", "kg_medido", "kg_estimado",
+                              "refeicoes_estimadas", "ongs"}
+    assert isinstance(municipio["lat"], float) and isinstance(municipio["ongs"], int)
+    uf, = refeicoes["por_uf"]
+    assert set(uf) == {"uf", "kg_medido", "kg_estimado", "refeicoes_estimadas", "ongs"}
+
+
+def test_sem_impacto_o_mapa_vem_vazio():
+    refeicoes = app.test_client().get("/reconecta/dashboard/impacto").json["refeicoes"]
+    assert refeicoes["por_municipio"] == [] and refeicoes["organizacoes_sem_municipio"] == 0
+
+
+def test_malha_do_ibge_versionada_tem_27_ufs_e_fonte():
+    raiz = Path(__file__).resolve().parents[1]
+    arquivo = raiz / "static" / "geo" / "brasil.topo.json"
+    assert arquivo.stat().st_size < 150 * 1024
+    topo = json.loads(arquivo.read_text(encoding="utf-8"))
+    ufs = {g["properties"]["uf"] for g in topo["objects"]["ufs"]["geometries"]}
+    assert len(ufs) == 27 and {"SP", "DF", "AC", "RS", "AP"} <= ufs
+    fontes = (raiz / "static" / "geo" / "FONTES.txt").read_text(encoding="utf-8")
+    assert "servicodados.ibge.gov.br" in fontes and "Natural Earth" in fontes
+    html = (raiz / "static" / "dashboard.html").read_text(encoding="utf-8")
+    assert '/static/js/mapa-calor.js' in html and "tile" not in html.lower()
+
+
+def test_demonstracao_enche_o_mapa_com_as_25_cidades_ficticias():
+    dados = json.loads((Path(__file__).resolve().parents[1] / "data" / "demonstracao.json")
+                       .read_text(encoding="utf-8"))
+    refeicoes = app.test_client().get("/reconecta/dashboard/impacto?modo=demonstracao").json["refeicoes"]
+    cidades = {(m["municipio"], m["uf"]) for m in refeicoes["por_municipio"]}
+    assert cidades == {(o["cidade"], o["uf"]) for o in dados["organizacoes_ficticias"]}
+    assert refeicoes["organizacoes_sem_municipio"] == 0
+    assert all(-34 < m["lat"] < 6 and -74 < m["lon"] < -34 and m["refeicoes_estimadas"] > 0
+               for m in refeicoes["por_municipio"])
+    assert sum(m["refeicoes_estimadas"] for m in refeicoes["por_municipio"]) == pytest.approx(
+        sum(u["refeicoes_estimadas"] for u in refeicoes["por_uf"]), abs=25)
+    assert "Exemplo" not in json.dumps(refeicoes)  # nomes das ONGs fictícias não vão para o mapa

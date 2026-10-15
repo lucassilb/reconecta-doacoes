@@ -14,6 +14,7 @@
   <script src="/static/js/layout.js" defer></script>
   <!-- Chart.js (MIT), servido pela jsDelivr, CDN gratuita -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="/static/js/mapa-calor.js" defer></script>
   <script src="/static/js/dashboard.js" defer></script>
 </head>
 <body class="dash">
@@ -53,7 +54,7 @@
     <section class="dash-grade dash-analise" aria-label="Análise regional e da inteligência">
       <article class="cartao dash-graf"><h2>Refeições potenciais por região</h2><p class="dash-graf__sub">UF da organização que recebeu; peso físico e estimado somados apenas para esta projeção.</p><figure class="dash-graf__area"><canvas id="g-regiao" role="img" aria-label="Gráfico de refeições potenciais por região"></canvas></figure><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-regiao"></div></details></article>
       <article class="cartao dash-graf"><h2>Qualidade da IA</h2><p class="dash-graf__sub" id="ia-medicao">Carregando avaliação…</p><figure class="dash-graf__area"><canvas id="g-acuracia" role="img" aria-label="Acurácia medida e limiares do classificador e da recomendação"></canvas></figure><div id="ia-metricas" class="dash-metricas"></div></article>
-      <article class="cartao dash-graf"><h2>Mapa de calor por UF</h2><p class="dash-graf__sub">Cartograma por UF de destino; cor representa refeições potenciais, não população.</p><div class="mapa-uf" id="mapa-uf" role="img" aria-label="Cartograma de refeições potenciais por UF"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-uf"></div></details></article>
+      <article class="cartao dash-graf dash-graf--mapa"><h2>Mapa de calor de refeições potenciais</h2><p class="dash-graf__sub">Onde chegou o alimento: UF e município da ONG do pedido ou de quem reservou o excedente. A cor de cada ponto soma, em partes iguais, as refeições da UF e a concentração em torno dos municípios; não representa população. Passe o mouse ou toque num estado para ver os números.</p><div class="mapa-calor" id="mapa-uf" role="img" aria-label="Mapa de calor de refeições potenciais por UF e município"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-uf"></div><div id="t-municipio"></div></details><p class="dash-fonte">Contornos: malha territorial do IBGE (2022); países vizinhos: Natural Earth. Sedes municipais: <code>data/municipios.csv</code>.</p></article>
       <article class="cartao dash-graf"><h2>Quando as doações são aceitas</h2><p class="dash-graf__sub">Dia da semana × hora em Brasília, em todo o histórico. Inclui aceitas e depois entregues.</p><div class="mapa-horas" id="mapa-horas"></div><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-horas"></div></details></article>
       <article class="cartao dash-graf"><h2>Refeições geradas por mês</h2><p class="dash-graf__sub" id="mes-sub">Kg confirmados convertidos pela premissa de 0,5 kg por refeição, por mês civil de Brasília.</p><figure class="dash-graf__area"><canvas id="g-mes" role="img" aria-label="Gráfico de linha com refeições estimadas geradas por mês"></canvas></figure><details class="dash-dados"><summary>Ver dados em tabela</summary><div id="t-mes"></div></details></article>
     </section>

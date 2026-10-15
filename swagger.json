@@ -331,7 +331,7 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Kg medidos/estimados, refeições projetadas por região, match, IA e calor"
+            "description": "Kg medidos/estimados, refeições projetadas por região, UF e município de quem recebeu (só cidade/UF, sede IBGE e números), match, IA e calor"
           }
         },
         "operationId": "get_impacto",

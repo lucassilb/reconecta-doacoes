@@ -1,0 +1,24 @@
+static/geo/brasil.topo.json — contornos do mapa de calor do /dashboard (static/js/mapa-calor.js)
+
+Objeto "ufs" (27 Unidades da Federação)
+  Fonte: IBGE, Malha Territorial (API de Malhas Geográficas v3), qualidade "intermediaria",
+  área total do país 8.510.417,771 km² (malha vigente desde 2022).
+  https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&qualidade=intermediaria&intrarregiao=UF
+  Licença: dado público do IBGE, de uso livre com citação da fonte (Lei 12.527/2011).
+  Propriedades acrescentadas: uf (sigla), nome, rx/ry (ponto interior para o rótulo).
+
+Objeto "vizinhos" (países da América do Sul, só fundo do mapa)
+  Fonte: Natural Earth, ne_50m_admin_0_countries, v5.1.2
+  https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_50m_admin_0_countries.geojson
+  Licença: domínio público (https://www.naturalearthdata.com/about/terms-of-use/).
+
+Geração (mapshaper 0.6.102, MPL-2.0, só na máquina de quem gera; o site não depende dele):
+  mapshaper ibge.json -simplify 30% keep-shapes -require siglas.js alias=S \
+    -each 'uf=S[codarea][0], nome=S[codarea][1], rx=..this.innerX.., ry=..this.innerY..' \
+    -rename-layers ufs -o ufs.topo.json format=topojson quantization=20000
+  mapshaper ne_50m.geojson -filter 'CONTINENT=="South America" && ADM0_A3!="BRA"' \
+    -clip bbox=-82,-40,-24,13 -filter-fields ADM0_A3 -simplify 25% keep-shapes \
+    -rename-layers vizinhos -o vizinhos.topo.json format=topojson quantization=10000
+  mapshaper -i ufs.topo.json vizinhos.topo.json combine-files \
+    -o brasil.topo.json format=topojson quantization=20000 target=*
+  siglas.js mapeia o código IBGE da UF (codarea) para sigla e nome.

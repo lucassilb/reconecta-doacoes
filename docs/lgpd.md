@@ -28,7 +28,10 @@ Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
 - O endereço de retirada do excedente aparece só para a ONG que reservou
   (`Excedentes.py`, chave `retirada` no detalhe autenticado).
 - O dashboard agrega tudo sem identificar pessoas; `instituicoes` (legado CP1)
-  não tem autenticação própria e não recebe consentimento.
+  não tem autenticação própria e não recebe consentimento. O mapa de calor
+  (`refeicoes.por_municipio`) publica só município/UF, a coordenada da sede do
+  município (IBGE), kg, refeições e quantas ONGs receberam; nunca nome, CNPJ,
+  logradouro, CEP ou dado de quem doou.
 - O resumo com IA lê só números agregados. O texto livre de pedidos passa pela
   remoção de padrões comuns de e-mail, documento e telefone em `llm_service.py`
   antes da chamada à LLM; essa remoção não cobre todos os formatos.

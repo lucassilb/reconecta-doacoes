@@ -186,7 +186,7 @@
     $("match-detalhe").textContent = "Pedido → doação: " + duracao(match.pedido_min) + " (" + (match.pedido_amostras || 0) + "); oferta → reserva: " + duracao(match.excedente_min) + " (" + (match.excedente_amostras || 0) + ").";
     $("sem-conversao").textContent = peso.itens_sem_conversao ? peso.itens_sem_conversao + " item(ns) sem conversão ficaram fora do cálculo." : "Todos os itens confirmados tinham conversão.";
     graficoRegiao(refeicoes.por_regiao || []);
-    mapaUF(refeicoes.por_uf || []);
+    mapaUF(refeicoes.por_uf || [], refeicoes.por_municipio || []);
     mapaHoras(d.calor_doacoes || {});
     graficoAcuracia(d.ia || {});
     graficoMes(d.refeicoes_mensal || {});
@@ -247,33 +247,18 @@
     ] }, options: op });
   }
 
-  var POSICOES_UF = { RR:[2,0], AP:[5,0], AM:[2,1], PA:[4,1], AC:[1,2], RO:[2,2], TO:[5,2], MA:[6,1], PI:[7,2], CE:[8,1], RN:[10,1], PB:[10,2], PE:[9,3], AL:[10,4], SE:[9,4], BA:[7,4], MT:[4,3], GO:[5,4], DF:[6,4], MS:[4,5], MG:[7,5], ES:[9,5], SP:[6,6], RJ:[8,6], PR:[5,7], SC:[6,8], RS:[5,9] };
-  function mapaUF(lista) {
-    var porUf = {};
-    lista.forEach(function (r) { porUf[r.uf] = r; });
-    var maximo = Math.max.apply(null, lista.map(function (r) { return r.refeicoes_estimadas; }).concat([1]));
-    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 660 510");
-    svg.setAttribute("aria-hidden", "true");
-    Object.keys(POSICOES_UF).forEach(function (uf) {
-      var pos = POSICOES_UF[uf], valor = (porUf[uf] || {}).refeicoes_estimadas || 0;
-      var grupo = document.createElementNS(svg.namespaceURI, "g");
-      var ret = document.createElementNS(svg.namespaceURI, "rect");
-      ret.setAttribute("x", 12 + pos[0] * 58); ret.setAttribute("y", 12 + pos[1] * 48);
-      ret.setAttribute("width", 53); ret.setAttribute("height", 43); ret.setAttribute("rx", 7);
-      ret.setAttribute("fill", valor ? "hsl(98 47% " + (85 - 56 * valor / maximo) + "%)" : "#e8e9e3");
-      var rotulo = document.createElementNS(svg.namespaceURI, "text");
-      rotulo.setAttribute("x", 38 + pos[0] * 58); rotulo.setAttribute("y", 39 + pos[1] * 48);
-      rotulo.setAttribute("text-anchor", "middle"); rotulo.setAttribute("font-size", "14");
-      rotulo.setAttribute("font-weight", "700"); rotulo.setAttribute("fill", "#19351c");
-      rotulo.textContent = uf;
-      var titulo = document.createElementNS(svg.namespaceURI, "title");
-      titulo.textContent = uf + ": " + inteiro.format(valor) + " refeições potenciais";
-      grupo.append(ret, rotulo, titulo); svg.appendChild(grupo);
-    });
-    $("mapa-uf").replaceChildren(svg);
-    $("t-uf").replaceChildren(tabela("Impacto por UF de destino", ["UF", "Refeições potenciais", "Kg físicos", "Kg estimados"],
-      lista.map(function (r) { return [r.uf, inteiro.format(r.refeicoes_estimadas), decimal.format(r.kg_medido), decimal.format(r.kg_estimado)]; }), [1, 2, 3]));
+  /* mapa de calor: contornos do IBGE e calor por município (static/js/mapa-calor.js) */
+  function mapaUF(lista, municipios) {
+    var alvo = $("mapa-uf");
+    if (window.ReConectaMapa) {
+      window.ReConectaMapa.desenhar(alvo, { porUf: lista, porMunicipio: municipios }).catch(function () {
+        alvo.replaceChildren(el("p", { classe: "dash-vazio", texto: "Mapa indisponível agora; os números estão na tabela." }));
+      });
+    }
+    $("t-uf").replaceChildren(tabela("Impacto por UF de destino", ["UF", "Refeições potenciais", "Kg físicos", "Kg estimados", "ONGs"],
+      lista.map(function (r) { return [r.uf, inteiro.format(r.refeicoes_estimadas), decimal.format(r.kg_medido), decimal.format(r.kg_estimado), inteiro.format(r.ongs || 0)]; }), [1, 2, 3, 4]));
+    $("t-municipio").replaceChildren(tabela("Impacto por município de quem recebeu", ["Município", "Refeições potenciais", "Kg físicos", "Kg estimados", "ONGs"],
+      municipios.map(function (m) { return [m.municipio + "/" + m.uf, inteiro.format(m.refeicoes_estimadas), decimal.format(m.kg_medido), decimal.format(m.kg_estimado), inteiro.format(m.ongs)]; }), [1, 2, 3, 4]));
   }
 
   function mapaHoras(calor) {
