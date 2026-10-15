@@ -9,12 +9,14 @@ from collections import Counter
 from contextvars import ContextVar
 from datetime import datetime, timezone
 import json
+import mimetypes
 import os
 from pathlib import Path
 import re
 import sys
 import tempfile
 import threading
+import zoneinfo
 
 from flask import request
 from sqlalchemy import event
@@ -28,13 +30,19 @@ _instalado = False
 _raiz = Path(__file__).resolve().parent
 _permitidas = tuple(p.resolve() for p in (_raiz, Path(tempfile.gettempdir()),
                                          Path(sys.prefix)))
+# Dados de sistema só de leitura que a biblioteca padrão consulta sozinha no Linux:
+# tabela de tipos (mimetypes, usada pelo send_from_directory) e fusos (zoneinfo).
+_arquivos_sistema = frozenset(Path(f).resolve() for f in mimetypes.knownfiles)
+_pastas_sistema = tuple(Path(d).resolve() for d in zoneinfo.TZPATH)
 _hosts_locais = {"127.0.0.1", "::1", "localhost", "db", "app", "ollama"}
 
 
 def _dentro(caminho):
     try:
         alvo = Path(caminho).resolve()
-        return any(alvo == base or base in alvo.parents for base in _permitidas)
+        return (any(alvo == base or base in alvo.parents for base in _permitidas)
+                or alvo in _arquivos_sistema
+                or any(base in alvo.parents for base in _pastas_sistema))
     except (OSError, TypeError, ValueError):
         return False
 
@@ -68,15 +76,17 @@ def _limpar_requisicao(_erro):
     _salvar()
 
 
-def _registrar(tipo, severidade=None):
+def _registrar(tipo, severidade=None, detalhe=None):
     contexto = _contexto.get()
     if contexto is None:
         return
     with _lock:
         _contagens[tipo] += 1
         if severidade and len(_achados) < 100:
-            _achados.append({"tipo": tipo, "severidade": severidade,
-                             "rota": contexto[0]})
+            achado = {"tipo": tipo, "severidade": severidade, "rota": contexto[0]}
+            if detalhe:
+                achado["detalhe"] = detalhe
+            _achados.append(achado)
 
 
 def _contaminado(texto, taints):
@@ -107,7 +117,8 @@ def _auditoria(evento, argumentos):
     elif evento == "open" and argumentos:
         caminho = argumentos[0]
         if isinstance(caminho, (str, bytes, os.PathLike)) and not _dentro(caminho):
-            _registrar("arquivo_fora_das_pastas_permitidas", "ALTA")
+            # o caminho do arquivo vai no relatório para o diagnóstico (não é dado de usuário)
+            _registrar("arquivo_fora_das_pastas_permitidas", "ALTA", detalhe=os.fsdecode(caminho)[:200])
     elif evento == "socket.connect" and len(argumentos) > 1:
         endereco = argumentos[1]
         if isinstance(endereco, tuple) and endereco and str(endereco[0]).lower() not in _hosts_locais:

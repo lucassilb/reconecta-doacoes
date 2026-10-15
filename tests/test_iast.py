@@ -78,3 +78,17 @@ def test_iast_nao_confunde_valor_com_nome_de_coluna():
     from iast_sensor import _contaminado
     assert not _contaminado("SELECT unidade_medida FROM itens_doacao", ("unidade",))
     assert _contaminado("SELECT 'unidade'", ("unidade",))
+
+
+def test_iast_aceita_tabelas_de_sistema_so_de_leitura_e_mantem_alerta_no_resto():
+    # no Linux do CI, a página inicial abre /etc/mime.types (mimetypes) e os fusos (zoneinfo)
+    import mimetypes
+    import zoneinfo
+
+    import iast_sensor
+
+    assert all(iast_sensor._dentro(f) for f in mimetypes.knownfiles)
+    for pasta in zoneinfo.TZPATH:
+        assert iast_sensor._dentro(os.path.join(pasta, "America", "Sao_Paulo"))
+    fora = "C:/Windows/win.ini" if os.name == "nt" else "/etc/passwd"
+    assert not iast_sensor._dentro(fora)
