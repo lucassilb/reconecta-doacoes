@@ -24,6 +24,9 @@ class Estabelecimento(db.Model):
     atividade_alimentar = db.Column(db.Boolean, nullable=False, default=True, server_default=true())
     consentimento_versao = db.Column(db.String(20), nullable=True)
     consentimento_em = db.Column(db.DateTime, nullable=True)
+    # Geração da sessão: o cookie guarda o número; sair, trocar a senha ou excluir
+    # a conta incrementa e os cookies antigos deixam de valer.
+    sessao_versao = db.Column(db.Integer, nullable=False, default=0, server_default='0')
     doacoes = db.relationship('Doacao', backref='estabelecimento', lazy=True)
 
 class Doador(db.Model):
@@ -37,6 +40,7 @@ class Doador(db.Model):
     senha_hash = db.Column(db.String(255), nullable=True)
     consentimento_versao = db.Column(db.String(20), nullable=True)
     consentimento_em = db.Column(db.DateTime, nullable=True)
+    sessao_versao = db.Column(db.Integer, nullable=False, default=0, server_default='0')
     doacoes = db.relationship('Doacao', backref='doador', lazy=True)
 
 class Instituicao(db.Model):

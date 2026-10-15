@@ -14,7 +14,7 @@ from pathlib import Path
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from cnpj_service import formatar_cnpj
@@ -49,6 +49,10 @@ _falhas = {}
 _falhas_lock = threading.Lock()
 JANELA_FALHAS = 15 * 60
 LIMITE_FALHAS = 5
+# Hash fictício verificado quando o identificador não existe: quem não tem conta
+# paga o mesmo custo de verificação de quem tem, e o tempo de resposta não revela
+# se o e-mail, CPF ou CNPJ está cadastrado.
+_HASH_FICTICIO = generate_password_hash("senha-ficticia-para-tempo-constante")
 
 login_entrada = ns.model("LoginEntrada", {
     "identificador": fields.String(required=True, description="E-mail, CNPJ ou CPF"),
@@ -104,11 +108,20 @@ def configurar_chave_secreta(app):
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 
-def iniciar_sessao(tipo, usuario_id):
+def iniciar_sessao(tipo, usuario):
     session.clear()
     session["tipo"] = tipo
-    session["usuario_id"] = usuario_id
+    session["usuario_id"] = usuario.id
     session["nonce"] = secrets.token_hex(16)
+    session["sv"] = usuario.sessao_versao or 0
+
+
+def sessao_expirada(usuario):
+    """True quando o cookie tem geração divergente da gravada (logout, troca de
+    senha ou exclusão derrubam as demais). Cookies antigos sem a geração seguem
+    valendo até expirar no navegador — a checagem só se aplica às sessões novas."""
+    versao = session.get("sv")
+    return versao is not None and versao != (usuario.sessao_versao or 0)
 
 
 def usuario_atual():
@@ -123,7 +136,7 @@ def usuario_atual():
     else:
         return None
     # Conta anonimizada perde a sessão em qualquer navegador.
-    if not usuario or conta_removida(usuario):
+    if not usuario or conta_removida(usuario) or sessao_expirada(usuario):
         return None
     return tipo, usuario
 
@@ -215,14 +228,15 @@ class Login(Resource):
             registrar_auditoria("login", "bloqueado")
             return _erro("MUITAS_TENTATIVAS", "Aguarde 15 minutos antes de tentar novamente.", 429)
         encontrado = _buscar_identificador(chave)
-        if not encontrado or not encontrado[1].senha_hash or not check_password_hash(encontrado[1].senha_hash, senha):
+        alvo = encontrado[1].senha_hash if encontrado and encontrado[1].senha_hash else _HASH_FICTICIO
+        if not check_password_hash(alvo, senha) or not encontrado or not encontrado[1].senha_hash:
             _registrar_falha(chave)
             registrar_auditoria("login", "falha")
             return _erro("CREDENCIAIS_INVALIDAS", "Identificador ou senha inválidos.", 401)
         with _falhas_lock:
             _falhas.pop(chave, None)
         tipo, usuario = encontrado
-        iniciar_sessao(tipo, usuario.id)
+        iniciar_sessao(tipo, usuario)
         registrar_auditoria("login", "ok", tipo=tipo, ator_id=usuario.id)
         return {"usuario": dados_usuario(tipo, usuario)}, 200
 
@@ -231,9 +245,17 @@ class Login(Resource):
 class Logout(Resource):
     @ns.response(204, "Sessão encerrada")
     def post(self):
-        """Encerra a sessão atual."""
+        """Encerra a sessão atual e invalida os cookies emitidos para a conta."""
         registrar_auditoria("logout", "ok", tipo=session.get("tipo"),
                             ator_id=session.get("usuario_id"))
+        atual = usuario_atual()
+        if atual:
+            # geração nova: o cookie desta sessão (e os das outras) morre de vez
+            atual[1].sessao_versao = (atual[1].sessao_versao or 0) + 1
+            try:
+                db.session.commit()
+            except SQLAlchemyError:
+                db.session.rollback()
         session.clear()
         return "", 204
 
@@ -306,11 +328,15 @@ class Me(Resource):
             usuario.nome = corpo["nome"].strip()
         if trocando_senha:
             usuario.senha_hash = generate_password_hash(corpo["nova_senha"])
+            # sessões antigas (outros navegadores) morrem; esta continua
+            usuario.sessao_versao = (usuario.sessao_versao or 0) + 1
         try:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
             return _erro("EMAIL_JA_CADASTRADO", "Este e-mail já está cadastrado.", 409)
+        if trocando_senha:
+            session["sv"] = usuario.sessao_versao
         registrar_auditoria("dados_editados", "ok", tipo=tipo, ator_id=usuario.id)
         if trocando_senha:
             registrar_auditoria("senha_trocada", "ok", tipo=tipo, ator_id=usuario.id)
@@ -327,6 +353,8 @@ class Me(Resource):
         if not atual:
             return _erro("NAO_AUTENTICADO", "Entre para continuar.", 401)
         tipo, usuario = atual
+        # a geração sobe junto com a anonimização: cookies desta conta morrem
+        usuario.sessao_versao = (usuario.sessao_versao or 0) + 1
         anonimizar_conta(tipo, usuario)
         registrar_auditoria("conta_removida", "ok", tipo=tipo, ator_id=usuario.id)
         session.clear()

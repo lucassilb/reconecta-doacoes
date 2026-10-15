@@ -1,5 +1,6 @@
 import os
 import secrets
+from urllib.parse import urlsplit
 from flask import Flask, request, send_from_directory
 from flask_restx import Api, Resource
 from sqlalchemy import text
@@ -47,6 +48,39 @@ if os.getenv("COOKIE_SEGURO") == "1":
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 db.init_app(app)
+
+_LOOPBACK = {"localhost", "127.0.0.1", "::1"}
+
+
+def _origem_aceita():
+    """Escritas por cookie exigem Origin/Referer da própria origem (anti-CSRF).
+
+    Sem o cabeçalho a requisição passa (scripts e clientes de API não mandam
+    Origin; o SameSite=Lax continua protegendo o navegador). Com ele, o host
+    precisa ser o do serviço — ou qualquer loopback no desenvolvimento local."""
+    origem = request.headers.get("Origin") or request.headers.get("Referer")
+    if origem is None:
+        return True
+    try:
+        partes = urlsplit(origem)
+    except ValueError:
+        return False
+    if partes.scheme not in ("http", "https") or not partes.hostname:
+        return False
+    alvo = urlsplit("//" + request.host).hostname or ""
+    return partes.hostname == alvo or (partes.hostname in _LOOPBACK
+                                     and alvo in _LOOPBACK)
+
+
+@app.before_request
+def conferir_origem_escrita():
+    if request.method not in ("POST", "PUT", "PATCH", "DELETE"):
+        return None
+    if not _origem_aceita():
+        return {"codigo": "ORIGEM_RECUSADA",
+                "mensagem": "Origem da requisição não corresponde ao site."}, 403
+    return None
+
 
 _CSP = (
     "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
