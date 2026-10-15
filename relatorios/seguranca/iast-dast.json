@@ -1,10 +1,10 @@
 {
   "ferramenta": "sensor IAST ReConecta 1",
-  "data": "2026-10-14T22:22:47.636947+00:00",
+  "data": "2026-10-15T00:55:12.730669+00:00",
   "processos": 3,
   "eventos": {
-    "codigo_dinamico": 82,
-    "sql_observado": 2450
+    "codigo_dinamico": 84,
+    "sql_observado": 2036
   },
   "achados": [],
   "por_severidade": {}

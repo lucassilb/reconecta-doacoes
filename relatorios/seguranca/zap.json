@@ -1,7 +1,7 @@
 {
   "ferramenta": "OWASP ZAP stable",
   "versao": "2.17.0",
-  "data": "2026-10-14T22:22:47.312167+00:00",
+  "data": "2026-10-15T00:55:12.138576+00:00",
   "alvo": "Compose SQLite efêmero local",
   "escopo": "baseline público + GETs e POSTs selecionados do swagger.json por papel fictício",
   "varreduras": {
@@ -46,15 +46,6 @@
         },
         {
           "id": "10049",
-          "nome": "Storable and Cacheable Content",
-          "severidade": "INFORMATIVA",
-          "ocorrencias": 2,
-          "rotas": [
-            "fora_do_swagger"
-          ]
-        },
-        {
-          "id": "10049",
           "nome": "Storable but Non-Cacheable Content",
           "severidade": "INFORMATIVA",
           "ocorrencias": 5,
@@ -64,7 +55,7 @@
           ]
         }
       ],
-      "quantidade": 6
+      "quantidade": 5
     },
     "publico": {
       "alertas": [
@@ -98,7 +89,7 @@
           "rotas": [
             "/reconecta/ia/risco-descarte",
             "/reconecta/ia/sugerir-destino",
-            "/reconecta/publico/doacoes",
+            "/reconecta/publico/ongs",
             "/reconecta/publico/resumo",
             "/reconecta/saude"
           ]
@@ -173,8 +164,8 @@
           "ocorrencias": 5,
           "rotas": [
             "/reconecta/auth/me",
-            "/reconecta/excedentes/meus",
             "/reconecta/ia/interpretar-pedido",
+            "/reconecta/notificacoes",
             "/reconecta/painel/doacoes"
           ]
         }
@@ -221,7 +212,7 @@
     }
   },
   "por_severidade": {
-    "INFORMATIVA": 12,
+    "INFORMATIVA": 11,
     "BAIXA": 6,
     "MEDIA": 0,
     "ALTA": 0,
@@ -232,6 +223,17 @@
     "empresa",
     "ong"
   ],
+  "oferta_multipart": {
+    "prova_direta": {
+      "multipart_com_foto": 201,
+      "foto_do_dono": 200,
+      "json_sem_foto": 400
+    },
+    "respostas_post_durante_o_scan": {
+      "400": 38,
+      "429": 427
+    }
+  },
   "operacoes_no_swagger": {
     "publico": {
       "GET": [

@@ -6,7 +6,8 @@ import subprocess
 import sys
 import pytest
 
-from scripts.dast import PUBLICAS, PAPEIS, POSTS, RAIZ, resumir_zap, spec_parcial
+from scripts.dast import (JPEG_MINIMO, PUBLICAS, PAPEIS, POSTS, RAIZ, ROTA_OFERTA, multipart,
+                          oferta_ficticia, respostas_da_oferta, resumir_zap, spec_parcial)
 
 
 def test_semente_recusa_execucao_fora_do_compose_efemero():
@@ -51,3 +52,51 @@ def test_resumo_zap_recusa_relatorio_sem_alvo(tmp_path):
     arquivo.write_text('{"site": []}', encoding="utf-8")
     with pytest.raises(RuntimeError, match="sem alvo"):
         resumir_zap({"publico": arquivo})
+
+
+def test_spec_do_doador_parte_de_oferta_valida_em_multipart(tmp_path):
+    """Rodada 19: a oferta é multipart (dados + foto); o ZAP parte de um `dados` válido."""
+    swagger = json.loads((RAIZ / "swagger.json").read_text(encoding="utf-8"))
+    saida = tmp_path / "doador.json"
+    spec_parcial(swagger, PAPEIS["doador"][2], saida, POSTS["doador"])
+    post = json.loads(saida.read_text(encoding="utf-8"))["paths"][ROTA_OFERTA]["post"]
+    assert post["consumes"] == ["multipart/form-data"]
+    parametros = {p["name"]: p for p in post["parameters"]}
+    assert parametros["foto"]["type"] == "file" and parametros["foto"]["in"] == "formData"
+    assert json.loads(parametros["dados"]["default"])["itens"][0]["nome"] == "Arroz"
+    # o swagger.json original não é alterado
+    assert "default" not in json.dumps(swagger["paths"][ROTA_OFERTA]["post"]["parameters"])
+
+
+def test_corpo_multipart_do_dast_publica_e_json_sem_foto_e_recusado(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    from app import app
+    from models import Doador, db
+    app.config["TESTING"] = True
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        doador = Doador(nome="Doador Ficticio", cpf="52998224725", email="doador@dast.invalid",
+                        telefone="11900000001")
+        db.session.add(doador)
+        db.session.commit()
+        doador_id = doador.id
+    cliente = app.test_client()
+    with cliente.session_transaction() as sessao:
+        sessao["tipo"], sessao["usuario_id"] = "doador", doador_id
+    corpo, tipo = multipart({"dados": json.dumps(oferta_ficticia(), ensure_ascii=False)},
+                            {"foto": ("validade.jpg", "image/jpeg", JPEG_MINIMO)})
+    criado = cliente.post(ROTA_OFERTA, data=corpo, content_type=tipo)
+    assert criado.status_code == 201, criado.json
+    assert cliente.get(criado.json["foto_url"]).data == JPEG_MINIMO
+    antigo = cliente.post(ROTA_OFERTA, json=oferta_ficticia())
+    assert antigo.status_code == 400 and "foto" in antigo.json["campos"]
+
+
+def test_contagem_do_access_log_desconta_a_prova_direta():
+    registro = "\n".join(["app-1  | POST /reconecta/excedentes 201 512 9ms",
+                           "app-1  | POST /reconecta/excedentes 400 120 2ms",
+                           "app-1  | POST /reconecta/excedentes 400 120 2ms",
+                           "app-1  | POST /reconecta/excedentes/7/reservar 403 80 1ms",
+                           "app-1  | GET /reconecta/excedentes 200 2 1ms"])
+    assert respostas_da_oferta(registro) == {"400": 1}
