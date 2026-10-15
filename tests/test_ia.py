@@ -94,7 +94,9 @@ def test_interpretar_pedido_aceita_saida_valida_e_envia_ao_ollama_local(monkeypa
     assert corpo["stream"] is False
     assert corpo["options"]["temperature"] == 0.2
     assert corpo["messages"][1]["content"] == texto
-    assert date.today().isoformat() in corpo["messages"][0]["content"]
+    # o prompt usa a data de Brasília; o CI roda em UTC e às 21h já é o dia seguinte lá
+    from fuso import hoje_brasilia
+    assert hoje_brasilia().isoformat() in corpo["messages"][0]["content"]
     assert "2 kg de arroz e 3 caixas de leite" in corpo["messages"][0]["content"]
     assert chamadas[0][1]["allow_redirects"] is False
 

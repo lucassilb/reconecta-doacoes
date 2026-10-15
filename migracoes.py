@@ -32,12 +32,15 @@ def _migrar_foto_excedente(engine):
     if not inspector.has_table("excedentes"):
         return
     colunas = {coluna["name"] for coluna in inspector.get_columns("excedentes")}
-    binario = "BYTEA" if engine.dialect.name == "postgresql" else "BLOB"
+    # SQL literal por dialeto (sem montar texto), para o Semgrep não ter o que apontar
+    coluna_foto = ("ALTER TABLE excedentes ADD COLUMN foto_dados BYTEA"
+                   if engine.dialect.name == "postgresql" else
+                   "ALTER TABLE excedentes ADD COLUMN foto_dados BLOB")
     with engine.begin() as conexao:
         if "foto_tipo" not in colunas:
             conexao.execute(text("ALTER TABLE excedentes ADD COLUMN foto_tipo VARCHAR(4)"))
         if "foto_dados" not in colunas:
-            conexao.execute(text(f"ALTER TABLE excedentes ADD COLUMN foto_dados {binario}"))
+            conexao.execute(text(coluna_foto))
 
 
 def _restricao_postgresql(conexao, tabela, nome):
