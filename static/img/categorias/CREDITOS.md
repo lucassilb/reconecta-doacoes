@@ -1,9 +1,10 @@
 # Créditos das fotos de categoria
 
-Fotos reais (nada gerado por IA) em close/plano médio sobre fundo neutro,
-do Wikimedia Commons, convertidas para WebP 640×480 (< 80 KB cada) pelo
-projeto. As licenças permitem uso, inclusive comercial; CC BY e CC BY-SA
-exigem atribuição — mantida neste arquivo e na nota de rodapé de `/privacidade`.
+Fotos reais (nada gerado por IA), convertidas para WebP 640×480 (< 80 KB cada) pelo
+projeto. Hortifrúti, padaria, bebidas e outros vêm do Wikimedia Commons, com licenças
+que permitem uso, inclusive comercial; CC BY e CC BY-SA exigem atribuição — mantida
+neste arquivo e na nota de rodapé de `/privacidade`. Laticínios, carnes e peixes, grãos
+e cereais e refeições prontas foram escolhidas pelo grupo em 2026-10-15.
 
 ## `hortifruti.webp` — Hortifrúti
 - Foto: [File:A woven basket filled with an assortment of colorful vegetables.jpg](https://commons.wikimedia.org/wiki/File:A_woven_basket_filled_with_an_assortment_of_colorful_vegetables.jpg)
