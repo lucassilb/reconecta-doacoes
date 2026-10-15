@@ -96,7 +96,7 @@
       <div id="ia-resultado" class="dash-ia__resultado" aria-live="polite" hidden></div>
     </section>
 
-    <div class="dash-grade">
+    <div class="dash-grade dash-final">
       <!-- pedido × recebido por categoria -->
       <section class="cartao dash-graf" aria-labelledby="g-cat-titulo">
         <h2 id="g-cat-titulo">Pedido × recebido por categoria</h2>
@@ -121,21 +121,21 @@
       <!-- alertas -->
       <section class="cartao dash-alertas" aria-labelledby="alertas-titulo">
         <h2 id="alertas-titulo">Alertas</h2>
-        <ul class="alertas" id="alertas" aria-live="polite"></ul>
+        <ul class="alertas" id="alertas" aria-live="polite" aria-labelledby="alertas-titulo" tabindex="0"></ul>
       </section>
 
       <!-- top empresas -->
-      <section class="cartao" aria-labelledby="top-titulo">
+      <section class="cartao dash-top" aria-labelledby="top-titulo">
         <h2 id="top-titulo">Organizações com mais doações recebidas</h2>
         <div class="dash-tabela" id="top-empresas"></div>
       </section>
-    </div>
 
-    <!-- histórico -->
-    <section class="cartao dash-historico" aria-labelledby="ult-titulo">
-      <h2 id="ult-titulo">Últimas doações</h2>
-      <div class="dash-tabela" id="ultimas"></div>
-    </section>
+      <!-- histórico -->
+      <section class="cartao dash-historico" aria-labelledby="ult-titulo">
+        <h2 id="ult-titulo">Últimas doações</h2>
+        <div class="dash-tabela" id="ultimas"></div>
+      </section>
+    </div>
   </main>
 
   <footer data-layout="rodape"></footer>

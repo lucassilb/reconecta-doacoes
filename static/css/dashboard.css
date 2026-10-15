@@ -162,3 +162,43 @@
 .gate__regra { font-size: .86rem; color: var(--tinta); }
 .gate__detalhe { grid-column: 2; font-size: .78rem; color: var(--tinta-suave); }
 @media (max-width: 719.98px) { .seg-grade { grid-template-columns: 1fr; } }
+
+/* R21: dashboard compacto em largura total. Só esta página; tamanhos de fonte inalterados. */
+.dash main.container { max-width: none; padding-inline: clamp(16px, 1.6vw, 24px); padding-bottom: 20px; }
+.dash .cartao { padding: clamp(14px, 1.3vw, 18px); }
+.dash-topo { padding-block: clamp(12px, 2vw, 24px) clamp(12px, 1.6vw, 18px); gap: 12px; }
+.dash-impacto, .dash-analise, .dash-seguranca { margin-bottom: 16px; }
+.dash-secao-topo { margin-bottom: 10px; }
+.impacto-cards, .sast-cards { gap: 10px; }
+.dash-grade { gap: 14px; margin-bottom: 16px; }
+.dash-grade .cartao, .dash-historico, .dash-analise .cartao { gap: 8px; }
+.dash-graf__area { height: 220px; }
+.seg-grade { margin-top: 12px; gap: 12px; }
+.seg-rosca { height: 190px; }
+.seg-controles { gap: 10px; margin-top: 10px; }
+.indicadores { gap: 10px; margin-bottom: 16px; }
+.indicador { padding: 14px 16px; border-radius: 16px; }
+.dash-ia { margin-bottom: 16px; gap: 12px; }
+.dash-final .dash-historico { grid-column: 1 / -1; }
+.mapa-calor { max-width: 640px; }
+@media (min-width: 1000px) { .impacto-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) {
+  /* 6 por linha: o destaque ocupa 2 colunas e os outros 10 fecham exatamente 2 linhas */
+  .indicadores { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .indicador--destaque { grid-column: span 2; grid-row: auto; }
+}
+@media (min-width: 1000px) {
+  /* a lista de alertas rola dentro do cartão em vez de esticar a linha inteira */
+  .dash-final .alertas { max-height: 360px; overflow-y: auto; padding-right: 4px; }
+}
+@media (min-width: 1400px) {
+  .dash-grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* mapa numa coluna, ao lado de dois gráficos por linha, sem ficar gigante */
+  .dash-analise .dash-graf--mapa { grid-column: 1; grid-row: 1 / span 2; }
+  .dash-analise .mapa-calor { max-width: 600px; }
+  /* 6 trilhas: três cartões de 2 por linha e as duas tabelas meio a meio */
+  .dash-final { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .dash-final > .cartao { grid-column: span 2; }
+  .dash-final > .dash-top, .dash-final > .dash-historico { grid-column: span 3; }
+  .dash-seguranca .gates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
