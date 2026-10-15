@@ -2,10 +2,10 @@
   "fonte": "swagger.json",
   "banco": "SQLite em memória",
   "contas_ficticias": 6,
-  "operacoes_swagger": 59,
+  "operacoes_swagger": 60,
   "escritas_classificadas": 30,
-  "leituras_privadas_classificadas": 15,
-  "requisicoes_verificadas": 185,
+  "leituras_privadas_classificadas": 16,
+  "requisicoes_verificadas": 213,
   "falhas": 0,
   "classes": {
     "admin": [
@@ -494,6 +494,286 @@
       "metodo": "GET",
       "rota": "/reconecta/contribuicoes/{id}/foto",
       "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "doador2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "empresa2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "ong1",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "ong2",
+      "classe": "objeto",
+      "esperado": [
+        200
+      ],
+      "obtido": 200
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}/foto",
+      "ator": "anonimo",
+      "classe": "objeto",
+      "esperado": [
+        404
+      ],
+      "obtido": 404
+    },
+    {
+      "metodo": "GET",
+      "rota": "/reconecta/excedentes/{id}",
+      "ator": "anonimo",
       "classe": "objeto",
       "esperado": [
         200

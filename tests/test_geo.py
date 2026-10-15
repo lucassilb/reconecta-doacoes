@@ -11,6 +11,7 @@ import requests
 os.environ["DATABASE_URL"] = "sqlite://"
 
 from app import app  # noqa: E402
+from foto_oferta import com_foto  # noqa: E402
 import geo  # noqa: E402
 from conexao import casar  # noqa: E402
 from eventos import Evento  # noqa: E402
@@ -276,7 +277,7 @@ def test_avisos_de_excedente_vao_das_ongs_mais_proximas_com_distancia():
         esperados = [ongs[n].id for n in ("pinheiros", "santo_andre", "campinas")]
     cliente = app.test_client()
     sessao(cliente, "empresa", mercado_id)
-    assert cliente.post("/reconecta/excedentes", json=anuncio()).status_code == 201
+    assert cliente.post("/reconecta/excedentes", data=com_foto(anuncio())).status_code == 201
     with app.app_context():
         privados = Evento.query.filter_by(tipo="excedente.publicado", publico=False).order_by(Evento.id).all()
         assert [e.dest_id for e in privados] == esperados  # Rio fica fora (outra UF e > 50 km)
@@ -314,7 +315,7 @@ def test_pagina_do_excedente_mostra_distancia_so_para_outra_organizacao():
         mercado_id, ong_id = mercado.id, ong.id
     publicador = app.test_client()
     sessao(publicador, "empresa", mercado_id)
-    id_ = publicador.post("/reconecta/excedentes", json=anuncio()).json["id"]
+    id_ = publicador.post("/reconecta/excedentes", data=com_foto(anuncio())).json["id"]
     assert "distancia" not in publicador.get(f"/reconecta/excedentes/{id_}").json
     assert "distancia" not in app.test_client().get(f"/reconecta/excedentes/{id_}").json
     visitante_ong = app.test_client()

@@ -290,3 +290,17 @@
 
 .privacidade-acoes { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 .consent-info { font-size: .85rem; color: var(--tinta-suave); margin: 0; }
+/* Foto da validade na oferta (mesmo campo da doação para pedido) */
+.ex-foto { margin-top: 16px; }
+.foto { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 16px; cursor: pointer; border: 1.5px dashed var(--linha-forte); background: var(--superficie); transition: border-color .15s ease, background-color .15s ease; }
+.foto:hover { border-color: var(--verde); background: color-mix(in srgb, var(--verde-suave) 40%, var(--superficie)); }
+.foto:has(.foto__input:focus-visible) { outline: 3px solid var(--foco); outline-offset: 2px; }
+.foto:has(.foto__input[aria-invalid="true"]) { border-color: var(--erro); }
+.foto__input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.foto__previa { flex: none; width: 72px; height: 72px; border-radius: 12px; display: grid; place-items: center; background: var(--verde-suave) center / cover no-repeat; color: var(--verde-texto); }
+.foto__previa svg { width: 32px; height: 32px; }
+.foto__previa--img svg { display: none; }
+.foto__texto { display: grid; gap: 2px; min-width: 0; font-size: .88rem; color: var(--tinta-suave); }
+.foto__texto strong { color: var(--tinta); font-size: 1rem; overflow-wrap: anywhere; }
+.ex-resumo__foto { width: 100%; max-width: 320px; max-height: 240px; object-fit: contain; border-radius: 12px; background: var(--superficie); }
+.ex-cartao__foto { width: 96px; height: 72px; object-fit: cover; border-radius: 10px; background: var(--superficie-2); }

@@ -593,6 +593,18 @@
           "429": {
             "description": "Cota de 20 publicações por hora"
           },
+          "413": {
+            "description": "Foto acima de 5 MB",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteErro"
+            }
+          },
+          "400": {
+            "description": "Dados inválidos; sem foto válida, campos.foto",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteErro"
+            }
+          },
           "201": {
             "description": "Excedente publicado",
             "schema": {
@@ -600,16 +612,26 @@
             }
           }
         },
+        "summary": "Publica uma oferta: multipart com `dados` (JSON da oferta) e `foto` da validade",
         "operationId": "post_excedentes",
         "parameters": [
           {
-            "name": "payload",
+            "name": "dados",
+            "in": "formData",
+            "type": "string",
             "required": true,
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/ExcedenteEntrada"
-            }
+            "description": "JSON: retirar_ate (data e hora ISO de Brasília, sem offset); itens [{nome, categoria, quantidade, unidade_medida, validade AAAA-MM-DD}]; observacao (até 200 caracteres); dentro_validade, embalagem_ok e armazenado_ok = true. Pessoa física: nao_caseiro = true e retirada {logradouro, numero, bairro, municipio, uf, cep}, que só a ONG que reservar vê"
+          },
+          {
+            "name": "foto",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Foto do alimento mostrando a validade: JPEG, PNG ou WebP de até 5 MB"
           }
+        ],
+        "consumes": [
+          "multipart/form-data"
         ],
         "tags": [
           "excedentes"
@@ -717,6 +739,33 @@
         ]
       }
     },
+    "/reconecta/excedentes/{excedente_id}/foto": {
+      "parameters": [
+        {
+          "name": "excedente_id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "get": {
+        "responses": {
+          "404": {
+            "description": "Foto não encontrada ou sem permissão",
+            "schema": {
+              "$ref": "#/definitions/ExcedenteErro"
+            }
+          },
+          "200": {
+            "description": "Foto da validade (só quem publicou e ONGs logadas)"
+          }
+        },
+        "operationId": "get_foto_excedente",
+        "tags": [
+          "excedentes"
+        ]
+      }
+    },
     "/reconecta/excedentes/{excedente_id}/cancelar-reserva": {
       "parameters": [
         {
@@ -785,6 +834,9 @@
         "responses": {
           "429": {
             "description": "Limite de 10 interpretações por minuto por empresa"
+          },
+          "400": {
+            "description": "Texto inválido ou recusado pela guarda (injeção de prompt ou fora do tema)"
           },
           "200": {
             "description": "Sugestão para revisão",
@@ -2052,77 +2104,6 @@
         }
       ]
     },
-    "ExcedenteEntrada": {
-      "required": [
-        "armazenado_ok",
-        "dentro_validade",
-        "embalagem_ok",
-        "itens",
-        "retirar_ate"
-      ],
-      "properties": {
-        "retirar_ate": {
-          "type": "string",
-          "description": "Data e hora ISO local de Brasília, sem offset"
-        },
-        "itens": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ItemExcedenteEntrada"
-          }
-        },
-        "observacao": {
-          "type": "string",
-          "description": "Até 200 caracteres"
-        },
-        "dentro_validade": {
-          "type": "boolean"
-        },
-        "embalagem_ok": {
-          "type": "boolean"
-        },
-        "armazenado_ok": {
-          "type": "boolean"
-        },
-        "nao_caseiro": {
-          "type": "boolean",
-          "description": "Obrigatório para pessoa física: não é comida feita em casa"
-        },
-        "retirada": {
-          "type": "object",
-          "description": "Obrigatório para pessoa física: {logradouro, numero, bairro, municipio, uf, cep}; só a ONG que reservar vê o endereço"
-        }
-      },
-      "type": "object"
-    },
-    "ItemExcedenteEntrada": {
-      "required": [
-        "categoria",
-        "nome",
-        "quantidade",
-        "unidade_medida",
-        "validade"
-      ],
-      "properties": {
-        "nome": {
-          "type": "string"
-        },
-        "categoria": {
-          "type": "string"
-        },
-        "quantidade": {
-          "type": "number"
-        },
-        "unidade_medida": {
-          "type": "string"
-        },
-        "validade": {
-          "type": "string",
-          "description": "Data AAAA-MM-DD"
-        }
-      },
-      "type": "object"
-    },
     "ExcedenteSaida": {
       "properties": {
         "id": {
@@ -2384,6 +2365,20 @@
         },
         "pedidos_abertos": {
           "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "ExcedenteErro": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "mensagem": {
+          "type": "string"
+        },
+        "campos": {
+          "type": "object"
         }
       },
       "type": "object"

@@ -171,6 +171,9 @@ class Excedente(db.Model):
     reservado_em = db.Column(db.DateTime)
     retirado_em = db.Column(db.DateTime)
     observacao = db.Column(db.String(200))
+    # foto do alimento mostrando a validade; nula só em ofertas anteriores à rodada 19
+    foto_tipo = db.Column(db.String(4), nullable=True)
+    foto_dados = db.deferred(db.Column(db.LargeBinary, nullable=True))
     criado_em = db.Column(db.DateTime, nullable=False, default=_utc_naive)
     publicador = db.relationship('Estabelecimento', foreign_keys=[estabelecimento_id])
     doador = db.relationship('Doador', foreign_keys=[doador_id])

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/css/painel.css">
   <script src="/static/js/layout.js" defer></script>
   <script src="/static/js/painel.js" defer></script>
+  <script src="/static/js/doacao-foto.js" defer></script>
   <script src="/static/js/painel-excedentes.js" defer></script>
   <script src="/static/js/meus-dados.js" defer></script>
 </head>
@@ -70,6 +71,21 @@
               <div id="ex-itens" class="itens__lista"></div>
               <button type="button" id="ex-add-item" class="btn btn--secundario btn--pequeno btn--add">Adicionar outro alimento</button>
             </fieldset>
+            <div class="campo ex-foto">
+              <span class="campo__rotulo" id="ex-foto-rotulo">Foto do alimento mostrando a validade</span>
+              <label class="foto" for="ex-foto">
+                <input id="ex-foto" type="file" accept="image/*" capture="environment" class="foto__input"
+                       aria-required="true" aria-labelledby="ex-foto-rotulo" aria-describedby="ex-foto-ajuda ex-foto-erro">
+                <span class="foto__previa" id="ex-foto-previa" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false"><path d="M4 8.5h3l1.6-2.5h6.8L17 8.5h3v10H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="13.3" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                </span>
+                <span class="foto__texto">
+                  <strong id="ex-foto-nome">Tirar ou escolher foto</strong>
+                  <span id="ex-foto-ajuda">Deixe a data de validade legível. Só você e as ONGs veem a foto.</span>
+                </span>
+              </label>
+              <p id="ex-foto-erro" class="campo__erro" data-erro></p>
+            </div>
             <div class="painel-etapa__acoes"><button type="button" class="btn btn--primario" data-ex-avancar="2">Continuar</button></div>
             </div>
             <div class="painel-etapa" data-etapa="2" hidden>

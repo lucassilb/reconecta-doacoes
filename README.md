@@ -300,6 +300,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/publico/opcoes` | Categorias e unidades aceitas. |
 | GET | `/reconecta/publico/doacoes` | Pedidos abertos. Paginação `pagina`/`por_pagina` (máx. 50), filtros `categoria`, `uf`, `busca`; cabeçalhos `X-Total-Count`, `X-Pagina`, `X-Por-Pagina`. |
 | GET | `/reconecta/publico/doacoes/{id}` | Detalhe do pedido com progresso por item. |
+| GET | `/reconecta/publico/ongs` | ONGs da rede: nome, município/UF e pedidos abertos, sem contato nem CNPJ. |
 | POST | `/reconecta/publico/doacoes/{id}/contribuicoes` | Doar (multipart: item, quantidade, validade, 4 respostas, foto). Limite de 20 por hora por usuário (429 `MUITAS_TENTATIVAS`). |
 | GET | `/reconecta/contribuicoes/{id}/foto` | Foto da doação (só quem doou ou a empresa dona). |
 | GET/POST | `/reconecta/painel/doacoes` | Pedidos da organização logada / publicar pedido. |
@@ -307,7 +308,8 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET | `/reconecta/painel/minhas-doacoes` | Doações feitas pela pessoa ou empresa logada. |
 | POST | `/reconecta/painel/contribuicoes/{id}/receber` | Dono do pedido confirma a entrega da contribuição. |
 | POST | `/reconecta/painel/contribuicoes/{id}/nao-recebida` | Dono do pedido registra que a contribuição não chegou. |
-| GET/POST | `/reconecta/excedentes` | Lista excedentes disponíveis / publica excedente da empresa de alimentos. |
+| GET/POST | `/reconecta/excedentes` | Lista excedentes disponíveis / publica a oferta da empresa de alimentos ou da pessoa física. POST em multipart: `dados` (o JSON da oferta) e `foto` do alimento mostrando a validade (JPEG, PNG ou WebP reais, até 5 MB, sem metadados ao gravar). JSON sem foto: 400 com `campos.foto`. |
+| GET | `/reconecta/excedentes/{id}/foto` | Foto da validade: quem publicou e ONGs logadas (oferta aberta ou reservada por ela); os demais recebem 404. |
 | GET | `/reconecta/excedentes/meus` | Excedentes publicados pela organização logada. |
 | GET | `/reconecta/excedentes/reservas` | Reservas da ONG logada. |
 | GET/DELETE | `/reconecta/excedentes/{id}` | Detalhe / cancelamento pelo publicador quando disponível. |
@@ -333,7 +335,7 @@ Todos os erros sob `/reconecta/` respondem JSON `{"codigo", "mensagem"}` (+ `cam
 | GET público / POST admin | `/reconecta/doacoes/` | CRUD legado do CP1; escrita administrativa. |
 | GET público / PUT/DELETE admin | `/reconecta/doacoes/{id}` | DELETE com itens, contribuições ou reservas: 409. |
 
-A tabela cobre as **58 operações em 44 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
+A tabela cobre as **60 operações em 46 caminhos** da API, conferidas contra o [swagger.json](swagger.json), que é a exportação da especificação OpenAPI atual; a versão interativa fica em `/swagger`.
 
 ## Banco de dados (critério 5 do CP2)
 

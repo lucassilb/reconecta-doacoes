@@ -42,6 +42,13 @@
             <div class="exc-fatos__largo"><dt>Onde retirar</dt><dd id="exc-local"></dd></div>
             <div class="exc-fatos__largo" id="exc-obs-linha" hidden><dt>Observação</dt><dd id="exc-obs"></dd></div>
           </dl>
+          <!-- foto da validade: a API só manda foto_url para quem publicou e para ONG logada -->
+          <figure class="exc-validade" id="exc-validade-foto" hidden>
+            <a id="exc-validade-link" href="#" target="_blank" rel="noopener">
+              <img id="exc-validade-img" alt="Foto do alimento mostrando a validade" width="640" height="480">
+            </a>
+            <figcaption id="exc-validade-legenda"></figcaption>
+          </figure>
           <ul class="exc-itens" id="exc-itens" aria-label="Itens desta doação"></ul>
         </div>
       </article>

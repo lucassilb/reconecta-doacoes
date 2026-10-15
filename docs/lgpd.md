@@ -17,6 +17,7 @@ Estado em 2026-10-14 (rodada 17). Política publicada em `/privacidade`
 | Consentimento | `*.consentimento_versao`, `.consentimento_em` | comprovar qual versão da política foi aceita e quando | obrigação legal, art. 7º II | enquanto a conta existir |
 | Pedidos, doações, excedentes, reservas | `doacoes`, `itens_doacao`, `contribuicoes`, `reservas`, `excedentes` | operar a rede e agregar impacto | execução do serviço, art. 7º V; legítimo interesse, art. 7º IX | persistem anonimizados após exclusão |
 | Foto da doação | `contribuicoes.foto_dados` | evidência para quem participa da doação | consentimento, art. 7º I | apagada na exclusão da conta |
+| Foto da validade da oferta | `excedentes.foto_dados` / `foto_tipo` | ONG confere o alimento e a validade antes de reservar; só quem publicou e ONGs logadas a veem (a ONG que reservou continua vendo) | consentimento, art. 7º I | apagada na exclusão da conta; a exportação lista o tipo e o endereço de download |
 | Log de auditoria | stdout (`reconecta.auditoria`) | segurança da conta; data, evento, IP truncado (/24), id do ator — sem payload | legítimo interesse, art. 7º IX | 7 dias (logs do Render, plano Hobby) |
 
 ## O que é público (minimização)
@@ -101,8 +102,11 @@ a política vale para eles também, mas o aceite gravado prova a versão vista.
 - `nome` → "Conta removida"; `email` → `removido-<tipo>-<id>@removido.invalid`;
   `telefone` → `"0"`; `senha_hash` → `NULL`; `cpf` → `REM<id>`; `cnpj` →
   `REMOVIDO-<id>` (os marcadores com letras não colidem com documentos válidos).
-- `doacoes.retirada_*` e `contribuicoes.foto_dados` do titular são apagados por
-  precaução (endereço de retirada e foto podem identificar).
+- `doacoes.retirada_*`, `contribuicoes.foto_dados` e `excedentes.foto_dados` do
+  titular são apagados por precaução (endereço de retirada e foto podem identificar).
+- Fotos de celular trazem EXIF com GPS. O navegador redesenha a foto antes de enviar
+  (lado maior até 1600 px, JPEG 0,8), o que já descarta os metadados; o servidor ainda
+  remove EXIF, XMP, IPTC e comentários da foto da oferta antes de gravar.
 - Pedidos, doações e excedentes mantêm a referência ao registro anonimizado:
   a estatística agregada (kg, refeições, contagens) não muda — LGPD art. 16
   permite a conservação anonimizada.

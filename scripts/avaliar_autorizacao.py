@@ -34,6 +34,9 @@ import IA  # noqa: E402
 from Auth import _auditoria  # noqa: E402
 
 _auditoria.disabled = True  # o relatório só registra códigos e papéis fictícios
+# JPEG mínimo (SOI, APP0, SOS, EOI): passa pela assinatura e pela limpeza de metadados
+JPEG = (b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00"
+        b"\xff\xda\x00\x08\x01\x01\x00\x00\x3f\x00\x12\x34\xff\xd9")
 
 
 # Chaves literais servem como revisão de escopo; os testes percorrem as operações
@@ -83,6 +86,7 @@ LEITURAS_PRIVADAS = {
     "GET /reconecta/painel/minhas-doacoes",
     "GET /reconecta/novidades",
     "GET /reconecta/excedentes/{excedente_id}",
+    "GET /reconecta/excedentes/{excedente_id}/foto",
     "GET /reconecta/estabelecimentos/",
     "GET /reconecta/estabelecimentos/{id}",
     "GET /reconecta/instituicoes/",
@@ -131,7 +135,8 @@ def semear():
                          retirada_endereco="Rua Segredo, 21 - Centro, São Paulo/SP - 01000000"
                          if tipo == "doador_id" else None,
                          status="RESERVADO" if reservante else "DISPONIVEL",
-                         reservado_por_id=usuarios[reservante].id if reservante else None)
+                         reservado_por_id=usuarios[reservante].id if reservante else None,
+                         foto_tipo="jpg", foto_dados=JPEG)
         db.session.add(item)
         db.session.flush()
         db.session.add(ItemExcedente(excedente_id=item.id, nome="Pão", categoria="Padaria",
@@ -319,6 +324,17 @@ def main(saida=None):
                                     ("empresa1", 404), ("anonimo", 404), ("ong1", 200)):
                 prova("GET", f"/reconecta/contribuicoes/{ids['entrega']}/foto", ator, esperado)
 
+            # Foto da validade da oferta: quem publicou e ONGs logadas (oferta aberta) ou a
+            # ONG que reservou. Empresa comum, outra pessoa e visitante recebem 404.
+            for alvo, permitidos in (("pessoa1", {"doador1", "ong1", "ong2"}),
+                                     ("reservado1", {"empresa1", "ong1"})):
+                for ator in ("doador1", "doador2", "empresa1", "empresa2", "ong1", "ong2", "anonimo"):
+                    autorizado = ator in permitidos
+                    prova("GET", f"/reconecta/excedentes/{ids[alvo]}/foto", ator,
+                          200 if autorizado else 404)
+                    prova("GET", f"/reconecta/excedentes/{ids[alvo]}", ator, 200,
+                          conferir=lambda d, sim=autorizado: assert_foto_url(d, sim))
+
             for ator, esperado, privado in (("doador1", 200, True),
                                              ("doador2", 200, False),
                                              ("empresa2", 200, False),
@@ -400,7 +416,8 @@ def main(saida=None):
                                  "numero": "7", "bairro": "Centro", "municipio": "São Paulo",
                                  "uf": "SP", "cep": "01000000"})
                 prova("POST", "/reconecta/excedentes", ator, esperado,
-                      json_=corpo, classificacao="papel")
+                      data={"dados": json.dumps(corpo), "foto": (BytesIO(JPEG), "validade.jpg")},
+                      classificacao="papel")
 
             for ator, esperado in (("doador1", 201), ("doador2", 201),
                                     ("ong1", 409), ("anonimo", 401)):
@@ -486,6 +503,12 @@ def main(saida=None):
 
 def assert_email(dados, esperado):
     assert dados["email"] == esperado, "atualização de perfil alheio"
+
+
+def assert_foto_url(dados, autorizado):
+    # raise explícito: segue valendo com python -O
+    if ("foto_url" in dados) != autorizado:
+        raise AssertionError("foto da validade fora do dono/ONG")
 
 
 def assert_privado_excedente(dados, autorizado):
