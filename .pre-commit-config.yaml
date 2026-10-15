@@ -1,0 +1,41 @@
+# Segurança "enquanto coda": roda antes de cada commit local e no CI (job guardas).
+# Instalação: pip install pre-commit && pre-commit install
+# As ferramentas de sistema abaixo precisam estar no PATH:
+#   pip install semgrep pip-audit
+#   gitleaks: baixar de github.com/gitleaks/gitleaks/releases (ou choco/brew)
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=200"]
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ["--fix=no"]
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        name: Bandit (só alto)
+        args: ["-lll", "--exclude", "tests,scripts,.venv,venv,instance"]
+  - repo: local
+    hooks:
+      - id: semgrep-local
+        name: Semgrep (regras locais do repositório)
+        entry: semgrep --config semgrep-local.yml --error --quiet
+        language: system
+        files: \.py$
+        pass_filenames: true
+      - id: pip-audit
+        name: pip-audit (CVEs das dependências)
+        entry: pip-audit -r requirements.txt -r requirements-dev.txt --strict
+        language: system
+        pass_filenames: false
+      - id: gitleaks
+        name: gitleaks (segredos no que será commitado)
+        entry: gitleaks protect --staged --verbose
+        language: system
+        pass_filenames: false

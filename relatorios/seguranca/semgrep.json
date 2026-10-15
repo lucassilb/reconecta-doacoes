@@ -1,0 +1,574 @@
+{
+  "version": "1.181.0",
+  "results": [],
+  "errors": [],
+  "paths": {
+    "scanned": [
+      ".dockerignore",
+      ".env.example",
+      ".github\\workflows\\ci.yml",
+      ".gitignore",
+      ".gitleaksignore",
+      ".pre-commit-config.yaml",
+      "app.py",
+      "Auth.py",
+      "Cadastro.py",
+      "classificador.py",
+      "cnae_alimentos.py",
+      "cnpj_service.py",
+      "conexao.py",
+      "Contribuicoes.py",
+      "crud_admin.py",
+      "crud_validacao.py",
+      "Dashboard.py",
+      "data\\alimentos.csv",
+      "data\\conversao_kg.csv",
+      "data\\demonstracao.json",
+      "data\\gerar_dataset.py",
+      "data\\lotes_descarte.csv",
+      "data\\municipios-licenca.txt",
+      "data\\municipios.csv",
+      "data\\ofertas_avaliacao.jsonl",
+      "data\\pedidos_avaliacao.jsonl",
+      "data\\README.md",
+      "data\\resumo_sast.json",
+      "Doacoes.py",
+      "docker-compose.yml",
+      "Dockerfile",
+      "docs\\avaliacao-modelos.md",
+      "docs\\cnae-alimentos.md",
+      "docs\\dashboard.md",
+      "docs\\dataset-modelo.md",
+      "docs\\geo.md",
+      "docs\\implantacao.md",
+      "docs\\lgpd.md",
+      "docs\\llm.md",
+      "docs\\modelagem.md",
+      "docs\\natureza-juridica.md",
+      "docs\\otimizacoes.md",
+      "docs\\sast.md",
+      "docs\\stride.md",
+      "docs\\tempo-real.md",
+      "Estabelecimentos.py",
+      "eventos.py",
+      "Excedentes.py",
+      "fuso.py",
+      "geo.py",
+      "IA.py",
+      "Instituicoes.py",
+      "LICENSE",
+      "llm_service.py",
+      "migracoes.py",
+      "modelo\\avaliacao.json",
+      "modelo\\avaliacao_conexao.json",
+      "modelo\\avaliacao_groq.json",
+      "modelo\\classificador_categorias.json",
+      "modelo\\limiares.json",
+      "modelo\\metricas.json",
+      "modelo\\risco_descarte.json",
+      "models.py",
+      "Painel.py",
+      "privacidade.py",
+      "Publico.py",
+      "README.md",
+      "relatorios\\sast\\bandit.html",
+      "relatorios\\sast\\bandit.json",
+      "relatorios\\sast\\bandit.txt",
+      "relatorios\\sast\\resumo.json",
+      "relatorios\\sast\\trivy-config.json",
+      "relatorios\\sast\\trivy-config.txt",
+      "relatorios\\sast\\trivy-fs.json",
+      "relatorios\\sast\\trivy-fs.txt",
+      "relatorios\\sast\\trivy-image.json",
+      "relatorios\\sast\\trivy-image.txt",
+      "relatorios\\seguranca\\bandit.json",
+      "relatorios\\seguranca\\gitleaks-dir.json",
+      "relatorios\\seguranca\\gitleaks-git.json",
+      "relatorios\\seguranca\\pip-audit.json",
+      "relatorios\\seguranca\\sbom-cyclonedx.json",
+      "relatorios\\seguranca\\semgrep.json",
+      "relatorios\\seguranca\\trivy-config.json",
+      "relatorios\\seguranca\\trivy-fs.json",
+      "render.yaml",
+      "requirements-dev.txt",
+      "requirements.txt",
+      "risco_descarte.py",
+      "Rotas.py",
+      "schema.sql",
+      "scripts\\atualizar_perfis.py",
+      "scripts\\avaliar_conexao.py",
+      "scripts\\avaliar_groq.py",
+      "scripts\\avaliar_modelos.py",
+      "scripts\\ciclo_ia.py",
+      "scripts\\classificar.py",
+      "scripts\\geocodificar.py",
+      "scripts\\resumo_sast.py",
+      "scripts\\sast.py",
+      "scripts\\treinar_modelo.py",
+      "scripts\\treinar_risco.py",
+      "semgrep-local.yml",
+      "static\\cadastro.html",
+      "static\\css\\base.css",
+      "static\\css\\cadastro.css",
+      "static\\css\\dashboard.css",
+      "static\\css\\doacao.css",
+      "static\\css\\entrar.css",
+      "static\\css\\excedente.css",
+      "static\\css\\home.css",
+      "static\\css\\painel.css",
+      "static\\css\\privacidade.css",
+      "static\\css\\sobre.css",
+      "static\\dashboard.html",
+      "static\\doacao.html",
+      "static\\entrar.html",
+      "static\\excedente.html",
+      "static\\img\\categorias\\bebidas.svg",
+      "static\\img\\categorias\\carnes.svg",
+      "static\\img\\categorias\\CREDITOS.md",
+      "static\\img\\categorias\\graos.svg",
+      "static\\img\\categorias\\hortifruti.svg",
+      "static\\img\\categorias\\laticinios.svg",
+      "static\\img\\categorias\\outros.svg",
+      "static\\img\\categorias\\padaria.svg",
+      "static\\img\\categorias\\refeicoes.svg",
+      "static\\img\\hero-cesta.svg",
+      "static\\img\\marca.svg",
+      "static\\index.html",
+      "static\\js\\cadastro.js",
+      "static\\js\\dashboard.js",
+      "static\\js\\doacao.js",
+      "static\\js\\entrar.js",
+      "static\\js\\excedente.js",
+      "static\\js\\home.js",
+      "static\\js\\layout.js",
+      "static\\js\\meus-dados.js",
+      "static\\js\\painel-excedentes.js",
+      "static\\js\\painel.js",
+      "static\\painel.html",
+      "static\\privacidade.html",
+      "static\\sobre.html",
+      "swagger.json",
+      "TempoReal.py"
+    ]
+  },
+  "time": {
+    "rules": [],
+    "rules_parse_time": 0.279130220413208,
+    "profiling_times": {
+      "config_time": 1.3523192405700684,
+      "core_time": 9.783611059188843,
+      "ignores_time": 0.0008597373962402344,
+      "total_time": 11.155370712280273
+    },
+    "parsing_time": {
+      "total_time": 4.58076810836792,
+      "per_file_time": {
+        "mean": 0.007980432244543409,
+        "std_dev": 0.0025556519703463687
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.36699358886478384,
+        "count_ratio": 0.005226480836236934
+      },
+      "very_slow_files": [
+        {
+          "fpath": "relatorios\\sast\\trivy-image.json",
+          "ftime": 0.40308237075805664
+        },
+        {
+          "fpath": "static\\js\\painel.js",
+          "ftime": 0.4120638370513916
+        },
+        {
+          "fpath": "modelo\\classificador_categorias.json",
+          "ftime": 0.8659663200378418
+        }
+      ]
+    },
+    "scanning_time": {
+      "total_time": 68.61641836166382,
+      "per_file_time": {
+        "mean": 0.18104595873789925,
+        "std_dev": 0.5735927406640197
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.7717708320802849,
+        "count_ratio": 0.036939313984168866
+      },
+      "very_slow_files": [
+        {
+          "fpath": "Excedentes.py",
+          "ftime": 2.8630754947662354
+        },
+        {
+          "fpath": "static\\js\\doacao.js",
+          "ftime": 3.2878787517547607
+        },
+        {
+          "fpath": "static\\js\\cadastro.js",
+          "ftime": 3.2979979515075684
+        },
+        {
+          "fpath": "llm_service.py",
+          "ftime": 3.8116838932037354
+        },
+        {
+          "fpath": "static\\js\\excedente.js",
+          "ftime": 3.856235980987549
+        },
+        {
+          "fpath": "static\\js\\painel-excedentes.js",
+          "ftime": 4.32891058921814
+        },
+        {
+          "fpath": "static\\js\\home.js",
+          "ftime": 4.864388704299927
+        },
+        {
+          "fpath": "static\\js\\painel.js",
+          "ftime": 5.210959196090698
+        },
+        {
+          "fpath": "static\\js\\layout.js",
+          "ftime": 5.933029413223267
+        },
+        {
+          "fpath": "static\\js\\dashboard.js",
+          "ftime": 5.988089084625244
+        }
+      ]
+    },
+    "matching_time": {
+      "total_time": 22.37028455734253,
+      "per_file_and_rule_time": {
+        "mean": 0.038972621180039246,
+        "std_dev": 0.016474580030572315
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.7454874822032973,
+        "count_ratio": 0.08362369337979095
+      },
+      "very_slow_rules_on_files": [
+        {
+          "fpath": "static\\js\\layout.js",
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 0.5298323631286621
+        },
+        {
+          "fpath": "static\\js\\excedente.js",
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 0.5319774150848389
+        },
+        {
+          "fpath": "static\\js\\layout.js",
+          "rule_id": "javascript.express.security.injection.raw-html-format.raw-html-format",
+          "time": 0.5520930290222168
+        },
+        {
+          "fpath": "static\\js\\cadastro.js",
+          "rule_id": "javascript.express.security.audit.express-ssrf.express-ssrf",
+          "time": 0.5935587882995605
+        },
+        {
+          "fpath": "geo.py",
+          "rule_id": "python.lang.security.audit.insecure-transport.requests.request-with-http.request-with-http",
+          "time": 0.6354198455810547
+        },
+        {
+          "fpath": "static\\js\\painel-excedentes.js",
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 0.6522524356842041
+        },
+        {
+          "fpath": "static\\js\\painel.js",
+          "rule_id": "javascript.express.security.injection.raw-html-format.raw-html-format",
+          "time": 0.7577884197235107
+        },
+        {
+          "fpath": "static\\js\\doacao.js",
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 0.780479907989502
+        },
+        {
+          "fpath": "static\\js\\dashboard.js",
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 1.2068507671356201
+        },
+        {
+          "fpath": "llm_service.py",
+          "rule_id": "python.lang.security.audit.insecure-transport.requests.request-with-http.request-with-http",
+          "time": 1.657510757446289
+        }
+      ]
+    },
+    "tainting_time": {
+      "total_time": 25.104142904281616,
+      "per_def_and_rule_time": {
+        "mean": 0.004364419837322951,
+        "std_dev": 0.0012582203852265516
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.7479846579125518,
+        "count_ratio": 0.011300417246175243
+      },
+      "very_slow_rules_on_defs": [
+        {
+          "fpath": "static\\js\\dashboard.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.x-frame-options-misconfiguration.x-frame-options-misconfiguration",
+          "time": 0.45222043991088867
+        },
+        {
+          "fpath": "static\\js\\layout.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.require-request.require-request",
+          "time": 0.47860193252563477
+        },
+        {
+          "fpath": "static\\js\\painel-excedentes.js",
+          "fline": 1,
+          "rule_id": "javascript.browser.security.raw-html-concat.raw-html-concat",
+          "time": 0.5056684017181396
+        },
+        {
+          "fpath": "static\\js\\painel.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.injection.raw-html-format.raw-html-format",
+          "time": 0.518031120300293
+        },
+        {
+          "fpath": "static\\js\\home.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.cors-misconfiguration.cors-misconfiguration",
+          "time": 0.5355098247528076
+        },
+        {
+          "fpath": "static\\js\\layout.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.x-frame-options-misconfiguration.x-frame-options-misconfiguration",
+          "time": 0.5417659282684326
+        },
+        {
+          "fpath": "static\\js\\home.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.require-request.require-request",
+          "time": 0.5704145431518555
+        },
+        {
+          "fpath": "static\\js\\layout.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.audit.xss.direct-response-write.direct-response-write",
+          "time": 0.6029191017150879
+        },
+        {
+          "fpath": "static\\js\\dashboard.js",
+          "fline": 1,
+          "rule_id": "javascript.express.security.require-request.require-request",
+          "time": 0.6046457290649414
+        },
+        {
+          "fpath": "static\\js\\home.js",
+          "fline": 1,
+          "rule_id": "javascript.lang.security.detect-eval-with-expression.detect-eval-with-expression",
+          "time": 0.7331936359405518
+        }
+      ]
+    },
+    "fixpoint_timeouts": [
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at Dashboard.py:248:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+        "location": {
+          "path": "Dashboard.py",
+          "start": {
+            "line": 248,
+            "col": 5,
+            "offset": 11454
+          },
+          "end": {
+            "line": 248,
+            "col": 21,
+            "offset": 11470
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at Excedentes.py:217:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+        "location": {
+          "path": "Excedentes.py",
+          "start": {
+            "line": 217,
+            "col": 5,
+            "offset": 9034
+          },
+          "end": {
+            "line": 217,
+            "col": 13,
+            "offset": 9042
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at scripts\\avaliar_modelos.py:169:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+        "location": {
+          "path": "scripts\\avaliar_modelos.py",
+          "start": {
+            "line": 169,
+            "col": 5,
+            "offset": 6785
+          },
+          "end": {
+            "line": 169,
+            "col": 21,
+            "offset": 6801
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at scripts\\avaliar_modelos.py:241:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+        "location": {
+          "path": "scripts\\avaliar_modelos.py",
+          "start": {
+            "line": 241,
+            "col": 5,
+            "offset": 11598
+          },
+          "end": {
+            "line": 241,
+            "col": 9,
+            "offset": 11602
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at scripts\\resumo_sast.py:191:4 [rules: 1, first: python.boto3.security.hardcoded-token.hardcoded-token]",
+        "location": {
+          "path": "scripts\\resumo_sast.py",
+          "start": {
+            "line": 191,
+            "col": 5,
+            "offset": 9044
+          },
+          "end": {
+            "line": 191,
+            "col": 12,
+            "offset": 9051
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at static\\js\\cadastro.js:1:0 [rules: 9, first: javascript.express.security.audit.express-ssrf.express-ssrf]",
+        "location": {
+          "path": "static\\js\\cadastro.js",
+          "start": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at static\\js\\excedente.js:1:0 [rules: 8, first: javascript.express.security.injection.raw-html-format.raw-html-format]",
+        "location": {
+          "path": "static\\js\\excedente.js",
+          "start": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at static\\js\\home.js:1:0 [rules: 6, first: javascript.express.security.injection.raw-html-format.raw-html-format]",
+        "location": {
+          "path": "static\\js\\home.js",
+          "start": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at static\\js\\layout.js:1:0 [rules: 8, first: javascript.express.security.injection.raw-html-format.raw-html-format]",
+        "location": {
+          "path": "static\\js\\layout.js",
+          "start": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          }
+        }
+      },
+      {
+        "error_type": "Fixpoint timeout",
+        "severity": "warn",
+        "message": "Fixpoint timeout while performing taint analysis at static\\js\\painel-excedentes.js:1:0 [rules: 2, first: javascript.express.security.injection.raw-html-format.raw-html-format]",
+        "location": {
+          "path": "static\\js\\painel-excedentes.js",
+          "start": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "col": 1,
+            "offset": 0
+          }
+        }
+      }
+    ],
+    "prefiltering": {
+      "project_level_time": 0.0,
+      "file_level_time": 0.0,
+      "rules_with_project_prefilters_ratio": 0.0,
+      "rules_with_file_prefilters_ratio": 0.9821114837885322,
+      "rules_selected_ratio": 0.052307938029068836,
+      "rules_matched_ratio": 0.052307938029068836
+    },
+    "targets": [],
+    "total_bytes": 0,
+    "max_memory_bytes": 1208411584
+  },
+  "engine_requested": "OSS",
+  "skipped_rules": [],
+  "profiling_results": []
+}

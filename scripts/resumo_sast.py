@@ -139,6 +139,43 @@ def _avaliar_gates(ferramentas, raiz):
                        "job ia falha se métricas caírem abaixo de modelo/limiares.json",
                        "passou" if passou_ia else "falhou" if passou_ia is False else "sem_dados",
                        detalhe_ia))
+
+    seguranca = raiz / "relatorios" / "seguranca"
+    semgrep = ferramentas.get("semgrep", {})
+    if semgrep.get("disponivel"):
+        erros = semgrep.get("severidades", {}).get("ERROR", 0)
+        gates.append(_gate("semgrep-erro",
+                           "sast-semgrep falha com achado de severidade ERROR",
+                           "passou" if erros == 0 else "falhou",
+                           f"{erros} achado(s) ERROR no último relatório"))
+    else:
+        gates.append(_gate("semgrep-erro",
+                           "sast-semgrep falha com achado de severidade ERROR",
+                           "sem_dados", "relatório semgrep.json ausente"))
+
+    audit = ferramentas.get("pip-audit", {})
+    if audit.get("disponivel"):
+        vulns = audit.get("vulnerabilidades", 0)
+        gates.append(_gate("sca-pip-audit",
+                           "sca-pip-audit falha com qualquer CVE nas dependências",
+                           "passou" if vulns == 0 else "falhou",
+                           f"{vulns} vulnerabilidade(s) nas dependências"))
+    else:
+        gates.append(_gate("sca-pip-audit",
+                           "sca-pip-audit falha com qualquer CVE nas dependências",
+                           "sem_dados", "relatório pip-audit.json ausente"))
+
+    leaks = ferramentas.get("gitleaks-dir", {})
+    if leaks.get("disponivel"):
+        achados = leaks.get("achados", 0)
+        gates.append(_gate("segredos-gitleaks",
+                           "segredos-gitleaks falha com qualquer segredo nos arquivos",
+                           "passou" if achados == 0 else "falhou",
+                           f"{achados} segredo(s) fora de .gitleaksignore"))
+    else:
+        gates.append(_gate("segredos-gitleaks",
+                           "segredos-gitleaks falha com qualquer segredo nos arquivos",
+                           "sem_dados", "relatório gitleaks-dir.json ausente"))
     return gates
 
 
@@ -169,6 +206,28 @@ def resumir(raiz=RAIZ):
         if nome != "bandit":
             arquivos[nome]["segredos"] = contagens["segredos"]
             arquivos[nome]["configuracoes"] = contagens["configuracoes"]
+    seguranca = raiz / "relatorios" / "seguranca"
+    rel_semgrep = seguranca / "semgrep.json"
+    if rel_semgrep.exists():
+        doc = json.loads(rel_semgrep.read_text(encoding="utf-8-sig"))
+        sev = Counter(r.get("extra", {}).get("severity", "UNKNOWN").upper()
+                      for r in doc.get("results", []))
+        arquivos["semgrep"] = {"disponivel": True, "severidades": dict(sev)}
+    else:
+        arquivos["semgrep"] = {"disponivel": False}
+    rel_audit = seguranca / "pip-audit.json"
+    if rel_audit.exists():
+        doc = json.loads(rel_audit.read_text(encoding="utf-8"))
+        deps = doc if isinstance(doc, list) else doc.get("dependencies", [])
+        arquivos["pip-audit"] = {"disponivel": True,
+                                 "vulnerabilidades": sum(len(d.get("vulns", [])) for d in deps)}
+    else:
+        arquivos["pip-audit"] = {"disponivel": False}
+    for nome in ("gitleaks-dir", "gitleaks-git"):
+        rel = seguranca / f"{nome}.json"
+        arquivos[nome] = ({"disponivel": True,
+                           "achados": len(json.loads(rel.read_text(encoding="utf-8")))}
+                          if rel.exists() else {"disponivel": False})
     return {"ferramentas": arquivos,
             "gates": _avaliar_gates(arquivos, raiz),
             "stride": contar_stride((raiz / "docs" / "stride.md").read_text(encoding="utf-8")),

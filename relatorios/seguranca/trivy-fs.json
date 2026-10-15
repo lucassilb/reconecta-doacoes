@@ -1,0 +1,178 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.76.0"
+  },
+  "ReportID": "01a13c91-60fc-7205-9f12-efec8fafb648",
+  "CreatedAt": "2026-10-14T19:38:42.9401324-03:00",
+  "ArtifactName": ".",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        {
+          "Name": "Flask",
+          "Identifier": {
+            "PURL": "pkg:pypi/flask@3.1.3",
+            "UID": "a4e8c04b81a3897f"
+          },
+          "Version": "3.1.3",
+          "Locations": [
+            {
+              "StartLine": 1,
+              "EndLine": 1
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "Flask-SQLAlchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/flask-sqlalchemy@3.1.1",
+            "UID": "ea7ab6ca8349e86f"
+          },
+          "Version": "3.1.1",
+          "Locations": [
+            {
+              "StartLine": 3,
+              "EndLine": 3
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "SQLAlchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlalchemy@2.1.2",
+            "UID": "dde866b7a9ab174b"
+          },
+          "Version": "2.1.2",
+          "Locations": [
+            {
+              "StartLine": 9,
+              "EndLine": 9
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "Werkzeug",
+          "Identifier": {
+            "PURL": "pkg:pypi/werkzeug@3.1.9",
+            "UID": "ac2359fbbdaeb936"
+          },
+          "Version": "3.1.9",
+          "Locations": [
+            {
+              "StartLine": 7,
+              "EndLine": 7
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "flask-restx",
+          "Identifier": {
+            "PURL": "pkg:pypi/flask-restx@1.3.2",
+            "UID": "a9d225a4552c2e52"
+          },
+          "Version": "1.3.2",
+          "Locations": [
+            {
+              "StartLine": 2,
+              "EndLine": 2
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "gunicorn",
+          "Identifier": {
+            "PURL": "pkg:pypi/gunicorn@23.0.0",
+            "UID": "20c7afb25dab9964"
+          },
+          "Version": "23.0.0",
+          "Locations": [
+            {
+              "StartLine": 8,
+              "EndLine": 8
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "psycopg",
+          "Identifier": {
+            "PURL": "pkg:pypi/psycopg@3.3.6",
+            "UID": "a738db0fc4bac35a"
+          },
+          "Version": "3.3.6",
+          "Locations": [
+            {
+              "StartLine": 5,
+              "EndLine": 5
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "python-dotenv",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dotenv@1.2.2",
+            "UID": "1d2780f9bb99a5c1"
+          },
+          "Version": "1.2.2",
+          "Locations": [
+            {
+              "StartLine": 4,
+              "EndLine": 4
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "requests",
+          "Identifier": {
+            "PURL": "pkg:pypi/requests@2.33.0",
+            "UID": "36f95218e32c40bd"
+          },
+          "Version": "2.33.0",
+          "Locations": [
+            {
+              "StartLine": 6,
+              "EndLine": 6
+            }
+          ],
+          "AnalyzedBy": "pip"
+        },
+        {
+          "Name": "tzdata",
+          "Identifier": {
+            "PURL": "pkg:pypi/tzdata@2026.4",
+            "UID": "b0f9140ea406e25c"
+          },
+          "Version": "2026.4",
+          "Locations": [
+            {
+              "StartLine": 10,
+              "EndLine": 10
+            }
+          ],
+          "AnalyzedBy": "pip"
+        }
+      ]
+    },
+    {
+      "Target": "Dockerfile",
+      "Class": "config",
+      "Type": "dockerfile",
+      "MisconfSummary": {
+        "Successes": 27,
+        "Failures": 0
+      }
+    }
+  ]
+}

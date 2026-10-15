@@ -14,8 +14,8 @@ jobs:
   testes:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
           cache: pip
@@ -23,7 +23,7 @@ jobs:
       - run: python -m pytest -q --junitxml=pytest.xml
         env:
           DATABASE_URL: sqlite://
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: pytest-junit
@@ -33,8 +33,8 @@ jobs:
   ia:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
           cache: pip
@@ -43,7 +43,7 @@ jobs:
         run: python scripts/ciclo_ia.py
         env:
           DATABASE_URL: sqlite://
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: metricas-ia
@@ -55,8 +55,8 @@ jobs:
   sast-bandit:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
           cache: pip
@@ -66,7 +66,7 @@ jobs:
           mkdir -p reports
           bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f json -o reports/bandit.json || true
           bandit -r . -x ./tests,./scripts,./.venv,./venv,./instance,./relatorios,./__pycache__ -f txt -o reports/bandit.txt || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: bandit-report
@@ -78,12 +78,12 @@ jobs:
   sast-trivy:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - run: mkdir -p reports
       - name: Construir imagem para varredura
         run: docker build -t reconecta:ci .
       - name: Arquivos, dependencias, segredos e configuracao (tabela)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -93,7 +93,7 @@ jobs:
           output: reports/trivy-fs.txt
           exit-code: "0"
       - name: Arquivos (SARIF)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -103,7 +103,7 @@ jobs:
           output: reports/trivy-fs.sarif
           exit-code: "0"
       - name: Arquivos (JSON para resumo)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -113,7 +113,7 @@ jobs:
           output: reports/trivy-fs.json
           exit-code: "0"
       - name: Configuração (JSON para resumo)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
           scan-ref: .
@@ -121,7 +121,7 @@ jobs:
           output: reports/trivy-config.json
           exit-code: "0"
       - name: Imagem (tabela)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
           image-ref: reconecta:ci
@@ -130,7 +130,7 @@ jobs:
           output: reports/trivy-image.txt
           exit-code: "0"
       - name: Imagem (SARIF)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
           image-ref: reconecta:ci
@@ -139,7 +139,7 @@ jobs:
           output: reports/trivy-image.sarif
           exit-code: "0"
       - name: Imagem (JSON para resumo)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
           image-ref: reconecta:ci
@@ -147,14 +147,14 @@ jobs:
           format: json
           output: reports/trivy-image.json
           exit-code: "0"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: trivy-report
           path: reports/trivy-*
           if-no-files-found: warn
       - name: "Gate: bloquear alta/critica corrigivel nos arquivos"
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -164,7 +164,7 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
       - name: "Gate: bloquear alta/critica na configuracao (IaC)"
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
           scan-ref: .
@@ -172,7 +172,7 @@ jobs:
           exit-code: "1"
       - name: "Gate: bloquear critica corrigivel na imagem"
         if: always()
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
           image-ref: reconecta:ci
@@ -181,10 +181,103 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
 
+  sast-semgrep:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - run: pip install semgrep
+      - name: Relatorio completo (p/python, flask, secrets, owasp)
+        run: |
+          mkdir -p reports
+          semgrep --config p/python --config p/flask --config p/secrets --config p/owasp-top-ten \
+            --json -o reports/semgrep.json --exclude tests --exclude .venv . || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: semgrep-report
+          path: reports/semgrep.json
+          if-no-files-found: warn
+      - name: "Gate: regras locais (ERROR falha)"
+        run: semgrep --config semgrep-local.yml --error --quiet .
+      - name: "Gate: severidade ERROR nos pacotes oficiais"
+        run: |
+          semgrep --config p/python --config p/flask --config p/secrets --config p/owasp-top-ten \
+            --severity ERROR --error --quiet --exclude tests --exclude .venv .
+
+  sca-pip-audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - run: pip install pip-audit cyclonedx-bom
+      - name: Relatorio + SBOM
+        run: |
+          mkdir -p reports
+          pip-audit -r requirements.txt -r requirements-dev.txt -f json -o reports/pip-audit.json || true
+          cat requirements.txt requirements-dev.txt > /tmp/reqs.txt
+          cyclonedx-py requirements /tmp/reqs.txt -o reports/sbom-cyclonedx.json --of JSON
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: sca-report
+          path: reports/
+          if-no-files-found: warn
+      - name: "Gate: nenhuma CVE nas dependencias"
+        run: pip-audit -r requirements.txt -r requirements-dev.txt --strict
+
+  segredos-gitleaks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Instalar gitleaks
+        run: |
+          curl -sL -o /tmp/gitleaks.tar.gz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz
+          sudo tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks
+      - name: Relatorio (arquivos + historico)
+        run: |
+          mkdir -p reports
+          gitleaks dir . -r reports/gitleaks-dir.json --exit-code 0
+          gitleaks git . -r reports/gitleaks-git.json --exit-code 0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: gitleaks-report
+          path: reports/
+          if-no-files-found: warn
+      - name: "Gate: nenhum segredo nos arquivos atuais"
+        run: gitleaks dir . --exit-code 1
+
+  guardas:
+    name: "Enquanto coda (pre-commit)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Ferramentas de sistema dos hooks
+        run: |
+          pip install pre-commit semgrep pip-audit
+          curl -sL -o /tmp/gitleaks.tar.gz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz
+          sudo tar -xzf /tmp/gitleaks.tar.gz -C /usr/local/bin gitleaks
+      - name: "Gate: mesmos hooks do commit local, em todos os arquivos"
+        run: pre-commit run --all-files
+
   docker:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Construir e subir Compose
         run: |
           docker compose build app
@@ -199,31 +292,43 @@ jobs:
         run: docker compose down -v
 
   sast-resumo:
-    needs: [sast-bandit, sast-trivy]
+    needs: [sast-bandit, sast-trivy, sast-semgrep, sca-pip-audit, segredos-gitleaks]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: bandit-report
           path: relatorios/sast
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: trivy-report
           path: relatorios/sast
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: semgrep-report
+          path: relatorios/seguranca
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: sca-report
+          path: relatorios/seguranca
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: gitleaks-report
+          path: relatorios/seguranca
       - name: Resumir varreduras e STRIDE
         run: python scripts/resumo_sast.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: sast-resumo
           path: relatorios/sast/resumo.json
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: [testes, ia, sast-bandit, sast-trivy, sast-resumo, docker]
+    needs: [testes, ia, sast-bandit, sast-trivy, sast-semgrep, sca-pip-audit, segredos-gitleaks, sast-resumo, docker, guardas]
     runs-on: ubuntu-24.04
     env:
       RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

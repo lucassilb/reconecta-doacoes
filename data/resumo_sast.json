@@ -49,6 +49,22 @@
       },
       "segredos": 0,
       "configuracoes": 0
+    },
+    "semgrep": {
+      "disponivel": true,
+      "severidades": {}
+    },
+    "pip-audit": {
+      "disponivel": true,
+      "vulnerabilidades": 0
+    },
+    "gitleaks-dir": {
+      "disponivel": true,
+      "achados": 0
+    },
+    "gitleaks-git": {
+      "disponivel": true,
+      "achados": 0
     }
   },
   "gates": [
@@ -81,6 +97,24 @@
       "regra": "job ia falha se métricas caírem abaixo de modelo/limiares.json",
       "resultado": "passou",
       "detalhe": "todas as métricas com limiar atendem"
+    },
+    {
+      "gate": "semgrep-erro",
+      "regra": "sast-semgrep falha com achado de severidade ERROR",
+      "resultado": "passou",
+      "detalhe": "0 achado(s) ERROR no último relatório"
+    },
+    {
+      "gate": "sca-pip-audit",
+      "regra": "sca-pip-audit falha com qualquer CVE nas dependências",
+      "resultado": "passou",
+      "detalhe": "0 vulnerabilidade(s) nas dependências"
+    },
+    {
+      "gate": "segredos-gitleaks",
+      "regra": "segredos-gitleaks falha com qualquer segredo nos arquivos",
+      "resultado": "passou",
+      "detalhe": "0 segredo(s) fora de .gitleaksignore"
     }
   ],
   "stride": {

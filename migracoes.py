@@ -23,7 +23,7 @@ def _migrar_foto_contribuicao(engine):
     if "foto_dados" not in colunas:
         tipo = "BYTEA" if engine.dialect.name == "postgresql" else "BLOB"
         with engine.begin() as conexao:
-            conexao.execute(text(f"ALTER TABLE contribuicoes ADD COLUMN foto_dados {tipo}"))
+            conexao.execute(text(f"ALTER TABLE contribuicoes ADD COLUMN foto_dados {tipo}"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
 
 
 def _restricao_postgresql(conexao, tabela, nome):
@@ -76,10 +76,10 @@ def _migrar_integridade_postgresql(engine):
                 continue
             validada = _restricao_postgresql(conexao, tabela, nome)
             if validada is None:
-                conexao.execute(text(f"ALTER TABLE {tabela} ADD CONSTRAINT {nome} {definicao} NOT VALID"))
+                conexao.execute(text(f"ALTER TABLE {tabela} ADD CONSTRAINT {nome} {definicao} NOT VALID"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
             if validada is not True:
                 try:
-                    conexao.execute(text(f"ALTER TABLE {tabela} VALIDATE CONSTRAINT {nome}"))
+                    conexao.execute(text(f"ALTER TABLE {tabela} VALIDATE CONSTRAINT {nome}"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
                 except DBAPIError as erro:
                     raise RuntimeError(
                         f"Migração de integridade interrompida: dados existentes violam "
@@ -160,10 +160,10 @@ def _migrar_consentimento(engine):
         colunas = {coluna["name"] for coluna in inspector.get_columns(tabela)}
         with engine.begin() as conexao:
             if "consentimento_versao" not in colunas:
-                conexao.execute(text(
+                conexao.execute(text(  # nosemgrep (identificadores fixos)
                     f"ALTER TABLE {tabela} ADD COLUMN consentimento_versao VARCHAR(20)"))  # tabela da tupla fixa; # nosec B608
             if "consentimento_em" not in colunas:
-                conexao.execute(text(
+                conexao.execute(text(  # nosemgrep (identificadores fixos)
                     f"ALTER TABLE {tabela} ADD COLUMN consentimento_em TIMESTAMP"))  # tabela da tupla fixa; # nosec B608
 
 
@@ -177,7 +177,7 @@ def _migrar_pedidos(engine):
         with engine.connect() as conexao:
             for tabela in ("arrecadacoes", "contribuicoes"):
                 if tabela in tabelas and (tabela == "arrecadacoes" or contribuicoes_antigas):
-                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608
+                    if conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608; # nosemgrep
                         raise RuntimeError(
                             f"Migração de pedidos interrompida: {tabela} contém dados; "
                             "não é seguro descartá-los automaticamente.")
@@ -282,7 +282,7 @@ def _migrar_doacoes_postgresql(engine):
                              ("retirada_endereco", "VARCHAR(200)"),
                              ("retirada_municipio", "VARCHAR(80)"),
                              ("retirada_uf", "CHAR(2)")):
-            conexao.execute(text(f"ALTER TABLE doacoes ADD COLUMN IF NOT EXISTS {coluna} {tipo}"))
+            conexao.execute(text(f"ALTER TABLE doacoes ADD COLUMN IF NOT EXISTS {coluna} {tipo}"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
         if not conexao.execute(text("""
             SELECT 1 FROM pg_constraint
             WHERE conname = 'fk_doacao_doador' AND conrelid = 'doacoes'::regclass
@@ -310,7 +310,7 @@ def aplicar_migracoes(engine=None):
         "arrecadacao_id" in {c["name"] for c in inspector.get_columns("contribuicoes")}):
         with engine.connect() as conexao:
             for tabela in ("arrecadacoes", "contribuicoes"):
-                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608
+                if tabela in tabelas and conexao.execute(text(f"SELECT COUNT(*) FROM {tabela}")).scalar():  # tabela da tupla fixa; # nosec B608; # nosemgrep
                     raise RuntimeError(f"Migração de pedidos interrompida: {tabela} contém dados.")
     inspector = inspect(engine)
     for tabela in ("estabelecimentos", "doadores"):
@@ -319,7 +319,7 @@ def aplicar_migracoes(engine=None):
         colunas = {coluna["name"] for coluna in inspector.get_columns(tabela)}
         if "senha_hash" not in colunas:
             with engine.begin() as conexao:
-                conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN senha_hash VARCHAR(255)"))
+                conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN senha_hash VARCHAR(255)"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
     if inspector.has_table("estabelecimentos"):
         colunas = {coluna["name"] for coluna in inspect(engine).get_columns("estabelecimentos")}
         definicoes = {
@@ -331,7 +331,7 @@ def aplicar_migracoes(engine=None):
         with engine.begin() as conexao:
             for coluna, definicao in definicoes.items():
                 if coluna not in colunas:
-                    conexao.execute(text(f"ALTER TABLE estabelecimentos ADD COLUMN {coluna} {definicao}"))
+                    conexao.execute(text(f"ALTER TABLE estabelecimentos ADD COLUMN {coluna} {definicao}"))  # identificadores fixos (tabela/coluna de tuplas literais); # nosec B608; # nosemgrep
     _migrar_consentimento(engine)
     if inspector.has_table("doacoes"):
         if engine.dialect.name == "sqlite":
